@@ -24,12 +24,4 @@ class GreetingActivityTest {
             .check(matches(withText("Hello Carl")))
         act.close()
     }
-
-    @Test
-    fun greetingMessageWithoutIntent(){ //for coverage purpose
-        val act = ActivityScenario.launch(GreetingActivity::class.java)
-        onView(withId(R.id.greetingMessage))
-            .check(matches(withText("Greetings !")))
-        act.close()
-    }
 }

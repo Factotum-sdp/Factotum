@@ -1,4 +1,4 @@
-package com.github.schuetzcarl.bootcamp
+package com.github.factotum_sdp.factotum
 
 import android.content.Intent
 import androidx.test.core.app.ActivityScenario

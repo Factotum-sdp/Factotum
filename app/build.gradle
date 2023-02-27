@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace 'com.github.schuetzcarl.bootcamp'
+    namespace 'com.github.factotum_sdp.factotum'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.github.schuetzcarl.bootcamp"
+        applicationId 'com.github.factotum_sdp.factotum'
         minSdk 24
         targetSdk 33
         versionCode 1

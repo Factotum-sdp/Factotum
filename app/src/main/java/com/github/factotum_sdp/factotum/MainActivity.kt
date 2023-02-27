@@ -1,12 +1,10 @@
-package com.github.schuetzcarl.bootcamp
+package com.github.factotum_sdp.factotum
 
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
-
-import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
 

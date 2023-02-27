@@ -1,4 +1,4 @@
-package com.github.schuetzcarl.bootcamp
+package com.github.factotum_sdp.factotum
 
 import android.os.Bundle
 import android.widget.TextView

@@ -12,7 +12,7 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "My Application1"
+rootProject.name = "Factotum"
 include ':app'
 
 ext.isCiServer = System.getenv().containsKey("CIRRUS_CI")

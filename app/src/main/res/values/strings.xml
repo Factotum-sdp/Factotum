@@ -3,4 +3,8 @@
     <string name="validate">validate</string>
     <string name="your_name">Your name</string>
     <string name="greetings">Greetings !</string>
+    <string name="phone">Phone</string>
+    <string name="email">Email</string>
+    <string name="Set">Set</string>
+    <string name="get">Get</string>
 </resources>

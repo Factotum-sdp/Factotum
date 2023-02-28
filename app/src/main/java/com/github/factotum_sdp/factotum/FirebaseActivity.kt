@@ -18,6 +18,8 @@ class FirebaseActivity : AppCompatActivity() {
         setContentView(R.layout.activity_firebase)
     }
 
+
+    // Retrieve the email from the database using the phone number
     fun get(view : View) {
         val emailView = findViewById<EditText>(R.id.editTextEmailAddress) as TextView
         val phoneView = findViewById<EditText>(R.id.editTextPhone) as TextView
@@ -26,7 +28,8 @@ class FirebaseActivity : AppCompatActivity() {
 
         val future = CompletableFuture<String>()
 
-        //Get in the database the values of the mail and phone
+        //Get in the database the email corresponding to the phone number
+        // using the phone number as a key
         db.child(phoneText).get().addOnSuccessListener {
             if (it.value == null) future.completeExceptionally(NoSuchFieldException())
             else future.complete(it.value as String)
@@ -34,12 +37,14 @@ class FirebaseActivity : AppCompatActivity() {
             future.completeExceptionally(it)
         }
 
-        //Set the mail and phone in the view
+        //Set the email we received from the database in the email field
+        //as an answer to the user
         future.thenAccept {
             emailView.text = it
         }
     }
 
+    // Set the email in the database using the phone number as a key
     fun set(view : View) {
         val emailView = findViewById<EditText>(R.id.editTextEmailAddress) as TextView
         val phoneView = findViewById<EditText>(R.id.editTextPhone) as TextView
@@ -47,6 +52,7 @@ class FirebaseActivity : AppCompatActivity() {
         val emailText = emailView.text.toString()
         val phoneText = phoneView.text.toString()
 
+        // Simply set the email in the database using the phone number as a key
         db.child(phoneText).setValue(emailText)
     }
 

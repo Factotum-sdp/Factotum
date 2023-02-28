@@ -24,18 +24,19 @@ class FirebaseActivityTest {
         FirebaseActivity::class.java
     )
 
-    //Execute one time before the test is launched
     companion object {
-
         private val database = Firebase.database
 
+        // This method is only call once before all
+        // of the tests of the class
         @BeforeClass
         @JvmStatic
         fun beforeClass() {
-            // With a DatabaseReference, write null to clear the database.
+            // Connect to the emulator database
             database.useEmulator("10.0.2.2", 9000)
         }
 
+        // Clean up the database after each test
         @After
         fun cleanUp() {
             // With a DatabaseReference, write null to clear the database.
@@ -46,7 +47,7 @@ class FirebaseActivityTest {
 
     @Test
     fun setAndGetTest() {
-        // Set the email and phone number
+        // Tap the email and the phone number and click on the set button
         Espresso.onView(withId(R.id.editTextEmailAddress)).perform(ViewActions.typeText("jules.perrin@epfl.ch"))
             .perform(ViewActions.closeSoftKeyboard())
         Espresso.onView(withId(R.id.editTextPhone)).perform(ViewActions.typeText("123-45-6789"))

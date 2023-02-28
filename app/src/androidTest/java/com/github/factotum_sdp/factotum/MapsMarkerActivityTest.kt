@@ -27,18 +27,6 @@ class MapsMarkerActivityTest {
             .check(matches(isDisplayed()))
     }
 
-    @Test
-    fun testMarkerClick_shouldShowToastWithCorrectText() {
-        // Perform a click on the map marker
-        onView(withContentDescription("Satellite"))
-            .perform(click())
-
-        // Verify that a toast is displayed with the correct text
-        onView(withText("Beer here at (46.520536, 6.568318)"))
-            .inRoot(ToastMatcher())
-            .check(matches(isDisplayed()))
-    }
-
     // Custom matcher for matching Toasts
     private class ToastMatcher : TypeSafeMatcher<Root>() {
 

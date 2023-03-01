@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Factotum</string>
-    <string name="validate">validate</string>
-    <string name="your_name">Your name</string>
-    <string name="greetings">Greetings !</string>
+    <string name="userNameTextFieldLabel">Enter your name</string>
+    <string name="userNameIntentId">userName</string>
+    <string name="validateButton">Validate</string>
+    <string name="greetingMessage">Welcome %1$s</string>
 </resources>

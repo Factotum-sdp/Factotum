@@ -1,19 +1,32 @@
 package com.github.factotum_sdp.factotum
 
 import android.os.Bundle
-import android.widget.TextView
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import com.github.factotum_sdp.factotum.ui.theme.FactotumTheme
 
 class GreetingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setContentView(R.layout.activity_greeting)
-        val plainText: TextView = findViewById(R.id.greetingMessage)
-        plainText.text =
-        buildString {
-            append("Hello ")
-            append(intent.getStringExtra("userName"))
+        setContent {
+            FactotumTheme {
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight()
+                    ) {
+                        val userName = intent.getStringExtra(getString(R.string.userNameIntentId))
+                        Text(text = getString(R.string.greetingMessage, userName))
+                    }
+                }
+            }
         }
     }
 }

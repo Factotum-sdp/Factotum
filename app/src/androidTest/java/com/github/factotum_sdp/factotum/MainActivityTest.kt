@@ -1,15 +1,13 @@
 package com.github.factotum_sdp.factotum
 
-import androidx.test.espresso.Espresso.onView
+import androidx.annotation.StringRes
+import androidx.compose.ui.test.*
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.espresso.action.ViewActions.*
-import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
-import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtra
-import androidx.test.espresso.matcher.ViewMatchers.withText
-import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 
 import org.junit.Rule
@@ -25,42 +23,67 @@ class MainActivityTest {
     private val userName = "Carl"
 
     @get:Rule
-    var testRule = ActivityScenarioRule(
-        MainActivity::class.java
-    )
+    var composeRule = createAndroidComposeRule<MainActivity>()
 
     @Test
-    fun userNameEditTextIsCorrectlyEdited() {
-        onView(withId(R.id.userNameEditText))
-            .perform(typeText(userName), closeSoftKeyboard())
-            .check(matches(withText(userName))
-        )
+    fun userNameEditTextLabelIsDisplayed() {
+        composeRule
+            .onNodeWithText(strRes(R.string.userNameTextFieldLabel))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun validateButtonIsDisplayed() {
+        composeRule
+            .onNodeWithText(strRes(R.string.validateButton))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun userNameIsDisplayedAfterEdition() {
+        performUserNameEdit()
+        composeRule.onNodeWithText(userName).assertIsDisplayed()
     }
 
     @Test
     fun intentIsCorrectlyFired() {
         Intents.init()
-        onView(withId(R.id.userNameEditText)).perform(typeText(userName), closeSoftKeyboard())
-        onView(withId(R.id.validateButton)).perform(click())
+        performUserNameEdit()
+        composeRule.onNodeWithText("Validate").performClick()
         intended(
             allOf(
                 hasComponent(GreetingActivity::class.java.name),
-                hasExtra("userName", userName)
+                hasExtra(strRes(R.string.userNameIntentId), userName)
             )
         )
         Intents.release()
     }
 
     @Test
-    fun endToEndCheckGreetingMessage() {
-        onView(withId(R.id.userNameEditText)).perform(typeText(userName), closeSoftKeyboard())
-        onView(withId(R.id.validateButton)).perform(click())
-        onView(withId(R.id.greetingMessage)).check(matches(withText("Hello Carl")))
+    fun endToEndGreetingMessage() {
+        performUserNameEdit()
+        composeRule.onNodeWithText(strRes(R.string.validateButton)).performClick()
+        composeRule
+            .onNodeWithText(composeRule.activity.getString(R.string.greetingMessage, userName))
+            .assertIsDisplayed()
     }
 
     @Test
-    fun endToEndCheckWithoutUserName() {
-        onView(withId(R.id.validateButton)).perform(click())
-        onView(withId(R.id.greetingMessage)).check(matches(withText("Hello ")))
+    fun endToEndGreetingMessageWithoutUserName() {
+        composeRule.onNodeWithText(strRes(R.string.validateButton)).performClick()
+        composeRule
+            .onNodeWithText(composeRule.activity.getString(R.string.greetingMessage, ""))
+            .assertIsDisplayed()
+    }
+
+    private fun performUserNameEdit() {
+        composeRule
+            .onNodeWithText(strRes(R.string.userNameTextFieldLabel))
+            .performTextInput(userName)
+        closeSoftKeyboard()
+    }
+
+    private fun strRes(@StringRes resId: Int): String {
+        return composeRule.activity.getString(resId)
     }
 }

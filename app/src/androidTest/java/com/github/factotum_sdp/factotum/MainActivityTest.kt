@@ -44,23 +44,9 @@ class MainActivityTest {
         onView(withId(R.id.validateButton)).perform(click())
         intended(
             allOf(
-                hasComponent(GreetingActivity::class.java.name),
-                hasExtra("userName", userName)
+                hasComponent(MapsMarkerActivity::class.java.name)
             )
         )
         Intents.release()
-    }
-
-    @Test
-    fun endToEndCheckGreetingMessage() {
-        onView(withId(R.id.userNameEditText)).perform(typeText(userName), closeSoftKeyboard())
-        onView(withId(R.id.validateButton)).perform(click())
-        onView(withId(R.id.greetingMessage)).check(matches(withText("Hello Carl")))
-    }
-
-    @Test
-    fun endToEndCheckWithoutUserName() {
-        onView(withId(R.id.validateButton)).perform(click())
-        onView(withId(R.id.greetingMessage)).check(matches(withText("Hello ")))
     }
 }

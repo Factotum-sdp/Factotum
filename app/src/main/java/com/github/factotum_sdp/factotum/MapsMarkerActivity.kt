@@ -55,7 +55,7 @@ class MapsMarkerActivity : AppCompatActivity(), GoogleMap.OnMarkerClickListener,
     override fun onMarkerClick(marker: Marker): Boolean {
         val text = "Beer here at (46.520536, 6.568318)"
 
-        // Check if a click count was set, then display the click count.
+        // Display the toast.
         Toast.makeText(
             this,
             text,

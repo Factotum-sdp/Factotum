@@ -26,25 +26,4 @@ class MapsMarkerActivityTest {
         onView(withId(R.id.map))
             .check(matches(isDisplayed()))
     }
-
-    // Custom matcher for matching Toasts
-    private class ToastMatcher : TypeSafeMatcher<Root>() {
-
-        override fun describeTo(description: Description?) {
-            description?.appendText("is toast")
-        }
-
-        override fun matchesSafely(root: Root?): Boolean {
-            val type = root?.windowLayoutParams?.get()?.type
-            if (type == WindowManager.LayoutParams.TYPE_TOAST) {
-                val windowToken = root.decorView?.windowToken
-                val appToken = root.decorView?.applicationWindowToken
-                if (windowToken === appToken) {
-                    // Means this window isn't contained by any other windows.
-                    return true
-                }
-            }
-            return false
-        }
-    }
 }

@@ -6,7 +6,7 @@ container:
 
 env:
   CC_TEST_REPORTER_ID: ENCRYPTED[ca4c0af7dbdaac713bbfd84dcba3b49a8d8d65f83693235e570b944f676fa090bbd8bdb55093d5b6c2be7ef8adb8a92a]
-  MAPS_API_KEY: ENCRYPTED[AIzaSyC2NVtIK9zER4GXuVjdsbKkeauZMwdDwiA]
+  MAPS_API_KEY: ENCRYPTED[!4e988f6e5fd4033f134eb0fb2ae1e831a7734e5f233692435988a5355864357f3229e4f975aedfc95d839b1ed35acb6d!]
 
 check_android_task:
   name: Run Android tests

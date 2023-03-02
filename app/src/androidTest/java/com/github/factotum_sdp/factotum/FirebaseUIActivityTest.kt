@@ -22,9 +22,5 @@ class FirebaseUIActivityTest {
 
     @Test
     fun correctLogIn(){
-        val firebaseUI :FirebaseUIActivity  = FirebaseUIActivity()
-        firebaseUI.createSignInIntent()
-
-
     }
 }

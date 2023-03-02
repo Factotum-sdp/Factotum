@@ -24,6 +24,9 @@
             android:name=".GreetingActivity"
             android:exported="true">
         </activity>
+        <activity android:name=".FirebaseActivity"
+            android:exported="true">
+        </activity>
     </application>
 
 </manifest>

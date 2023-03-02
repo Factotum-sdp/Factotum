@@ -3,6 +3,7 @@ package com.github.factotum_sdp.factotum
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 
 import android.widget.Button
 
@@ -12,7 +13,7 @@ import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.firebase.auth.FirebaseAuth
 
-class FirebaseUIActivity : AppCompatActivity() {
+class FirebaseUIActivity : AppCompatActivity(), FirebaseUI {
     private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
     ) { res -> this.onSignInResult(res)
@@ -28,7 +29,7 @@ class FirebaseUIActivity : AppCompatActivity() {
     }
 
     //create and launch the sign in intent
-    private fun createSignInIntent() {
+    override fun createSignInIntent() {
         // authentication providers
         val providers = arrayListOf(
             AuthUI.IdpConfig.GoogleBuilder().build()
@@ -43,7 +44,7 @@ class FirebaseUIActivity : AppCompatActivity() {
     }
 
     //callback on sign in
-    private fun onSignInResult(result : FirebaseAuthUIAuthenticationResult) {
+    override fun onSignInResult(result : FirebaseAuthUIAuthenticationResult) {
         val response = result.idpResponse
 
         if (result.resultCode == RESULT_OK){
@@ -51,7 +52,7 @@ class FirebaseUIActivity : AppCompatActivity() {
 
             val user = FirebaseAuth.getInstance().currentUser
             val intent = Intent(this, LoggedIn::class.java)
-            intent.putExtra("userEmail", user.email)
+            intent.putExtra("userEmail", user!!.email)
             intent.putExtra("userName", user.displayName)
             startActivity(intent)
         } else {
@@ -60,6 +61,7 @@ class FirebaseUIActivity : AppCompatActivity() {
                 // authentication canceled
             } else {
                 val error = response.error
+                Log.e("LOGIN_ERROR", error.toString())
             }
         }
     }

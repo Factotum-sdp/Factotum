@@ -21,5 +21,11 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra("userName", text.text.toString())
             startActivity(intent)
         }
+
+        val loginButton : Button = findViewById(R.id.goToLogin)
+        loginButton.setOnClickListener {
+            val intent = Intent(this, FirebaseUIActivity::class.java)
+            startActivity(intent)
+        }
     }
 }

@@ -6,12 +6,14 @@ import android.os.Bundle
 import android.util.Log
 
 import android.widget.Button
+import android.widget.TextView
 
 import com.firebase.ui.auth.AuthUI
 
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.firebase.auth.FirebaseAuth
+import org.w3c.dom.Text
 
 class FirebaseUIActivity : AppCompatActivity(), FirebaseUI {
     private val signInLauncher = registerForActivityResult(
@@ -25,6 +27,14 @@ class FirebaseUIActivity : AppCompatActivity(), FirebaseUI {
         val login: Button = findViewById(R.id.Login)
         login.setOnClickListener {
             createSignInIntent()
+        }
+        val logout: Button = findViewById(R.id.logout)
+        logout.setOnClickListener{
+            signOut()
+        }
+        val delete: Button = findViewById(R.id.delete)
+        delete.setOnClickListener{
+            delete()
         }
     }
 
@@ -46,11 +56,18 @@ class FirebaseUIActivity : AppCompatActivity(), FirebaseUI {
     override fun signOut() {
         AuthUI.getInstance()
             .signOut(this)
+            .addOnCompleteListener{
+                val text: TextView = findViewById(R.id.loggedInText)
+                text.text = buildString { append("You are now logged out") }
+            }
     }
 
     override fun delete() {
         AuthUI.getInstance()
-            .delete(this)
+            .delete(this).addOnCompleteListener{
+                val text: TextView = findViewById(R.id.loggedInText)
+                text.text = buildString { append("You have deleted your account") }
+            }
     }
 
     //callback on sign in
@@ -61,10 +78,13 @@ class FirebaseUIActivity : AppCompatActivity(), FirebaseUI {
             //successfully signed in
 
             val user = FirebaseAuth.getInstance().currentUser
-            val intent = Intent(this, LoggedIn::class.java)
-            intent.putExtra("userEmail", user!!.email)
-            intent.putExtra("userName", user.displayName)
-            startActivity(intent)
+            val logInText: TextView = findViewById(R.id.loggedInText)
+            logInText.text = buildString {
+                append("Hello ")
+                append(user!!.displayName)
+                append("\nYou are logged in with the address : ")
+                append(user.email)
+            }
         } else {
             // sign in failed
             if (response == null) {

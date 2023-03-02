@@ -7,4 +7,5 @@
     <string name="email">Email</string>
     <string name="Set">Set</string>
     <string name="get">Get</string>
+    <string name="login_str">login</string>
 </resources>

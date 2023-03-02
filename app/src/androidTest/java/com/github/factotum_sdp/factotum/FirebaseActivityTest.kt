@@ -1,15 +1,11 @@
 package com.github.factotum_sdp.factotum
 
-import android.content.Intent
-import androidx.test.core.app.ActivityScenario
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
-import androidx.test.rule.ActivityTestRule
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import org.junit.After

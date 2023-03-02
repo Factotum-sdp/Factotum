@@ -3,11 +3,11 @@ package com.github.factotum_sdp.factotum
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+
 import android.widget.Button
-import android.widget.EditText
+
 import com.firebase.ui.auth.AuthUI
-import com.firebase.ui.auth.ErrorCodes
+
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.firebase.auth.FirebaseAuth
@@ -34,7 +34,7 @@ class FirebaseUIActivity : AppCompatActivity() {
             AuthUI.IdpConfig.GoogleBuilder().build()
         )
 
-        // create and lauch sign-in intent
+        // create and launch sign-in intent
         val signInIntent = AuthUI.getInstance()
             .createSignInIntentBuilder()
             .setAvailableProviders(providers)

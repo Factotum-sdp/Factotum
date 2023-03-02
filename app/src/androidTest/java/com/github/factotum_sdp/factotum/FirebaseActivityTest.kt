@@ -1,15 +1,11 @@
 package com.github.factotum_sdp.factotum
 
-import android.content.Intent
-import androidx.test.core.app.ActivityScenario
-import androidx.test.core.app.ApplicationProvider
-import androidx.test.espresso.Espresso
+import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
-import androidx.test.rule.ActivityTestRule
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import org.junit.After
@@ -48,19 +44,19 @@ class FirebaseActivityTest {
     @Test
     fun setAndGetTest() {
         // Tap the email and the phone number and click on the set button
-        Espresso.onView(withId(R.id.editTextEmailAddress)).perform(ViewActions.typeText("jules.perrin@epfl.ch"))
+        onView(withId(R.id.editTextEmailAddress)).perform(ViewActions.typeText("jules.perrin@epfl.ch"))
             .perform(ViewActions.closeSoftKeyboard())
-        Espresso.onView(withId(R.id.editTextPhone)).perform(ViewActions.typeText("123-45-6789"))
+        onView(withId(R.id.editTextPhone)).perform(ViewActions.typeText("123-45-6789"))
             .perform(ViewActions.closeSoftKeyboard())
-        Espresso.onView(withId(R.id.buttonSet)).perform(ViewActions.click())
+        onView(withId(R.id.buttonSet)).perform(ViewActions.click())
 
         // Get the email using the phone number
         // Clean the email field
-        Espresso.onView(withId(R.id.editTextEmailAddress)).perform(ViewActions.clearText())
-        Espresso.onView(withId(R.id.buttonGet)).perform(ViewActions.click())
+        onView(withId(R.id.editTextEmailAddress)).perform(ViewActions.clearText())
+        onView(withId(R.id.buttonGet)).perform(ViewActions.click())
 
         // Check that the email in the email field is the one we set
-        Espresso.onView(withId(R.id.editTextEmailAddress))
+        onView(withId(R.id.editTextEmailAddress))
             .check(ViewAssertions.matches(ViewMatchers.withText("jules.perrin@epfl.ch")))
     }
 

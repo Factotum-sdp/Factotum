@@ -2,7 +2,6 @@ package com.github.factotum_sdp.factotum
 
 import android.os.Bundle
 import android.view.View
-import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.database.DatabaseReference
@@ -21,8 +20,8 @@ class FirebaseActivity : AppCompatActivity() {
 
     // Retrieve the email from the database using the phone number
     fun get(view : View) {
-        val emailView = findViewById<EditText>(R.id.editTextEmailAddress) as TextView
-        val phoneView = findViewById<EditText>(R.id.editTextPhone) as TextView
+        val emailView = findViewById<TextView>(R.id.editTextEmailAddress)
+        val phoneView = findViewById<TextView>(R.id.editTextPhone)
 
         val phoneText = phoneView.text.toString()
 
@@ -46,8 +45,8 @@ class FirebaseActivity : AppCompatActivity() {
 
     // Set the email in the database using the phone number as a key
     fun set(view : View) {
-        val emailView = findViewById<EditText>(R.id.editTextEmailAddress) as TextView
-        val phoneView = findViewById<EditText>(R.id.editTextPhone) as TextView
+        val emailView = findViewById<TextView>(R.id.editTextEmailAddress)
+        val phoneView = findViewById<TextView>(R.id.editTextPhone)
 
         val emailText = emailView.text.toString()
         val phoneText = phoneView.text.toString()

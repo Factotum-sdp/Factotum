@@ -5,4 +5,6 @@ import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 interface FirebaseUI {
     fun onSignInResult(result : FirebaseAuthUIAuthenticationResult)
     fun createSignInIntent()
+    fun signOut()
+    fun delete()
 }

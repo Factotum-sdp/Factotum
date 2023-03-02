@@ -43,6 +43,16 @@ class FirebaseUIActivity : AppCompatActivity(), FirebaseUI {
         signInLauncher.launch(signInIntent)
     }
 
+    override fun signOut() {
+        AuthUI.getInstance()
+            .signOut(this)
+    }
+
+    override fun delete() {
+        AuthUI.getInstance()
+            .delete(this)
+    }
+
     //callback on sign in
     override fun onSignInResult(result : FirebaseAuthUIAuthenticationResult) {
         val response = result.idpResponse

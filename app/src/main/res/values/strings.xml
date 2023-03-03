@@ -3,4 +3,14 @@
     <string name="validate">validate</string>
     <string name="your_name">Your name</string>
     <string name="greetings">Greetings !</string>
+    <string name="title_1">Inbox</string>
+    <string name="title_2">Deliveries</string>
+    <string name="title_3">Routes</string>
+    <string name="header_title">Header</string>
+    <string name="header_text">Second Header</string>
+    <string name="top_app_bar">Da Bar</string>
+    <string name="subtitle">Subtitle</string>
+    <string name="title_4">Your Account</string>
+    <string name="title_5">Contacts</string>
+    <string name="text_deliveries">3 deliveries succesfully completed</string>
 </resources>

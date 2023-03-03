@@ -16,12 +16,14 @@ class MainActivity : AppCompatActivity() {
             drawerLayout.open()
         }
 
-        /*navigationView.setNavigationItemSelectedListener { menuItem ->
+        val navigationView = findViewById<com.google.android.material.navigation.NavigationView>(R.id.navigation)
+
+        navigationView.setNavigationItemSelectedListener { menuItem ->
             // Handle menu item selected
             menuItem.isChecked = true
             drawerLayout.close()
             true
-        }*/
+        }
     }
 
 }

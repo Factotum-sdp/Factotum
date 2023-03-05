@@ -17,5 +17,6 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, MapsMarkerActivity::class.java)
             startActivity(intent)
         }
+
     }
 }

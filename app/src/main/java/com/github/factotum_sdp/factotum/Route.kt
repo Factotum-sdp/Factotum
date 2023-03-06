@@ -1,6 +1,8 @@
 package com.github.factotum_sdp.factotum
 
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 
 /**
  * Class that represents a route
@@ -18,10 +20,37 @@ class Route (srcLat: Double, srcLon: Double, dstLat: Double, dstLon: Double) {
 
     val src = LatLng(srcLat, srcLon)
     val dst = LatLng(dstLat, dstLon)
+    val id = hashCode()
 
+    constructor(src: LatLng, dst: LatLng) : this(src.latitude, src.longitude, dst.latitude, dst.longitude)
+    /**
+     * Returns the coordinates of the start and destination of the route
+     *
+     * @return string : sentence explaining where the route starts and ends
+     */
     override fun toString(): String {
-        return String.format("The route starts at coordinates %s and finishes at coordinates %s")
+        return String.format("The route starts at coordinates (${src.latitude}, ${src.longitude}) and finishes at coordinates (${dst.latitude}, ${dst.longitude})")
     }
+
+    /**
+     * Adds a route to the map
+     *
+     * @param googleMap : map to which the route is added
+     */
+    fun addToMap(googleMap: GoogleMap) {
+        googleMap.addMarker(
+            MarkerOptions()
+                .position(this.src)
+                .title("Start of $id")
+        )
+
+        googleMap.addMarker(
+            MarkerOptions()
+                .position(this.dst)
+                .title("Destination of $id")
+        )
+    }
+
 
 
 }

@@ -17,6 +17,8 @@ import com.google.android.gms.maps.model.MarkerOptions
 class MapsMarkerActivity : AppCompatActivity(), GoogleMap.OnMarkerClickListener,
     OnMapReadyCallback {
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Retrieve the content view that renders the map.
@@ -29,11 +31,9 @@ class MapsMarkerActivity : AppCompatActivity(), GoogleMap.OnMarkerClickListener,
 
     override fun onMapReady(googleMap: GoogleMap) {
         val satellite = LatLng(46.520544, 6.567825)
-        googleMap.addMarker(
-            MarkerOptions()
-                .position(satellite)
-                .title("Satellite")
-        )
+        val incBuilding = LatLng(46.51864288439962, 6.561958064149488)
+        val postCoursRoute = Route(incBuilding, satellite)
+        postCoursRoute.addToMap(googleMap)
         val epfl = LatLng(46.520536, 6.568318)
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(epfl))
 
@@ -52,15 +52,12 @@ class MapsMarkerActivity : AppCompatActivity(), GoogleMap.OnMarkerClickListener,
     }
 
     override fun onMarkerClick(marker: Marker): Boolean {
-        val text = "Beer here at (46.520536, 6.568318)"
-
         // Display the toast.
         Toast.makeText(
             this,
-            text,
+            marker.title,
             Toast.LENGTH_SHORT
         ).show()
-
         // Return false to indicate that we have not consumed the event and that we wish
         // for the default behavior to occur.
         return false

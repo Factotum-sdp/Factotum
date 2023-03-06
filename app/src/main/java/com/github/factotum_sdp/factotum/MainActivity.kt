@@ -18,5 +18,12 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        val routesButton: Button = findViewById(R.id.routesButton)
+
+        routesButton.setOnClickListener{
+            val intent = Intent(this, RoutesActivity::class.java)
+            startActivity(intent)
+        }
+
     }
 }

@@ -1,6 +1,7 @@
 package com.github.factotum_sdp.factotum
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -30,9 +31,7 @@ class MapsMarkerActivity : AppCompatActivity(), GoogleMap.OnMarkerClickListener,
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        val satellite = LatLng(46.520544, 6.567825)
-        val incBuilding = LatLng(46.51864288439962, 6.561958064149488)
-        val postCoursRoute = Route(incBuilding, satellite)
+        val postCoursRoute = retrieveRoute()
         postCoursRoute.addToMap(googleMap)
         val epfl = LatLng(46.520536, 6.568318)
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(epfl))
@@ -61,5 +60,15 @@ class MapsMarkerActivity : AppCompatActivity(), GoogleMap.OnMarkerClickListener,
         // Return false to indicate that we have not consumed the event and that we wish
         // for the default behavior to occur.
         return false
+    }
+
+    private fun retrieveRoute(): Route{
+
+        val srcLat = intent.getStringExtra("srcLat").toString().toDouble()
+        val srcLng = intent.getStringExtra("srcLng").toString().toDouble()
+        val dstLat = intent.getStringExtra("dstLat").toString().toDouble()
+        val dstLng = intent.getStringExtra("dstLng").toString().toDouble()
+        Log.d("DANIEL", srcLat.toString())
+        return Route(srcLat, srcLng, dstLat, dstLng)
     }
 }

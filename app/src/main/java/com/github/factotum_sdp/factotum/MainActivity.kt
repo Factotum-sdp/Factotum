@@ -15,10 +15,7 @@ class MainActivity : AppCompatActivity() {
         val button: Button = findViewById(R.id.validateButton)
 
         button.setOnClickListener {
-            val intent = Intent(this, GreetingActivity::class.java)
-            val text: EditText = findViewById(R.id.userNameEditText)
-
-            intent.putExtra("userName", text.text.toString())
+            val intent = Intent(this, ProofPhotoActivity::class.java)
             startActivity(intent)
         }
     }

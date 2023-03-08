@@ -14,7 +14,7 @@ class MainActivity : AppCompatActivity() {
         val button: Button = findViewById(R.id.validateButton)
 
         button.setOnClickListener {
-            val intent = Intent(this, MapsMarkerActivity::class.java)
+            val intent = Intent(this, BasicActivity::class.java)
             startActivity(intent)
         }
 

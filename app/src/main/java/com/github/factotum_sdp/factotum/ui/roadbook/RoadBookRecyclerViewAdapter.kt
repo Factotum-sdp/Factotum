@@ -6,7 +6,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.data.DestinationRecord
 import com.github.factotum_sdp.factotum.databinding.FragmentDestrecordBinding
-import com.github.factotum_sdp.factotum.databinding.FragmentRoadbookBinding
 
 class RoadBookRecyclerViewAdapter(private val values: List<DestinationRecord>
 ) : RecyclerView.Adapter<RoadBookRecyclerViewAdapter.ViewHolder>() {
@@ -20,7 +19,6 @@ class RoadBookRecyclerViewAdapter(private val values: List<DestinationRecord>
                 false
             )
         )
-
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -34,7 +32,6 @@ class RoadBookRecyclerViewAdapter(private val values: List<DestinationRecord>
     inner class ViewHolder(binding: FragmentDestrecordBinding) : RecyclerView.ViewHolder(binding.root) {
         val idView: TextView = binding.itemNumber
         val contentView: TextView = binding.content
-
         override fun toString(): String {
             return super.toString() + " '" + contentView.text + "'"
         }

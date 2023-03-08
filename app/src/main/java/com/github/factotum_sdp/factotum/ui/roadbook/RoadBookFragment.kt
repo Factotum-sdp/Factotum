@@ -4,19 +4,36 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ListView
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.data.Action
+import com.github.factotum_sdp.factotum.data.DestinationRecord
+import com.github.factotum_sdp.factotum.databinding.FragmentDirectoryBinding
+import com.github.factotum_sdp.factotum.databinding.FragmentRoadbookBinding
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
+import java.util.Collections
+
 
 /**
- * A fragment representing a list of destination
+ * A fragment representing a list of DestinationRecord
  */
 class RoadBookFragment : Fragment() {
 
     private var columnCount = 1
+    private var _binding: FragmentRoadbookBinding? = null
+
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,26 +48,51 @@ class RoadBookFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_roadbook, container, false)
+        val recyclerView: RecyclerView = view.findViewById(R.id.list)
 
-        // Set the adapter
-        if (view is RecyclerView) {
-            with(view) {
-                layoutManager = when {
-                    columnCount <= 1 -> LinearLayoutManager(context)
-                    else -> GridLayoutManager(context, columnCount)
-                }
-                adapter = RoadBookRecyclerViewAdapter(DestinationRecords.RECORDS)
-            }
+        recyclerView.adapter = RoadBookRecyclerViewAdapter(DestinationRecords.RECORDS)
+        recyclerView.adapter
+        (recyclerView as RecyclerView).layoutManager = LinearLayoutManager(context)
+        val divDec: DividerItemDecoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
+        //recyclerView.addItemDecoration(divDec)
+
+        view.findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
+            Snackbar
+                .make(it, "Don't touch ;)", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show()
         }
+
+        /*
+        val itemTouch: ItemTouchHelper = ItemTouchHelper(ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END, 0) {
+
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                // Get the position of the items being moved
+                val fromPosition = viewHolder.absoluteAdapterPosition
+                val toPosition = target.absoluteAdapterPosition
+
+                recyclerView.adapter =
+                    RoadBookRecyclerViewAdapter(recyclerView.adapter.notifyItemInserted(0))
+
+                return true
+            }
+        })
+        recyclerView.
+        */
         return view
     }
 
+
+
+
+
     companion object {
 
-        // TODO: Customize parameter argument names
         const val ARG_COLUMN_COUNT = "column-count"
 
-        // TODO: Customize parameter initialization
         @JvmStatic
         fun newInstance(columnCount: Int) =
             RoadBookFragment().apply {

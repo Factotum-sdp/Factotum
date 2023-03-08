@@ -9,7 +9,10 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.github.factotum_sdp.factotum.data.Action
+import com.github.factotum_sdp.factotum.data.DestinationRecord
 import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
+import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 
@@ -25,10 +28,12 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.appBarMain.toolbar)
 
+        /*
         binding.appBarMain.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Don't touch ;)", Snackbar.LENGTH_LONG)
+            Snackbar
+                .make(view, "Don't touch ;)", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
-        }
+        }*/
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_main)

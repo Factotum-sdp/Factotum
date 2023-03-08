@@ -10,4 +10,5 @@ class PictureViewModel : ViewModel() {
         value = "This is the picture Fragment"
     }
     val text: LiveData<String> = _text
+
 }

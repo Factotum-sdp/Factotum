@@ -1,5 +1,7 @@
 # Factotum
 
+[UI mock of the app](https://www.figma.com/file/eJQUTJq93wlnZxzrw3NjLE/Factotum-UI?node-id=0%3A1&t=zw2E4JaSMoVI2aMI-1)
+
 ### Application Design
 
 

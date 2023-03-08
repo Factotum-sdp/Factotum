@@ -1,7 +1,6 @@
 package com.github.factotum_sdp.factotum.data
 
 import java.time.Instant
-
 data class DestinationRecord(
     val timeStamp: Instant?,
     val destName: String,

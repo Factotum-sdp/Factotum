@@ -1,6 +1,5 @@
 package com.github.factotum_sdp.factotum.placeholder
 
-
 import com.github.factotum_sdp.factotum.data.Action
 import com.github.factotum_sdp.factotum.data.DestinationRecord
 import java.time.Instant

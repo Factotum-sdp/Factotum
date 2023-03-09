@@ -18,9 +18,9 @@ import com.google.android.gms.maps.model.MarkerOptions
  */
 class Route (srcLat: Double, srcLon: Double, dstLat: Double, dstLon: Double) {
 
-    val src = LatLng(srcLat, srcLon)
-    val dst = LatLng(dstLat, dstLon)
-    val id = hashCode()
+    var src = LatLng(srcLat, srcLon)
+    var dst = LatLng(dstLat, dstLon)
+    var id = hashCode()
 
     constructor(src: LatLng, dst: LatLng) : this(src.latitude, src.longitude, dst.latitude, dst.longitude)
     /**

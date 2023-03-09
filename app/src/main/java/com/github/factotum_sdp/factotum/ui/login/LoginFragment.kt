@@ -1,9 +1,5 @@
-package com.github.factotum_sdp.factotum.login.ui.login
+package com.github.factotum_sdp.factotum.ui.login
 
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.annotation.StringRes
-import androidx.fragment.app.Fragment
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -11,13 +7,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ProgressBar
 import android.widget.Toast
-import com.github.factotum_sdp.factotum.login.databinding.FragmentLoginBinding
+import androidx.annotation.StringRes
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
+import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.databinding.FragmentLoginBinding
 
-import com.github.factotum_sdp.factotum.login.R
 
 class LoginFragment : Fragment() {
 
@@ -33,21 +31,20 @@ class LoginFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
         return binding.root
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
-            .get(LoginViewModel::class.java)
+        loginViewModel =
+            ViewModelProvider(this, LoginViewModelFactory())[LoginViewModel::class.java]
 
         val usernameEditText = binding.username
         val passwordEditText = binding.password
         val loginButton = binding.login
         val loadingProgressBar = binding.loading
+        val signupButton = binding.signup
 
         loginViewModel.loginFormState.observe(viewLifecycleOwner,
             Observer { loginFormState ->
@@ -110,18 +107,24 @@ class LoginFragment : Fragment() {
                 passwordEditText.text.toString()
             )
         }
+
+        signupButton.setOnClickListener {
+            //navigate to signup fragment
+            requireActivity().findNavController(view.id)
+                .navigate(R.id.action_loginFragment_to_signupFragment)
+        }
     }
 
     private fun updateUiWithUser(model: LoggedInUserView) {
-        val welcome = getString(R.string.welcome) + model.displayName
+        val welcome = getString(R.string.welcome) + " " + model.displayName
         // TODO : initiate successful logged in experience
         val appContext = context?.applicationContext ?: return
-        Toast.makeText(appContext, welcome, Toast.LENGTH_LONG).show()
+        Toast.makeText(appContext, welcome, Toast.LENGTH_SHORT).show()
     }
 
     private fun showLoginFailed(@StringRes errorString: Int) {
         val appContext = context?.applicationContext ?: return
-        Toast.makeText(appContext, errorString, Toast.LENGTH_LONG).show()
+        Toast.makeText(appContext, errorString, Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroyView() {

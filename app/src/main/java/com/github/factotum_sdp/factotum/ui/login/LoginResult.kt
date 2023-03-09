@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum.login.ui.login
+package com.github.factotum_sdp.factotum.ui.login
 
 /**
  * Authentication result : success (user details) or error message.

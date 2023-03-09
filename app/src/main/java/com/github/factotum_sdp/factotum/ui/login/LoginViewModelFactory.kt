@@ -1,9 +1,9 @@
-package com.github.factotum_sdp.factotum.login.ui.login
+package com.github.factotum_sdp.factotum.ui.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.github.factotum_sdp.factotum.login.data.LoginDataSource
-import com.github.factotum_sdp.factotum.login.data.LoginRepository
+import com.github.factotum_sdp.factotum.data.LoginDataSource
+import com.github.factotum_sdp.factotum.data.LoginRepository
 
 /**
  * ViewModel provider factory to instantiate LoginViewModel.

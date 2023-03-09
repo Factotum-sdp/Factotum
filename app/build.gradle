@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'jacoco'
     id 'com.google.gms.google-services'
+    id 'androidx.navigation.safeargs.kotlin'
 }
 
 android {
@@ -56,7 +57,13 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.5.2'
     androidTestImplementation 'androidx.test:rules:1.5.0'
     androidTestImplementation 'androidx.test.espresso:espresso-intents:3.5.1'
+    implementation 'androidx.navigation:navigation-dynamic-features-fragment:2.5.3'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
     implementation 'com.google.android.gms:play-services-auth:20.4.1'
+    debugImplementation 'androidx.fragment:fragment-testing:1.5.5'
+    debugImplementation 'androidx.test:monitor:1.6.1'
+
 }
 
 tasks.withType(Test) {

@@ -1,13 +1,13 @@
-package com.github.factotum_sdp.factotum.login.ui.login
+package com.github.factotum_sdp.factotum.ui.login
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import android.util.Patterns
-import com.github.factotum_sdp.factotum.login.data.LoginRepository
-import com.github.factotum_sdp.factotum.login.data.Result
+import com.github.factotum_sdp.factotum.data.LoginRepository
+import com.github.factotum_sdp.factotum.data.Result
 
-import com.github.factotum_sdp.factotum.login.R
+import com.github.factotum_sdp.factotum.R
 
 class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel() {
 

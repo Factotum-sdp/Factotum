@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum.login.ui.login
+package com.github.factotum_sdp.factotum.ui.login
 
 /**
  * User details post authentication that is exposed to the UI

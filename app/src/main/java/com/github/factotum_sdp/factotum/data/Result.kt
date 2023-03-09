@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum.login.data
+package com.github.factotum_sdp.factotum.data
 
 /**
  * A generic class that holds a value with its loading status.

@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum.login.ui.login
+package com.github.factotum_sdp.factotum.ui.login
 
 /**
  * Data validation state of the login form.

@@ -7,6 +7,7 @@ import java.time.Instant
 object DestinationRecords {
 
     var RECORDS: MutableList<DestinationRecord> = ArrayList()
+    val RECORD_TO_ADD: DestinationRecord = DestinationRecord(null, "new", 2, arrayListOf(Action.PICK))
 
     init {
         RECORDS.add(DestinationRecord(Instant.now(), "QG", 1, arrayListOf()))

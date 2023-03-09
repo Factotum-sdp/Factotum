@@ -38,7 +38,6 @@ class FirebaseActivityTest {
             // With a DatabaseReference, write null to clear the database.
             database.reference.setValue(null)
         }
-
     }
 
     @Test

@@ -2,7 +2,6 @@ package com.github.factotum_sdp.factotum.placeholder
 
 import com.github.factotum_sdp.factotum.data.Action
 import com.github.factotum_sdp.factotum.data.DestinationRecord
-import java.time.Instant
 
 object DestinationRecords {
 
@@ -10,7 +9,7 @@ object DestinationRecords {
     val RECORD_TO_ADD: DestinationRecord = DestinationRecord(null, "new", 2, arrayListOf(Action.PICK))
 
     init {
-        RECORDS.add(DestinationRecord(Instant.now(), "QG", 1, arrayListOf()))
+        RECORDS.add(DestinationRecord(null, "QG", 1, arrayListOf()))
         RECORDS.add(DestinationRecord(null, "Buhagiat", 1, arrayListOf(Action.PICK, Action.CONTACT)))
         RECORDS.add(DestinationRecord(null, "X17", 1, arrayListOf(Action.DELIVER, Action.CONTACT)))
 

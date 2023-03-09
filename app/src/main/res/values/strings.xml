@@ -3,4 +3,8 @@
     <string name="validate">validate</string>
     <string name="your_name">Your name</string>
     <string name="greetings">Greetings !</string>
+    <string name="main_diary_activity">Main Diary Activity</string>
+    <string name="contact_name">Name</string>
+    <string name="contact_surname">Number</string>
+    <string name="contact_image">Contact_image</string>
 </resources>

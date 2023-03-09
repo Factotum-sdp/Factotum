@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.Action
 import com.github.factotum_sdp.factotum.data.DestinationRecord
+import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 
@@ -50,7 +51,7 @@ class RoadBookFragment : Fragment() {
         recyclerView.addItemDecoration(divDec)
 
         view.findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
-            rbViewModel.addRecord(DestinationRecord(null, "new", 2, arrayListOf(Action.PICK)))
+            rbViewModel.addRecord(DestinationRecords.RECORD_TO_ADD)
             Snackbar
                 .make(it, "new record added", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()

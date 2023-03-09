@@ -1,18 +1,15 @@
-package com.github.factotum_sdp.factotum
+package com.github.factotum_sdp.factotum.maps
 
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.databinding.FragmentFirstBinding
-import com.github.factotum_sdp.factotum.databinding.FragmentSecondBinding
 import com.google.android.gms.maps.model.LatLng
 
 

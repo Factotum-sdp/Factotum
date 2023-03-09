@@ -1,13 +1,13 @@
-package com.github.factotum_sdp.factotum
+package com.github.factotum_sdp.factotum.maps
 
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
+import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.databinding.ActivityBasicBinding
 
 class BasicActivity : AppCompatActivity() {

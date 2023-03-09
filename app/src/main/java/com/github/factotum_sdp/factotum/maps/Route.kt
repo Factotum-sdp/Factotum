@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum
+package com.github.factotum_sdp.factotum.maps
 
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng

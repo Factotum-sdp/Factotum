@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import com.github.factotum_sdp.factotum.maps.BasicActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -15,13 +16,6 @@ class MainActivity : AppCompatActivity() {
 
         button.setOnClickListener {
             val intent = Intent(this, BasicActivity::class.java)
-            startActivity(intent)
-        }
-
-        val routesButton: Button = findViewById(R.id.routesButton)
-
-        routesButton.setOnClickListener{
-            val intent = Intent(this, RoutesActivity::class.java)
             startActivity(intent)
         }
 

@@ -1,6 +1,7 @@
 package com.github.factotum_sdp.factotum
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.factotum_sdp.factotum.maps.Route
 import com.google.android.gms.maps.model.LatLng
 import junit.framework.TestCase.assertEquals
 import org.junit.Test

@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum
+package com.github.factotum_sdp.factotum.maps
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

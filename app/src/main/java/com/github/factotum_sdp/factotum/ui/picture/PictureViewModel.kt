@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 class PictureViewModel : ViewModel() {
 
     private val _text = MutableLiveData<String>().apply {
+        //temp text, let it hardcoded until true fragment implementation
         value = "This is the picture Fragment"
     }
     val text: LiveData<String> = _text

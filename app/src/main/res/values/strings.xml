@@ -15,4 +15,9 @@
     <string name="menu_roadbook">Home</string>
     <string name="menu_directory">Directory</string>
     <string name="menu_picture">Picture</string>
+    <string name="fab_add_description">add_floating_button</string>
+    <string name="snap_text_record_added">Record added</string>
+    <string name="del_button_text">Del</string>
+    <string name="snap_text_on_rec_delete">Last record deleted</string>
+    <string name="temp_delete_action_button">temp_delete_action_button</string>
 </resources>

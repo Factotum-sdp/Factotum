@@ -23,12 +23,15 @@
         android:id="@+id/del_button"
         android:layout_width="88dp"
         android:layout_height="47dp"
+        android:layout_marginStart="204dp"
         android:layout_marginTop="659dp"
+        android:layout_marginEnd="119dp"
         android:layout_marginBottom="25dp"
         android:text="@string/del_button_text"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="204dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"

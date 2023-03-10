@@ -46,7 +46,8 @@
             android:clickable="true"
             android:contentDescription="@string/fab_add_description"
             android:focusable="true"
-            app:srcCompat="@android:drawable/ic_input_add" />
+            app:srcCompat="@android:drawable/ic_input_add"
+            />
     </LinearLayout>
 
 

@@ -3,9 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
-        tools:ignore="ScopedStorage" />
     <uses-feature android:name="android.hardware.camera" />
 
     <queries>
@@ -39,9 +36,6 @@
             android:exported="true">
         </activity>
         <activity android:name=".FirebaseActivity"
-            android:exported="true">
-        </activity>
-        <activity android:name=".ProofPhotoActivity"
             android:exported="true">
         </activity>
 

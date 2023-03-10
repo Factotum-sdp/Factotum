@@ -9,11 +9,17 @@ class RoadBookViewModel() : ViewModel() {
     val recordsList: MutableLiveData<List<DestinationRecord>> =
         MutableLiveData(DestinationRecords.RECORDS)
 
-    //need to handle null case
-    fun addRecord(destinationRecord: DestinationRecord): Unit {
+    fun addRecord(destinationRecord: DestinationRecord) {
         val newList = arrayListOf<DestinationRecord>()
         newList.addAll(recordsList.value as Collection<DestinationRecord>)
         newList.add(destinationRecord)
+        recordsList.postValue(newList)
+    }
+
+    fun deleteLastRecord() {
+        val newList = arrayListOf<DestinationRecord>()
+        newList.addAll(recordsList.value as Collection<DestinationRecord>)
+        if (newList.isNotEmpty()) newList.removeLast()
         recordsList.postValue(newList)
     }
 }

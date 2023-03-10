@@ -1,13 +1,14 @@
-similar-code:
-    enabled: false
-identical-code:
-    enabled: false
-method-lines:
-    enabled: true
-    config:
-      threshold: 40
+checks:
+    similar-code:
+        enabled: false
+    identical-code:
+        enabled: false
+    method-lines:
+        enabled: true
+        config:
+        threshold: 40
 
-exclude_patterns:
-- "**/test/"
-- "**/androidTest/"
-- "**test"
+    exclude_patterns:
+    - "**/test/"
+    - "**/androidTest/"
+    - "**test"

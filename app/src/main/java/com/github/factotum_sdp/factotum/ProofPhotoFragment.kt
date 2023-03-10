@@ -30,7 +30,6 @@ class ProofPhotoFragment : Fragment() {
     private val storage: FirebaseStorage = FirebaseStorage.getInstance()
     private val storageRef: StorageReference = storage.reference
 
-    @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.activity_main, container, false)
 
@@ -70,7 +69,6 @@ class ProofPhotoFragment : Fragment() {
                 Log.e(TAG, "Failed to upload photo: ${it.message}")
             }
         } else {
-            // Handle the error    private const val PERMISSIONS_REQUEST_CODE = 1
             Log.d(TAG, "Error")
         }
     }

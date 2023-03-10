@@ -20,4 +20,9 @@
         android:name="com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment"
         android:label="fragment_directory"
         tools:layout="@layout/fragment_directory" />
+    <fragment
+        android:id="@+id/mapsFragment"
+        android:name="com.github.factotum_sdp.factotum.ui.maps.MapsFragment"
+        android:label="fragment_maps"
+        tools:layout="@layout/fragment_maps" />
 </navigation>

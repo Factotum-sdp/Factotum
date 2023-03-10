@@ -20,6 +20,7 @@ import com.google.android.material.snackbar.Snackbar
  * A fragment representing a RoadBook which is a list of DestinationRecord
  */
 class RoadBookFragment : Fragment() {
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

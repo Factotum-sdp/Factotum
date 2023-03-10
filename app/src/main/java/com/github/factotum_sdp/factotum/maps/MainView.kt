@@ -5,9 +5,13 @@ import androidx.lifecycle.ViewModel
 
 class MainView : ViewModel() {
 
-    val route = MutableLiveData<Route>()
+    val routes: MutableLiveData<MutableList<Route>> = MutableLiveData(mutableListOf())
 
-    fun setRoute(_route: Route){
-        route.value = Route(_route.src, _route.dst)
+    fun addRoute(route: Route){
+        routes.value?.add(route)
+    }
+
+    fun deleteAll(){
+        routes.value = mutableListOf()
     }
 }

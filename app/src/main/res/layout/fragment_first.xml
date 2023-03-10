@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".maps.FirstFragment">
+    tools:context=".maps.RouteFragment"
+    android:id="@+id/route_fragment">
 
 
     <Button
@@ -13,6 +14,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/next" />
+    <Button
+        android:id="@+id/button_all"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/show_all"
+        android:layout_toEndOf="@id/button_first"
+        />
 
     <ListView
         android:id="@+id/list_view"

@@ -6,8 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.databinding.FragmentSecondBinding
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 
@@ -15,7 +17,7 @@ import com.google.android.gms.maps.model.LatLng
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
  */
-class SecondFragment : Fragment() {
+class MapsFragment : Fragment() {
 
     private var _binding: FragmentSecondBinding? = null
     private val viewModel: MainView by activityViewModels()
@@ -38,8 +40,10 @@ class SecondFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val mapFragment = binding.map.getFragment() as SupportMapFragment
         mapFragment.getMapAsync{ googleMap ->
-            val postCoursRoute = viewModel.route.value
-            postCoursRoute!!.addToMap(googleMap)
+            googleMap.clear()
+            for (route in viewModel.routes.value.orEmpty()){
+                route.addToMap(googleMap)
+            }
             val epfl = LatLng(46.520536, 6.568318)
             googleMap.moveCamera(CameraUpdateFactory.newLatLng(epfl))
 
@@ -48,13 +52,8 @@ class SecondFragment : Fragment() {
 
             // Add zoom gestures to the map
             googleMap.uiSettings.isZoomGesturesEnabled = true
-
-            // Set a preference for minimum and maximum zoom.
-            googleMap.setMinZoomPreference(6.0f)
-            googleMap.setMaxZoomPreference(14.0f)
         }
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

@@ -16,7 +16,7 @@ import com.google.android.gms.maps.model.LatLng
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
-class FirstFragment : Fragment() {
+class RouteFragment : Fragment() {
 
     private var _binding: FragmentFirstBinding? = null
     private val viewModel: MainView by activityViewModels()
@@ -39,26 +39,31 @@ class FirstFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.buttonFirst.setOnClickListener {
-            val satellite = LatLng(46.520544, 6.567825)
-            val incBuilding = LatLng(46.51864288439962, 6.561958064149488)
-            val postCoursRoute = Route(incBuilding, satellite)
-            viewModel.setRoute(postCoursRoute)
             findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
         }
-        val list = arrayListOf("hello", "my", "name", "is", "Daniel")
+
+        viewModel.deleteAll()
+        val listCourse = arrayListOf("BC -> Satelitte", "EPFL -> Chauderon", "Genève -> Lausanne")
+        val listRoute = arrayListOf<Route>(Route(46.51869448523383, 6.561842896370142, 46.520742473314236, 6.567824983999257),
+            Route(46.51916261132295, 6.566773558010879, 46.52369559941859, 6.6250423828801654),
+            Route(46.205062260846894, 6.1430383670835464, 46.517234720289416, 6.6291717405531605),
+        )
         val listView: ListView = binding.listView
         val adapter: ArrayAdapter<String?> = ArrayAdapter(requireContext(),
             android.R.layout.simple_list_item_1,
-            list as List<String?>
+            listCourse as List<String?>
         )
         listView.adapter = adapter
         adapter.notifyDataSetChanged()
         listView.setOnItemClickListener{_, _, position, _ ->
-            Toast.makeText(
-                requireContext(),
-                binding.listView.getItemAtPosition(position).toString(),
-                Toast.LENGTH_SHORT
-            ).show()
+            viewModel.addRoute(listRoute[position])
+        }
+
+        binding.buttonAll.setOnClickListener{
+            for(route in listRoute){
+                viewModel.addRoute(route)
+            }
+            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
         }
     }
 

@@ -47,7 +47,7 @@ class RoadBookFragment : Fragment() {
                 .setAction("Action", null).show()
         }
 
-        view.findViewById<Button>(R.id.del_button).setOnClickListener {
+        view.findViewById<FloatingActionButton>(R.id.fab_delete).setOnClickListener {
             rbViewModel.deleteLastRecord()
             Snackbar
                 .make(it, getString(R.string.snap_text_on_rec_delete), 700)

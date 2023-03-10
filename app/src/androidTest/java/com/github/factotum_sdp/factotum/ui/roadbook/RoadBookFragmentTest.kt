@@ -32,34 +32,34 @@ class RoadBookFragmentTest {
 
     @Test
     fun delButtonIsCorrectlyDisplayedOnFirstView() {
-        onView(withId(R.id.del_button))
+        onView(withId(R.id.fab_delete))
             .check(matches(isDisplayed()))
     }
 
     @Test
     fun roadBookIsCorrectlyDisplayedOnFirstView() {
         onView(withId(R.id.list))
-            .check(ViewAssertions.matches(isDisplayed()))
+            .check(matches(isDisplayed()))
     }
 
     @Test
     fun startingRecordsAreDisplayed() {
         for (i in 0..2)
             onView(withText(DestinationRecords.RECORDS[i].destName))
-                .check(ViewAssertions.matches(isDisplayed()))
+                .check(matches(isDisplayed()))
     }
 
     @Test
     fun pressingFabCreatesNewRecord() {
         onView(withText(DestinationRecords.RECORDS[0].destName))
-            .check(ViewAssertions.matches(isDisplayed()))
+            .check(matches(isDisplayed()))
         onView(withId(R.id.fab)).perform(click())
         onView(withId(R.id.list)).perform(
             click(),
             RecyclerViewActions.scrollToLastPosition<RoadBookViewAdapter.RecordViewHolder>(),
         )
         onView((withText(DestinationRecords.RECORD_TO_ADD.destName)))
-            .check(ViewAssertions.matches(isDisplayed()))
+            .check(matches(isDisplayed()))
     }
 
     @Test
@@ -70,8 +70,8 @@ class RoadBookFragmentTest {
             RecyclerViewActions.scrollToLastPosition<RoadBookViewAdapter.RecordViewHolder>(),
         )
         onView((withText(DestinationRecords.RECORD_TO_ADD.destName)))
-            .check(ViewAssertions.matches(isDisplayed()))
-        onView(withId(R.id.del_button)).perform(click())
+            .check(matches(isDisplayed()))
+        onView(withId(R.id.fab_delete)).perform(click())
         onView((withText(DestinationRecords.RECORD_TO_ADD.destName)))
             .check(doesNotExist())
     }

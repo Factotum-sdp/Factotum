@@ -21,13 +21,18 @@
 
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="16dp"
+        android:layout_width="56dp"
+        android:layout_height="128dp"
+        android:layout_marginStart="316dp"
+        android:layout_marginTop="587dp"
         android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:orientation="vertical">
+        app:layout_constraintHorizontal_bias="0.67"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -45,8 +50,8 @@
             android:layout_height="wrap_content"
             android:clickable="true"
             android:contentDescription="@string/fab_add_description"
-            app:srcCompat="@android:drawable/ic_input_add"
-            android:focusable="true" />
+            android:focusable="true"
+            app:srcCompat="@android:drawable/ic_input_add" />
     </LinearLayout>
 
 

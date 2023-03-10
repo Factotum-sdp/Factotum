@@ -4,6 +4,7 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
+import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
@@ -26,18 +27,18 @@ class RoadBookFragmentTest {
     @Test
     fun fabIsCorrectlyDisplayedOnFirstView() {
         onView(withId(R.id.fab))
-            .check(ViewAssertions.matches(isDisplayed()))
+            .check(matches(isDisplayed()))
     }
 
     @Test
     fun delButtonIsCorrectlyDisplayedOnFirstView() {
-        onView(ViewMatchers.withId(R.id.del_button))
-            .check(ViewAssertions.matches(isDisplayed()))
+        onView(withId(R.id.del_button))
+            .check(matches(isDisplayed()))
     }
 
     @Test
     fun roadBookIsCorrectlyDisplayedOnFirstView() {
-        onView(ViewMatchers.withId(R.id.list))
+        onView(withId(R.id.list))
             .check(ViewAssertions.matches(isDisplayed()))
     }
 
@@ -55,7 +56,7 @@ class RoadBookFragmentTest {
         onView(withId(R.id.fab)).perform(click())
         onView(withId(R.id.list)).perform(
             click(),
-            RecyclerViewActions.scrollToLastPosition<RoadBookRecyclerViewAdapter.RecordViewHolder>(),
+            RecyclerViewActions.scrollToLastPosition<RoadBookViewAdapter.RecordViewHolder>(),
         )
         onView((withText(DestinationRecords.RECORD_TO_ADD.destName)))
             .check(ViewAssertions.matches(isDisplayed()))
@@ -66,7 +67,7 @@ class RoadBookFragmentTest {
         onView(withId(R.id.fab)).perform(click())
         onView(withId(R.id.list)).perform(
             click(),
-            RecyclerViewActions.scrollToLastPosition<RoadBookRecyclerViewAdapter.RecordViewHolder>(),
+            RecyclerViewActions.scrollToLastPosition<RoadBookViewAdapter.RecordViewHolder>(),
         )
         onView((withText(DestinationRecords.RECORD_TO_ADD.destName)))
             .check(ViewAssertions.matches(isDisplayed()))

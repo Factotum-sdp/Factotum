@@ -26,7 +26,7 @@ class RoadBookFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_roadbook, container, false)
         val recyclerView: RecyclerView = view.findViewById(R.id.list)
-        val adapter = RoadBookRecyclerViewAdapter()
+        val adapter = RoadBookViewAdapter()
 
         val rbViewModel: RoadBookViewModel =
             ViewModelProvider(this)[RoadBookViewModel::class.java]

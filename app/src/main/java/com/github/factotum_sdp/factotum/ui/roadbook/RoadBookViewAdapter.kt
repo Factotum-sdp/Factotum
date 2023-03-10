@@ -10,8 +10,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.DestinationRecord
 
-class RoadBookRecyclerViewAdapter(
-) : RecyclerView.Adapter<RoadBookRecyclerViewAdapter.RecordViewHolder>() {
+/**
+ * Adapter for the RecyclerView which will hold a dynamic list of DestinationRecord
+ * Choice of the RecyclerView instead of ListAdapter for later facilities with drageNdrop
+ */
+class RoadBookViewAdapter(
+) : RecyclerView.Adapter<RoadBookViewAdapter.RecordViewHolder>() {
 
     private val differCallback = object : DiffUtil.ItemCallback<DestinationRecord>(){
         override fun areItemsTheSame(oldItem: DestinationRecord,

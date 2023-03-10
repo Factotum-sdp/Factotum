@@ -23,9 +23,9 @@ class MainActivityTest {
         MainActivity::class.java
     )
 
-    //=============================================================
+    //========================================================================================
     // Entry view checks :
-    //=============================================================
+    //========================================================================================
 
     @Test
     fun appBarIsCorrectlyDisplayedOnFirstView() {
@@ -35,20 +35,17 @@ class MainActivityTest {
     @Test
     fun toolBarIsCorrectlyDisplayedOnFirstView() {
         onView(withId(R.id.toolbar)).check(matches(isDisplayed()))
-        //onView(withId(R.id.app_bar_main)).check(matches(isDisplayed()))
     }
 
     @Test
     fun drawerLayoutIsCorrectlyDisplayedOnFirstView() {
         onView(withId(R.id.drawer_layout)).check(matches(isDisplayed()))
-        //onView(withId(R.id.app_bar_main)).check(matches(isDisplayed()))
     }
 
 
-    //=============================================================
-    // DrawerMenu Menu Navigation :
-    //=============================================================
-
+    //========================================================================================
+    // Drawer Menu Navigation :
+    //========================================================================================
     @Test
     fun drawerMenuOpensCorrectly() {
         onView(withId(R.id.drawer_layout))
@@ -64,7 +61,7 @@ class MainActivityTest {
         onView(withId(R.id.pictureFragment))
             .perform(click())
         onView(withId(R.id.fragment_picture_directors_parent)).check(matches(isDisplayed()))
-        onView(withId(R.id.drawer_layout)).check(matches(DrawerMatchers.isClosed(Gravity.LEFT))) //with menu closed
+        onView(withId(R.id.drawer_layout)).check(matches(DrawerMatchers.isClosed(Gravity.LEFT)))
     }
 
     @Test
@@ -74,7 +71,7 @@ class MainActivityTest {
         onView(withId(R.id.directoryFragment))
             .perform(click())
         onView(withId(R.id.fragment_directory_directors_parent)).check(matches(isDisplayed()))
-        onView(withId(R.id.drawer_layout)).check(matches(DrawerMatchers.isClosed(Gravity.LEFT))) //with menu closed
+        onView(withId(R.id.drawer_layout)).check(matches(DrawerMatchers.isClosed(Gravity.LEFT)))
     }
 
     @Test
@@ -85,7 +82,7 @@ class MainActivityTest {
         onView(withId(R.id.roadBookFragment))
             .perform(click())
         onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
-        onView(withId(R.id.drawer_layout)).check(matches(DrawerMatchers.isClosed(Gravity.LEFT))) //with menu closed
+        onView(withId(R.id.drawer_layout)).check(matches(DrawerMatchers.isClosed(Gravity.LEFT)))
     }
 
     @Test
@@ -110,4 +107,5 @@ class MainActivityTest {
         openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
         onView(withText(R.string.action_settings)).perform(click())
     }
+
 }

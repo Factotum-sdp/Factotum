@@ -6,6 +6,8 @@
     android:id="@+id/fragment_roadbook_directors_parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list"
         android:name="com.github.factotum_sdp.navdraweractivity.RoadBookFragment"
@@ -14,20 +16,20 @@
         app:layoutManager="LinearLayoutManager"
         tools:context=".ui.roadbook.RoadBookFragment"
         tools:listitem="@layout/fragment_destrecord">
+
     </androidx.recyclerview.widget.RecyclerView>
+
+
     <LinearLayout
-        android:layout_width="56dp"
-        android:layout_height="128dp"
-        android:layout_marginStart="316dp"
-        android:layout_marginTop="587dp"
+        android:layout_width="64dp"
+        android:layout_height="131dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.67"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintEnd_toEndOf="parent">
+
+
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_delete"
             android:layout_width="wrap_content"
@@ -46,4 +48,6 @@
             android:focusable="true"
             app:srcCompat="@android:drawable/ic_input_add" />
     </LinearLayout>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -23,7 +23,9 @@ class ProofPhotoFragmentTest {
     private lateinit var storage: FirebaseStorage
     private val externalDir = Environment.getExternalStorageDirectory()
     private val picturesDir = File(externalDir, "/Android/data/com.github.factotum_sdp.factotum/files/Pictures")
-    private val timeWaitCamera = 3000L
+    private val TIME_WAIT_SHUTTER = 5000L
+    private val TIME_WAIT_DONE_OR_CANCEL = 3000L
+    private val TIME_WAIT_UPLOAD = 500L
 
     @get:Rule
     val permissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
@@ -58,7 +60,7 @@ class ProofPhotoFragmentTest {
         scenario.moveToState(Lifecycle.State.RESUMED)
 
         // Wait for the camera to open
-        Thread.sleep(timeWaitCamera)
+        Thread.sleep(TIME_WAIT_SHUTTER)
 
         // Click on the button of the open camera to take a photo
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
@@ -66,14 +68,14 @@ class ProofPhotoFragmentTest {
         takePictureButton.click()
 
         // Wait for the photo to be taken
-        Thread.sleep(1000)
+        Thread.sleep(TIME_WAIT_DONE_OR_CANCEL)
 
         // Click the button to validate the photo
         val validateButton = device.findObject(UiSelector().description("Done"))
         validateButton.click()
 
         // Wait for the photo to be uploaded
-        Thread.sleep(500)
+        Thread.sleep(TIME_WAIT_UPLOAD)
 
         // Check that the storage contains at least one file
         storage.reference.listAll().addOnSuccessListener { listResult ->
@@ -96,7 +98,7 @@ class ProofPhotoFragmentTest {
         scenario.moveToState(Lifecycle.State.RESUMED)
 
         // Wait for the camera to open
-        Thread.sleep(timeWaitCamera)
+        Thread.sleep(TIME_WAIT_SHUTTER)
 
         // Click on the button of the open camera to take a photo
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
@@ -104,14 +106,14 @@ class ProofPhotoFragmentTest {
         takePictureButton.click()
 
         // Wait for the photo to be taken
-        Thread.sleep(1000)
+        Thread.sleep(TIME_WAIT_DONE_OR_CANCEL)
 
         // Click the button to cancel the photo
         val cancelButton = device.findObject(UiSelector().description("Cancel"))
         cancelButton.click()
 
         // Wait for the photo to be uploaded
-        Thread.sleep(500)
+        Thread.sleep(TIME_WAIT_UPLOAD)
 
         // Check that the storage contains no files
         storage.reference.listAll().addOnSuccessListener { listResult ->
@@ -139,7 +141,7 @@ class ProofPhotoFragmentTest {
         scenario.moveToState(Lifecycle.State.RESUMED)
 
         // Wait for the camera to open
-        Thread.sleep(timeWaitCamera)
+        Thread.sleep(TIME_WAIT_SHUTTER)
 
         // Click on the button of the open camera to take a photo
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
@@ -147,13 +149,13 @@ class ProofPhotoFragmentTest {
         takePictureButton.click()
 
         // Wait for the photo to be taken
-        Thread.sleep(1000)
+        Thread.sleep(TIME_WAIT_DONE_OR_CANCEL)
         // Click the button to validate the photo
         val validateButton = device.findObject(UiSelector().description("Done"))
         validateButton.click()
 
         // Wait for the photo to be uploaded
-        Thread.sleep(500)
+        Thread.sleep(TIME_WAIT_UPLOAD)
 
         //Check if there is a file in the local directory
         picturesDir.listFiles()?.forEach { file ->

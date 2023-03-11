@@ -1,16 +1,20 @@
-package com.github.factotum_sdp.factotum
+package com.github.factotum_sdp.factotum.ui.picture
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
-import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import com.github.factotum_sdp.factotum.databinding.FragmentPictureBinding
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
@@ -18,10 +22,15 @@ import com.google.firebase.storage.ktx.storage
 import java.io.File
 import java.util.*
 
-class ProofPhotoFragment : Fragment() {
-    // Firebase Storage
-    private val storage: FirebaseStorage = Firebase.storage
+class PictureFragment : Fragment() {
+
+    private var _binding: FragmentPictureBinding? = null
+    private val storage: FirebaseStorage = FirebaseStorage.getInstance()
     private val storageRef: StorageReference = storage.reference
+
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +57,24 @@ class ProofPhotoFragment : Fragment() {
             // Permission is already granted
             openCamera()
         }
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        val galleryViewModel =
+            ViewModelProvider(this).get(PictureViewModel::class.java)
+
+        _binding = FragmentPictureBinding.inflate(inflater, container, false)
+        val root: View = binding.root
+
+        val textView: TextView = binding.textGallery
+        galleryViewModel.text.observe(viewLifecycleOwner) {
+            textView.text = it
+        }
+        return root
     }
 
     private fun openCamera() {
@@ -81,4 +108,8 @@ class ProofPhotoFragment : Fragment() {
         private const val TAG = "ProofPhotoFragment: "
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }

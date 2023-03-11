@@ -7,18 +7,19 @@ import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val btnPhoto = findViewById<Button>(R.id.buttonProofPhoto)
+        val button: Button = findViewById(R.id.validateButton)
 
-        btnPhoto.setOnClickListener {
-            supportFragmentManager.beginTransaction()
-                .replace(android.R.id.content, ProofPhotoFragment())
-                .addToBackStack(null)
-                .commit()
+        button.setOnClickListener {
+            val intent = Intent(this, GreetingActivity::class.java)
+            val text: EditText = findViewById(R.id.userNameEditText)
+
+            intent.putExtra("userName", text.text.toString())
+            startActivity(intent)
         }
-
     }
 }

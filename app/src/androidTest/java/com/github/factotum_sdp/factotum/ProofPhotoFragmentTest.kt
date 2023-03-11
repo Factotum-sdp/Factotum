@@ -16,11 +16,9 @@ import com.google.firebase.storage.ktx.storage
 import junit.framework.TestCase.assertTrue
 import org.junit.*
 import org.junit.runner.RunWith
-import org.junit.runners.MethodSorters
 import java.io.File
 
 @RunWith(AndroidJUnit4::class)
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class ProofPhotoFragmentTest {
     private val TIME_WAIT_SHUTTER = 5000L
     private val TIME_WAIT_DONE_OR_CANCEL = 3000L
@@ -28,7 +26,6 @@ class ProofPhotoFragmentTest {
 
     private lateinit var storage: FirebaseStorage
     private lateinit var scenario: FragmentScenario<ProofPhotoFragment>
-    private lateinit var device: UiDevice
     private val externalDir = Environment.getExternalStorageDirectory()
     private val picturesDir = File(externalDir, "/Android/data/com.github.factotum_sdp.factotum/files/Pictures")
 
@@ -62,11 +59,12 @@ class ProofPhotoFragmentTest {
         // Wait for the camera to open
         Thread.sleep(TIME_WAIT_SHUTTER)
 
-        device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
     }
 
     @Test
-    fun testA_UploadFileCorrectly() {
+    fun testUploadFileCorrectly() {
+
+        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
         val takePictureButton = device.findObject(UiSelector().description("Shutter"))
         takePictureButton.click()
@@ -90,7 +88,9 @@ class ProofPhotoFragmentTest {
     }
 
     @Test
-    fun testB_CancelPhoto() {
+    fun testCancelPhoto() {
+        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+
         val takePictureButton = device.findObject(UiSelector().description("Shutter"))
         takePictureButton.click()
 
@@ -114,11 +114,12 @@ class ProofPhotoFragmentTest {
     }
 
     @Test
-    fun testC_DoesNotDeleteFileIfUploadFails() {
+    fun testDoesNotDeleteFileIfUploadFails() {
 
         //Disconnect from the storage emulator
         storage.useEmulator("10.0.2.2", 9198)
 
+        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         val takePictureButton = device.findObject(UiSelector().description("Shutter"))
         takePictureButton.click()
 

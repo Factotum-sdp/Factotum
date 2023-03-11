@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/roadBookFragment">
+
+    <fragment
+        android:id="@+id/roadBookFragment"
+        android:name="com.github.factotum_sdp.factotum.ui.roadbook.RoadBookFragment"
+        android:label="fragment_roadbook"
+        tools:layout="@layout/fragment_roadbook" />
+    <fragment
+        android:id="@+id/pictureFragment"
+        android:name="com.github.factotum_sdp.factotum.ui.picture.PictureFragment"
+        android:label="fragment_picture"
+        tools:layout="@layout/fragment_picture" />
+    <fragment
+        android:id="@+id/directoryFragment"
+        android:name="com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment"
+        android:label="fragment_directory"
+        tools:layout="@layout/fragment_directory" />
+    <fragment
+        android:id="@+id/mapsFragment"
+        android:name="com.github.factotum_sdp.factotum.ui.maps.MapsFragment"
+        android:label="fragment_maps"
+        tools:layout="@layout/fragment_maps" />
+</navigation>

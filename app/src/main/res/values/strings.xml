@@ -1,11 +1,24 @@
 <resources>
     <string name="app_name">Factotum</string>
-    <string name="validate">validate</string>
-    <string name="your_name">Your name</string>
-    <string name="greetings">Greetings !</string>
     <string name="phone">Phone</string>
     <string name="email">Email</string>
     <string name="Set">Set</string>
     <string name="get">Get</string>
-    <string name="take_photo">Take Photo</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_roadbook">Home</string>
+    <string name="menu_directory">Directory</string>
+    <string name="menu_picture">Picture</string>
+    <string name="fab_add_description">add_floating_button</string>
+    <string name="snap_text_record_added">Record added</string>
+    <string name="del_button_text">Del</string>
+    <string name="snap_text_on_rec_delete">Last record deleted</string>
+    <string name="temp_delete_action_button">temp_delete_action_button</string>
+    <string name="menu_maps">Maps</string>
 </resources>

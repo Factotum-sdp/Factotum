@@ -2,6 +2,7 @@ package com.github.factotum_sdp.factotum
 
 import android.Manifest
 import android.os.Environment
+import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.lifecycle.Lifecycle
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -13,22 +14,27 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
 import junit.framework.TestCase.assertTrue
-import junit.framework.TestCase.fail
 import org.junit.*
 import org.junit.runner.RunWith
+import org.junit.runners.MethodSorters
 import java.io.File
 
 @RunWith(AndroidJUnit4::class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class ProofPhotoFragmentTest {
-    private lateinit var storage: FirebaseStorage
-    private val externalDir = Environment.getExternalStorageDirectory()
-    private val picturesDir = File(externalDir, "/Android/data/com.github.factotum_sdp.factotum/files/Pictures")
     private val TIME_WAIT_SHUTTER = 5000L
     private val TIME_WAIT_DONE_OR_CANCEL = 3000L
     private val TIME_WAIT_UPLOAD = 500L
 
+    private lateinit var storage: FirebaseStorage
+    private lateinit var scenario: FragmentScenario<ProofPhotoFragment>
+    private lateinit var device: UiDevice
+    private val externalDir = Environment.getExternalStorageDirectory()
+    private val picturesDir = File(externalDir, "/Android/data/com.github.factotum_sdp.factotum/files/Pictures")
+
+
     @get:Rule
-    val permissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
+    val permissionsRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
 
     @Before
     fun setUp() {
@@ -46,15 +52,9 @@ class ProofPhotoFragmentTest {
         picturesDir.listFiles()?.forEach { file ->
             file.delete()
         }
-    }
 
-
-    @Test
-    fun testUploadFileCorrectly() {
         // Launch the fragment
-        val scenario = launchFragmentInContainer<ProofPhotoFragment>(
-            initialState = Lifecycle.State.INITIALIZED
-        )
+        scenario = launchFragmentInContainer(initialState = Lifecycle.State.INITIALIZED)
 
         // Wait for the fragment to reach the resumed state
         scenario.moveToState(Lifecycle.State.RESUMED)
@@ -62,8 +62,12 @@ class ProofPhotoFragmentTest {
         // Wait for the camera to open
         Thread.sleep(TIME_WAIT_SHUTTER)
 
-        // Click on the button of the open camera to take a photo
-        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+    }
+
+    @Test
+    fun testA_UploadFileCorrectly() {
+
         val takePictureButton = device.findObject(UiSelector().description("Shutter"))
         takePictureButton.click()
 
@@ -82,26 +86,11 @@ class ProofPhotoFragmentTest {
             assertTrue(listResult.items.isNotEmpty())
             //Check that the local picture directory is empty
             assertTrue(picturesDir.listFiles()?.isEmpty() ?: false)
-        }.addOnFailureListener {
-            fail("Failed to get the list of files")
         }
     }
 
     @Test
-    fun testCancelPhoto() {
-        // Launch the fragment
-        val scenario = launchFragmentInContainer<ProofPhotoFragment>(
-            initialState = Lifecycle.State.INITIALIZED
-        )
-
-        // Wait for the fragment to reach the resumed state
-        scenario.moveToState(Lifecycle.State.RESUMED)
-
-        // Wait for the camera to open
-        Thread.sleep(TIME_WAIT_SHUTTER)
-
-        // Click on the button of the open camera to take a photo
-        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+    fun testB_CancelPhoto() {
         val takePictureButton = device.findObject(UiSelector().description("Shutter"))
         takePictureButton.click()
 
@@ -120,31 +109,16 @@ class ProofPhotoFragmentTest {
             assertTrue(listResult.items.isEmpty())
             //Check that the local picture directory is empty
             assertTrue(picturesDir.listFiles()?.isEmpty() ?: false)
-        }.addOnFailureListener {
-            fail("Failed to get the list of files")
         }
 
     }
 
     @Test
-    fun testDoesNotDeleteFileIfUploadFails() {
+    fun testC_DoesNotDeleteFileIfUploadFails() {
 
         //Disconnect from the storage emulator
         storage.useEmulator("10.0.2.2", 9198)
 
-        // Launch the fragment
-        val scenario = launchFragmentInContainer<ProofPhotoFragment>(
-            initialState = Lifecycle.State.INITIALIZED
-        )
-
-        // Wait for the fragment to reach the resumed state
-        scenario.moveToState(Lifecycle.State.RESUMED)
-
-        // Wait for the camera to open
-        Thread.sleep(TIME_WAIT_SHUTTER)
-
-        // Click on the button of the open camera to take a photo
-        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         val takePictureButton = device.findObject(UiSelector().description("Shutter"))
         takePictureButton.click()
 

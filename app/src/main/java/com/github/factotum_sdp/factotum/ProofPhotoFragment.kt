@@ -19,10 +19,7 @@ import java.io.File
 import java.util.*
 
 class ProofPhotoFragment : Fragment() {
-    private lateinit var photoName: String
-    private lateinit var photoFile: File
-    private lateinit var photoUri: Uri
-
+    // Firebase Storage
     private val storage: FirebaseStorage = Firebase.storage
     private val storageRef: StorageReference = storage.reference
 
@@ -53,44 +50,30 @@ class ProofPhotoFragment : Fragment() {
         }
     }
 
-    private val takePicture =
-        registerForActivityResult(ActivityResultContracts.TakePicture()) { result ->
-            if (result) {
-                // Upload photo to Firebase Storage
-                val photoRef = storageRef.child(photoName)
-                val uploadTask = photoRef.putFile(photoUri)
-
-                // Register observers to listen for when the upload is done or if it fails
-                uploadTask.addOnSuccessListener {
-                    // Delete photo from local storage
-                    photoFile.delete()
-
-                }.addOnFailureListener {
-                    Log.e(TAG, "Failed to upload photo: ${it.message}")
-                }
-            } else {
-                photoFile.delete()
-                Toast.makeText(context, "The file couldn't be saved or created", Toast.LENGTH_LONG)
-                    .show()
-            }
-        }
-
     private fun openCamera() {
-        // Prepare the file where to save the photo
+        val fileProvider = "com.github.factotum_sdp.factotum.file-provider"
         val storageDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        photoName = "JPEG_${UUID.randomUUID()}.jpg"
+        val photoName = "IMG_${UUID.randomUUID()}.jpg"
+        val photoFile = File.createTempFile(photoName, ".jpg", storageDir)
+        val photoUri = FileProvider.getUriForFile(requireContext(), fileProvider, photoFile)
 
-        photoFile = File.createTempFile(
-            photoName,
-            ".jpg",
-            storageDir
-        )
-        photoUri = FileProvider.getUriForFile(
-            requireContext(),
-            "com.github.factotum_sdp.factotum.file-provider",
-            photoFile
-        )
-        takePicture.launch(photoUri)
+        // Register an activity result launcher to take a picture and upload it to Firebase Storage
+        val takePictureAndUpload =
+            registerForActivityResult(ActivityResultContracts.TakePicture()) { result ->
+                if (result) {
+                    // Upload photo to Firebase Storage
+                    val photoRef = storageRef.child(photoName)
+                    val uploadTask = photoRef.putFile(photoUri)
+
+                    // Register observers to listen for when the upload is done or if it fails
+                    uploadTask.addOnSuccessListener { photoFile.delete() }
+                } else {
+                    photoFile.delete()
+                }
+            }
+
+        // Launch the camera given the URI of the photo
+        takePictureAndUpload.launch(photoUri)
     }
 
 

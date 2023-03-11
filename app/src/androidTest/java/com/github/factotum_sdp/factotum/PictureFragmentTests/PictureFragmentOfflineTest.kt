@@ -12,6 +12,7 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.ui.picture.PictureFragment
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
@@ -25,7 +26,7 @@ import java.io.File
 @RunWith(AndroidJUnit4::class)
 class PictureFragmentOfflineTest {
     private lateinit var scenario: FragmentScenario<PictureFragment>
-    private val storage = Firebase.storage
+    private lateinit var storage: FirebaseStorage
     private val externalDir = Environment.getExternalStorageDirectory()
     private val picturesDir = File(externalDir, "/Android/data/com.github.factotum_sdp.factotum/files/Pictures")
 
@@ -35,6 +36,7 @@ class PictureFragmentOfflineTest {
     @Before
     fun setUp() {
         // Initialize Firebase Storage
+        storage = Firebase.storage
         storage.useEmulator("10.0.2.2", 9198)
         emptyFirebaseStorage(storage)
 

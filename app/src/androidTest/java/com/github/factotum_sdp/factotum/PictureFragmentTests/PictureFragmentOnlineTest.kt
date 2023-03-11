@@ -26,7 +26,7 @@ class PictureFragmentOnlineTest {
 
     // Those tests need to run with a firebase storage emulator
     private lateinit var scenario: FragmentScenario<PictureFragment>
-    private val storage = Firebase.storage
+    private lateinit var storage: FirebaseStorage
     private val externalDir = Environment.getExternalStorageDirectory()
     private val picturesDir = File(externalDir, "/Android/data/com.github.factotum_sdp.factotum/files/Pictures")
 
@@ -36,8 +36,7 @@ class PictureFragmentOnlineTest {
 
     @Before
     fun setUp() {
-
-        FirebaseStorage.getInstance().maxUploadRetryTimeMillis = 100000L
+        storage = Firebase.storage
         storage.useEmulator("10.0.2.2", 9199)
         emptyFirebaseStorage(storage)
 

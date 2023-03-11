@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".maps.RouteFragment"
+    tools:context=".ui.maps.RouteFragment"
     android:id="@+id/route_fragment">
 
 

@@ -10,7 +10,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
-import com.github.factotum_sdp.factotum.maps.BasicActivity
 import junit.framework.TestCase.assertTrue
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -24,7 +23,7 @@ class MapsFragmentTest {
 
     @get:Rule
     var testRule = ActivityScenarioRule(
-        BasicActivity::class.java
+        MainActivity::class.java
     )
     @Test
     fun goesToSecondFragement(){

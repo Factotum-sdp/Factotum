@@ -1,11 +1,15 @@
 package com.github.factotum_sdp.factotum
 
+import android.content.Intent
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.Intents.intended
+import androidx.test.espresso.intent.matcher.IntentMatchers.*
+import androidx.test.espresso.intent.rule.IntentsTestRule
+import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
@@ -17,6 +21,7 @@ import androidx.test.uiautomator.UiObject
 import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.UiSelector
 import junit.framework.TestCase.assertTrue
+import org.hamcrest.CoreMatchers.allOf
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -102,6 +107,24 @@ class MapsFragmentTest {
         assertEquals(startMarker.size, endMarker.size)
         assertEquals(startIds.toSet(), endIds.toSet()
         )
+    }
+
+    @Test
+    fun runLaunchesMaps(){
+        Intents.init()
+        val device = UiDevice.getInstance(getInstrumentation())
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.routeFragment))
+            .perform(click())
+        device.findObject(UiSelector().textContains("->")).click()
+        val runButton = onView(withId(R.id.button_run))
+        runButton.perform(click())
+        intended(allOf(hasAction(Intent.ACTION_VIEW),
+            toPackage("com.google.android.apps.maps")
+        ))
+        Intents.release()
+
     }
 
 

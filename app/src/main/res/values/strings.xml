@@ -14,7 +14,7 @@
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="google_maps">Google maps</string>
-    <string name="show_all">Show all</string>
+    <string name="show_all">Show dst</string>
     <string name="phone">Phone</string>
     <string name="email">Email</string>
     <string name="Set">Set</string>
@@ -36,4 +36,5 @@
     <string name="snap_text_on_rec_delete">Last record deleted</string>
     <string name="temp_delete_action_button">temp_delete_action_button</string>
     <string name="menu_maps">Maps</string>
+    <string name="run">Run</string>
 </resources>

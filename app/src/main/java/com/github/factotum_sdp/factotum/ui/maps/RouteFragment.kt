@@ -1,5 +1,7 @@
 package com.github.factotum_sdp.factotum.ui.maps
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -59,6 +61,10 @@ class RouteFragment : Fragment() {
         adapter.notifyDataSetChanged()
         listView.setOnItemClickListener{_, _, position, _ ->
             viewModel.addRoute(listRoute[position])
+            viewModel.setRunRoute(listRoute[position])
+            binding.buttonRun.visibility = Button.VISIBLE
+            binding.buttonFirst.visibility = Button.VISIBLE
+
         }
 
         binding.buttonAll.setOnClickListener{
@@ -67,7 +73,22 @@ class RouteFragment : Fragment() {
             }
             findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
         }
+        binding.buttonRun.setOnClickListener{
+            val route = viewModel.runRoute.value!!
+            val googleMapsUrl = "http://maps.google.com/maps?" +
+                    "saddr=${route.src.latitude}," +
+                    "${route.src.longitude} &" +
+                    "daddr=${route.dst.latitude}," +
+                    "${route.dst.longitude} &mode=b"
+            val uri = Uri.parse(googleMapsUrl)
+            val googleMapsPackage = "com.google.android.apps.maps"
+            val intent = Intent(Intent.ACTION_VIEW, uri).apply {
+                setPackage(googleMapsPackage)
+            }
+            requireContext().startActivity(intent)
+        }
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

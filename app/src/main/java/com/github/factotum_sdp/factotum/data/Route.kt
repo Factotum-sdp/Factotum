@@ -37,18 +37,22 @@ class Route (srcLat: Double, srcLon: Double, dstLat: Double, dstLon: Double) {
      *
      * @param googleMap : map to which the route is added
      */
-    fun addToMap(googleMap: GoogleMap) {
-        googleMap.addMarker(
-            MarkerOptions()
-                .position(this.src)
-                .title("Start of $id")
-        )
+    fun addToMap(googleMap: GoogleMap, src: Boolean = true, dst: Boolean = true) {
+        if (src){
+            googleMap.addMarker(
+                MarkerOptions()
+                    .position(this.src)
+                    .title("Start of $id")
+            )
 
-        googleMap.addMarker(
-            MarkerOptions()
-                .position(this.dst)
-                .title("Destination of $id")
-        )
+        }
+        if(dst) {
+            googleMap.addMarker(
+                MarkerOptions()
+                    .position(this.dst)
+                    .title("Destination of $id")
+            )
+        }
     }
 
 

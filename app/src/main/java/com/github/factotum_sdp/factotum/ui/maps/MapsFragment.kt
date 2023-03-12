@@ -40,7 +40,7 @@ class MapsFragment : Fragment() {
         mapFragment.getMapAsync{ googleMap ->
             googleMap.clear()
             for (route in viewModel.routes.value.orEmpty()){
-                route.addToMap(googleMap)
+                route.addToMap(googleMap, src = false)
             }
             val epfl = LatLng(46.520536, 6.568318)
             googleMap.moveCamera(CameraUpdateFactory.newLatLng(epfl))

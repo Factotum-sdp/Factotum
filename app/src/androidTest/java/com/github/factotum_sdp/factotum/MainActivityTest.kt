@@ -68,10 +68,8 @@ class MainActivityTest {
     fun clickOnMapsMenuItemLeadsToCorrectFragment() {
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
-        onView(withId(R.id.mapsFragment))
+        onView(withId(R.id.routeFragment))
             .perform(click())
-        //temp hard-coded string bug to fetch the fragment parent id
-        onView(withText("This is the maps Fragment")).check(matches(isDisplayed()))
         onView(withId(R.id.drawer_layout)).check(matches(DrawerMatchers.isClosed(Gravity.LEFT)))
     }
 

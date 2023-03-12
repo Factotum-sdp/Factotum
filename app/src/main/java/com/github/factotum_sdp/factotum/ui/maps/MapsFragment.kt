@@ -13,7 +13,7 @@ import com.google.android.gms.maps.model.LatLng
 
 
 /**
- * A simple [Fragment] subclass as the second destination in the navigation.
+ * Fragment class that represents the map
  */
 class MapsFragment : Fragment() {
 
@@ -28,7 +28,7 @@ class MapsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         _binding = FragmentMapsBinding.inflate(inflater, container, false)
         return binding.root
@@ -36,9 +36,17 @@ class MapsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        setMapProperties()
+
+    }
+
+    private fun setMapProperties(){
         val mapFragment = binding.map.getFragment() as SupportMapFragment
         mapFragment.getMapAsync{ googleMap ->
+            // clears map from previous markers
             googleMap.clear()
+            //Shows destinations of selected roads
             for (route in viewModel.routes.value.orEmpty()){
                 route.addToMap(googleMap, src = false)
             }
@@ -50,6 +58,10 @@ class MapsFragment : Fragment() {
 
             // Add zoom gestures to the map
             googleMap.uiSettings.isZoomGesturesEnabled = true
+
+            // Sets zoom preferences
+            googleMap.setMinZoomPreference(2.0f)
+            googleMap.setMaxZoomPreference(14.0f)
         }
     }
 

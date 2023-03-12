@@ -70,15 +70,22 @@ class RouteTest {
     @Test
     fun routeViewAdd(){
         val mapView = MapsViewModel()
-        val route = Route(10.0, 10.0, 10.0, 10.0,)
+        val route = Route(10.0, 10.0, 10.0, 10.0)
         mapView.addRoute(route)
         assertEquals(1, mapView.routes.value!!.size)
+    }
+    @Test
+    fun routeViewSetsRun(){
+        val mapView = MapsViewModel()
+        val route = Route(10.0, 10.0, 10.0, 10.0)
+        mapView.setRunRoute(route)
+        assertEquals(mapView.runRoute.value, route)
     }
 
     @Test
     fun routeViewDeletes(){
         val mapView = MapsViewModel()
-        val route = Route(10.0, 10.0, 10.0, 10.0,)
+        val route = Route(10.0, 10.0, 10.0, 10.0)
         mapView.addRoute(route)
         mapView.deleteAll()
         assertEquals(0, mapView.routes.value!!.size)

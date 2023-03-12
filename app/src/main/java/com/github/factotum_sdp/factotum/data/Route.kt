@@ -35,7 +35,9 @@ class Route (srcLat: Double, srcLon: Double, dstLat: Double, dstLon: Double) {
     /**
      * Adds a route to the map
      *
-     * @param googleMap : map to which the route is added
+     *@param googleMap : map to which the route is added
+     * @param src : boolean if we want to show the route source
+     * @param dst : boolean if we want to show the route destination
      */
     fun addToMap(googleMap: GoogleMap, src: Boolean = true, dst: Boolean = true) {
         if (src){

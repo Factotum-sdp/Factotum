@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.github.factotum_sdp.factotum.data.DestinationRecord
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 
-class RoadBookViewModel() : ViewModel() {
+class RoadBookViewModel : ViewModel() {
     val recordsList: MutableLiveData<List<DestinationRecord>> =
         MutableLiveData(DestinationRecords.RECORDS)
 

@@ -6,18 +6,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.ListView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.data.Route
 import com.github.factotum_sdp.factotum.databinding.FragmentRoutesBinding
-import com.github.factotum_sdp.factotum.ui.maps.MapsViewModel
+import com.github.factotum_sdp.factotum.placeholder.RouteRecords.DUMMY_COURSE
+import com.github.factotum_sdp.factotum.placeholder.RouteRecords.DUMMY_ROUTE
 
 
 /**
- * A simple [Fragment] subclass as the default destination in the navigation.
+ * Fragment that represents the routes
  */
 class RouteFragment : Fragment() {
 
@@ -31,7 +33,7 @@ class RouteFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         _binding = FragmentRoutesBinding.inflate(inflater, container, false)
         return binding.root
@@ -40,19 +42,26 @@ class RouteFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        binding.buttonFirst.setOnClickListener {
-            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
-        }
-
+        // resets viewModel
         viewModel.deleteAll()
-        val listCourse = arrayListOf("BC -> Satelitte", "EPFL -> Chauderon", "Genève -> Lausanne")
-        val listRoute = arrayListOf<Route>(
-            Route(46.51869448523383, 6.561842896370142, 46.520742473314236, 6.567824983999257),
-            Route(46.51916261132295, 6.566773558010879, 46.52369559941859, 6.6250423828801654),
-            Route(46.205062260846894, 6.1430383670835464, 46.517234720289416, 6.6291717405531605),
-        )
-        val listView: ListView = binding.listView
+
+        setListenerList()
+
+        setListenerButtons()
+
+
+    }
+
+    /**
+     * Sets the listeners to the listView
+     *
+     */
+    private fun setListenerList(){
+        // instantiate fake data
+        val listCourse = DUMMY_COURSE
+        val listRoute = DUMMY_ROUTE
+
+        val listView: ListView = binding.listViewRoutes
         val adapter: ArrayAdapter<String?> = ArrayAdapter(requireContext(),
             android.R.layout.simple_list_item_1,
             listCourse as List<String?>
@@ -63,12 +72,22 @@ class RouteFragment : Fragment() {
             viewModel.addRoute(listRoute[position])
             viewModel.setRunRoute(listRoute[position])
             binding.buttonRun.visibility = Button.VISIBLE
-            binding.buttonFirst.visibility = Button.VISIBLE
+            binding.buttonNext.visibility = Button.VISIBLE
 
+        }
+    }
+
+    /**
+     * Sets the listeners for the buttons
+     *
+     */
+    private fun setListenerButtons(){
+        binding.buttonNext.setOnClickListener {
+            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
         }
 
         binding.buttonAll.setOnClickListener{
-            for(route in listRoute){
+            for(route in DUMMY_ROUTE){
                 viewModel.addRoute(route)
             }
             findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)

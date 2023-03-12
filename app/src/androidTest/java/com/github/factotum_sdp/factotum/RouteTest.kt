@@ -2,6 +2,7 @@ package com.github.factotum_sdp.factotum
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.data.Route
+import com.github.factotum_sdp.factotum.ui.maps.MapsViewModel
 import com.google.android.gms.maps.model.LatLng
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
@@ -58,5 +59,28 @@ class RouteTest {
         val route = Route(srcLat, srcLng, dstLat, dstLng)
         val str = "The route starts at coordinates ($srcLat, $srcLng) and finishes at coordinates ($dstLat, $dstLng)"
         assertEquals(str, route.toString())
+    }
+
+    @Test
+    fun routeViewInitializesCorrectly(){
+        val mapView = MapsViewModel()
+        assertEquals(0, mapView.routes.value!!.size)
+    }
+
+    @Test
+    fun routeViewAdd(){
+        val mapView = MapsViewModel()
+        val route = Route(10.0, 10.0, 10.0, 10.0,)
+        mapView.addRoute(route)
+        assertEquals(1, mapView.routes.value!!.size)
+    }
+
+    @Test
+    fun routeViewDeletes(){
+        val mapView = MapsViewModel()
+        val route = Route(10.0, 10.0, 10.0, 10.0,)
+        mapView.addRoute(route)
+        mapView.deleteAll()
+        assertEquals(0, mapView.routes.value!!.size)
     }
 }

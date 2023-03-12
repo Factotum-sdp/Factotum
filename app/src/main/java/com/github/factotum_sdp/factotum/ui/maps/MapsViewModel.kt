@@ -13,6 +13,6 @@ class MapsViewModel : ViewModel() {
     }
 
     fun deleteAll(){
-        routes.value = mutableListOf()
+        routes.postValue(mutableListOf())
     }
 }

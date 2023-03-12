@@ -100,7 +100,8 @@ class MapsFragmentTest {
         val endMarker = device.findObjects(descContains("Destination"))
         val endIds = endMarker.map { it.contentDescription.substringAfter("of") }
         assertEquals(startMarker.size, endMarker.size)
-        assertEquals(startIds.toSet(), endIds.toSet())
+        assertEquals(startIds.toSet(), endIds.toSet()
+        )
     }
 
 

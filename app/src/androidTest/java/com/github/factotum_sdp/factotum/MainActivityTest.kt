@@ -1,5 +1,6 @@
 package com.github.factotum_sdp.factotum
 
+import android.Manifest
 import android.provider.MediaStore
 import android.view.Gravity
 import androidx.test.core.app.ApplicationProvider
@@ -14,6 +15,7 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
 import org.hamcrest.Matchers.allOf
@@ -29,6 +31,9 @@ class MainActivityTest {
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
     )
+
+    @get:Rule
+    val permissionsRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
 
     //========================================================================================
     // Entry view checks :

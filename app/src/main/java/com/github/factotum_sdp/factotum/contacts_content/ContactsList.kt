@@ -1,6 +1,7 @@
 package com.github.factotum_sdp.factotum.contacts_content
 
-import kotlin.math.min
+import android.os.Parcelable
+import com.github.factotum_sdp.factotum.R
 
 /**
  * Class representing a list of contacts.
@@ -12,13 +13,12 @@ object ContactsList {
      */
     val ITEMS: MutableList<Contact> = ArrayList()
 
-    /**
-     * A map of sample contacts, by ID.
-     */
-    private val ITEM_MAP: MutableMap<String, Contact> = HashMap()
-
     private val randomNames = listOf("John", "Jane", "Bob", "Alice", "Tom", "Mary", "Peter", "Kate", "Jack", "Sarah")
-    private val randomSurnames = listOf("Smith", "Johnson", "Williams", "Brown", "Jones", "Miller", "Davis", "Garcia", "Rodriguez", "Wilson")
+    private val roles = listOf("Boss", "Courier", "Client")
+    private val randomAddresses = listOf("123 Fake Street", "456 Fake Street", "789 Fake Street")
+    private val randomPhones = listOf("123456789", "987654321", "123987456")
+
+    private const val image = R.drawable.contact_image
 
     private const val COUNT = 10
 
@@ -31,18 +31,18 @@ object ContactsList {
 
     private fun addItem(item: Contact) {
         ITEMS.add(item)
-        ITEM_MAP[item.id] = item
     }
 
     private fun createContact(position: Int): Contact {
-        val pos = min(position, randomNames.size-1)
-        return Contact(position.toString(), randomNames[pos], randomSurnames[pos], "../../../../../../res/drawable/contact_image.png")
+        return Contact(roles[position % roles.size], randomNames[position % randomNames.size], image,
+            randomAddresses[position % randomAddresses.size], randomPhones[position % randomPhones.size])
     }
 
     /**
      * A data class representing a contact.
      */
-    data class Contact(val id: String, val name: String, val surname: String, val profile_pic: String? = null) {
-        override fun toString(): String = "$name $surname"
+    @kotlinx.parcelize.Parcelize
+    data class Contact(val role: String, val name: String, val profile_pic_id: Int, val address: String, val phone: String, val details: String? = null) : Parcelable {
+        override fun toString(): String = "$role: $name"
     }
 }

@@ -5,6 +5,10 @@
     <string name="greetings">Greetings !</string>
     <string name="main_diary_activity">Main Diary Activity</string>
     <string name="contact_name">Name</string>
-    <string name="contact_surname">Number</string>
+    <string name="contact_role">Role</string>
     <string name="contact_image">Contact_image</string>
+    <string name="contact_address">Address</string>
+    <string name="contact_phone">Phone number</string>
+    <string name="contact_details">Details of contact</string>
+    <string name="back_to_list_button">Back to List</string>
 </resources>

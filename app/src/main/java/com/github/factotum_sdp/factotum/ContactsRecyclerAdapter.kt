@@ -1,44 +1,35 @@
 package com.github.factotum_sdp.factotum
 
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.contacts_content.ContactsList
 
 class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.ContactsViewHolder>() {
 
-    private val contacts = listOf(
-        ContactsList.Contact("1", "John", "Lennon"),
-        ContactsList.Contact("2", "Paul", "McCartney"),
-        ContactsList.Contact("3", "George", "Harrison"),
-        ContactsList.Contact("4", "Ringo", "Starr"),
-        //create more random contacts
-        ContactsList.Contact("5", "John", "Lennon"),
-        ContactsList.Contact("6", "Paul", "McCartney"),
-        ContactsList.Contact("7", "George", "Harrison"),
-        ContactsList.Contact("8", "Ringo", "Starr"),
-        ContactsList.Contact("9", "John", "Lennon"),
-        ContactsList.Contact("10", "Paul", "McCartney"),
-        ContactsList.Contact("11", "George", "Harrison"),
-        ContactsList.Contact("12", "Ringo", "Starr"),
-        ContactsList.Contact("13", "John", "Lennon"),
-    )
-
-    private val image = R.drawable.contact_image
+    private val contacts = ContactsList.ITEMS
 
     inner class ContactsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
+        var itemRole : TextView
         var itemName : TextView
-        var itemSurname : TextView
         var itemImage : ImageView
 
         init {
+            itemRole = itemView.findViewById(R.id.contact_role)
             itemName = itemView.findViewById(R.id.contact_name)
-            itemSurname = itemView.findViewById(R.id.contact_surname)
             itemImage = itemView.findViewById(R.id.contact_image)
+
+            itemView.setOnClickListener {
+                itemView.findNavController().navigate(R.id.action_contactsFragment_to_contactDetailsFragment, Bundle().apply {
+                    putInt("id", bindingAdapterPosition)
+                })
+            }
         }
     }
 
@@ -50,9 +41,9 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
     }
 
     override fun onBindViewHolder(holder: ContactsViewHolder, i: Int) {
+        holder.itemRole.text = contacts[i].role
         holder.itemName.text = contacts[i].name
-        holder.itemSurname.text = contacts[i].surname
-        holder.itemImage.setImageResource(image)
+        holder.itemImage.setImageResource(contacts[i].profile_pic_id)
     }
 
     override fun getItemCount(): Int {

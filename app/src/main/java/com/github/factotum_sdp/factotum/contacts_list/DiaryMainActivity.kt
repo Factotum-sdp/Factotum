@@ -1,7 +1,8 @@
-package com.github.factotum_sdp.factotum
+package com.github.factotum_sdp.factotum.contacts_list
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.github.factotum_sdp.factotum.R
 
 class DiaryMainActivity : AppCompatActivity() {
 

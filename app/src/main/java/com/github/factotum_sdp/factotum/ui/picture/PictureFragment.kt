@@ -69,14 +69,14 @@ class PictureFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val galleryViewModel =
+        val pictureViewModel =
             ViewModelProvider(this)[PictureViewModel::class.java]
 
         _binding = FragmentPictureBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
         val textView: TextView = binding.textGallery
-        galleryViewModel.text.observe(viewLifecycleOwner) {
+        pictureViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
         }
         return root

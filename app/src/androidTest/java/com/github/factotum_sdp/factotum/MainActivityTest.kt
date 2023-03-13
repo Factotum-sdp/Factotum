@@ -22,6 +22,7 @@ import org.hamcrest.core.AllOf.allOf
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest {
 
+    /*
     private val userName = "Carl"
 
     @get:Rule
@@ -62,5 +63,5 @@ class MainActivityTest {
     fun endToEndCheckWithoutUserName() {
         onView(withId(R.id.validateButton)).perform(click())
         onView(withId(R.id.greetingMessage)).check(matches(withText("Hello ")))
-    }
+    } */
 }

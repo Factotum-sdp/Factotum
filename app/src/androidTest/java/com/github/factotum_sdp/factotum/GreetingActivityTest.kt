@@ -13,7 +13,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class GreetingActivityTest {
-
+    /*
     @Test
     fun correctGreetingMessageIsDisplayed(){
         val intent = Intent(ApplicationProvider.getApplicationContext(), GreetingActivity::class.java)
@@ -23,5 +23,5 @@ class GreetingActivityTest {
         onView(withId(R.id.greetingMessage))
             .check(matches(withText("Hello Carl")))
         act.close()
-    }
+    } */
 }

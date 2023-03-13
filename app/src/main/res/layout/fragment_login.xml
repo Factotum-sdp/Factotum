@@ -9,6 +9,7 @@
     android:paddingTop="@dimen/fragment_vertical_margin"
     android:paddingRight="@dimen/fragment_horizontal_margin"
     android:paddingBottom="@dimen/fragment_vertical_margin"
+    android:visibility="visible"
     tools:context=".ui.login.LoginFragment">
 
     <LinearLayout
@@ -48,16 +49,16 @@
             android:id="@+id/username"
             android:layout_width="337dp"
             android:layout_height="55dp"
-            android:hint="@string/prompt_email"
             android:layout_marginBottom="16dp"
+            android:hint="@string/prompt_email"
             android:inputType="textEmailAddress"
-            android:selectAllOnFocus="true"  />
+            android:selectAllOnFocus="true" />
 
         <TextView
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
-            android:layout_marginBottom="16dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
             android:text="Password" />
 
         <EditText
@@ -72,7 +73,7 @@
             android:selectAllOnFocus="true" />
 
         <TextView
-            android:id="@+id/textView6"
+            android:id="@+id/pwdForgot"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
@@ -98,15 +99,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="64dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginBottom="64dp"
             android:visibility="gone" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
             android:orientation="horizontal">
 

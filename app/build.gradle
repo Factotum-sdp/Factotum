@@ -63,7 +63,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-auth:20.4.1'
     debugImplementation 'androidx.fragment:fragment-testing:1.5.5'
     debugImplementation 'androidx.test:monitor:1.6.1'
-
+    debugImplementation 'androidx.fragment:fragment-testing:1.5.5'
 }
 
 tasks.withType(Test) {

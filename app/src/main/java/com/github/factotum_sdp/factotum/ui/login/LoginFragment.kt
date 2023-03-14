@@ -52,17 +52,12 @@ class LoginFragment : Fragment() {
         val googleSignInButton = requireView().findViewById<SignInButton>(R.id.sign_in_button)
 
         observe(loginButton, usernameEditText, passwordEditText)
-
         addListeners(loadingProgressBar)
 
         val afterTextChangedListener = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-                // ignore
-            }
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                // ignore
-            }
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
 
             override fun afterTextChanged(s: Editable) {
                 loginViewModel.loginDataChanged(
@@ -73,13 +68,9 @@ class LoginFragment : Fragment() {
         }
 
         addListeners(usernameEditText, passwordEditText, afterTextChangedListener)
-
         login(loginButton, loadingProgressBar, usernameEditText, passwordEditText)
-
         displaySnackbarOnClick(signupButton, "Sign Up")
-
         displaySnackbarOnClick(pwdForgotButton, "Password Forgot")
-
         displaySnackbarOnClick(googleSignInButton, "Google Sign In")
     }
 

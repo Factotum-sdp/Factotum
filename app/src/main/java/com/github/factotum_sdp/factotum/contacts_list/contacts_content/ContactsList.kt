@@ -12,6 +12,7 @@ object ContactsList {
      */
     val ITEMS: MutableList<Contact> = ArrayList()
 
+    //fake data --> to be replaced with connection to database
     private val randomNames = listOf("John Smith", "Jane Doe", "Bob Builder")
     private val roles = listOf("Boss", "Courier", "Client")
     private val randomAddresses = listOf("123 Fake Street", "456 Fake Street", "789 Fake Street")
@@ -29,6 +30,7 @@ object ContactsList {
         }
     }
 
+    //Trivial method for now but will be useful when connecting to database
     private fun addItem(item: Contact) {
         ITEMS.add(item)
     }

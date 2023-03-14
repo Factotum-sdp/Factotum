@@ -20,14 +20,15 @@ class ContactDetailsFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val mainView = inflater.inflate(R.layout.contact_with_details, container, false)
-        val button = mainView.findViewById<Button>(R.id.button)
+        val button = mainView.findViewById<Button>(R.id.button) // connect the button to the layout
         button.setOnClickListener { view ->
-            view.findNavController().navigate(R.id.action_contactDetailsFragment_to_contactsFragment)}
-        setContactDetails(mainView, ContactsList.ITEMS[arguments?.getInt("id")!!])
+            view.findNavController().navigate(R.id.action_contactDetailsFragment_to_contactsFragment)} // go back to the list of contacts when the button is clicked
+        setContactDetails(mainView, ContactsList.ITEMS[arguments?.getInt("id")!!]) //links the contact details to the layout
 
         return mainView
     }
 
+    // links contact details to the layout
     private fun setContactDetails(view: View, contact: ContactsList.Contact) {
         val contactName = view.findViewById<TextView>(R.id.contact_name)
         val contactRole = view.findViewById<TextView>(R.id.contact_role)

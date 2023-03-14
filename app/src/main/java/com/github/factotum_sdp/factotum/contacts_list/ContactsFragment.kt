@@ -22,9 +22,10 @@ class ContactsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val recycler = view.findViewById <RecyclerView>(R.id.contacts_recycler_view)
+        val recycler = view.findViewById <RecyclerView>(R.id.contacts_recycler_view) // connect the recycler view to the layout
+        //the recycler is just the way we chose to represent the list of contacts
         recycler.apply {
-            layoutManager = LinearLayoutManager(context)
+            layoutManager = LinearLayoutManager(context)    //recycler needs a layout manager and an adapter which we set here
             adapter = ContactsRecyclerAdapter()
         }
     }

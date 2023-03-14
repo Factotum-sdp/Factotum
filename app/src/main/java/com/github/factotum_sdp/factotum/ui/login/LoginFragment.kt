@@ -143,7 +143,6 @@ class LoginFragment : Fragment() {
 
     private fun displaySnackbarOnClick(button: View, text: String) {
         button.setOnClickListener {
-            val appContext = context?.applicationContext
             Snackbar.make(requireView(), text, Snackbar.LENGTH_LONG).show()
         }
     }

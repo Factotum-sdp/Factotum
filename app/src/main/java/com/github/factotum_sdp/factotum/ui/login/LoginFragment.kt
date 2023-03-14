@@ -7,16 +7,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.Toast
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ProgressBar
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.databinding.FragmentLoginBinding
-import com.github.factotum_sdp.factotum.safeNavigate
 import com.google.android.gms.common.SignInButton
 import com.google.android.material.snackbar.Snackbar
 
@@ -52,31 +51,9 @@ class LoginFragment : Fragment() {
         val pwdForgotButton = binding.pwdForgot
         val googleSignInButton = requireView().findViewById<SignInButton>(R.id.sign_in_button)
 
-        loginViewModel.loginFormState.observe(viewLifecycleOwner,
-            Observer { loginFormState ->
-                if (loginFormState == null) {
-                    return@Observer
-                }
-                loginButton.isEnabled = loginFormState.isDataValid
-                loginFormState.usernameError?.let {
-                    usernameEditText.error = getString(it)
-                }
-                loginFormState.passwordError?.let {
-                    passwordEditText.error = getString(it)
-                }
-            })
+        observe(loginButton, usernameEditText, passwordEditText)
 
-        loginViewModel.loginResult.observe(viewLifecycleOwner,
-            Observer { loginResult ->
-                loginResult ?: return@Observer
-                loadingProgressBar.visibility = View.GONE
-                loginResult.error?.let {
-                    showLoginFailed(it)
-                }
-                loginResult.success?.let {
-                    updateUiWithUser(it)
-                }
-            })
+        addListeners(loadingProgressBar)
 
         val afterTextChangedListener = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
@@ -94,6 +71,57 @@ class LoginFragment : Fragment() {
                 )
             }
         }
+
+        addListeners(usernameEditText, passwordEditText, afterTextChangedListener)
+
+        login(loginButton, loadingProgressBar, usernameEditText, passwordEditText)
+
+        displaySnackbarOnClick(signupButton, "Sign Up")
+
+        displaySnackbarOnClick(pwdForgotButton, "Password Forgot")
+
+        displaySnackbarOnClick(googleSignInButton, "Google Sign In")
+    }
+
+    private fun observe(
+        loginButton: Button,
+        usernameEditText: EditText,
+        passwordEditText: EditText
+    ) {
+        loginViewModel.loginFormState.observe(viewLifecycleOwner,
+            Observer { loginFormState ->
+                if (loginFormState == null) {
+                    return@Observer
+                }
+                loginButton.isEnabled = loginFormState.isDataValid
+                loginFormState.usernameError?.let {
+                    usernameEditText.error = getString(it)
+                }
+                loginFormState.passwordError?.let {
+                    passwordEditText.error = getString(it)
+                }
+            })
+    }
+
+    private fun addListeners(loadingProgressBar: ProgressBar) {
+        loginViewModel.loginResult.observe(viewLifecycleOwner,
+            Observer { loginResult ->
+                loginResult ?: return@Observer
+                loadingProgressBar.visibility = View.GONE
+                loginResult.error?.let {
+                    showLoginFailed(it)
+                }
+                loginResult.success?.let {
+                    updateUiWithUser(it)
+                }
+            })
+    }
+
+    private fun addListeners(
+        usernameEditText: EditText,
+        passwordEditText: EditText,
+        afterTextChangedListener: TextWatcher
+    ) {
         usernameEditText.addTextChangedListener(afterTextChangedListener)
         passwordEditText.addTextChangedListener(afterTextChangedListener)
         passwordEditText.setOnEditorActionListener { _, actionId, _ ->
@@ -105,28 +133,27 @@ class LoginFragment : Fragment() {
             }
             false
         }
+    }
 
-        loginButton.setOnClickListener {
-            loadingProgressBar.visibility = View.VISIBLE
+    private fun login(
+        button: Button,
+        progressBar: ProgressBar,
+        usernameEditText: EditText,
+        passwordEditText: EditText
+    ) {
+        button.setOnClickListener {
+            progressBar.visibility = View.VISIBLE
             loginViewModel.login(
                 usernameEditText.text.toString(),
                 passwordEditText.text.toString()
             )
         }
+    }
 
-        signupButton.setOnClickListener {
+    private fun displaySnackbarOnClick(button: View, text: String) {
+        button.setOnClickListener {
             val appContext = context?.applicationContext
-            Snackbar.make(requireView(), "Sign Up", Snackbar.LENGTH_LONG).show()
-        }
-
-        pwdForgotButton.setOnClickListener {
-            val appContext = context?.applicationContext
-            Snackbar.make(requireView(), "Password Forgot", Snackbar.LENGTH_LONG).show()
-        }
-
-        googleSignInButton.setOnClickListener {
-            val appContext = context?.applicationContext
-            Snackbar.make(requireView(), "Google Sign In", Snackbar.LENGTH_LONG).show()
+            Snackbar.make(requireView(), text, Snackbar.LENGTH_LONG).show()
         }
     }
 

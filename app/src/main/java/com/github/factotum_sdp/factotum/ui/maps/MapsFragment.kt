@@ -7,10 +7,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.github.factotum_sdp.factotum.databinding.FragmentDirectoryBinding
+import com.github.factotum_sdp.factotum.databinding.FragmentMapsBinding
 
 class MapsFragment: Fragment() {
-    private var _binding: FragmentDirectoryBinding? = null
+    private var _binding: FragmentMapsBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -24,10 +24,10 @@ class MapsFragment: Fragment() {
         val slideshowViewModel =
             ViewModelProvider(this).get(MapsViewModel::class.java)
 
-        _binding = FragmentDirectoryBinding.inflate(inflater, container, false)
+        _binding = FragmentMapsBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textSlideshow
+        val textView: TextView = binding.maps
         slideshowViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
         }

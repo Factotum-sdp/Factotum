@@ -26,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:text="Login"
+            android:text="@string/login_text"
             android:textSize="48sp" />
 
         <TextView
@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="7dp"
             android:layout_marginBottom="16dp"
-            android:text="Welcome Back"
+            android:text="@string/welcome_back_text"
             android:textSize="20sp" />
 
         <TextView
@@ -43,7 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:text="E-mail adress" />
+            android:text="@string/e_mail_adress_text" />
 
         <EditText
             android:id="@+id/username"
@@ -52,14 +52,15 @@
             android:layout_marginBottom="16dp"
             android:hint="@string/prompt_email"
             android:inputType="textEmailAddress"
-            android:selectAllOnFocus="true" />
+            android:selectAllOnFocus="true"
+            android:autofillHints="" />
 
         <TextView
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:text="Password" />
+            android:text="@string/password_text" />
 
         <EditText
             android:id="@+id/password"
@@ -70,7 +71,8 @@
             android:imeActionLabel="@string/action_sign_in_short"
             android:imeOptions="actionDone"
             android:inputType="textPassword"
-            android:selectAllOnFocus="true" />
+            android:selectAllOnFocus="true"
+            android:autofillHints="" />
 
         <TextView
             android:id="@+id/pwdForgot"
@@ -79,7 +81,7 @@
             android:layout_marginBottom="16dp"
             android:clickable="true"
             android:focusable="true"
-            android:text="Forgot my password" />
+            android:text="@string/forgot_my_password_text" />
 
         <Button
             android:id="@+id/login"
@@ -113,7 +115,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
-                android:text="Register via another account" />
+                android:text="@string/register_via_another_account_text" />
 
             <com.google.android.gms.common.SignInButton
                 android:id="@+id/sign_in_button"
@@ -132,7 +134,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
                 android:layout_marginBottom="28dp"
-                android:text="I don't have an account" />
+                android:text="@string/i_don_t_have_an_account_text" />
 
             <TextView
                 android:id="@+id/signup"
@@ -142,7 +144,7 @@
                 android:layout_marginBottom="28dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:text="Create one" />
+                android:text="@string/create_one_text" />
         </LinearLayout>
 
     </LinearLayout>

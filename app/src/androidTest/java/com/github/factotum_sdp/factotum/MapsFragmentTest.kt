@@ -22,6 +22,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.TimeUnit
 
 
 @RunWith(AndroidJUnit4::class)
@@ -66,11 +67,14 @@ class MapsFragmentTest {
             .perform(DrawerActions.open())
         onView(withId(R.id.routeFragment))
             .perform(click())
-        Thread.sleep(1000)
         val nbRoutes = device.findObjects(textContains("->")).size
         val showAll = onView(withId(R.id.button_all))
         showAll.perform(click())
-        val endMarker = device.findObjects(descContains("Destination"))
+        var endMarker = device.findObjects(descContains("Destination"))
+        val endTime = System.nanoTime() + TimeUnit.SECONDS.toNanos(5)
+        while(endMarker.size == 0 && System.nanoTime() < endTime) {
+            endMarker = device.findObjects(descContains("Destination"))
+        }
         assertEquals(nbRoutes, endMarker.size)
     }
 

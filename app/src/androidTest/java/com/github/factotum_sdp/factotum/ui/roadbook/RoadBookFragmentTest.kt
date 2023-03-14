@@ -52,6 +52,7 @@ class RoadBookFragmentTest {
         onView(withText(DestinationRecords.RECORDS[0].destName))
             .check(matches(isDisplayed()))
         onView(withId(R.id.fab)).perform(click())
+        // Scroll to last position to see if the new record is displayed at the end
         onView(withId(R.id.list)).perform(
             click(),
             RecyclerViewActions.scrollToLastPosition<RoadBookViewAdapter.RecordViewHolder>(),
@@ -67,9 +68,12 @@ class RoadBookFragmentTest {
             click(),
             RecyclerViewActions.scrollToLastPosition<RoadBookViewAdapter.RecordViewHolder>(),
         )
+        // Record just added is displayed at the end of the list
         onView((withText(DestinationRecords.RECORD_TO_ADD.destName)))
             .check(matches(isDisplayed()))
         onView(withId(R.id.fab_delete)).perform(click())
+
+        // Record added previously is now deleted
         onView((withText(DestinationRecords.RECORD_TO_ADD.destName)))
             .check(doesNotExist())
     }

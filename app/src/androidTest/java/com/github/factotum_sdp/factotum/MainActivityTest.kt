@@ -53,15 +53,17 @@ class MainActivityTest {
             .perform(DrawerActions.open())
             .check(matches(DrawerMatchers.isOpen()))
     }
-
-    @Test
-    fun clickOnPictureMenuItemLeadsToCorrectFragment() {
+    private fun clickOnAMenuItemLeadsCorrectly(menuItemId: Int, fragment_parent_id: Int) {
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
-        onView(withId(R.id.pictureFragment))
+        onView(withId(menuItemId))
             .perform(click())
-        onView(withId(R.id.fragment_picture_directors_parent)).check(matches(isDisplayed()))
+        onView(withId(fragment_parent_id)).check(matches(isDisplayed()))
         onView(withId(R.id.drawer_layout)).check(matches(DrawerMatchers.isClosed(Gravity.LEFT)))
+    }
+    @Test
+    fun clickOnPictureMenuItemLeadsToCorrectFragment() {
+        clickOnAMenuItemLeadsCorrectly(R.id.pictureFragment, R.id.fragment_picture_directors_parent)
     }
 
     @Test
@@ -77,40 +79,19 @@ class MainActivityTest {
 
     @Test
     fun clickOnDirectoryMenuItemLeadsToCorrectFragment() {
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.directoryFragment))
-            .perform(click())
-        onView(withId(R.id.fragment_directory_directors_parent)).check(matches(isDisplayed()))
-        onView(withId(R.id.drawer_layout)).check(matches(DrawerMatchers.isClosed(Gravity.LEFT)))
+        clickOnAMenuItemLeadsCorrectly(R.id.directoryFragment, R.id.fragment_directory_directors_parent)
     }
 
     @Test
     fun clickOnRoadBookMenuItemStaysToCorrectFragment() {
         onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.roadBookFragment))
-            .perform(click())
-        onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
-        onView(withId(R.id.drawer_layout)).check(matches(DrawerMatchers.isClosed(Gravity.LEFT)))
+        clickOnAMenuItemLeadsCorrectly(R.id.roadBookFragment, R.id.fragment_roadbook_directors_parent)
     }
 
     @Test
     fun navigateThroughDrawerMenuWorks() {
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.directoryFragment))
-            .perform(click())
-        onView(withId(R.id.fragment_directory_directors_parent)).check(matches(isDisplayed()))
-        onView(withId(R.id.drawer_layout)).check(matches(DrawerMatchers.isClosed(Gravity.LEFT)))
-
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.roadBookFragment))
-            .perform(click())
-        onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
-        onView(withId(R.id.drawer_layout)).check(matches(DrawerMatchers.isClosed(Gravity.LEFT)))
+        clickOnAMenuItemLeadsCorrectly(R.id.directoryFragment, R.id.fragment_directory_directors_parent)
+        clickOnAMenuItemLeadsCorrectly(R.id.roadBookFragment, R.id.fragment_roadbook_directors_parent)
     }
 
     @Test

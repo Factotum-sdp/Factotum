@@ -66,11 +66,11 @@ class MapsFragmentTest {
             .perform(DrawerActions.open())
         onView(withId(R.id.routeFragment))
             .perform(click())
+        Thread.sleep(1000)
         val nbRoutes = device.findObjects(textContains("->")).size
         val showAll = onView(withId(R.id.button_all))
         showAll.perform(click())
         val endMarker = device.findObjects(descContains("Destination"))
-        val endIds = endMarker.map { it.contentDescription.substringAfter("of") }
         assertEquals(nbRoutes, endMarker.size)
     }
 

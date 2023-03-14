@@ -17,6 +17,6 @@
     <string name="create_one_text">Create one</string>
     <string name="login_text">Login</string>
     <string name="welcome_back_text">Welcome Back</string>
-    <string name="e_mail_adress_text">E-mail adress</string>
+    <string name="e_mail_address_text">E-mail address</string>
     <string name="sign_up_text">Sign Up</string>
 </resources>

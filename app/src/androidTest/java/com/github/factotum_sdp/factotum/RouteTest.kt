@@ -1,10 +1,12 @@
 package com.github.factotum_sdp.factotum
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.data.Route
 import com.github.factotum_sdp.factotum.ui.maps.MapsViewModel
 import com.google.android.gms.maps.model.LatLng
 import junit.framework.TestCase.assertEquals
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -74,12 +76,15 @@ class RouteTest {
         mapView.addRoute(route)
         assertEquals(1, mapView.routes.value!!.size)
     }
+
+    @get:Rule
+    val rule = InstantTaskExecutorRule()
     @Test
     fun routeViewSetsRun(){
         val mapView = MapsViewModel()
         val route = Route(10.0, 10.0, 10.0, 10.0)
         mapView.setRunRoute(route)
-        assertEquals(mapView.runRoute.value, route)
+        assertEquals(route, mapView.runRoute.value)
     }
 
     @Test

@@ -109,7 +109,8 @@ class PictureFragment : Fragment() {
         noinline denied: (permission: String) -> Unit = {},
         noinline explained: (permission: String) -> Unit = {}
 
-    ): ReadOnlyProperty<Fragment, R> = PermissionResultDelegate(this, permission, granted, denied, explained)
+    ): ReadOnlyProperty<Fragment, R> =
+        PermissionResultDelegate(this, permission, granted, denied, explained)
 
 }
 

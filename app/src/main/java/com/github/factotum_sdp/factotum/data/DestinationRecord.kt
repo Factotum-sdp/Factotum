@@ -1,6 +1,7 @@
 package com.github.factotum_sdp.factotum.data
 
-import java.util.Date
+import com.github.factotum_sdp.factotum.data.DestinationRecord.Action
+import java.util.*
 
 /**
  * Data design of a Destination Record
@@ -18,8 +19,7 @@ data class DestinationRecord(
     val waitingTime: Int,
     val rate: Int,
     val actions: List<Action>
-)
-{
+) {
     /**
      * The possible actions to achieve on a destination
      */
@@ -28,6 +28,7 @@ data class DestinationRecord(
         DELIVER,
         CONTACT,
         RELAY;
+
         override fun toString(): String =
             when (this) {
                 PICK -> "p"

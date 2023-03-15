@@ -8,8 +8,10 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.data.Action
 import com.github.factotum_sdp.factotum.data.DestinationRecord
 import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * Adapter for the RecyclerView which will display a dynamic list of DestinationRecord
@@ -50,21 +52,66 @@ class RoadBookViewAdapter(
     // Bind each displayed Record to the corresponding current async list slot
     override fun onBindViewHolder(holder: RecordViewHolder, position: Int) {
         val item = asyncList.currentList[position]
-        holder.idView.text = item.timeStamp?.let { SimpleDateFormat.getTimeInstance().format(it) }
-        holder.contentView.text = item.destID
+        val context = holder.itemView.context
+
+        // Formatting and bind the TextViews
+        holder.destID.text = item.destID
+        holder.timeStamp.text =
+            timestampStringFormat(item.timeStamp, context.getString(R.string.arrival_text_view))
+        holder.waitingTime.text =
+            waitingTimeStringFormat(item.waitingTime, context.getString(R.string.wait_text_view))
+        holder.rate.text =
+            rateStringFormat(item.rate, context.getString(R.string.rate_text_view))
+        holder.actions.text =
+            actionsStringFormat(item.actions, context.getString(R.string.actions_text_view))
+    }
+
+    private fun rateStringFormat(rate: Int, label: String): String {
+        return "$label : $rate"
+    }
+
+    // Only displayed if there is a non zero waiting time
+    private fun waitingTimeStringFormat(waitTime: Int, label: String): String {
+        if (waitTime != 0)
+            return "$label : $waitTime"
+        return ""
+    }
+
+    private fun timestampStringFormat(date: Date?, label: String): String {
+        val sb = java.lang.StringBuilder("$label : ")
+        if (date == null)
+            return sb.append('_').toString()
+        date.let {
+            sb.append(SimpleDateFormat.getTimeInstance().format(it)) }
+        return sb.toString()
+    }
+
+    private fun actionsStringFormat(actions: List<Action>, label: String): String {
+        val sb = StringBuilder("$label : (")
+        if (actions.isEmpty())
+            return sb.append(" )").toString()
+        sb.append(actions.first())
+        actions.forEach {
+            sb.append(" | ")
+            sb.append(it)
+        }
+        sb.append(")")
+        return sb.toString()
     }
 
     override fun getItemCount(): Int = asyncList.currentList.size
-
 
     /**
      * ViewHolder of a (destination) record
      */
     inner class RecordViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val idView: TextView = itemView.findViewById(R.id.item_number)
-        val contentView: TextView = itemView.findViewById(R.id.content)
+        val destID: TextView = itemView.findViewById(R.id.dest_id)
+        val timeStamp: TextView = itemView.findViewById(R.id.timestamp)
+        val waitingTime: TextView = itemView.findViewById(R.id.waiting_time)
+        val rate: TextView = itemView.findViewById(R.id.rate)
+        val actions: TextView = itemView.findViewById(R.id.dest_actions)
         override fun toString(): String {
-            return super.toString() + " '" + contentView.text + "'"
+            return super.toString() + " '" + timeStamp.text + "'"
         }
     }
 

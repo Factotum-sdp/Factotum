@@ -27,5 +27,12 @@ data class DestinationRecord(
         PICK,
         DELIVER,
         CONTACT,
-        RELAY
+        RELAY;
+        override fun toString(): String =
+            when (this) {
+                PICK -> "p"
+                DELIVER -> "d"
+                CONTACT -> "c"
+                RELAY -> "r"
+            }
     }

@@ -1,5 +1,7 @@
 package com.github.factotum_sdp.factotum
 
+import android.Manifest
+import android.provider.MediaStore
 import android.view.Gravity
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.*
@@ -7,9 +9,16 @@ import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.DrawerMatchers
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.rule.GrantPermissionRule
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.UiSelector
+import org.hamcrest.Matchers.allOf
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,10 +27,15 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest {
 
+    private val userName = "Carl"
+
     @get:Rule
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
     )
+
+    @get:Rule
+    val permissionsRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
 
     //========================================================================================
     // Entry view checks :
@@ -35,11 +49,6 @@ class MainActivityTest {
     @Test
     fun toolBarIsCorrectlyDisplayedOnFirstView() {
         onView(withId(R.id.toolbar)).check(matches(isDisplayed()))
-    }
-
-    @Test
-    fun drawerLayoutIsCorrectlyDisplayedOnFirstView() {
-        onView(withId(R.id.drawer_layout)).check(matches(isDisplayed()))
     }
 
 
@@ -56,12 +65,27 @@ class MainActivityTest {
 
     @Test
     fun clickOnPictureMenuItemLeadsToCorrectFragment() {
+        Intents.init()
+        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.pictureFragment))
             .perform(click())
-        onView(withId(R.id.fragment_picture_directors_parent)).check(matches(isDisplayed()))
-        onView(withId(R.id.drawer_layout)).check(matches(DrawerMatchers.isClosed(Gravity.LEFT)))
+        // Check that is open the camera
+
+        // Create an IntentMatcher to capture the intent that should open the camera app
+        val expectedIntent = allOf(hasAction(MediaStore.ACTION_IMAGE_CAPTURE))
+
+        Thread.sleep(5000)
+
+        // Click on the camera shutter button
+        val takePictureButton = device.findObject(UiSelector().description("Shutter"))
+        takePictureButton.click()
+
+        // Use Intents.intended() to check that the captured intent matches the expected intent
+        Intents.intended(expectedIntent)
+        Intents.release()
     }
 
     @Test

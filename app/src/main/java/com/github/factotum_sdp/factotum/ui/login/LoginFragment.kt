@@ -78,9 +78,6 @@ class LoginFragment : Fragment() {
 
         addListeners(usernameEditText, passwordEditText, afterTextChangedListener)
         login(loginButton, loadingProgressBar, usernameEditText, passwordEditText)
-        displaySnackbarOnClick(signupButton)
-        displaySnackbarOnClick(pwdForgotButton)
-        displaySnackbarOnClick(googleSignInButton)
     }
 
     private fun observe(
@@ -149,12 +146,6 @@ class LoginFragment : Fragment() {
                 passwordEditText.text.toString()
             )
             (activity as AppCompatActivity).supportActionBar?.show()
-        }
-    }
-
-    private fun displaySnackbarOnClick(button: View) {
-        button.setOnClickListener {
-            findNavController().navigate(R.id.action_loginFragment_to_signUpFragment)
         }
     }
 

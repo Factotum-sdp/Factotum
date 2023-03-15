@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.data.Action
 import com.github.factotum_sdp.factotum.data.DestinationRecord
+import com.github.factotum_sdp.factotum.data.DestinationRecord.Action
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -21,14 +21,18 @@ class RoadBookViewAdapter(
 ) : RecyclerView.Adapter<RoadBookViewAdapter.RecordViewHolder>() {
 
     // Call back needed to instantiate the async list attribute
-    private val differCallback = object : DiffUtil.ItemCallback<DestinationRecord>(){
-        override fun areItemsTheSame(oldItem: DestinationRecord,
-                                     newItem: DestinationRecord): Boolean {
-            return  oldItem.destID == newItem.destID
+    private val differCallback = object : DiffUtil.ItemCallback<DestinationRecord>() {
+        override fun areItemsTheSame(
+            oldItem: DestinationRecord,
+            newItem: DestinationRecord
+        ): Boolean {
+            return oldItem.destID == newItem.destID
         }
 
-        override fun areContentsTheSame(oldItem: DestinationRecord,
-                                        newItem: DestinationRecord): Boolean {
+        override fun areContentsTheSame(
+            oldItem: DestinationRecord,
+            newItem: DestinationRecord
+        ): Boolean {
             return oldItem == newItem
         }
     }
@@ -82,11 +86,15 @@ class RoadBookViewAdapter(
         if (date == null)
             return sb.append('_').toString()
         date.let {
-            sb.append(SimpleDateFormat.getTimeInstance().format(it)) }
+            sb.append(SimpleDateFormat.getTimeInstance().format(it))
+        }
         return sb.toString()
     }
 
-    private fun actionsStringFormat(actions: List<Action>, label: String): String {
+    private fun actionsStringFormat(
+        actions: List<Action>,
+        label: String
+    ): String {
         val sb = StringBuilder("$label : (")
         if (actions.isEmpty())
             return sb.append(" )").toString()

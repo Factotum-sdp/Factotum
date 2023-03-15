@@ -77,16 +77,8 @@ class LoginFragmentTest {
     }
 
     @Test
-    fun signUpButtonOpenSnackbarWhenClicked() {
+    fun signUpButtonOpenSignUpFragmentWhenClicked() {
         onView(withId(R.id.signup)).perform(click())
-        onView(withText("Sign Up"))
-            .check(matches(isDisplayed()))
-    }
-
-    @Test
-    fun googleSignInButtonOpenSnackbarWhenClicked() {
-        onView(withId(R.id.sign_in_button)).perform(click())
-        onView(withText("Google Sign In"))
-            .check(matches(isDisplayed()))
+        onView(withId(R.id.fragment_signup_directors_parent)).check(matches(isDisplayed()))
     }
 }

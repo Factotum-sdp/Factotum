@@ -78,16 +78,6 @@ class LoginFragment : Fragment() {
 
         addListeners(usernameEditText, passwordEditText, afterTextChangedListener)
         login(loginButton, loadingProgressBar, usernameEditText, passwordEditText)
-        signupButton.setOnClickListener {
-            findNavController().navigate(R.id.action_loginFragment_to_signUpFragment)
-        }
-        googleSignInButton.setOnClickListener {
-            Snackbar.make(
-                requireView(),
-                "Google Sign In",
-                Snackbar.LENGTH_LONG
-            ).show()
-        }
     }
 
     private fun observe(

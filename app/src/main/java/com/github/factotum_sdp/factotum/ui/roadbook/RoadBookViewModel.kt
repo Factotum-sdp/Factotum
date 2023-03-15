@@ -6,10 +6,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.github.factotum_sdp.factotum.data.DestinationRecord
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.google.firebase.database.DatabaseReference
-import java.text.SimpleDateFormat.getTimeInstance
 import java.text.SimpleDateFormat.getDateInstance
 import java.util.Calendar
-import kotlin.random.Random
 
 /**
  * The RoadBook ViewModel
@@ -22,10 +20,10 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
     private var dbRef: DatabaseReference
     init {
         val date = Calendar.getInstance().time
-        dbRef = _dbRef
-                .child(getDateInstance().format(date)) // One node to classify daily RoadBook data
-                .child(getTimeInstance().format(date).plus(Random.nextInt().toString()))
-                // Unique ref path to register all back-ups from this RoadBook
+        dbRef = _dbRef // ref path to register all back-ups from this RoadBook
+                .child(getDateInstance().format(date))
+                //.child(getTimeInstance().format(date).plus(Random.nextInt().toString()))
+                // Let uncommented for testing purpose. Uncomment it for back-up uniqueness in the DB
     }
 
     fun addRecord(destinationRecord: DestinationRecord) {

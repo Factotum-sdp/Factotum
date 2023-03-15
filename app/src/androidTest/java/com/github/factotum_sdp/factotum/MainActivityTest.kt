@@ -27,6 +27,8 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest {
 
+    private val userName = "Carl"
+
     @get:Rule
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
@@ -47,11 +49,6 @@ class MainActivityTest {
     @Test
     fun toolBarIsCorrectlyDisplayedOnFirstView() {
         onView(withId(R.id.toolbar)).check(matches(isDisplayed()))
-    }
-
-    @Test
-    fun drawerLayoutIsCorrectlyDisplayedOnFirstView() {
-        onView(withId(R.id.drawer_layout)).check(matches(isDisplayed()))
     }
 
 

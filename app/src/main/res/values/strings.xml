@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">Factotum</string>
+    <string name="validate">validate</string>
+    <string name="your_name">Your name</string>
+    <string name="greetings">Greetings !</string>
     <string name="phone">Phone</string>
     <string name="email">Email</string>
     <string name="Set">Set</string>
@@ -25,4 +28,7 @@
     <string name="wait_text_view">wait</string>
     <string name="arrival_text_view">arrival</string>
     <string name="actions_text_view">actions</string>
+
+    <string name="file_provider">"com.github.factotum_sdp.factotum.file-provider"</string>
+    <string name="camera_permission_not_granted">Permission needed to take a photo</string>
 </resources>

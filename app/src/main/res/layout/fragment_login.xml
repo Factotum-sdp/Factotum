@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/container"
+    android:id="@+id/fragment_login_directors_parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingLeft="@dimen/fragment_horizontal_margin"
@@ -81,6 +81,7 @@
             android:layout_marginBottom="16dp"
             android:clickable="true"
             android:focusable="true"
+            android:visibility="gone"
             android:text="@string/forgot_my_password_text" />
 
         <Button

@@ -3,6 +3,7 @@ package com.github.factotum_sdp.factotum
 import android.Manifest
 import android.provider.MediaStore
 import android.view.Gravity
+import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.*
 import androidx.test.espresso.action.ViewActions.*
@@ -18,7 +19,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
+import com.github.factotum_sdp.factotum.ui.login.LoginFragment
 import org.hamcrest.Matchers.allOf
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,8 +29,6 @@ import org.junit.runner.RunWith
 //Later when non-root fragment will exists : add test for navigateUp
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest {
-
-    private val userName = "Carl"
 
     @get:Rule
     var testRule = ActivityScenarioRule(
@@ -40,6 +41,11 @@ class MainActivityTest {
     //========================================================================================
     // Entry view checks :
     //========================================================================================
+
+    @Test
+    fun loginFragmentIsCorrectlyDisplayedOnFirstView() {
+        onView(withId(R.id.fragment_login_directors_parent)).check(matches(isDisplayed()))
+    }
 
     @Test
     fun appBarIsCorrectlyDisplayedOnFirstView() {
@@ -80,8 +86,7 @@ class MainActivityTest {
         Thread.sleep(5000)
 
         // Click on the camera shutter button
-        val takePictureButton = device.findObject(UiSelector().description("Shutter"))
-        takePictureButton.click()
+        device.executeShellCommand("input keyevent 27")
 
         // Use Intents.intended() to check that the captured intent matches the expected intent
         Intents.intended(expectedIntent)
@@ -111,7 +116,6 @@ class MainActivityTest {
 
     @Test
     fun clickOnRoadBookMenuItemStaysToCorrectFragment() {
-        onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))

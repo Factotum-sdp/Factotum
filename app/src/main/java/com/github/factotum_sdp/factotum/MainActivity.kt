@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
         // In order to keep out the NavigateUpButton which would mask the HamburgerButton
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.roadBookFragment, R.id.pictureFragment, R.id.directoryFragment
+                R.id.roadBookFragment, R.id.pictureFragment, R.id.directoryFragment, R.id.loginFragment
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)

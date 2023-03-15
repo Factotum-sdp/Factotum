@@ -16,7 +16,6 @@
         app:layoutManager="LinearLayoutManager"
         tools:context=".ui.roadbook.RoadBookFragment"
         tools:listitem="@layout/fragment_destrecord">
-
     </androidx.recyclerview.widget.RecyclerView>
 
 

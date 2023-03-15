@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum.PictureFragmentTests
+package com.github.factotum_sdp.factotum.ui.picture
 
 import android.Manifest
 import android.os.Environment
@@ -10,7 +10,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
-import com.github.factotum_sdp.factotum.ui.picture.PictureFragment
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage

@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum.contacts_list
+package com.github.factotum_sdp.factotum.ui.directory
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.contacts_list.contacts_content.ContactsList
+import com.github.factotum_sdp.factotum.contacts_content.ContactsList
 
 class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.ContactsViewHolder>() {
 
@@ -29,7 +29,7 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
             itemImage = itemView.findViewById(R.id.contact_image)
 
             itemView.setOnClickListener {   //when a contact is clicked, go to the contact details fragment
-                itemView.findNavController().navigate(R.id.action_contactsFragment_to_contactDetailsFragment, Bundle().apply {
+                itemView.findNavController().navigate(R.id.action_directoryFragment_to_contactDetailsFragment2, Bundle().apply {
                     putInt("id", bindingAdapterPosition) //pass the id of the contact to the contact details fragment so that it can display the correct contact
                 })
             }

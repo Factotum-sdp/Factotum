@@ -1,9 +1,10 @@
-package com.github.factotum_sdp.factotum.contacts_list
+package com.github.factotum_sdp.factotum.ui.directory
 
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -12,9 +13,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
+import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.contacts_list.contacts_content.ContactsList
+import com.github.factotum_sdp.factotum.contacts_content.ContactsList
 import junit.framework.TestCase.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,7 +25,15 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class ContactsFragmentTest {
     @get:Rule
-    var activityRule = ActivityScenarioRule(DiaryMainActivity::class.java)
+    var activityRule = ActivityScenarioRule(MainActivity::class.java)
+
+    @Before
+    fun goToContacts() {
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.directoryFragment))
+            .perform(click())
+    }
 
     @Test
     fun recyclerViewIsCorrectlyDisplayed() {

@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum.contacts_list
+package com.github.factotum_sdp.factotum.ui.directory
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,7 +10,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.contacts_list.contacts_content.ContactsList
+import com.github.factotum_sdp.factotum.contacts_content.ContactsList
 
 class ContactDetailsFragment : Fragment() {
 
@@ -22,7 +22,7 @@ class ContactDetailsFragment : Fragment() {
         val mainView = inflater.inflate(R.layout.contact_with_details, container, false)
         val button = mainView.findViewById<Button>(R.id.button) // connect the button to the layout
         button.setOnClickListener { view ->
-            view.findNavController().navigate(R.id.action_contactDetailsFragment_to_contactsFragment)} // go back to the list of contacts when the button is clicked
+            view.findNavController().navigate(R.id.action_contactDetailsFragment2_to_directoryFragment)} // go back to the list of contacts when the button is clicked
         setContactDetails(mainView, ContactsList.ITEMS[arguments?.getInt("id")!!]) //links the contact details to the layout
 
         return mainView

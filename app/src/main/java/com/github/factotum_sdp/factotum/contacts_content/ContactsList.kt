@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum.contacts_list.contacts_content
+package com.github.factotum_sdp.factotum.contacts_content
 
 import com.github.factotum_sdp.factotum.R
 
@@ -47,6 +47,6 @@ object ContactsList {
      * A data class representing a contact.
      */
     data class Contact(val role: String, val name: String, val profile_pic_id: Int, val address: String, val phone: String, val details: String? = null) {
-        override fun toString(): String = "$role: $name"
+        //override fun toString(): String = "$role: $name"
     }
 }

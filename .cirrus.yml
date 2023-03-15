@@ -23,7 +23,7 @@ check_android_task:
       -gpu swiftshader_indirect
       -no-snapshot
       -no-window
-      -camera-back none
+      -camera-back emulated
   assemble_instrumented_tests_script: |
     chmod +x gradlew
     ./gradlew assembleDebugAndroidTest

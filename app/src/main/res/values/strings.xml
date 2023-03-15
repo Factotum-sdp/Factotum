@@ -24,6 +24,10 @@
     <string name="snap_text_on_rec_delete">Last record deleted</string>
     <string name="temp_delete_action_button">temp_delete_action_button</string>
     <string name="menu_maps">Maps</string>
+    <string name="rate_text_view">rate</string>
+    <string name="wait_text_view">wait</string>
+    <string name="arrival_text_view">arrival</string>
+    <string name="actions_text_view">actions</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">email@gmail.com</string>
@@ -46,5 +50,4 @@
     <string name="sign_up_text">Sign Up</string>
     <string name="file_provider">"com.github.factotum_sdp.factotum.file-provider"</string>
     <string name="camera_permission_not_granted">Permission needed to take a photo</string>
-
 </resources>

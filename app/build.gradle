@@ -42,6 +42,7 @@ android {
 }
 
 dependencies {
+
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.8.0'
@@ -61,6 +62,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-auth:20.4.1'
     implementation 'com.google.firebase:firebase-storage-ktx:20.1.0'
     implementation "androidx.lifecycle:lifecycle-common-java8:2.6.0"
+    implementation 'androidx.test.uiautomator:uiautomator-v18:2.2.0-alpha1'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

@@ -13,6 +13,7 @@
         android:name="com.github.factotum_sdp.navdraweractivity.RoadBookFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#FF003549"
         app:layoutManager="LinearLayoutManager"
         tools:context=".ui.roadbook.RoadBookFragment"
         tools:listitem="@layout/fragment_destrecord">

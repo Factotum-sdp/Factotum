@@ -35,18 +35,12 @@ class RoadBookFragment : Fragment() {
         // Set events that triggers change in the roadbook ViewModel
         setRoadBookEvents(rbViewModel, view)
 
-        // Set up the RecyclerView
-        val recyclerView: RecyclerView = view.findViewById(R.id.list)
-        setUpRecyclerView(recyclerView)
-        recyclerView.adapter = adapter
+        // Set up the RoadBook RecyclerView
+        val rbRecyclerView: RecyclerView = view.findViewById(R.id.list)
+        rbRecyclerView.layoutManager = LinearLayoutManager(context)
+        rbRecyclerView.adapter = adapter
 
         return view
-    }
-
-    private fun setUpRecyclerView(recyclerView: RecyclerView) {
-        recyclerView.layoutManager = LinearLayoutManager(context)
-        val divDec = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
-        recyclerView.addItemDecoration(divDec)
     }
 
     private fun setRoadBookEvents(rbViewModel: RoadBookViewModel, view: View) {

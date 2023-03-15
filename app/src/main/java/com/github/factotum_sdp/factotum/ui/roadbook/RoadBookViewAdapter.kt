@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.DestinationRecord
+import java.text.SimpleDateFormat
 
 /**
  * Adapter for the RecyclerView which will display a dynamic list of DestinationRecord
@@ -21,7 +22,7 @@ class RoadBookViewAdapter(
     private val differCallback = object : DiffUtil.ItemCallback<DestinationRecord>(){
         override fun areItemsTheSame(oldItem: DestinationRecord,
                                      newItem: DestinationRecord): Boolean {
-            return  oldItem.destName == newItem.destName
+            return  oldItem.destID == newItem.destID
         }
 
         override fun areContentsTheSame(oldItem: DestinationRecord,
@@ -49,11 +50,12 @@ class RoadBookViewAdapter(
     // Bind each displayed Record to the corresponding current async list slot
     override fun onBindViewHolder(holder: RecordViewHolder, position: Int) {
         val item = asyncList.currentList[position]
-        holder.idView.text = item.rate.toString()
-        holder.contentView.text = item.destName
+        holder.idView.text = item.timeStamp?.let { SimpleDateFormat.getTimeInstance().format(it) }
+        holder.contentView.text = item.destID
     }
 
     override fun getItemCount(): Int = asyncList.currentList.size
+
 
     /**
      * ViewHolder of a (destination) record
@@ -65,4 +67,5 @@ class RoadBookViewAdapter(
             return super.toString() + " '" + contentView.text + "'"
         }
     }
+
 }

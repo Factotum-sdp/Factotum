@@ -15,14 +15,19 @@ import androidx.navigation.ui.setupWithNavController
 import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
+    private lateinit var db : DatabaseReference
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        db = Firebase.database.reference
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -65,7 +70,7 @@ class MainActivity : AppCompatActivity() {
         // Instantiate the current user
         val userFact =
             UserViewModel.UserViewModelFactory(UsersPlaceHolder.USER1.name, UsersPlaceHolder.USER1.email)
-        val user = ViewModelProvider(this, userFact).get<UserViewModel>(UserViewModel::class.java)
+        val user = ViewModelProvider(this, userFact)[UserViewModel::class.java]
         binding.navView.findViewTreeLifecycleOwner()?.let { lco ->
             user.name.observe(lco){
                 userName.text = it
@@ -74,5 +79,9 @@ class MainActivity : AppCompatActivity() {
                 email.text = it
             }
         }
+    }
+
+    fun getDatabaseRef(): DatabaseReference {
+        return db
     }
 }

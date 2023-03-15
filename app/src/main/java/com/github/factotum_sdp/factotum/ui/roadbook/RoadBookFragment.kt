@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.*
+import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -18,14 +19,17 @@ import com.google.android.material.snackbar.Snackbar
  */
 class RoadBookFragment : Fragment() {
 
+    private lateinit var rbViewModel: RoadBookViewModel
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_roadbook, container, false)
         val adapter = RoadBookViewAdapter()
-        val rbViewModel: RoadBookViewModel =
-            ViewModelProvider(this)[RoadBookViewModel::class.java]
+        val dbRef = (activity as MainActivity).getDatabaseRef().child(ROADBOOK_DB_PATH)
+        val rbFact = RoadBookViewModel.RoadBookViewModelFactory(dbRef)
+        rbViewModel = ViewModelProvider(this, rbFact)[RoadBookViewModel::class.java]
 
         // Observe the roadbook ViewModel, to detect data changes
         // and update the displayed RecyclerView accordingly
@@ -41,6 +45,11 @@ class RoadBookFragment : Fragment() {
         rbRecyclerView.adapter = adapter
 
         return view
+    }
+
+    override fun onPause() {
+        rbViewModel.backUp()
+        super.onPause()
     }
 
     private fun setRoadBookEvents(rbViewModel: RoadBookViewModel, view: View) {
@@ -61,4 +70,7 @@ class RoadBookFragment : Fragment() {
         }
     }
 
+    companion object{
+        private const val ROADBOOK_DB_PATH: String = "Sheet-shift"
+    }
 }

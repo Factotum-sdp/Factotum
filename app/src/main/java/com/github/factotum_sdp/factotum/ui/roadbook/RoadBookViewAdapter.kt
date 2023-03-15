@@ -54,7 +54,7 @@ class RoadBookViewAdapter(
         val item = asyncList.currentList[position]
         val context = holder.itemView.context
 
-        // Formatting and bind the TextViews
+        // Format and bind the TextViews
         holder.destID.text = item.destID
         holder.timeStamp.text =
             timestampStringFormat(item.timeStamp, context.getString(R.string.arrival_text_view))
@@ -110,9 +110,6 @@ class RoadBookViewAdapter(
         val waitingTime: TextView = itemView.findViewById(R.id.waiting_time)
         val rate: TextView = itemView.findViewById(R.id.rate)
         val actions: TextView = itemView.findViewById(R.id.dest_actions)
-        override fun toString(): String {
-            return super.toString() + " '" + timeStamp.text + "'"
-        }
     }
 
 }

@@ -16,10 +16,13 @@ class UserViewModel(userValue: String, nameValue: String) : ViewModel() {
         name.value = nameValue
     }
 
-    // Factory needed to assign values at construction time to the class arguments
-    class UserViewModelFactory(private val nameValue: String, private val emailValue: String) : ViewModelProvider.Factory {
+    // Factory needed to assign values at construction time to the class attributes
+    class UserViewModelFactory(private val nameValue: String, private val emailValue: String)
+        : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return modelClass.getConstructor(String::class.java, String::class.java).newInstance(nameValue, emailValue)
+            return modelClass
+                        .getConstructor(String::class.java, String::class.java)
+                        .newInstance(nameValue, emailValue)
         }
     }
 }

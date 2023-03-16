@@ -5,7 +5,7 @@ package com.github.factotum_sdp.factotum.data.model
  */
 data class User(
     val userId: String,
-    val displayName: String,
+    val name: String,
     val email: String,
     val userRole: Role
 )

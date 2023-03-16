@@ -8,6 +8,8 @@ import com.github.factotum_sdp.factotum.data.LoginRepository
 import com.github.factotum_sdp.factotum.data.Result
 
 import com.github.factotum_sdp.factotum.R
+import com.google.firebase.database.DatabaseReference
+import java.text.SimpleDateFormat
 
 class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel() {
 
@@ -23,7 +25,7 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
 
         if (result is Result.Success) {
             _loginResult.value =
-                LoginResult(success = LoggedInUserView(displayName = result.data.displayName))
+                LoginResult(success = LoggedInUserView(displayName = result.data.name))
         } else {
             _loginResult.value = LoginResult(error = R.string.login_failed)
         }

@@ -79,15 +79,6 @@ class MainActivityTest {
     }
 
     @Test
-    fun clickOnMapsMenuItemLeadsToCorrectFragment() {
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.routeFragment))
-            .perform(click())
-        onView(withId(R.id.drawer_layout)).check(matches(DrawerMatchers.isClosed(Gravity.LEFT)))
-    }
-
-    @Test
     fun clickOnDirectoryMenuItemLeadsToCorrectFragment() {
         clickOnAMenuItemLeadsCorrectly(R.id.directoryFragment, R.id.fragment_directory_directors_parent)
     }
@@ -130,26 +121,6 @@ class MainActivityTest {
             .perform(click())
         //temp hard-coded string bug to fetch the fragment parent id
         onView(withText("This is the maps Fragment")).check(matches(isDisplayed()))
-        onView(withId(R.id.drawer_layout)).check(matches(DrawerMatchers.isClosed(Gravity.LEFT)))
-    }
-
-    @Test
-    fun clickOnDirectoryMenuItemLeadsToCorrectFragment() {
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.directoryFragment))
-            .perform(click())
-        onView(withId(R.id.fragment_directory_directors_parent)).check(matches(isDisplayed()))
-        onView(withId(R.id.drawer_layout)).check(matches(DrawerMatchers.isClosed(Gravity.LEFT)))
-    }
-
-    @Test
-    fun clickOnRoadBookMenuItemStaysToCorrectFragment() {
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.roadBookFragment))
-            .perform(click())
-        onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
         onView(withId(R.id.drawer_layout)).check(matches(DrawerMatchers.isClosed(Gravity.LEFT)))
     }
 

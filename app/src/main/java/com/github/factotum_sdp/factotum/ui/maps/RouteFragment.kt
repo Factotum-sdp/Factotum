@@ -23,9 +23,12 @@ import com.github.factotum_sdp.factotum.placeholder.RouteRecords.DUMMY_ROUTE
  */
 class RouteFragment : Fragment() {
 
+    companion object {
+        const val MAPS_PKG = "com.google.android.apps.maps"
+    }
     private var _binding: FragmentRoutesBinding? = null
     private val viewModel: MapsViewModel by activityViewModels()
-    private val MAPS_PKG = "com.google.android.apps.maps"
+
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -97,7 +100,7 @@ class RouteFragment : Fragment() {
                 .toString()
             val uri = Uri.parse(googleMapsUrl)
             val intent = Intent(Intent.ACTION_VIEW, uri).apply {
-                setPackage("com.google.android.apps.maps")
+                setPackage(MAPS_PKG)
             }
             requireContext().startActivity(intent)
         }

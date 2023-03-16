@@ -17,9 +17,17 @@ import com.google.android.gms.maps.model.LatLng
  */
 class MapsFragment : Fragment() {
 
+    companion object {
+        private val EPFL_LOC = LatLng(46.520536, 6.568318)
+        private const val minZoom = 2.0f
+        private const val maxZoom = 14.0f
+
+    }
+
     private var _binding: FragmentMapsBinding? = null
     private val viewModel: MapsViewModel by activityViewModels()
-    private val EPFL_LOC = LatLng(46.520536, 6.568318)
+
+
 
 
     // This property is only valid between onCreateView and
@@ -60,8 +68,8 @@ class MapsFragment : Fragment() {
             googleMap.uiSettings.isZoomGesturesEnabled = true
 
             // Sets zoom preferences
-            googleMap.setMinZoomPreference(2.0f)
-            googleMap.setMaxZoomPreference(14.0f)
+            googleMap.setMinZoomPreference(minZoom)
+            googleMap.setMaxZoomPreference(maxZoom)
         }
     }
 

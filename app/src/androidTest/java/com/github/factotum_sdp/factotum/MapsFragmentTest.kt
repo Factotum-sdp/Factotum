@@ -16,6 +16,7 @@ import androidx.test.uiautomator.By.descContains
 import androidx.test.uiautomator.By.textContains
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
+import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
 import junit.framework.TestCase.assertTrue
 import org.hamcrest.CoreMatchers.allOf
 import org.junit.Assert.assertEquals
@@ -82,7 +83,7 @@ class MapsFragmentTest {
         val runButton = onView(withId(R.id.button_run))
         runButton.perform(click())
         intended(allOf(hasAction(Intent.ACTION_VIEW),
-            toPackage("com.google.android.apps.maps")
+            toPackage(RouteFragment.MAPS_PKG)
         ))
         Intents.release()
 

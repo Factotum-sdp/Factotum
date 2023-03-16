@@ -19,8 +19,7 @@ object DestinationRecords {
         RECORDS.addAll(
             listOf(
                 DestinationRecord("QG", cal.time, 3, 1, arrayListOf()),
-                DestinationRecord("Buhagiat", null, 0, 1, arrayListOf(Action.PICK, Action.CONTACT)),
-                DestinationRecord("Buhagiat", null, 0, 1, arrayListOf(Action.PICK, Action.RELAY, Action.CONTACT)),
+                DestinationRecord("Buhagiat", null, 0, 1, arrayListOf(Action.PICK, Action.CONTACT, Action.RELAY)),
                 DestinationRecord("X17", null,0, 1, arrayListOf(Action.DELIVER, Action.CONTACT))
             )
         )

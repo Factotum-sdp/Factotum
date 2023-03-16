@@ -19,6 +19,7 @@ import androidx.test.uiautomator.UiSelector
 import junit.framework.TestCase.assertTrue
 import org.hamcrest.CoreMatchers.allOf
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -33,13 +34,16 @@ class MapsFragmentTest {
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
     )
-    @Test
-    fun goesToSecondFragement(){
-        val device = UiDevice.getInstance(getInstrumentation())
+
+    @Before fun setUp(){
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.routeFragment))
             .perform(click())
+    }
+    @Test
+    fun goesToSecondFragement(){
+        val device = UiDevice.getInstance(getInstrumentation())
         device.findObject(UiSelector().textContains("->")).click()
         val nextButton = onView(withId(R.id.button_next))
         nextButton.perform(click())
@@ -49,10 +53,6 @@ class MapsFragmentTest {
     @Test
     fun showsDestinationMarker(){
         val device = UiDevice.getInstance(getInstrumentation())
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.routeFragment))
-            .perform(click())
         device.findObject(UiSelector().textContains("->")).click()
         val nextButton = onView(withId(R.id.button_next))
         nextButton.perform(click())
@@ -63,10 +63,6 @@ class MapsFragmentTest {
     @Test
     fun showsAllDest(){
         val device = UiDevice.getInstance(getInstrumentation())
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.routeFragment))
-            .perform(click())
         val nbRoutes = device.findObjects(textContains("->")).size
         val showAll = onView(withId(R.id.button_all))
         showAll.perform(click())
@@ -82,10 +78,6 @@ class MapsFragmentTest {
     fun runLaunchesMaps(){
         Intents.init()
         val device = UiDevice.getInstance(getInstrumentation())
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.routeFragment))
-            .perform(click())
         device.findObject(UiSelector().textContains("->")).click()
         val runButton = onView(withId(R.id.button_run))
         runButton.perform(click())

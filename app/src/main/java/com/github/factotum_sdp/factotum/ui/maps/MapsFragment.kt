@@ -19,6 +19,7 @@ class MapsFragment : Fragment() {
 
     private var _binding: FragmentMapsBinding? = null
     private val viewModel: MapsViewModel by activityViewModels()
+    private val EPFL_LOC = LatLng(46.520536, 6.568318)
 
 
     // This property is only valid between onCreateView and
@@ -48,10 +49,9 @@ class MapsFragment : Fragment() {
             googleMap.clear()
             //Shows destinations of selected roads
             for (route in viewModel.routes.value.orEmpty()){
-                route.addToMap(googleMap, src = false)
+                route.addDstToMap(googleMap)
             }
-            val epfl = LatLng(46.520536, 6.568318)
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(epfl))
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(EPFL_LOC))
 
             // Add zoom controls to the map
             googleMap.uiSettings.isZoomControlsEnabled = true

@@ -25,6 +25,7 @@ class RouteFragment : Fragment() {
 
     private var _binding: FragmentRoutesBinding? = null
     private val viewModel: MapsViewModel by activityViewModels()
+    private val MAPS_PKG = "com.google.android.apps.maps"
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -52,10 +53,6 @@ class RouteFragment : Fragment() {
 
     }
 
-    /**
-     * Sets the listeners to the listView
-     *
-     */
     private fun setListenerList(){
         // instantiate fake data
         val listCourse = DUMMY_COURSE
@@ -77,10 +74,6 @@ class RouteFragment : Fragment() {
         }
     }
 
-    /**
-     * Sets the listeners for the buttons
-     *
-     */
     private fun setListenerButtons(){
         binding.buttonNext.setOnClickListener {
             findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
@@ -94,15 +87,17 @@ class RouteFragment : Fragment() {
         }
         binding.buttonRun.setOnClickListener{
             val route = viewModel.runRoute.value!!
-            val googleMapsUrl = "http://maps.google.com/maps?" +
-                    "saddr=${route.src.latitude}," +
-                    "${route.src.longitude} &" +
-                    "daddr=${route.dst.latitude}," +
-                    "${route.dst.longitude} &mode=b"
+            val googleMapsUrl = StringBuilder()
+                .append("http://maps.google.com/maps?")
+                .append("saddr=${route.src.latitude},")
+                .append("${route.src.longitude} &")
+                .append("daddr=${route.dst.latitude},")
+                .append("${route.dst.longitude} ")
+                .append("&mode=b")
+                .toString()
             val uri = Uri.parse(googleMapsUrl)
-            val googleMapsPackage = "com.google.android.apps.maps"
             val intent = Intent(Intent.ACTION_VIEW, uri).apply {
-                setPackage(googleMapsPackage)
+                setPackage("com.google.android.apps.maps")
             }
             requireContext().startActivity(intent)
         }

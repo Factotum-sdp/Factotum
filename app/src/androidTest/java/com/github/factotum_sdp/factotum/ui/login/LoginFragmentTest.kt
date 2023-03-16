@@ -58,14 +58,16 @@ class LoginFragmentTest {
     @Test
     fun loginFormWithValidDataAccessButtonIsEnabled() {
         usernameInput.perform(typeText("user.name@gmail.com"))
-        passwordInput.perform(typeText("password"), closeSoftKeyboard())
+        passwordInput.perform(typeText("password"))
+        passwordInput.perform(closeSoftKeyboard())
         loginButton.check(matches(isEnabled()))
     }
 
     @Test
     fun loginFormWithValidDataAccessOpenRoadBookFragment() {
         usernameInput.perform(typeText("user.name@gmail.com"))
-        passwordInput.perform(typeText("password"), closeSoftKeyboard())
+        passwordInput.perform(typeText("password"))
+        passwordInput.perform(closeSoftKeyboard())
         loginButton.perform(click())
         onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
     }

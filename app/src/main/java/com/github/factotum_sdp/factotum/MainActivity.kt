@@ -30,7 +30,6 @@ class MainActivity : AppCompatActivity() {
         db = Firebase.database.reference
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         setSupportActionBar(binding.appBarMain.toolbar)
 
         val drawerLayout: DrawerLayout = binding.drawerLayout

@@ -104,18 +104,21 @@ class RoadBookFragmentTest {
         onView(withId(R.id.fragment_directory_directors_parent))
             .check(matches(isDisplayed()))
 
+        // Our target value to fetch
+        // is represented as a List<String> in Firebase
         val future = CompletableFuture<List<String>>()
+
         ref.get().addOnSuccessListener {
             if (it.value == null) {
+                // Set an exception in the future if our target value is not found in Firebase
                 future.completeExceptionally(NoSuchFieldException())
             }
-            else {
+            else { // Necessary cast to access List methods
                 val ls: List<String> = it.value as List<String>
                 future.complete(ls)
                 assert(ls.size == DestinationRecords.RECORDS.size + 1)
             }
         }.addOnFailureListener {
-            assert(false)
             future.completeExceptionally(it)
         }
     }

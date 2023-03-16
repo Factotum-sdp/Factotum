@@ -76,7 +76,7 @@ class RoadBookViewAdapter(
             return "$label : $waitTime"
         return ""
     }
-
+    // arrival : _ or arrival : HH:MM:SS AM-PM
     private fun timestampStringFormat(date: Date?, label: String): String {
         val sb = java.lang.StringBuilder("$label : ")
         if (date == null)
@@ -85,7 +85,7 @@ class RoadBookViewAdapter(
             sb.append(SimpleDateFormat.getTimeInstance().format(it)) }
         return sb.toString()
     }
-
+    // actions : () or actions : (p | p | c)
     private fun actionsStringFormat(actions: List<Action>, label: String): String {
         val sb = StringBuilder("$label : (")
         if (actions.isEmpty())

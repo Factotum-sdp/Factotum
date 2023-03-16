@@ -19,7 +19,11 @@
         android:id="@+id/directoryFragment"
         android:name="com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment"
         android:label="fragment_directory"
-        tools:layout="@layout/fragment_directory" />
+        tools:layout="@layout/fragment_directory" >
+        <action
+            android:id="@+id/action_directoryFragment_to_contactDetailsFragment2"
+            app:destination="@id/contactDetailsFragment2" />
+    </fragment>
     <fragment
         android:id="@+id/mapsFragment"
         android:name="com.github.factotum_sdp.factotum.ui.maps.MapsFragment"
@@ -42,4 +46,12 @@
         android:name="com.github.factotum_sdp.factotum.ui.signup.SignUpFragment"
         android:label="fragment_signup"
         tools:layout="@layout/fragment_signup" />
+    <fragment
+        android:id="@+id/contactDetailsFragment2"
+        android:name="com.github.factotum_sdp.factotum.ui.directory.ContactDetailsFragment"
+        android:label="ContactDetailsFragment" >
+        <action
+            android:id="@+id/action_contactDetailsFragment2_to_directoryFragment"
+            app:destination="@id/directoryFragment" />
+    </fragment>
 </navigation>

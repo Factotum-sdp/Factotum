@@ -20,8 +20,11 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
 import androidx.navigation.ui.setupActionBarWithNavController
+import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.databinding.FragmentLoginBinding
+import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookFragment
+import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookViewModel
 import com.google.android.gms.common.SignInButton
 import com.google.android.material.snackbar.Snackbar
 
@@ -47,8 +50,6 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        (activity as AppCompatActivity).supportActionBar?.hide()
-
         loginViewModel =
             ViewModelProvider(this, LoginViewModelFactory())[LoginViewModel::class.java]
 
@@ -59,6 +60,7 @@ class LoginFragment : Fragment() {
         val signupButton = binding.signup
         val pwdForgotButton = binding.pwdForgot
         val googleSignInButton = requireView().findViewById<SignInButton>(R.id.sign_in_button)
+        val dbRef = (activity as MainActivity).getDatabaseRef().child(DISPATCH_DB_PATH)
 
         observe(loginButton, usernameEditText, passwordEditText)
         addListeners(loadingProgressBar)
@@ -145,7 +147,6 @@ class LoginFragment : Fragment() {
                 usernameEditText.text.toString(),
                 passwordEditText.text.toString()
             )
-            (activity as AppCompatActivity).supportActionBar?.show()
         }
     }
 
@@ -162,5 +163,9 @@ class LoginFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object{
+        private const val DISPATCH_DB_PATH: String = "profile-dispatch"
     }
 }

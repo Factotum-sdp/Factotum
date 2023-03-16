@@ -5,11 +5,11 @@
     android:layout_height="wrap_content"
     android:layout_margin="4dp"
     app:cardBackgroundColor="@color/white"
-    app:cardCornerRadius="12dp">
+    app:cardCornerRadius="12dp"
+    android:id="@+id/fragment_destrecord_directors_parent">
 
 
     <LinearLayout
-        android:id="@+id/fragment_destrecord_directors_parent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical">

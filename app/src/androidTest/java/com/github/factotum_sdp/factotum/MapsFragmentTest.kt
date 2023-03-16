@@ -47,7 +47,7 @@ class MapsFragmentTest {
         device.findObject(UiSelector().textContains("->")).click()
         val nextButton = onView(withId(R.id.button_next))
         nextButton.perform(click())
-        onView(withId(R.id.maps_fragment)).check(matches(isDisplayed()))
+        onView(withId(R.id.fragment_maps_directors_parent)).check(matches(isDisplayed()))
     }
 
     @Test

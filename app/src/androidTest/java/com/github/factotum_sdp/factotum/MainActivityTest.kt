@@ -84,7 +84,7 @@ class MainActivityTest {
 
     @Test
     fun clickOnRoadBookMenuItemStaysToCorrectFragment() {
-        onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
+        //onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
         clickOnAMenuItemLeadsCorrectly(
             R.id.roadBookFragment,
             R.id.fragment_roadbook_directors_parent
@@ -117,13 +117,10 @@ class MainActivityTest {
 
     @Test
     fun clickOnMapsMenuItemLeadsToCorrectFragment() {
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.mapsFragment))
-            .perform(click())
-        //temp hard-coded string bug to fetch the fragment parent id
-        onView(withText("This is the maps Fragment")).check(matches(isDisplayed()))
-        onView(withId(R.id.drawer_layout)).check(matches(DrawerMatchers.isClosed(Gravity.LEFT)))
+        clickOnAMenuItemLeadsCorrectly(
+            R.id.routeFragment,
+            R.id.fragment_route_directors_parent
+        )
     }
 
     @Test

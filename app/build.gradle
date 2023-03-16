@@ -44,9 +44,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.navigation:navigation-fragment:2.5.3'
-    implementation 'androidx.navigation:navigation-ui:2.5.3'
+
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.8.0'
@@ -69,6 +67,7 @@ dependencies {
     implementation 'androidx.test.espresso:espresso-contrib:3.5.1'
     implementation 'com.google.firebase:firebase-storage-ktx:20.1.0'
     implementation "androidx.lifecycle:lifecycle-common-java8:2.6.0"
+    implementation 'androidx.test.uiautomator:uiautomator-v18:2.2.0-alpha1'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

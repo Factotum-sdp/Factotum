@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum.PictureFragmentTests
+package com.github.factotum_sdp.factotum.ui.picture
 
 import com.google.firebase.storage.FirebaseStorage
 import java.io.File

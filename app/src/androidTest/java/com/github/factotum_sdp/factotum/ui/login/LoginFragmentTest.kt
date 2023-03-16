@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum
+package com.github.factotum_sdp.factotum.ui.login
 
 import android.content.Context
 import androidx.test.espresso.Espresso.onView
@@ -8,6 +8,8 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import com.github.factotum_sdp.factotum.MainActivity
+import com.github.factotum_sdp.factotum.R
 import org.hamcrest.Matchers.not
 import org.junit.Rule
 import org.junit.Test
@@ -35,8 +37,10 @@ class LoginFragmentTest {
 
     @Test
     fun emptyUsernameDisplayInvalidUsernameError() {
-        usernameInput.perform(typeText(""), closeSoftKeyboard())
-        passwordInput.perform(typeText("pwd"), closeSoftKeyboard())
+        usernameInput.perform(typeText(""))
+        usernameInput.perform(closeSoftKeyboard())
+        passwordInput.perform(typeText("pwd"))
+        passwordInput.perform(closeSoftKeyboard())
         loginButton.perform(click())
 
         val invalidUsernameText = context.getString(R.string.invalid_username)
@@ -46,8 +50,10 @@ class LoginFragmentTest {
 
     @Test
     fun shortPasswordDisplayInvalidPasswordError() {
-        usernameInput.perform(typeText("user.name@gmail.com"), closeSoftKeyboard())
-        passwordInput.perform(typeText("pwd"), closeSoftKeyboard())
+        usernameInput.perform(typeText("user.name@gmail.com"))
+        usernameInput.perform(closeSoftKeyboard())
+        passwordInput.perform(typeText("pwd"))
+        passwordInput.perform(closeSoftKeyboard())
         loginButton.perform(click())
 
         val invalidPasswordText = context.getString(R.string.invalid_password)

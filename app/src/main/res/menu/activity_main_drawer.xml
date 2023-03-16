@@ -20,5 +20,9 @@
             android:id="@+id/mapsFragment"
             android:icon="@android:drawable/ic_dialog_map"
             android:title="@string/menu_maps" />
+        <item
+            android:id="@+id/shareFragment"
+            android:icon="@android:drawable/ic_menu_share"
+            android:title="@string/menu_share" />
     </group>
 </menu>

@@ -25,4 +25,10 @@
         android:name="com.github.factotum_sdp.factotum.ui.maps.MapsFragment"
         android:label="fragment_maps"
         tools:layout="@layout/fragment_maps" />
+
+    <fragment
+        android:id="@+id/shareFragment"
+        android:name="com.github.factotum_sdp.factotum.ui.share.ShareFragment"
+        android:label="fragment_share"
+        tools:layout="@layout/fragment_share" />
 </navigation>

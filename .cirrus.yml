@@ -22,11 +22,12 @@ check_android_task:
       -gpu swiftshader_indirect
       -no-snapshot
       -no-window
+      -camera-back emulated
   build_script: |
     chmod +x gradlew
     echo MAPS_API_KEY=$MAPS_API_KEY >> local.properties
     ./gradlew assembleDebugAndroidTest
-      -camera-back emulated
+      
   assemble_instrumented_tests_script: |
     chmod +x gradlew
     ./gradlew assembleDebugAndroidTest

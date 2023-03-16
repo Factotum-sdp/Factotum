@@ -14,6 +14,7 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,6 +28,15 @@ class RoadBookFragmentTest {
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
     )
+
+
+    @Before
+    fun toRoadBookFragment() {
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.roadBookFragment))
+            .perform(click())
+    }
 
     @Test
     fun fabIsCorrectlyDisplayedOnFirstView() {

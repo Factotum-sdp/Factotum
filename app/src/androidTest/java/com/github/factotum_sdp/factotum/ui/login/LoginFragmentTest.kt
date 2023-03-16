@@ -18,7 +18,6 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class LoginFragmentTest {
 
-    private val context: Context = getInstrumentation().targetContext
     private val usernameInput = onView(withId(R.id.username))
     private val passwordInput = onView(withId(R.id.password))
     private val loginButton = onView(withId(R.id.login))

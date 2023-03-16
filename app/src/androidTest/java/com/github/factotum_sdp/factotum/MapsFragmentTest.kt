@@ -21,14 +21,16 @@ import junit.framework.TestCase.assertTrue
 import org.hamcrest.CoreMatchers.allOf
 import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.FixMethodOrder
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.runners.MethodSorters
 import java.util.concurrent.TimeUnit
 
 
 @RunWith(AndroidJUnit4::class)
-
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class MapsFragmentTest {
 
     @get:Rule
@@ -43,7 +45,7 @@ class MapsFragmentTest {
             .perform(click())
     }
     @Test
-    fun goesToSecondFragement(){
+    fun testA_goesToSecondFragement(){
         val device = UiDevice.getInstance(getInstrumentation())
         device.findObject(UiSelector().textContains("->")).click()
         val nextButton = onView(withId(R.id.button_next))
@@ -52,7 +54,7 @@ class MapsFragmentTest {
     }
 
     @Test
-    fun showsDestinationMarker(){
+    fun testB_showsDestinationMarker(){
         val device = UiDevice.getInstance(getInstrumentation())
         device.findObject(UiSelector().textContains("->")).click()
         val nextButton = onView(withId(R.id.button_next))
@@ -62,7 +64,7 @@ class MapsFragmentTest {
     }
 
     @Test
-    fun showsAllDest(){
+    fun testC_showsAllDest(){
         val device = UiDevice.getInstance(getInstrumentation())
         val nbRoutes = device.findObjects(textContains("->")).size
         val showAll = onView(withId(R.id.button_all))
@@ -76,7 +78,7 @@ class MapsFragmentTest {
     }
 
     @Test
-    fun runLaunchesMaps(){
+    fun testD_runLaunchesMaps(){
         Intents.init()
         val device = UiDevice.getInstance(getInstrumentation())
         device.findObject(UiSelector().textContains("->")).click()

@@ -1,6 +1,6 @@
 container:
   image: cirrusci/android-sdk:30
-  cpu: 4
+  cpu: 8
   memory: 16G
   kvm: true
 
@@ -24,6 +24,8 @@ check_android_task:
       -no-snapshot
       -no-window
       -camera-back emulated
+  download_firebase_emulator_script: |
+    curl -Lo ./firebase https://firebase.tools/bin/linux/latest
   assemble_instrumented_tests_script: |
     chmod +x gradlew
     ./gradlew assembleDebugAndroidTest
@@ -39,8 +41,9 @@ check_android_task:
     ./cc-test-reporter before-build
   screen_record_background_script:
     for n in $(seq 1 20); do adb exec-out screenrecord --time-limit=180 --output-format=h264 - > $n.h264; done
-  check_script:
-    ./gradlew check connectedCheck
+  check_script: |
+    chmod +x firebase
+    ./firebase emulators:exec './gradlew check connectedCheck'
   report_codeclimate_script: |
     export JACOCO_SOURCE_PATH=app/src/main/java/
     ./cc-test-reporter format-coverage ./app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml --input-type jacoco

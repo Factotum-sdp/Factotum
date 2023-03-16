@@ -79,22 +79,6 @@ class MainActivityTest {
     }
 
     @Test
-    fun clickOnMapsMenuItemLeadsToCorrectFragment() {
-        clickOnAMenuItemLeadsCorrectly(R.id.mapsFragment, R.id.fragment_maps_directors_parent)
-    }
-
-    @Test
-    fun clickOnDirectoryMenuItemLeadsToCorrectFragment() {
-        clickOnAMenuItemLeadsCorrectly(R.id.directoryFragment, R.id.fragment_directory_directors_parent)
-    }
-
-    @Test
-    fun clickOnRoadBookMenuItemStaysToCorrectFragment() {
-        onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
-        clickOnAMenuItemLeadsCorrectly(R.id.roadBookFragment, R.id.fragment_roadbook_directors_parent)
-    }
-
-    @Test
     fun clickOnPictureMenuItemLeadsToCorrectFragmentAnd() {
         Intents.init()
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())

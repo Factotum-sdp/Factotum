@@ -24,7 +24,7 @@ check_android_task:
       -no-snapshot
       -no-window
       -camera-back emulated
-  download_firebase_emulator: |
+  download_firebase_emulator_script: |
     curl -Lo ./firebase https://firebase.tools/bin/linux/latest
   assemble_instrumented_tests_script: |
     chmod +x gradlew

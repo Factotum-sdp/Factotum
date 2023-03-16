@@ -4,34 +4,69 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import com.github.factotum_sdp.factotum.databinding.FragmentMapsBinding
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
 
-class MapsFragment: Fragment() {
+
+/**
+ * Fragment class that represents the map
+ */
+class MapsFragment : Fragment() {
+
+    companion object {
+        private val EPFL_LOC = LatLng(46.520536, 6.568318)
+        private const val minZoom = 2.0f
+        private const val maxZoom = 14.0f
+
+    }
+
     private var _binding: FragmentMapsBinding? = null
-
+    private val viewModel: MapsViewModel by activityViewModels()
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val slideshowViewModel =
-            ViewModelProvider(this).get(MapsViewModel::class.java)
 
         _binding = FragmentMapsBinding.inflate(inflater, container, false)
-        val root: View = binding.root
+        return binding.root
+    }
 
-        val textView: TextView = binding.maps
-        slideshowViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setMapProperties()
+
+    }
+
+    private fun setMapProperties(){
+        val mapFragment = binding.map.getFragment() as SupportMapFragment
+        mapFragment.getMapAsync{ googleMap ->
+            // clears map from previous markers
+            googleMap.clear()
+            //Shows destinations of selected roads
+            for (route in viewModel.routes.value.orEmpty()){
+                route.addDstToMap(googleMap)
+            }
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(EPFL_LOC))
+
+            // Add zoom controls to the map
+            googleMap.uiSettings.isZoomControlsEnabled = true
+
+            // Add zoom gestures to the map
+            googleMap.uiSettings.isZoomGesturesEnabled = true
+
+            // Sets zoom preferences
+            googleMap.setMinZoomPreference(minZoom)
+            googleMap.setMaxZoomPreference(maxZoom)
         }
-        return root
     }
 
     override fun onDestroyView() {

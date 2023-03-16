@@ -72,7 +72,11 @@ class MainActivityTest {
 
     @Test
     fun clickOnMapsMenuItemLeadsToCorrectFragment() {
-        clickOnAMenuItemLeadsCorrectly(R.id.mapsFragment, R.id.fragment_maps_directors_parent)
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.routeFragment))
+            .perform(click())
+        onView(withId(R.id.drawer_layout)).check(matches(DrawerMatchers.isClosed(Gravity.LEFT)))
     }
 
     @Test

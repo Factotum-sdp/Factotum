@@ -6,6 +6,26 @@
     app:startDestination="@id/roadBookFragment">
 
     <fragment
+        android:id="@+id/routeFragment"
+        android:name="com.github.factotum_sdp.factotum.ui.maps.RouteFragment"
+        android:label="@string/first_fragment_label"
+        tools:layout="@layout/fragment_routes">
+
+        <action
+            android:id="@+id/action_FirstFragment_to_SecondFragment"
+            app:destination="@id/MapsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/MapsFragment"
+        android:name="com.github.factotum_sdp.factotum.ui.maps.MapsFragment"
+        android:label="@string/second_fragment_label"
+        tools:layout="@layout/fragment_maps">
+
+        <action
+            android:id="@+id/action_SecondFragment_to_FirstFragment"
+            app:destination="@id/routeFragment" />
+    </fragment>
+    <fragment
         android:id="@+id/roadBookFragment"
         android:name="com.github.factotum_sdp.factotum.ui.roadbook.RoadBookFragment"
         android:label="fragment_roadbook"

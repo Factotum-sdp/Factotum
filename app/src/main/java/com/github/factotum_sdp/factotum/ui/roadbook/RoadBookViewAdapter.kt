@@ -17,8 +17,7 @@ import java.util.*
  * Adapter for the RecyclerView which will display a dynamic list of DestinationRecord
  * Choice of the RecyclerView instead of a ListAdapter for later facilities with drageNdrop
  */
-class RoadBookViewAdapter(
-) : RecyclerView.Adapter<RoadBookViewAdapter.RecordViewHolder>() {
+class RoadBookViewAdapter : RecyclerView.Adapter<RoadBookViewAdapter.RecordViewHolder>() {
 
     // Call back needed to instantiate the async list attribute
     private val differCallback = object : DiffUtil.ItemCallback<DestinationRecord>(){

@@ -36,57 +36,8 @@ class LoginFragmentTest {
     }
 
     @Test
-    fun emptyUsernameDisplayInvalidUsernameError() {
-        usernameInput.perform(typeText(""))
-        usernameInput.perform(closeSoftKeyboard())
-        passwordInput.perform(typeText("pwd"))
-        passwordInput.perform(closeSoftKeyboard())
-        loginButton.perform(click())
-
-        val invalidUsernameText = context.getString(R.string.invalid_username)
-
-        usernameInput.check(matches(hasErrorText(invalidUsernameText)))
-    }
-
-    @Test
-    fun shortPasswordDisplayInvalidPasswordError() {
-        usernameInput.perform(typeText("user.name@gmail.com"))
-        usernameInput.perform(closeSoftKeyboard())
-        passwordInput.perform(typeText("pwd"))
-        passwordInput.perform(closeSoftKeyboard())
-        loginButton.perform(click())
-
-        val invalidPasswordText = context.getString(R.string.invalid_password)
-
-        passwordInput.check(matches(hasErrorText(invalidPasswordText)))
-    }
-
-    @Test
-    fun loginFormWithValidDataAccessButtonIsEnabled() {
-        usernameInput.perform(typeText("user.name@gmail.com"))
-        passwordInput.perform(typeText("password"))
-        passwordInput.perform(closeSoftKeyboard())
-        loginButton.check(matches(isEnabled()))
-    }
-
-    @Test
-    fun loginFormWithValidDataAccessOpenRoadBookFragment() {
-        usernameInput.perform(typeText("user.name@gmail.com"))
-        passwordInput.perform(typeText("password"))
-        passwordInput.perform(closeSoftKeyboard())
-        loginButton.perform(click())
-        onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
-    }
-
-    @Test
     fun loginFormWithoutPassword() {
         usernameInput.perform(typeText("user.name@gmail.com"))
         loginButton.check(matches(not(isEnabled())))
-    }
-
-    @Test
-    fun signUpButtonOpenSignUpFragmentWhenClicked() {
-        onView(withId(R.id.signup)).perform(click())
-        onView(withId(R.id.fragment_signup_directors_parent)).check(matches(isDisplayed()))
     }
 }

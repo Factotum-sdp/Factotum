@@ -38,21 +38,4 @@ class LoginFragmentTest {
         usernameInput.perform(typeText("user.name@gmail.com"))
         loginButton.check(matches(not(isEnabled())))
     }
-
-    /*
-    @Test
-    fun correctUserEntryLeadsToRoadBook() {
-        usernameInput.perform(typeText("user.name@gmail.com"))
-        passwordInput.perform(typeText("dfsdfdddddddddd"))
-        loginButton.perform(click())
-        onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
-    }
-
-    @Test
-    fun clickOnSignUpLeadsToSignUpFragment() {
-        signUp.perform(click())
-        onView(withId(R.id.fragment_signup_directors_parent)).check(matches(isDisplayed()))
-    }
-    *
-     */
 }

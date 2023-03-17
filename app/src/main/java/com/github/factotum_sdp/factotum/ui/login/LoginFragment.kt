@@ -48,6 +48,7 @@ class LoginFragment : Fragment() {
         val passwordEditText = binding.password
         val loginButton = binding.login
         val loadingProgressBar = binding.loading
+        val signupButton = binding.signup
 
         observe(loginButton, usernameEditText, passwordEditText)
         addListeners(loadingProgressBar)
@@ -68,6 +69,10 @@ class LoginFragment : Fragment() {
         addListeners(usernameEditText, passwordEditText, afterTextChangedListener)
         loginButton.setOnClickListener {
             findNavController().navigate(R.id.action_loginFragment_to_roadBookFragment2)
+        }
+
+        signupButton.setOnClickListener {
+            findNavController().navigate(R.id.action_loginFragment_to_signUpFragment)
         }
     }
 

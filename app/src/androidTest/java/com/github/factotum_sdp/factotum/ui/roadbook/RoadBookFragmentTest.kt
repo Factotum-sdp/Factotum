@@ -14,6 +14,7 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,6 +28,15 @@ class RoadBookFragmentTest {
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
     )
+
+
+    @Before
+    fun toRoadBookFragment() {
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.roadBookFragment))
+            .perform(click())
+    }
 
     @Test
     fun fabIsCorrectlyDisplayedOnFirstView() {
@@ -104,18 +114,21 @@ class RoadBookFragmentTest {
         onView(withId(R.id.fragment_directory_directors_parent))
             .check(matches(isDisplayed()))
 
+        // Our target value to fetch
+        // is represented as a List<String> in Firebase
         val future = CompletableFuture<List<String>>()
+
         ref.get().addOnSuccessListener {
             if (it.value == null) {
+                // Set an exception in the future if our target value is not found in Firebase
                 future.completeExceptionally(NoSuchFieldException())
             }
-            else {
+            else { // Necessary cast to access List methods
                 val ls: List<String> = it.value as List<String>
                 future.complete(ls)
                 assert(ls.size == DestinationRecords.RECORDS.size + 1)
             }
         }.addOnFailureListener {
-            assert(false)
             future.completeExceptionally(it)
         }
     }

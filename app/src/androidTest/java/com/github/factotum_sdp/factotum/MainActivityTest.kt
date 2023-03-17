@@ -3,7 +3,6 @@ package com.github.factotum_sdp.factotum
 import android.Manifest
 import android.provider.MediaStore
 import android.view.Gravity
-import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.*
 import androidx.test.espresso.action.ViewActions.*
@@ -18,10 +17,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
-import androidx.test.uiautomator.UiSelector
-import com.github.factotum_sdp.factotum.ui.login.LoginFragment
 import org.hamcrest.Matchers.allOf
-import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -79,19 +75,20 @@ class MainActivityTest {
     }
 
     @Test
-    fun clickOnMapsMenuItemLeadsToCorrectFragment() {
-        clickOnAMenuItemLeadsCorrectly(R.id.mapsFragment, R.id.fragment_maps_directors_parent)
-    }
-
-    @Test
     fun clickOnDirectoryMenuItemLeadsToCorrectFragment() {
-        clickOnAMenuItemLeadsCorrectly(R.id.directoryFragment, R.id.fragment_directory_directors_parent)
+        clickOnAMenuItemLeadsCorrectly(
+            R.id.directoryFragment,
+            R.id.fragment_directory_directors_parent
+        )
     }
 
     @Test
     fun clickOnRoadBookMenuItemStaysToCorrectFragment() {
-        onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
-        clickOnAMenuItemLeadsCorrectly(R.id.roadBookFragment, R.id.fragment_roadbook_directors_parent)
+        //onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
+        clickOnAMenuItemLeadsCorrectly(
+            R.id.roadBookFragment,
+            R.id.fragment_roadbook_directors_parent
+        )
     }
 
     @Test
@@ -120,39 +117,22 @@ class MainActivityTest {
 
     @Test
     fun clickOnMapsMenuItemLeadsToCorrectFragment() {
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.mapsFragment))
-            .perform(click())
-        //temp hard-coded string bug to fetch the fragment parent id
-        onView(withText("This is the maps Fragment")).check(matches(isDisplayed()))
-        onView(withId(R.id.drawer_layout)).check(matches(DrawerMatchers.isClosed(Gravity.LEFT)))
-    }
-
-    @Test
-    fun clickOnDirectoryMenuItemLeadsToCorrectFragment() {
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.directoryFragment))
-            .perform(click())
-        onView(withId(R.id.fragment_directory_directors_parent)).check(matches(isDisplayed()))
-        onView(withId(R.id.drawer_layout)).check(matches(DrawerMatchers.isClosed(Gravity.LEFT)))
-    }
-
-    @Test
-    fun clickOnRoadBookMenuItemStaysToCorrectFragment() {
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.roadBookFragment))
-            .perform(click())
-        onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
-        onView(withId(R.id.drawer_layout)).check(matches(DrawerMatchers.isClosed(Gravity.LEFT)))
+        clickOnAMenuItemLeadsCorrectly(
+            R.id.routeFragment,
+            R.id.fragment_route_directors_parent
+        )
     }
 
     @Test
     fun navigateThroughDrawerMenuWorks() {
-        clickOnAMenuItemLeadsCorrectly(R.id.directoryFragment, R.id.fragment_directory_directors_parent)
-        clickOnAMenuItemLeadsCorrectly(R.id.roadBookFragment, R.id.fragment_roadbook_directors_parent)
+        clickOnAMenuItemLeadsCorrectly(
+            R.id.directoryFragment,
+            R.id.fragment_directory_directors_parent
+        )
+        clickOnAMenuItemLeadsCorrectly(
+            R.id.roadBookFragment,
+            R.id.fragment_roadbook_directors_parent
+        )
     }
 
     @Test

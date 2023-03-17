@@ -17,8 +17,7 @@ import java.util.*
  * Adapter for the RecyclerView which will display a dynamic list of DestinationRecord
  * Choice of the RecyclerView instead of a ListAdapter for later facilities with drageNdrop
  */
-class RoadBookViewAdapter(
-) : RecyclerView.Adapter<RoadBookViewAdapter.RecordViewHolder>() {
+class RoadBookViewAdapter : RecyclerView.Adapter<RoadBookViewAdapter.RecordViewHolder>() {
 
     // Call back needed to instantiate the async list attribute
     private val differCallback = object : DiffUtil.ItemCallback<DestinationRecord>() {
@@ -80,7 +79,7 @@ class RoadBookViewAdapter(
             return "$label : $waitTime"
         return ""
     }
-
+    // arrival : _ or arrival : HH:MM:SS AM-PM
     private fun timestampStringFormat(date: Date?, label: String): String {
         val sb = java.lang.StringBuilder("$label : ")
         if (date == null)
@@ -90,11 +89,16 @@ class RoadBookViewAdapter(
         }
         return sb.toString()
     }
+<<<<<<< HEAD
 
     private fun actionsStringFormat(
         actions: List<Action>,
         label: String
     ): String {
+=======
+    // actions : () or actions : (p | p | c)
+    private fun actionsStringFormat(actions: List<Action>, label: String): String {
+>>>>>>> feature/login-ui_merge
         val sb = StringBuilder("$label : (")
         if (actions.isEmpty())
             return sb.append(" )").toString()

@@ -15,20 +15,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-<<<<<<< HEAD
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
-import androidx.navigation.ui.setupActionBarWithNavController
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.databinding.FragmentLoginBinding
-import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookFragment
-import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookViewModel
 import com.google.android.gms.common.SignInButton
-=======
-import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.databinding.FragmentLoginBinding
->>>>>>> feature/login-ui_merge
 import com.google.android.material.snackbar.Snackbar
 
 
@@ -61,12 +51,10 @@ class LoginFragment : Fragment() {
         val loginButton = binding.login
         val loadingProgressBar = binding.loading
         val signupButton = binding.signup
-<<<<<<< HEAD
         val pwdForgotButton = binding.pwdForgot
         val googleSignInButton = requireView().findViewById<SignInButton>(R.id.sign_in_button)
         val dbRef = (activity as MainActivity).getDatabaseRef().child(DISPATCH_DB_PATH)
-=======
->>>>>>> feature/login-ui_merge
+
 
         observe(loginButton, usernameEditText, passwordEditText)
         addListeners(loadingProgressBar)
@@ -146,7 +134,6 @@ class LoginFragment : Fragment() {
         }
     }
 
-<<<<<<< HEAD
     private fun login(
         button: Button,
         progressBar: ProgressBar,
@@ -163,8 +150,6 @@ class LoginFragment : Fragment() {
         }
     }
 
-=======
->>>>>>> feature/login-ui_merge
     private fun updateUiWithUser(model: LoggedInUserView) {
         val welcome = getString(R.string.welcome) + " " + model.displayName
         Snackbar.make(requireView(), welcome, Snackbar.LENGTH_LONG).show()
@@ -179,7 +164,7 @@ class LoginFragment : Fragment() {
         _binding = null
     }
 
-    companion object{
+    companion object {
         private const val DISPATCH_DB_PATH: String = "profile-dispatch"
     }
 }

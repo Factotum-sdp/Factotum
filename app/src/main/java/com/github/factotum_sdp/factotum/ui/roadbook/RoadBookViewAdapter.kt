@@ -89,16 +89,11 @@ class RoadBookViewAdapter : RecyclerView.Adapter<RoadBookViewAdapter.RecordViewH
         }
         return sb.toString()
     }
-<<<<<<< HEAD
 
     private fun actionsStringFormat(
         actions: List<Action>,
         label: String
     ): String {
-=======
-    // actions : () or actions : (p | p | c)
-    private fun actionsStringFormat(actions: List<Action>, label: String): String {
->>>>>>> feature/login-ui_merge
         val sb = StringBuilder("$label : (")
         if (actions.isEmpty())
             return sb.append(" )").toString()

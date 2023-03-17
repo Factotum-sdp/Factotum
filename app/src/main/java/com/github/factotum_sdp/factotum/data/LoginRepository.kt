@@ -22,7 +22,7 @@ class LoginRepository(val dataSource: LoginDataSource) {
         user = null
     }
 
-    fun login(username: String, password: String): Result<LoggedInUser> {
+    fun login(username: String, password: String): Result<User> {
         // handle login
         val result = dataSource.login(username, password)
 

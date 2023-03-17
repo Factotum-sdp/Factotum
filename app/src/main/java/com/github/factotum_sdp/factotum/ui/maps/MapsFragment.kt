@@ -43,7 +43,6 @@ class MapsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setMapProperties()
-
     }
 
     private fun setMapProperties(){

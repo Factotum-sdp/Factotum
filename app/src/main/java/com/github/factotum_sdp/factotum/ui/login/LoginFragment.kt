@@ -15,10 +15,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.databinding.FragmentLoginBinding
-import com.google.android.gms.common.SignInButton
 import com.google.android.material.snackbar.Snackbar
 
 
@@ -52,8 +50,8 @@ class LoginFragment : Fragment() {
         val loadingProgressBar = binding.loading
         val signupButton = binding.signup
         val pwdForgotButton = binding.pwdForgot
-        val googleSignInButton = requireView().findViewById<SignInButton>(R.id.sign_in_button)
-        val dbRef = (activity as MainActivity).getDatabaseRef().child(DISPATCH_DB_PATH)
+        val googleSignInButton = binding.signInButton
+
 
 
         observe(loginButton, usernameEditText, passwordEditText)

@@ -1,15 +1,12 @@
 package com.github.factotum_sdp.factotum.ui.login
 
+import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import android.util.Patterns
+import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.LoginRepository
 import com.github.factotum_sdp.factotum.data.Result
-
-import com.github.factotum_sdp.factotum.R
-import com.google.firebase.database.DatabaseReference
-import java.text.SimpleDateFormat
 
 class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel() {
 

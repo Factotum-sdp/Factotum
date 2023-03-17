@@ -10,12 +10,14 @@ import java.io.IOException
 class LoginDataSource {
 
     fun login(username: String, password: String): Result<User> {
-        try {
-            val fakeUser = User(java.util.UUID.randomUUID().toString(), username,
-                "$username@gmail.com", Role.COURIER )
-            return Result.Success(fakeUser)
+        return try {
+            val fakeUser = User(
+                java.util.UUID.randomUUID().toString(), username,
+                "$username@gmail.com", Role.BOSS
+            )
+            Result.Success(fakeUser)
         } catch (e: Throwable) {
-            return Result.Error(IOException("Error logging in", e))
+            Result.Error(IOException("Error logging in", e))
         }
     }
 

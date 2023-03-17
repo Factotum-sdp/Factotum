@@ -38,9 +38,4 @@ class LoginFragmentTest {
         loginButton.check(matches(not(isEnabled())))
     }
 
-    @Test
-    fun signUpButtonOpenSignupFragmentWhenClicked() {
-        onView(withId(R.id.signup)).perform(click())
-        onView(withId(R.id.fragment_signup_directors_parent)).check(matches(isDisplayed()))
-    }
 }

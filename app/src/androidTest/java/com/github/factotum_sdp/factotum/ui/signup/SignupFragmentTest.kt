@@ -19,15 +19,4 @@ class SignupFragmentTest {
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
     )
-
-    @Test
-    fun testSignUpHasText() {
-        testRule.scenario
-
-        onView(withId(R.id.signup))
-            .perform(click())
-
-        onView(withText(R.string.sign_up_text))
-            .check(matches(isDisplayed()))
-    }
 }

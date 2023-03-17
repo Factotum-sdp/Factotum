@@ -47,11 +47,9 @@ class LoginFragment : Fragment() {
         val usernameEditText = binding.username
         val passwordEditText = binding.password
         val loginButton = binding.login
-        val loadingProgressBar = binding.loading
         val signupButton = binding.signup
 
         observe(loginButton, usernameEditText, passwordEditText)
-        addListeners(loadingProgressBar)
 
         val afterTextChangedListener = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -92,20 +90,6 @@ class LoginFragment : Fragment() {
                 }
                 loginFormState.passwordError?.let {
                     passwordEditText.error = getString(it)
-                }
-            })
-    }
-
-    private fun addListeners(loadingProgressBar: ProgressBar) {
-        loginViewModel.loginResult.observe(viewLifecycleOwner,
-            Observer { loginResult ->
-                loginResult ?: return@Observer
-                loadingProgressBar.visibility = View.GONE
-                loginResult.error?.let {
-                    showLoginFailed(it)
-                }
-                loginResult.success?.let {
-                    updateUiWithUser(it)
                 }
             })
     }

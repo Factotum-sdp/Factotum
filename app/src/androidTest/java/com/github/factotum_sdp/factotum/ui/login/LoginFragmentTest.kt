@@ -19,6 +19,7 @@ class LoginFragmentTest {
     private val usernameInput = onView(withId(R.id.username))
     private val passwordInput = onView(withId(R.id.password))
     private val loginButton = onView(withId(R.id.login))
+    private val signUp = onView(withId(R.id.signup))
 
     @get:Rule
     var testRule = ActivityScenarioRule(
@@ -36,6 +37,20 @@ class LoginFragmentTest {
     fun loginFormWithoutPassword() {
         usernameInput.perform(typeText("user.name@gmail.com"))
         loginButton.check(matches(not(isEnabled())))
+    }
+
+    @Test
+    fun correctUserEntryLeadsToRoadBook() {
+        usernameInput.perform(typeText("user.name@gmail.com"))
+        passwordInput.perform(typeText("dfsdfdddddddddd"))
+        loginButton.perform(click())
+        onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun clickOnSignUpLeadsToSignUpFragment() {
+        signUp.perform(click())
+        onView(withId(R.id.fragment_signup_directors_parent)).check(matches(isDisplayed()))
     }
 
 }

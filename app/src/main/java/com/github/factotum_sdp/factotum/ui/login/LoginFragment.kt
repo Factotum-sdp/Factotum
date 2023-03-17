@@ -101,24 +101,6 @@ class LoginFragment : Fragment() {
     ) {
         usernameEditText.addTextChangedListener(afterTextChangedListener)
         passwordEditText.addTextChangedListener(afterTextChangedListener)
-        passwordEditText.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                loginViewModel.login(
-                    usernameEditText.text.toString(),
-                    passwordEditText.text.toString()
-                )
-            }
-            false
-        }
-    }
-
-    private fun updateUiWithUser(model: LoggedInUserView) {
-        val welcome = getString(R.string.welcome) + " " + model.displayName
-        Snackbar.make(requireView(), welcome, Snackbar.LENGTH_LONG).show()
-    }
-
-    private fun showLoginFailed(@StringRes errorString: Int) {
-        Snackbar.make(requireView(), errorString, Snackbar.LENGTH_LONG).show()
     }
 
     override fun onDestroyView() {

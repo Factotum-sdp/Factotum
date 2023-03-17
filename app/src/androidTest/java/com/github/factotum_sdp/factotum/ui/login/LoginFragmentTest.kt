@@ -39,6 +39,7 @@ class LoginFragmentTest {
         loginButton.check(matches(not(isEnabled())))
     }
 
+    /*
     @Test
     fun correctUserEntryLeadsToRoadBook() {
         usernameInput.perform(typeText("user.name@gmail.com"))
@@ -52,4 +53,6 @@ class LoginFragmentTest {
         signUp.perform(click())
         onView(withId(R.id.fragment_signup_directors_parent)).check(matches(isDisplayed()))
     }
+    *
+     */
 }

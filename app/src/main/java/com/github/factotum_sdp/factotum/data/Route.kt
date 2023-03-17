@@ -16,13 +16,19 @@ import com.google.android.gms.maps.model.MarkerOptions
  * @param dstLat: Double. Latitude of the ending point
  * @param dstLon: Double. Longitude of the ending point
  */
-class Route (srcLat: Double, srcLon: Double, dstLat: Double, dstLon: Double) {
+class Route(srcLat: Double, srcLon: Double, dstLat: Double, dstLon: Double) {
 
     val src = LatLng(srcLat, srcLon)
     val dst = LatLng(dstLat, dstLon)
     val id = hashCode()
 
-    constructor(src: LatLng, dst: LatLng) : this(src.latitude, src.longitude, dst.latitude, dst.longitude)
+    constructor(src: LatLng, dst: LatLng) : this(
+        src.latitude,
+        src.longitude,
+        dst.latitude,
+        dst.longitude
+    )
+
     /**
      * Returns the coordinates of the start and destination of the route
      *
@@ -40,13 +46,11 @@ class Route (srcLat: Double, srcLon: Double, dstLat: Double, dstLon: Double) {
      * @param dst : boolean if we want to show the route destination
      */
     fun addDstToMap(googleMap: GoogleMap) {
-            googleMap.addMarker(
-                MarkerOptions()
-                    .position(this.dst)
-                    .title("Destination of $id")
-            )
+        googleMap.addMarker(
+            MarkerOptions()
+                .position(this.dst)
+                .title("Destination of $id")
+        )
     }
-
-
 
 }

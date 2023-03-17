@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/roadBookFragment">
+    app:startDestination="@id/loginFragment">
 
     <fragment
         android:id="@+id/routeFragment"
@@ -49,6 +49,23 @@
         android:name="com.github.factotum_sdp.factotum.ui.maps.MapsFragment"
         android:label="fragment_maps"
         tools:layout="@layout/fragment_maps" />
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.github.factotum_sdp.factotum.ui.login.LoginFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" >
+        <action
+            android:id="@+id/action_loginFragment_to_roadBookFragment2"
+            app:destination="@id/roadBookFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_signUpFragment"
+            app:destination="@id/signUpFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/signUpFragment"
+        android:name="com.github.factotum_sdp.factotum.ui.signup.SignUpFragment"
+        android:label="fragment_signup"
+        tools:layout="@layout/fragment_signup" />
     <fragment
         android:id="@+id/contactDetailsFragment2"
         android:name="com.github.factotum_sdp.factotum.ui.directory.ContactDetailsFragment"

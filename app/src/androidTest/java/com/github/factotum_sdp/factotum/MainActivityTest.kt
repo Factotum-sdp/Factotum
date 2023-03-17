@@ -17,7 +17,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
-import androidx.test.uiautomator.UiSelector
 import org.hamcrest.Matchers.allOf
 import org.junit.Rule
 import org.junit.Test
@@ -38,6 +37,11 @@ class MainActivityTest {
     //========================================================================================
     // Entry view checks :
     //========================================================================================
+
+    @Test
+    fun loginFragmentIsCorrectlyDisplayedOnFirstView() {
+        onView(withId(R.id.fragment_login_directors_parent)).check(matches(isDisplayed()))
+    }
 
     @Test
     fun appBarIsCorrectlyDisplayedOnFirstView() {
@@ -71,23 +75,20 @@ class MainActivityTest {
     }
 
     @Test
-    fun clickOnMapsMenuItemLeadsToCorrectFragment() {
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.routeFragment))
-            .perform(click())
-        onView(withId(R.id.drawer_layout)).check(matches(DrawerMatchers.isClosed(Gravity.LEFT)))
-    }
-
-    @Test
     fun clickOnDirectoryMenuItemLeadsToCorrectFragment() {
-        clickOnAMenuItemLeadsCorrectly(R.id.directoryFragment, R.id.fragment_directory_directors_parent)
+        clickOnAMenuItemLeadsCorrectly(
+            R.id.directoryFragment,
+            R.id.fragment_directory_directors_parent
+        )
     }
 
     @Test
     fun clickOnRoadBookMenuItemStaysToCorrectFragment() {
-        onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
-        clickOnAMenuItemLeadsCorrectly(R.id.roadBookFragment, R.id.fragment_roadbook_directors_parent)
+        //onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
+        clickOnAMenuItemLeadsCorrectly(
+            R.id.roadBookFragment,
+            R.id.fragment_roadbook_directors_parent
+        )
     }
 
     @Test
@@ -107,8 +108,7 @@ class MainActivityTest {
         Thread.sleep(5000)
 
         // Click on the camera shutter button
-        val takePictureButton = device.findObject(UiSelector().description("Shutter"))
-        takePictureButton.click()
+        device.executeShellCommand("input keyevent 27")
 
         // Use Intents.intended() to check that the captured intent matches the expected intent
         Intents.intended(expectedIntent)
@@ -116,9 +116,23 @@ class MainActivityTest {
     }
 
     @Test
+    fun clickOnMapsMenuItemLeadsToCorrectFragment() {
+        clickOnAMenuItemLeadsCorrectly(
+            R.id.routeFragment,
+            R.id.fragment_route_directors_parent
+        )
+    }
+
+    @Test
     fun navigateThroughDrawerMenuWorks() {
-        clickOnAMenuItemLeadsCorrectly(R.id.directoryFragment, R.id.fragment_directory_directors_parent)
-        clickOnAMenuItemLeadsCorrectly(R.id.roadBookFragment, R.id.fragment_roadbook_directors_parent)
+        clickOnAMenuItemLeadsCorrectly(
+            R.id.directoryFragment,
+            R.id.fragment_directory_directors_parent
+        )
+        clickOnAMenuItemLeadsCorrectly(
+            R.id.roadBookFragment,
+            R.id.fragment_roadbook_directors_parent
+        )
     }
 
     @Test

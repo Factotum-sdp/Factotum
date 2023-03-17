@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum
+package com.github.factotum_sdp.factotum.ui.maps
 
 import android.content.Intent
 import androidx.test.espresso.Espresso.onView
@@ -16,7 +16,8 @@ import androidx.test.uiautomator.By.descContains
 import androidx.test.uiautomator.By.textContains
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
-import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
+import com.github.factotum_sdp.factotum.MainActivity
+import com.github.factotum_sdp.factotum.R
 import junit.framework.TestCase.assertTrue
 import org.hamcrest.CoreMatchers.allOf
 import org.junit.Assert.assertEquals
@@ -47,7 +48,7 @@ class MapsFragmentTest {
         device.findObject(UiSelector().textContains("->")).click()
         val nextButton = onView(withId(R.id.button_next))
         nextButton.perform(click())
-        onView(withId(R.id.maps_fragment)).check(matches(isDisplayed()))
+        onView(withId(R.id.fragment_maps_directors_parent)).check(matches(isDisplayed()))
     }
 
     @Test

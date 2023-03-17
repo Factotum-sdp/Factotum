@@ -56,6 +56,25 @@
     <string name="phone_nb_ex_layout">Phone Number :</string>
     <string name="notes_ex_layout">Notes :</string>
 
+    <!-- Strings related to login -->
+    <string name="prompt_email">email@gmail.com</string>
+    <string name="prompt_password">••••••</string>
+    <string name="action_sign_in">Access</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome!"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="web_client_id">"539052463718–6gefd2fnlvbb1h9aiq09kil6sip37i0u.apps.googleusercontent.com"</string>
+    <string name="forgot_my_password_text">Forgot my password</string>
+    <string name="password_text">Password</string>
+    <string name="register_via_another_account_text">Register via another account</string>
+    <string name="i_don_t_have_an_account_text">I don\'t have an account</string>
+    <string name="create_one_text">Create one</string>
+    <string name="login_text">Login</string>
+    <string name="welcome_back_text">Welcome Back</string>
+    <string name="e_mail_address_text">E-mail address</string>
+    <string name="sign_up_text">Sign Up</string>
     <string name="file_provider">"com.github.factotum_sdp.factotum.file-provider"</string>
     <string name="camera_permission_not_granted">Permission needed to take a photo</string>
 </resources>

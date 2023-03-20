@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.data.Action
+import com.github.factotum_sdp.factotum.data.DestinationRecord.Action
 import com.github.factotum_sdp.factotum.data.DestinationRecord
 import java.text.SimpleDateFormat
 import java.util.*

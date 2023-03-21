@@ -19,9 +19,9 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
 
     inner class ContactsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) { //this is the view holder for the recycler view
 
-        var itemRole : TextView //these are the views that we want to display for each contact
-        var itemName : TextView
-        var itemImage : ImageView
+        val itemRole : TextView //these are the views that we want to display for each contact
+        val itemName : TextView
+        val itemImage : ImageView
 
         init {
             itemRole = itemView.findViewById(R.id.contact_role) //connect the views to the layout

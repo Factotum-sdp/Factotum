@@ -57,12 +57,6 @@ class MapsFragment : Fragment() {
             // clears map from previous markers
             googleMap.clear()
 
-            //Shows destinations of selected roads
-            for (route in viewModel.routesState.value.orEmpty()){
-                route.addDstToMap(googleMap)
-            }
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(EPFL_LOC))
-
             // places markers on the map and centers the camera
             placeMarkers(viewModel.routesState, googleMap)
 

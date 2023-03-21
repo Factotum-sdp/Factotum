@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.MutableLiveData
 import com.github.factotum_sdp.factotum.data.Route
 import com.github.factotum_sdp.factotum.databinding.FragmentMapsBinding
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -21,7 +22,7 @@ import com.google.android.gms.maps.model.LatLngBounds
 class MapsFragment : Fragment() {
 
     companion object {
-        private val EPFL_LOC = LatLng(46.520536, 6.568318)
+        private const val ZOOM_PADDING = 100
         private const val minZoom = 6.0f
         private const val maxZoom = 14.0f
     }
@@ -53,7 +54,7 @@ class MapsFragment : Fragment() {
             // clears map from previous markers
             googleMap.clear()
             // places markers on the map and centers the camera
-            placeMarkers(viewModel.routes.value!!, googleMap)
+            placeMarkers(viewModel.routes, googleMap)
 
             // Add zoom controls to the map
             googleMap.uiSettings.isZoomControlsEnabled = true
@@ -67,15 +68,15 @@ class MapsFragment : Fragment() {
         }
     }
 
-    private fun placeMarkers(routes : MutableList<Route>, googleMap: GoogleMap){
+    private fun placeMarkers(routes : MutableLiveData<MutableList<Route>>, googleMap: GoogleMap){
         val bounds = LatLngBounds.Builder()
 
-        for (route in routes){
+        for (route in routes.value.orEmpty()){
             route.addDstToMap(googleMap)
             bounds.include(route.dst)
         }
 
-        val padding = 100 // offset from edges of the map in pixels
+        val padding = ZOOM_PADDING // offset from edges of the map in pixels
 
         val cuf = CameraUpdateFactory.newLatLngBounds(bounds.build(), padding)
         googleMap.moveCamera(cuf)

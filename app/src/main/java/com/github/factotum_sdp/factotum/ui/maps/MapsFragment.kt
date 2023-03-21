@@ -51,7 +51,7 @@ class MapsFragment : Fragment() {
             // clears map from previous markers
             googleMap.clear()
             //Shows destinations of selected roads
-            for (route in viewModel.routesState.value!!){
+            for (route in viewModel.routesState.value.orEmpty()){
                 route.addDstToMap(googleMap)
             }
             googleMap.moveCamera(CameraUpdateFactory.newLatLng(EPFL_LOC))

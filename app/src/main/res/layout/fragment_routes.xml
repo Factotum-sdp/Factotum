@@ -13,7 +13,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:queryHint="Search address..."
-        android:layout_alignParentEnd= "true"/>
+        android:layout_alignParentEnd= "true"
+        app:iconifiedByDefault="false"/>
 
     <LinearLayout
         android:id= "@+id/search_button_line"

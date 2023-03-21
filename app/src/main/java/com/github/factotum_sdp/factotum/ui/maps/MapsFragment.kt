@@ -22,6 +22,7 @@ import com.google.android.gms.maps.model.LatLngBounds
 class MapsFragment : Fragment() {
 
     companion object {
+        private val EPFL_LOC = LatLng(46.520536, 6.568318)
         private const val ZOOM_PADDING = 100
         private const val minZoom = 6.0f
         private const val maxZoom = 14.0f
@@ -29,6 +30,7 @@ class MapsFragment : Fragment() {
 
     private var _binding: FragmentMapsBinding? = null
     private val viewModel: MapsViewModel by activityViewModels()
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -48,9 +50,9 @@ class MapsFragment : Fragment() {
         setMapProperties()
     }
 
-    private fun setMapProperties(){
+    private fun setMapProperties() {
         val mapFragment = binding.map.getFragment() as SupportMapFragment
-        mapFragment.getMapAsync{ googleMap ->
+        mapFragment.getMapAsync { googleMap ->
             // clears map from previous markers
             googleMap.clear()
             // places markers on the map and centers the camera
@@ -68,17 +70,20 @@ class MapsFragment : Fragment() {
         }
     }
 
-    private fun placeMarkers(routes : MutableLiveData<MutableList<Route>>, googleMap: GoogleMap){
+    private fun placeMarkers(routes: MutableLiveData<MutableList<Route>>, googleMap: GoogleMap) {
         val bounds = LatLngBounds.Builder()
 
-        for (route in routes.value.orEmpty()){
+        for (route in routes.value.orEmpty()) {
             route.addDstToMap(googleMap)
             bounds.include(route.dst)
         }
 
         val padding = ZOOM_PADDING // offset from edges of the map in pixels
 
-        val cuf = CameraUpdateFactory.newLatLngBounds(bounds.build(), padding)
+        val cuf = routes.value?.takeIf { it.isNotEmpty() }
+            ?.run { CameraUpdateFactory.newLatLngBounds(bounds.build(), padding) }
+            ?: CameraUpdateFactory.newLatLngZoom(EPFL_LOC, 8f)
+
         googleMap.moveCamera(cuf)
     }
 

@@ -8,6 +8,7 @@ import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 // ViewModel for managing the display of images from Firebase Storage
 class DisplayViewModel : ViewModel() {
@@ -32,11 +33,11 @@ class DisplayViewModel : ViewModel() {
 
             // List all items in the storage and process the results
             storageRef.listAll().addOnSuccessListener { listResult ->
-                val photoRefs = listResult.items.sortedBy { it.name }
-                photoRefs.forEach { photoRef ->
-                    photoList.add(photoRef)
+                val photoRefs = listResult.items.sorted()
+                for (i in photoRefs.indices) {
+                    photoList.add(photoRefs[i])
 
-                    if (photoList.size == photoRefs.size) {
+                    if (i == photoRefs.lastIndex) {
                         // All items have been processed, update the LiveData
                         _photoReferences.postValue(photoList)
                     }
@@ -48,22 +49,19 @@ class DisplayViewModel : ViewModel() {
     // Refresh the list of images from Firebase Storage
     fun refreshImages() {
         CoroutineScope(Dispatchers.IO).launch {
-            val newPhotoList = mutableListOf<StorageReference>()
+            val photoList = _photoReferences.value?.toMutableList() ?: mutableListOf()
             val storageRef = storage.reference
 
-            // List all items in the storage and process the results
+            // Clear the existing list and list all items in the storage
+            photoList.clear()
             storageRef.listAll().addOnSuccessListener { listResult ->
-                val photoRefs = listResult.items.sortedBy { it.name }
-                val itemsCount = photoRefs.size
-                var itemsProcessed = 0
+                val photoRefs = listResult.items.sorted()
+                for (i in photoRefs.indices) {
+                    photoList.add(photoRefs[i])
 
-                photoRefs.forEach { photoRef ->
-                    newPhotoList.add(photoRef)
-                    itemsProcessed++
-
-                    if (itemsProcessed == itemsCount) {
+                    if (i == photoRefs.lastIndex) {
                         // All items have been processed, update the LiveData
-                        _photoReferences.postValue(newPhotoList)
+                        _photoReferences.postValue(photoList)
                     }
                 }
             }

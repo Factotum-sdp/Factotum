@@ -8,7 +8,6 @@ import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 // ViewModel for managing the display of images from Firebase Storage
 class DisplayViewModel : ViewModel() {
@@ -27,43 +26,31 @@ class DisplayViewModel : ViewModel() {
 
     // Fetch photo references from Firebase Storage
     private fun fetchPhotoReferences() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val photoList = mutableListOf<StorageReference>()
-            val storageRef = storage.reference
-
-            // List all items in the storage and process the results
-            storageRef.listAll().addOnSuccessListener { listResult ->
-                val photoRefs = listResult.items.sorted()
-                for (i in photoRefs.indices) {
-                    photoList.add(photoRefs[i])
-
-                    if (i == photoRefs.lastIndex) {
-                        // All items have been processed, update the LiveData
-                        _photoReferences.postValue(photoList)
-                    }
-                }
-            }
-        }
+        updateImages(false)
     }
 
     // Refresh the list of images from Firebase Storage
     fun refreshImages() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val photoList = _photoReferences.value?.toMutableList() ?: mutableListOf()
-            val storageRef = storage.reference
+        updateImages(true)
+    }
 
-            // Clear the existing list and list all items in the storage
-            photoList.clear()
+    // Update the list of images from Firebase Storage
+    private fun updateImages(refresh: Boolean) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val storageRef = storage.reference
             storageRef.listAll().addOnSuccessListener { listResult ->
                 val photoRefs = listResult.items.sorted()
-                for (i in photoRefs.indices) {
-                    photoList.add(photoRefs[i])
+                val photoList = if (refresh) _photoReferences.value?.toMutableList() ?: mutableListOf() else mutableListOf()
 
-                    if (i == photoRefs.lastIndex) {
-                        // All items have been processed, update the LiveData
-                        _photoReferences.postValue(photoList)
-                    }
+                if (refresh) {
+                    photoList.clear()
                 }
+
+                for (photoRef in photoRefs) {
+                    photoList.add(photoRef)
+                }
+
+                _photoReferences.postValue(photoList)
             }
         }
     }

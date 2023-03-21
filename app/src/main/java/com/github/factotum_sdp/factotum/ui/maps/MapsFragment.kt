@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.github.factotum_sdp.factotum.data.Route
 import com.github.factotum_sdp.factotum.databinding.FragmentMapsBinding
@@ -55,8 +56,9 @@ class MapsFragment : Fragment() {
         mapFragment.getMapAsync { googleMap ->
             // clears map from previous markers
             googleMap.clear()
+
             // places markers on the map and centers the camera
-            placeMarkers(viewModel.routes, googleMap)
+            placeMarkers(viewModel.routesState, googleMap)
 
             // Add zoom controls to the map
             googleMap.uiSettings.isZoomControlsEnabled = true
@@ -70,7 +72,7 @@ class MapsFragment : Fragment() {
         }
     }
 
-    private fun placeMarkers(routes: MutableLiveData<MutableList<Route>>, googleMap: GoogleMap) {
+    private fun placeMarkers(routes: LiveData<List<Route>>, googleMap: GoogleMap) {
         val bounds = LatLngBounds.Builder()
 
         for (route in routes.value.orEmpty()) {

@@ -1,5 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -14,8 +15,10 @@ import java.util.Calendar
  * holds an observable list of DestinationRecord which can evolve dynamically
  */
 class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
-    val recordsList: MutableLiveData<List<DestinationRecord>> =
+    private val _recordsList: MutableLiveData<List<DestinationRecord>> =
         MutableLiveData(DestinationRecords.RECORDS)
+
+    val recordsListState: LiveData<List<DestinationRecord>> = _recordsList
 
     private var dbRef: DatabaseReference
     init {
@@ -28,20 +31,20 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
 
     fun addRecord(destinationRecord: DestinationRecord) {
         val newList = arrayListOf<DestinationRecord>()
-        newList.addAll(recordsList.value as Collection<DestinationRecord>)
+        newList.addAll(_recordsList.value as Collection<DestinationRecord>)
         newList.add(destinationRecord)
-        recordsList.postValue(newList)
+        _recordsList.postValue(newList)
     }
 
     fun deleteLastRecord() {
         val newList = arrayListOf<DestinationRecord>()
-        newList.addAll(recordsList.value as Collection<DestinationRecord>)
+        newList.addAll(_recordsList.value as Collection<DestinationRecord>)
         if (newList.isNotEmpty()) newList.removeLast()
-        recordsList.postValue(newList)
+        _recordsList.postValue(newList)
     }
 
     fun backUp() {
-        dbRef.setValue(recordsList.value)
+        dbRef.setValue(_recordsList.value)
     }
 
     // Factory needed to assign a value at construction time to the class attribute

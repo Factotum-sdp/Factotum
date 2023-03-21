@@ -15,7 +15,7 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.contacts_content.ContactsList
+import com.github.factotum_sdp.factotum.placeholder.ContactsList
 import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Rule

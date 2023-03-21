@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum.contacts_content
+package com.github.factotum_sdp.factotum.placeholder
 
 import com.github.factotum_sdp.factotum.R
 

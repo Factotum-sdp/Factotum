@@ -82,13 +82,11 @@ class RouteFragment : Fragment() {
             findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
         }
         binding.buttonAll.setOnClickListener{
-            for(route in DUMMY_ROUTE){
-                viewModel.addRoute(route)
-            }
+            viewModel.addAll(DUMMY_ROUTE)
             findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
         }
         binding.buttonRun.setOnClickListener{
-            val route = viewModel.runRoute.value!!
+            val route = viewModel.runRouteState.value!!
             val googleMapsUrl = StringBuilder()
                 .append("http://maps.google.com/maps?")
                 .append("saddr=${route.src.latitude},${route.src.longitude} &")

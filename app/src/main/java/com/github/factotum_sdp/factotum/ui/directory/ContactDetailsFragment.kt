@@ -10,7 +10,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.contacts_content.ContactsList
+import com.github.factotum_sdp.factotum.placeholder.ContactsList
 
 class ContactDetailsFragment : Fragment() {
 

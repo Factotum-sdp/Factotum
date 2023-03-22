@@ -40,16 +40,13 @@ class DisplayViewModel : ViewModel() {
             val storageRef = storage.reference
             storageRef.listAll().addOnSuccessListener { listResult ->
                 val photoRefs = listResult.items.sorted()
-                val photoList = if (refresh) _photoReferences.value?.toMutableList() ?: mutableListOf() else mutableListOf()
+                val photoList = _photoReferences.value?.toMutableList() ?: mutableListOf()
 
                 if (refresh) {
                     photoList.clear()
                 }
 
-                for (photoRef in photoRefs) {
-                    photoList.add(photoRef)
-                }
-
+                photoList.addAll(photoRefs)
                 _photoReferences.postValue(photoList)
             }
         }

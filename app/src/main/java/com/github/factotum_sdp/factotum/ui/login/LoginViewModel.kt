@@ -1,13 +1,17 @@
 package com.github.factotum_sdp.factotum.ui.login
 
+import android.util.Log
+import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import android.util.Patterns
+import androidx.lifecycle.viewModelScope
+import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.LoginRepository
 import com.github.factotum_sdp.factotum.data.Result
-
-import com.github.factotum_sdp.factotum.R
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel() {
 
@@ -17,15 +21,22 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
     private val _loginResult = MutableLiveData<LoginResult>()
     val loginResult: LiveData<LoginResult> = _loginResult
 
-    fun login(username: String, password: String) {
-        // can be launched in a separate asynchronous job
-        val result = loginRepository.login(username, password)
-
-        if (result is Result.Success) {
-            _loginResult.value =
-                LoginResult(success = LoggedInUserView(displayName = result.data.displayName))
-        } else {
-            _loginResult.value = LoginResult(error = R.string.login_failed)
+    fun login(userEmail: String, password: String) {
+        // launch in a separate asynchronous job
+        viewModelScope.launch {
+            val result = withContext(Dispatchers.IO) { loginRepository.login(userEmail, password) }
+            if (result is Result.Success) {
+                _loginResult.value =
+                    LoginResult(
+                        success = LoggedInUserView(
+                            displayName = result.data.displayName,
+                            email = result.data.email
+                        )
+                    )
+            } else {
+                Log.d("LOGIN", result.toString());
+                _loginResult.value = LoginResult(error = R.string.login_failed)
+            }
         }
     }
 

@@ -1,10 +1,8 @@
 package com.github.factotum_sdp.factotum
 
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
@@ -14,27 +12,27 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.github.factotum_sdp.factotum.data.LoginDataSource
+import com.github.factotum_sdp.factotum.data.LoginRepository
+import com.github.factotum_sdp.factotum.data.model.LoggedInUser
 import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
+import com.github.factotum_sdp.factotum.ui.login.LoggedInUserView
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
-    private lateinit var db : DatabaseReference
-    private lateinit var auth: FirebaseAuth
+    private lateinit var db: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         db = Firebase.database.reference
-        auth = Firebase.auth
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.appBarMain.toolbar)
@@ -55,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
-        
+
         // Bind user data displayed in the Navigation Header
         setUserHeader()
     }
@@ -65,6 +63,7 @@ class MainActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.main, menu)
         return true
     }
+
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
@@ -82,10 +81,10 @@ class MainActivity : AppCompatActivity() {
             UserViewModel.UserViewModelFactory(UsersPlaceHolder.USER1.name, UsersPlaceHolder.USER1.email)
         val user = ViewModelProvider(this, userFact)[UserViewModel::class.java]
         binding.navView.findViewTreeLifecycleOwner()?.let { lco ->
-            user.name.observe(lco){
+            user.name.observe(lco) {
                 userName.text = it
             }
-            user.email.observe(lco){
+            user.email.observe(lco) {
                 email.text = it
             }
         }

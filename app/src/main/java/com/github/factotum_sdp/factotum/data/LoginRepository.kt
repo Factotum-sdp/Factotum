@@ -1,6 +1,8 @@
 package com.github.factotum_sdp.factotum.data
 
+import android.util.Log
 import com.github.factotum_sdp.factotum.data.model.LoggedInUser
+import com.google.firebase.auth.FirebaseAuth
 
 /**
  * Class that requests authentication and user information from the remote data source and
@@ -22,11 +24,12 @@ class LoginRepository(val dataSource: LoginDataSource) {
         user = null
     }
 
-    fun login(username: String, password: String): Result<LoggedInUser> {
+    fun login(userEmail: String, password: String): Result<LoggedInUser> {
         // handle login
-        val result = dataSource.login(username, password)
+        val result = dataSource.login(userEmail, password)
 
         if (result is Result.Success) {
+            Log.d("LOGIN", "LoginRepository: login: result is Result.Success")
             setLoggedInUser(result.data)
         }
 

@@ -21,4 +21,13 @@
             android:icon="@android:drawable/ic_dialog_map"
             android:title="@string/menu_maps" />
     </group>
+
+    <group
+        android:id="@+id/menu_bottom"
+        android:checkableBehavior="none">
+        <item
+            android:id="@+id/signoutButton"
+            android:icon="@drawable/ic_menu_logout"
+            android:title="@string/sign_out" />
+    </group>
 </menu>

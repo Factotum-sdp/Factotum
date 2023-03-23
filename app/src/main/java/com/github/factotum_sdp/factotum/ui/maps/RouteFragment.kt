@@ -1,6 +1,7 @@
 package com.github.factotum_sdp.factotum.ui.maps
 
 import android.content.Intent
+import android.location.Geocoder
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ListView
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -52,6 +54,8 @@ class RouteFragment : Fragment() {
         setListenerList()
 
         setListenerButtons()
+
+        setListenerSearch()
 
 
     }
@@ -99,6 +103,26 @@ class RouteFragment : Fragment() {
             }
             requireContext().startActivity(intent)
         }
+    }
+
+    private fun setListenerSearch(){
+        binding.searchBar.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                query?.let {
+                    if (it != ""){
+                        val geocoder = Geocoder(requireContext())
+                    }
+                }
+
+
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                return false
+            }
+        })
     }
 
 

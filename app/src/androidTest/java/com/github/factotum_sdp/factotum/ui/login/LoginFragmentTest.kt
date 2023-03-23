@@ -35,9 +35,9 @@ class LoginFragmentTest {
     }
 
     fun correctUserEntryLeadsToRoadBook() {
-        onView(withId(R.id.username)).perform(typeText("user.name@gmail.com"))
+        onView(withId(R.id.username)).perform(typeText("jane.doe@gmail.com"))
         closeSoftKeyboard()
-        onView(withId(R.id.password)).perform(typeText("dfsdfdddddddddd"))
+        onView(withId(R.id.password)).perform(typeText("123456"))
         closeSoftKeyboard()
         onView(withId(R.id.login)).perform(click())
         onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
@@ -56,6 +56,8 @@ class LoginFragmentTest {
         onView(withId(R.id.password)).perform(typeText("azertyuiop"))
         closeSoftKeyboard()
         onView(withId(R.id.login)).perform(click())
+        onView(withId(com.google.android.material.R.id.snackbar_text))
+            .check(matches(withText(R.string.login_failed)))
         onView(withId(R.id.fragment_login_directors_parent)).check(matches(isDisplayed()))
     }
 }

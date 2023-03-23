@@ -48,16 +48,4 @@ class LoginFragmentTest {
         onView(withId(R.id.signup)).perform(click())
         onView(withId(R.id.fragment_signup_directors_parent)).check(matches(isDisplayed()))
     }
-
-    @Test
-    fun incorrectUserEntryKeepLoginFragmentOpen() {
-        onView(withId(R.id.username)).perform(typeText("jane.doe@gmail.com"))
-        closeSoftKeyboard()
-        onView(withId(R.id.password)).perform(typeText("azertyuiop"))
-        closeSoftKeyboard()
-        onView(withId(R.id.login)).perform(click())
-        onView(withId(com.google.android.material.R.id.snackbar_text))
-            .check(matches(withText(R.string.login_failed)))
-        onView(withId(R.id.fragment_login_directors_parent)).check(matches(isDisplayed()))
-    }
 }

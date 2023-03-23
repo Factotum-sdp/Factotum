@@ -56,7 +56,7 @@ class LoggedInUserViewTest {
 
         // Then
         assertEquals(
-            "LoggedInUserView(displayName=$expectedDisplayName, displayName=$expectedEmail)",
+            "LoggedInUserView(displayName=$expectedDisplayName, email=$expectedEmail)",
             userViewString
         )
     }

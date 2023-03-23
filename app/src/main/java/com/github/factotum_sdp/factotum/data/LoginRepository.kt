@@ -1,9 +1,5 @@
 package com.github.factotum_sdp.factotum.data
 
-import android.util.Log
-import com.github.factotum_sdp.factotum.data.model.LoggedInUser
-import com.google.firebase.auth.FirebaseAuth
-
 /**
  * Class that requests authentication and user information from the remote data source and
  * maintains an in-memory cache of login status and user credentials information.

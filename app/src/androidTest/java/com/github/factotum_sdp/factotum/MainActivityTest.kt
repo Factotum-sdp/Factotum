@@ -124,17 +124,17 @@ class MainActivityTest {
     }
 
     @Test
-<<<<<<< HEAD
     fun clickOnSignOutMenuItemLeadsToCorrectFragment() {
         clickOnAMenuItemLeadsCorrectly(
             R.id.signoutButton,
             R.id.fragment_login_directors_parent
-=======
+        )
+    }
+
     fun clickOnDisplayProofPictureMenuItemLeadsToCorrectFragment() {
         clickOnAMenuItemLeadsCorrectly(
             R.id.displayFragment,
             R.id.fragment_display_directors_parent
->>>>>>> main
         )
     }
 

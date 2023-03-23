@@ -10,13 +10,12 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.databinding.FragmentLoginBinding
+import com.google.android.material.snackbar.Snackbar
 
 
 class LoginFragment : Fragment() {

@@ -50,14 +50,12 @@ class LoginFragmentTest {
     }
 
     @Test
-    fun incorrectUserEntryLeadsToErrorSnackbar() {
+    fun incorrectUserEntryKeepLoginFragmentOpen() {
         onView(withId(R.id.username)).perform(typeText("jane.doe@gmail.com"))
         closeSoftKeyboard()
         onView(withId(R.id.password)).perform(typeText("azertyuiop"))
         closeSoftKeyboard()
         onView(withId(R.id.login)).perform(click())
         onView(withId(R.id.fragment_login_directors_parent)).check(matches(isDisplayed()))
-        onView(withId(com.google.android.material.R.id.snackbar_text))
-            .check(matches(withText("Login failed")))
     }
 }

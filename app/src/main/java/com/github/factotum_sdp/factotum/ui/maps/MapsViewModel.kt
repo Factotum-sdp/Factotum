@@ -1,5 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.maps
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.github.factotum_sdp.factotum.data.Route
@@ -10,8 +11,10 @@ import com.github.factotum_sdp.factotum.data.Route
  */
 class MapsViewModel : ViewModel() {
 
-    val routes: MutableLiveData<MutableList<Route>> = MutableLiveData(mutableListOf())
-    val runRoute : MutableLiveData<Route> = MutableLiveData()
+    private val _routes: MutableLiveData<List<Route>> = MutableLiveData(listOf())
+    private val _runRoute : MutableLiveData<Route> = MutableLiveData()
+    val routesState: LiveData<List<Route>> = _routes
+    val runRouteState: LiveData<Route> = _runRoute
 
     /**
      * Adds a route to be shown on the map
@@ -19,7 +22,22 @@ class MapsViewModel : ViewModel() {
      * @param route : route to be shown
      */
     fun addRoute(route: Route){
-        routes.value?.add(route)
+        _routes.value?.let{
+            val res = it.plus(route)
+            _routes.postValue(res)
+        }
+    }
+
+    /**
+     * Add a list of route to be shown on the map
+     *
+     * @param routes : routes to be shown
+     */
+    fun addAll(routes: List<Route>) {
+        _routes.value?.let {
+            val res = it.plus(routes)
+            _routes.postValue(res)
+        }
     }
 
     /**
@@ -27,7 +45,7 @@ class MapsViewModel : ViewModel() {
      *
      */
     fun deleteAll(){
-        routes.postValue(mutableListOf())
+        _routes.postValue(listOf())
     }
 
     /**
@@ -36,6 +54,6 @@ class MapsViewModel : ViewModel() {
      * @param route : route to be run
      */
     fun setRunRoute(route: Route){
-        runRoute.postValue(route)
+        _runRoute.postValue(route)
     }
 }

@@ -1,6 +1,6 @@
 package com.github.factotum_sdp.factotum
 
-import com.github.factotum_sdp.factotum.data.model.LoggedInUser
+import com.github.factotum_sdp.factotum.data.LoggedInUser
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 

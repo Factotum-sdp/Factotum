@@ -2,7 +2,7 @@ package com.github.factotum_sdp.factotum
 
 import com.github.factotum_sdp.factotum.data.LoginDataSource
 import com.github.factotum_sdp.factotum.data.Result
-import com.github.factotum_sdp.factotum.data.model.LoggedInUser
+import com.github.factotum_sdp.factotum.data.LoggedInUser
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test

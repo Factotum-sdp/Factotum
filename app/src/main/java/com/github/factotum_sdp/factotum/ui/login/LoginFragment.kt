@@ -17,7 +17,6 @@ import androidx.navigation.fragment.findNavController
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.databinding.FragmentLoginBinding
-import com.google.android.material.snackbar.Snackbar
 
 
 class LoginFragment : Fragment() {

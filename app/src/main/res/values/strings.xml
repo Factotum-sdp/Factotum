@@ -1,8 +1,5 @@
 <resources>
     <string name="app_name">Factotum</string>
-    <string name="validate">validate</string>
-    <string name="your_name">Your name</string>
-    <string name="greetings">Greetings !</string>
     <string name="title_activity_maps">Map with Marker</string>
     <string name="title_activity_basic">BasicActivity</string>
     <!-- Strings used for fragments for navigation -->
@@ -78,4 +75,6 @@
     <string name="file_provider">"com.github.factotum_sdp.factotum.file-provider"</string>
     <string name="camera_permission_not_granted">Permission needed to take a photo</string>
     <string name="sign_out">Sign Out</string>
+    <string name="menu_view_proof_picture">View Proof Pictures</string>
+    <string name="refresh">Refresh</string>
 </resources>

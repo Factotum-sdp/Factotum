@@ -8,7 +8,9 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -17,6 +19,7 @@ import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.FirebaseApp
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -38,14 +41,17 @@ class MainActivity : AppCompatActivity() {
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
+        val navController = navHostFragment.navController
 
         // Passing each menu ID considered as top level destinations.
         // In order to keep out the NavigateUpButton which would mask the HamburgerButton
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.roadBookFragment, R.id.pictureFragment,
-                R.id.directoryFragment, R.id.loginFragment, R.id.routeFragment
+                R.id.directoryFragment, R.id.loginFragment, R.id.routeFragment,
+                R.id.displayFragment
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)

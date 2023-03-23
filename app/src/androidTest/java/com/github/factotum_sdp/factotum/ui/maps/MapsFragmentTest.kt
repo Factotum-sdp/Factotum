@@ -1,6 +1,7 @@
 package com.github.factotum_sdp.factotum.ui.maps
 
 import android.content.Intent
+import androidx.test.espresso.Espresso.onData
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -20,6 +21,7 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import junit.framework.TestCase.assertTrue
 import org.hamcrest.CoreMatchers.allOf
+import org.hamcrest.Matchers.anything
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -44,8 +46,7 @@ class MapsFragmentTest {
     }
     @Test
     fun goesToSecondFragement(){
-        val device = UiDevice.getInstance(getInstrumentation())
-        device.findObject(UiSelector().textContains("->")).click()
+        onData(anything()).inAdapterView(withId(R.id.list_view_routes)).atPosition(0).perform(click())
         val nextButton = onView(withId(R.id.button_next))
         nextButton.perform(click())
         onView(withId(R.id.fragment_maps_directors_parent)).check(matches(isDisplayed()))
@@ -54,7 +55,7 @@ class MapsFragmentTest {
     @Test
     fun showsDestinationMarker(){
         val device = UiDevice.getInstance(getInstrumentation())
-        device.findObject(UiSelector().textContains("->")).click()
+        onData(anything()).inAdapterView(withId(R.id.list_view_routes)).atPosition(0).perform(click())
         val nextButton = onView(withId(R.id.button_next))
         nextButton.perform(click())
         val endMarker = device.findObject(UiSelector().descriptionContains("Destination"))

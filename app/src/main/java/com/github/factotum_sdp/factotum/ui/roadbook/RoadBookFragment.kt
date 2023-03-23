@@ -33,7 +33,7 @@ class RoadBookFragment : Fragment() {
 
         // Observe the roadbook ViewModel, to detect data changes
         // and update the displayed RecyclerView accordingly
-        rbViewModel.recordsList.observe(this.viewLifecycleOwner) {
+        rbViewModel.recordsListState.observe(this.viewLifecycleOwner) {
             adapter.submitList(it)
         }
         // Set events that triggers change in the roadbook ViewModel

@@ -6,6 +6,8 @@ plugins {
     id 'com.google.gms.google-services'
     id 'kotlin-parcelize'
     id 'androidx.navigation.safeargs.kotlin'
+    id 'kotlin-kapt'
+    id 'kotlin-android'
 }
 
 android {
@@ -65,6 +67,9 @@ dependencies {
     implementation "androidx.fragment:fragment-ktx:1.5.5"
     implementation 'androidx.test.espresso:espresso-contrib:3.5.1'
     implementation 'com.google.firebase:firebase-database-ktx:20.1.0'
+    implementation 'com.firebaseui:firebase-ui-storage:8.0.2'
+    implementation 'com.github.bumptech.glide:glide:4.15.1'
+    kapt 'com.github.bumptech.glide:compiler:4.15.1'
 
     implementation 'androidx.fragment:fragment-ktx:1.5.5'
     implementation 'androidx.navigation:navigation-dynamic-features-fragment:2.5.3'
@@ -92,7 +97,7 @@ dependencies {
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.3.0-alpha02'
     androidTestImplementation 'androidx.test.espresso:espresso-intents:3.5.1'
     androidTestImplementation 'androidx.navigation:navigation-testing:2.5.3'
-    androidTestImplementation 'androidx.navigation:navigation-testing:2.5.3'
+    androidTestImplementation 'androidx.arch.core:core-testing:2.2.0'
 
     debugImplementation "androidx.test:monitor:1.6.1"
     debugImplementation "androidx.fragment:fragment-testing:1.5.5"

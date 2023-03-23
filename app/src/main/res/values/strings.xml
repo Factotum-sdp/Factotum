@@ -74,4 +74,6 @@
     <string name="sign_up_text">Sign Up</string>
     <string name="file_provider">"com.github.factotum_sdp.factotum.file-provider"</string>
     <string name="camera_permission_not_granted">Permission needed to take a photo</string>
+    <string name="menu_view_proof_picture">View Proof Pictures</string>
+    <string name="refresh">Refresh</string>
 </resources>

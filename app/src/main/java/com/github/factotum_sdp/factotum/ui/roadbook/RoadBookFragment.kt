@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.*
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.DestinationRecord
@@ -73,14 +74,24 @@ class RoadBookFragment : Fragment(), MenuProvider {
                 target: RecyclerView.ViewHolder
             ): Boolean {
                 try {
-                    val fromPosition: Int = viewHolder.absoluteAdapterPosition
-                    val toPosition: Int = target.absoluteAdapterPosition
+                    val fromPosition = viewHolder.absoluteAdapterPosition
+                    val toPosition = target.absoluteAdapterPosition
 
-                    recyclerView.adapter?.notifyItemMoved(fromPosition, toPosition)
-
+                    // Only the front-end is updated when drag-travelling for a smoother UX
+                    recyclerView.adapter?.notifyItemMoved(fromPosition!!, toPosition!!)
+                    rbViewModel.swapRecords(fromPosition, toPosition - 1)
                     return true
                 } catch (e: java.lang.Exception){
                     return false
+                }
+            }
+
+            // Hacky move to update the ViewModel only when the Drag&Drop is validated
+            override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+                super.onSelectedChanged(viewHolder, actionState)
+
+                if (actionState == ItemTouchHelper.ACTION_STATE_IDLE) {
+                    rbViewModel.pushDragAndDropResult()
                 }
             }
 
@@ -89,6 +100,8 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
                 when(direction){
                     ItemTouchHelper.RIGHT -> {
+                        val check = rbViewModel.recordsListState.value
+                        val check3 = rbRecyclerView.adapter
                         val recordVH = viewHolder as RoadBookViewAdapter.RecordViewHolder
                         val position = recordVH.absoluteAdapterPosition
                         val rec = rbViewModel.recordsListState.value!![position]

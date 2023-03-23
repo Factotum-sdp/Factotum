@@ -4,11 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.data.DestinationRecord
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.google.firebase.database.DatabaseReference
 import java.text.SimpleDateFormat.getDateInstance
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * The RoadBook ViewModel
@@ -19,6 +21,8 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         MutableLiveData(DestinationRecords.RECORDS)
 
     val recordsListState: LiveData<List<DestinationRecord>> = _recordsList
+
+    private val recordsOnDragAndDrop: ArrayList<DestinationRecord> = arrayListOf()
 
     private var dbRef: DatabaseReference
     init {
@@ -47,12 +51,28 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         dbRef.setValue(_recordsList.value)
     }
 
+    fun swapRecords(from: Int, to: Int) {
+        if(recordsOnDragAndDrop.isEmpty())
+            recordsOnDragAndDrop.addAll(_recordsList.value as Collection<DestinationRecord>)
+        Collections.swap(recordsOnDragAndDrop, from, to)
+    }
+
+    fun pushDragAndDropResult() {
+        if(recordsOnDragAndDrop.isNotEmpty()) {
+            var ls = listOf<DestinationRecord>()
+            ls = ls.plus(recordsOnDragAndDrop)
+            _recordsList.postValue(ls)
+            recordsOnDragAndDrop.clear()
+        }
+    }
+
     fun editRecord(pos: Int, newRec: DestinationRecord) {
         val ls = arrayListOf<DestinationRecord>()
         ls.addAll(_recordsList.value as Collection<DestinationRecord>)
         ls[pos] = newRec
         _recordsList.postValue(ls)
     }
+
 
     // Factory needed to assign a value at construction time to the class attribute
     class RoadBookViewModelFactory(private val _dbRef: DatabaseReference)

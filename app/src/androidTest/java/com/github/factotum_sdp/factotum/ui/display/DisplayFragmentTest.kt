@@ -73,6 +73,10 @@ class DisplayFragmentTest {
 
         Thread.sleep(WAIT_TIME_INIT)
 
+        onView(withId(R.id.refreshButton)).perform(click())
+
+        Thread.sleep(WAIT_TIME_REFRESH)
+
         runBlocking {
             val imagePath = "test_image1.jpg"
             uploadImageToStorageEmulator(context, imagePath, "test_image1.jpg")

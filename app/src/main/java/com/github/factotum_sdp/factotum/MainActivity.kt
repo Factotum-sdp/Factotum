@@ -12,13 +12,10 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.github.factotum_sdp.factotum.data.LoginDataSource
-import com.github.factotum_sdp.factotum.data.LoginRepository
-import com.github.factotum_sdp.factotum.data.model.LoggedInUser
 import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
-import com.github.factotum_sdp.factotum.ui.login.LoggedInUserView
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -28,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var db: DatabaseReference
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,6 +54,14 @@ class MainActivity : AppCompatActivity() {
 
         // Bind user data displayed in the Navigation Header
         setUserHeader()
+
+        // Set listener on logout button
+        binding.navView.menu.findItem(R.id.signoutButton).setOnMenuItemClickListener {
+            auth.signOut()
+            drawerLayout.closeDrawers()
+            navController.navigate(R.id.loginFragment)
+            true
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -78,7 +84,10 @@ class MainActivity : AppCompatActivity() {
 
         // Instantiate the current user
         val userFact =
-            UserViewModel.UserViewModelFactory(UsersPlaceHolder.USER1.name, UsersPlaceHolder.USER1.email)
+            UserViewModel.UserViewModelFactory(
+                UsersPlaceHolder.USER1.name,
+                UsersPlaceHolder.USER1.email
+            )
         val user = ViewModelProvider(this, userFact)[UserViewModel::class.java]
         binding.navView.findViewTreeLifecycleOwner()?.let { lco ->
             user.name.observe(lco) {

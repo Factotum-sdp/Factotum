@@ -40,7 +40,7 @@ class LoginDataSource {
         return authResultFuture.get()
     }
 
-    fun logout(auth: FirebaseAuth) {
+    fun logout() {
         auth.signOut()
     }
 

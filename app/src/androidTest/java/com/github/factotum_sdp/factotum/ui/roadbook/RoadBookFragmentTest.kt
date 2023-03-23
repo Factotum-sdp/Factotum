@@ -1,9 +1,12 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
+import android.view.InputDevice
+import android.view.MotionEvent
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.*
+import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
@@ -23,6 +26,7 @@ import org.junit.runner.RunWith
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.CompletableFuture
+
 
 @RunWith(AndroidJUnit4::class)
 class RoadBookFragmentTest {
@@ -139,5 +143,157 @@ class RoadBookFragmentTest {
         }.addOnFailureListener {
             future.completeExceptionally(it)
         }
+    }
+
+    @Test
+    fun editOnSwipeRight() {
+        onView(withId(R.id.list)).perform(
+            longClick(),
+            RecyclerViewActions.actionOnItemAtPosition<RoadBookViewAdapter.RecordViewHolder>(
+                4, GeneralSwipeAction(
+                    Swipe.SLOW,
+                    {
+                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
+                        val x = xy[0] + (it.width - 1) * 0.5f
+                        val y = xy[1] + (it.height - 1) * 1f
+                        floatArrayOf(x, y)
+                    },
+                    {
+                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
+                        val x = xy[0] + (it.width - 1) * 2f
+                        val y = xy[1] + (it.height - 1) * 1f
+                        floatArrayOf(x, y)
+                    },
+                    Press.PINPOINT
+                )
+            )
+        )
+    }
+
+    @Test
+    fun swipeRightTriggersEditScreen() {
+        onView(withId(R.id.list)).perform(
+            longClick(),
+            RecyclerViewActions.actionOnItemAtPosition<RoadBookViewAdapter.RecordViewHolder>(
+                4, GeneralSwipeAction(
+                    Swipe.SLOW,
+                    {
+                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
+                        val x = xy[0] + (it.width - 1) * 0.5f
+                        val y = xy[1] + (it.height - 1) * 1f
+                        floatArrayOf(x, y)
+                    },
+                    {
+                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
+                        val x = xy[0] + (it.width - 1) * 2f
+                        val y = xy[1] + (it.height - 1) * 1f
+                        floatArrayOf(x, y)
+                    },
+                    Press.PINPOINT
+                )
+            )
+        )
+        Thread.sleep(4000)
+        onView(withText(R.string.editDialogTitle)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun editARecordDestIDWorks() {
+        onView(withId(R.id.list)).perform(
+            longClick(),
+            RecyclerViewActions.actionOnItemAtPosition<RoadBookViewAdapter.RecordViewHolder>(
+                2, GeneralSwipeAction(
+                    Swipe.SLOW,
+                    {
+                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
+                        val x = xy[0] + (it.width - 1) * 0.5f
+                        val y = xy[1] + (it.height - 1) * 1f
+                        floatArrayOf(x, y)
+                    },
+                    {
+                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
+                        val x = xy[0] + (it.width - 1) * 2f
+                        val y = xy[1] + (it.height - 1) * 1f
+                        floatArrayOf(x, y)
+                    },
+                    Press.PINPOINT
+                )
+            )
+        )
+        Thread.sleep(4000)
+        onView(withText(R.string.editDialogTitle)).check(matches(isDisplayed()))
+        onView(withText("X17")).perform(typeText("edited"))
+        onView(withText(R.string.editDialogUpdateB)).perform(click())
+        onView((withText("X17edited"))).check(matches(isDisplayed()))
+    }
+    @Test
+    fun cancelOnRecordEditionWorks() {
+        onView(withId(R.id.list)).perform(
+            longClick(),
+            RecyclerViewActions.actionOnItemAtPosition<RoadBookViewAdapter.RecordViewHolder>(
+                2, GeneralSwipeAction(
+                    Swipe.SLOW,
+                    {
+                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
+                        val x = xy[0] + (it.width - 1) * 0.5f
+                        val y = xy[1] + (it.height - 1) * 1f
+                        floatArrayOf(x, y)
+                    },
+                    {
+                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
+                        val x = xy[0] + (it.width - 1) * 2f
+                        val y = xy[1] + (it.height - 1) * 1f
+                        floatArrayOf(x, y)
+                    },
+                    Press.PINPOINT
+                )
+            )
+        )
+        onView(withText(R.string.editDialogTitle)).check(matches(isDisplayed()))
+        onView(withText("X17")).perform(typeText("edited"))
+        onView(withText(R.string.editDialogCancelB)).perform(click())
+        // Same record is displayed, without the edited text happened to his destRecordID
+        onView((withText("X17"))).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun clickingOutsideTheDialogOnRecordEditionWorks() { // For setOnCancelListener() coverage
+        onView(withId(R.id.list)).perform(
+            longClick(),
+            RecyclerViewActions.actionOnItemAtPosition<RoadBookViewAdapter.RecordViewHolder>(
+                2, GeneralSwipeAction(
+                    Swipe.SLOW,
+                    {
+                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
+                        val x = xy[0] + (it.width - 1) * 0.5f
+                        val y = xy[1] + (it.height - 1) * 1f
+                        floatArrayOf(x, y)
+                    },
+                    {
+                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
+                        val x = xy[0] + (it.width - 1) * 2f
+                        val y = xy[1] + (it.height - 1) * 1f
+                        floatArrayOf(x, y)
+                    },
+                    Press.PINPOINT
+                )
+            )
+        )
+        onView(withText(R.string.editDialogTitle)).check(matches(isDisplayed()))
+        onView(withText("X17")).perform(typeText("edited"))
+
+        onView(withText(R.string.editDialogUpdateB)).perform(actionWithAssertions(GeneralClickAction(Tap.SINGLE,
+            {
+                val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
+                val x = xy[0] + (it.width - 1) * 0f
+                val y = xy[1] + (it.height - 1) * 2f
+                floatArrayOf(x, y)
+            },
+            Press.FINGER,
+            InputDevice.SOURCE_UNKNOWN,
+            MotionEvent.BUTTON_PRIMARY)) )
+        Thread.sleep(4000)
+        onView(withText("X17")).check(matches(isDisplayed()))
+        // Same record is displayed, without the edited text happened to his destRecordID
     }
 }

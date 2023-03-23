@@ -1,23 +1,42 @@
 package com.github.factotum_sdp.factotum.ui.maps
 
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.location.Address
 import android.location.Geocoder
+import android.location.Geocoder.GeocodeListener
 import android.net.Uri
+import android.os.Build
+import android.os.Build.VERSION_CODES.TIRAMISU
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ListView
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.testing.FragmentScenario.Companion.launch
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.data.Route
 import com.github.factotum_sdp.factotum.databinding.FragmentRoutesBinding
 import com.github.factotum_sdp.factotum.placeholder.RouteRecords.DUMMY_COURSE
 import com.github.factotum_sdp.factotum.placeholder.RouteRecords.DUMMY_ROUTE
+import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import java.io.IOException
 
 
 /**
@@ -112,20 +131,52 @@ class RouteFragment : Fragment() {
                 query?.let {
                     if (it != ""){
                         val geocoder = Geocoder(requireContext())
+                        if (Build.VERSION.SDK_INT >= TIRAMISU) {
+                            tiramisuResultHandler(query, geocoder)
+                        } else{
+                            resultHandler(query, geocoder)
+                        }
                     }
                 }
-
-
                 return false
             }
-
             override fun onQueryTextChange(newText: String?): Boolean {
                 return false
             }
         })
     }
 
+    @RequiresApi(TIRAMISU)
+    private fun tiramisuResultHandler(query: String, geocoder: Geocoder) {
+        val context = requireContext()
+        geocoder.getFromLocationName(query, 1, GeocodeListener { addresses ->
+            val toShow : String
+            if (addresses.size == 0){
+                toShow = "No address found"
+            }
+            else{
+                val bestAddress = addresses[0]
+                toShow = bestAddress.toString()
+            }
 
+            requireActivity().runOnUiThread{
+                Toast.makeText(context, toShow, Toast.LENGTH_LONG).show()
+            }
+        })
+    }
+
+    private fun resultHandler(query: String, geocoder: Geocoder): Address? {
+        var bestAddress : Address? = null
+        try {
+            val bestAddresses = geocoder.getFromLocationName(query, 1)
+            bestAddress = bestAddresses?.get(0)
+        } catch (e : IOException){
+            e.printStackTrace()
+        }
+        Toast.makeText(requireContext(), bestAddress.toString() , Toast.LENGTH_LONG).show()
+        return bestAddress
+
+    }
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

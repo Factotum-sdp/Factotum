@@ -1,5 +1,7 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
@@ -29,13 +31,19 @@ class RoadBookFragmentTest {
         MainActivity::class.java
     )
 
-
     @Before
     fun toRoadBookFragment() {
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))
             .perform(click())
+    }
+
+    @Test
+    fun radioButtonsAreAccessible() {
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rbLabelDragDrop)).check(matches(isDisplayed()))
+        onView(withText(R.string.rbLabelSwipeEdition)).check(matches(isDisplayed()))
     }
 
     @Test

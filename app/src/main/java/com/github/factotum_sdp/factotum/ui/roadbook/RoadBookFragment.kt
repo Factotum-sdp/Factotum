@@ -2,8 +2,6 @@ package com.github.factotum_sdp.factotum.ui.roadbook
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
-import android.content.ClipData
-import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import android.widget.EditText
@@ -13,11 +11,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.*
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.DestinationRecord
-import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
@@ -57,85 +53,12 @@ class RoadBookFragment : Fragment(), MenuProvider {
         rbRecyclerView.layoutManager = LinearLayoutManager(context)
         rbRecyclerView.adapter = adapter
 
-        // Set ItemTouchHelper Callback to manage elaborate screen touch events
+        // Set ItemTouchHelper Callback to manage Drag&Drop and SwipeRight edition
         val itemTouchHelper = ItemTouchHelper(itemTHCallback)
         itemTouchHelper.attachToRecyclerView(rbRecyclerView)
 
         return view
     }
-
-    private val itemTHCallback =
-        object :
-            ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN,
-                ItemTouchHelper.RIGHT or ItemTouchHelper.ACTION_STATE_SWIPE ) {
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-                try {
-                    val fromPosition = viewHolder.absoluteAdapterPosition
-                    val toPosition = target.absoluteAdapterPosition
-
-                    // Only the front-end is updated when drag-travelling for a smoother UX
-                    recyclerView.adapter?.notifyItemMoved(fromPosition!!, toPosition!!)
-                    rbViewModel.swapRecords(fromPosition, toPosition - 1)
-                    return true
-                } catch (e: java.lang.Exception){
-                    return false
-                }
-            }
-
-            // Hacky move to update the ViewModel only when the Drag&Drop is validated
-            override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
-                super.onSelectedChanged(viewHolder, actionState)
-
-                if (actionState == ItemTouchHelper.ACTION_STATE_IDLE) {
-                    rbViewModel.pushDragAndDropResult()
-                }
-            }
-
-            @SuppressLint("NotifyDataSetChanged")
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-
-                when(direction){
-                    ItemTouchHelper.RIGHT -> {
-                        val check = rbViewModel.recordsListState.value
-                        val check3 = rbRecyclerView.adapter
-                        val recordVH = viewHolder as RoadBookViewAdapter.RecordViewHolder
-                        val position = recordVH.absoluteAdapterPosition
-                        val rec = rbViewModel.recordsListState.value!![position]
-
-                        val editdestId = EditText(context)
-                        editdestId.setText(rec.destID)
-
-                        val builder = AlertDialog.Builder(context)
-                        builder.setTitle("Change destination ID :")
-                        builder.setCancelable(true)
-                        builder.setView(editdestId)
-                        builder.setNegativeButton("cancel") { dialog, which ->
-                            rbRecyclerView.adapter!!.notifyItemChanged(position) // Update the screen, no changes to back-end
-                        }
-                        builder.setPositiveButton("update") { dialog, which ->
-                            rbViewModel.editRecord(
-                                position,
-                                DestinationRecord(
-                                    editdestId.text.toString(),
-                                    rec.timeStamp,
-                                    rec.waitingTime,
-                                    rec.rate,
-                                    rec.actions
-                                )
-                            )
-                        }
-                        builder.show()
-                    }
-                }
-            }
-
-        }
-
-
     override fun onPause() {
         rbViewModel.backUp()
         super.onPause()
@@ -164,13 +87,12 @@ class RoadBookFragment : Fragment(), MenuProvider {
         (requireActivity() as MenuHost).addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-        val binding = ActivityMainBinding.inflate(layoutInflater)
-        binding.drawerLayout.open()
         menuInflater.inflate(R.menu.main, menu)
-        val m = menu.add("Edit RB")
+        menu.add(getString(R.string.rbLabelDragDrop))
+        menu.add(getString(R.string.rbLabelSwipeEdition))
     }
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-        // Needed to have onSupportNavigateUp() called
+        // Needed to have the onSupportNavigateUp() called
         // when clicking on the home button after an onMenuItemSelected() override
         if (menuItem.itemId == android.R.id.home) {
             return false
@@ -178,6 +100,92 @@ class RoadBookFragment : Fragment(), MenuProvider {
         return true
     }
 
+    /** ItemTouchHelper Callback for Drag & Drop and Swipe-right edition */
+    private val itemTHCallback =
+        object :
+            ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+                ItemTouchHelper.RIGHT or ItemTouchHelper.ACTION_STATE_SWIPE ) {
+
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                try {
+                    val fromPosition = viewHolder.absoluteAdapterPosition
+                    val toPosition = target.absoluteAdapterPosition
+
+                    // Only the front-end is updated when drag-travelling for a smoother UX
+                    recyclerView.adapter?.notifyItemMoved(fromPosition!!, toPosition!!)
+
+                    // Back-end swap job not published here, @see pushSwapsResult() call
+                    if(toPosition < fromPosition) {
+                        rbViewModel.swapRecords(toPosition, fromPosition - 1)
+                    } else {
+                        rbViewModel.swapRecords(fromPosition, toPosition - 1)
+                    }
+
+                    return true
+                } catch (e: java.lang.Exception){
+                    return false
+                }
+            }
+
+            // Hacky move to update the ViewModel only when the Drag&Drop has ended
+            override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+                super.onSelectedChanged(viewHolder, actionState)
+
+                if (actionState == ItemTouchHelper.ACTION_STATE_IDLE) {
+                    // Push only if the STATE_IDLE arrives after a Drag and Drop move
+                    rbViewModel.pushSwapsResult()
+                }
+            }
+
+            @SuppressLint("NotifyDataSetChanged")
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                when(direction){
+                    ItemTouchHelper.RIGHT -> {
+                        buildAlertDialog(viewHolder).show()
+                    }
+                }
+            }
+
+            // Dialog for editing a DestinationRecord
+            private fun buildAlertDialog(viewHolder: RecyclerView.ViewHolder): AlertDialog.Builder {
+                val position = viewHolder.absoluteAdapterPosition
+                val rec = rbViewModel.recordsListState.value!![position]
+
+                val editDestId = EditText(context)
+                editDestId.setText(rec.destID)
+
+                val builder = AlertDialog.Builder(context)
+                builder.setTitle(getString(R.string.editDialogTitle))
+                builder.setCancelable(true)
+                builder.setView(editDestId)
+
+                builder.setNegativeButton(getString(R.string.editDialogCancelB)) { _, _ ->
+                    // Update the screen, no changes to back-end
+                    rbRecyclerView.adapter!!.notifyItemChanged(position)
+                }
+                builder.setOnCancelListener {
+                    // Update the screen, no changes to back-end
+                    rbRecyclerView.adapter!!.notifyItemChanged(position)
+                }
+                builder.setPositiveButton(getString(R.string.editDialogUpdateB)) { _, _ ->
+                    rbViewModel.editRecord(
+                        position,
+                        DestinationRecord(
+                            editDestId.text.toString(),
+                            rec.timeStamp,
+                            rec.waitingTime,
+                            rec.rate,
+                            rec.actions
+                        )
+                    )
+                }
+                return builder
+            }
+        }
     companion object{
         private const val ROADBOOK_DB_PATH: String = "Sheet-shift"
     }

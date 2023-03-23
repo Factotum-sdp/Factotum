@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.data.DestinationRecord
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.google.firebase.database.DatabaseReference
@@ -15,15 +14,16 @@ import kotlin.collections.ArrayList
 /**
  * The RoadBook ViewModel
  * holds an observable list of DestinationRecord which can evolve dynamically
+ *
+ * @param _dbRef The database root reference to register RoadBook data
  */
 class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
+
     private val _recordsList: MutableLiveData<List<DestinationRecord>> =
         MutableLiveData(DestinationRecords.RECORDS)
 
     val recordsListState: LiveData<List<DestinationRecord>> = _recordsList
-
-    private val recordsOnDragAndDrop: ArrayList<DestinationRecord> = arrayListOf()
-
+    private val swapedRecords: ArrayList<DestinationRecord> = arrayListOf()
     private var dbRef: DatabaseReference
     init {
         val date = Calendar.getInstance().time
@@ -33,6 +33,10 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
                 // Let uncommented for testing purpose. Uncomment it for back-up uniqueness in the DB
     }
 
+    /**
+     * Add a new DestinationRecord at the end of the recordsList
+     * @param destinationRecord DestinationRecord to be added
+     */
     fun addRecord(destinationRecord: DestinationRecord) {
         val newList = arrayListOf<DestinationRecord>()
         newList.addAll(_recordsList.value as Collection<DestinationRecord>)
@@ -40,6 +44,9 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         _recordsList.postValue(newList)
     }
 
+    /**
+     * Delete the last DestinationRecord of the recordsList
+     */
     fun deleteLastRecord() {
         val newList = arrayListOf<DestinationRecord>()
         newList.addAll(_recordsList.value as Collection<DestinationRecord>)
@@ -47,32 +54,52 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         _recordsList.postValue(newList)
     }
 
+    /**
+     * Send the current recordsList data to the Database referenced at construction time
+     */
     fun backUp() {
         dbRef.setValue(_recordsList.value)
     }
 
+    /**
+     * Swap between DestinationRecords at position : from and at position : to
+     * It is a one way swap, hence the from index must be lower or equal to the to index.
+     *
+     * @param from Int
+     * @param to Int
+     */
     fun swapRecords(from: Int, to: Int) {
-        if(recordsOnDragAndDrop.isEmpty())
-            recordsOnDragAndDrop.addAll(_recordsList.value as Collection<DestinationRecord>)
-        Collections.swap(recordsOnDragAndDrop, from, to)
+        assert(from <= to)
+        if(swapedRecords.isEmpty())
+            swapedRecords.addAll(_recordsList.value as Collection<DestinationRecord>)
+        Collections.swap(swapedRecords, from, to)
     }
 
-    fun pushDragAndDropResult() {
-        if(recordsOnDragAndDrop.isNotEmpty()) {
+    /**
+     * Update the Observable LiveData of this RoadBookViewModel
+     * To be called after a series of swapRecords() that comes to an end,
+     * in order to show the result to some possible observers.
+     */
+    fun pushSwapsResult() {
+        if(swapedRecords.isNotEmpty()) {
             var ls = listOf<DestinationRecord>()
-            ls = ls.plus(recordsOnDragAndDrop)
+            ls = ls.plus(swapedRecords)
             _recordsList.postValue(ls)
-            recordsOnDragAndDrop.clear()
+            swapedRecords.clear()
         }
     }
 
+    /**
+     * Edit the DestinationRecort at indec pos in the recordsList attribute
+     * @param pos: Int position Index at which the current DestRecord will be override
+     * @param newRec: DestinationRecord The record containing the new data
+     */
     fun editRecord(pos: Int, newRec: DestinationRecord) {
         val ls = arrayListOf<DestinationRecord>()
         ls.addAll(_recordsList.value as Collection<DestinationRecord>)
         ls[pos] = newRec
         _recordsList.postValue(ls)
     }
-
 
     // Factory needed to assign a value at construction time to the class attribute
     class RoadBookViewModelFactory(private val _dbRef: DatabaseReference)

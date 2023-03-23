@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -56,12 +57,7 @@ class MainActivity : AppCompatActivity() {
         setUserHeader()
 
         // Set listener on logout button
-        binding.navView.menu.findItem(R.id.signoutButton).setOnMenuItemClickListener {
-            auth.signOut()
-            drawerLayout.closeDrawers()
-            navController.navigate(R.id.loginFragment)
-            true
-        }
+        listenLogoutButton(drawerLayout, navController)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -96,6 +92,15 @@ class MainActivity : AppCompatActivity() {
             user.email.observe(lco) {
                 email.text = it
             }
+        }
+    }
+
+    private fun listenLogoutButton(drawerLayout: DrawerLayout, navController: NavController) {
+        binding.navView.menu.findItem(R.id.signoutButton).setOnMenuItemClickListener {
+            auth.signOut()
+            drawerLayout.closeDrawers()
+            navController.navigate(R.id.loginFragment)
+            true
         }
     }
 

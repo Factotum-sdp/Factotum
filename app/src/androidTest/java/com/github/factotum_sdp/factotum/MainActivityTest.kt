@@ -124,6 +124,14 @@ class MainActivityTest {
     }
 
     @Test
+    fun clickOnSignOutMenuItemLeadsToCorrectFragment() {
+        clickOnAMenuItemLeadsCorrectly(
+            R.id.signoutButton,
+            R.id.fragment_login_directors_parent
+        )
+    }
+
+    @Test
     fun navigateThroughDrawerMenuWorks() {
         clickOnAMenuItemLeadsCorrectly(
             R.id.directoryFragment,
@@ -140,5 +148,4 @@ class MainActivityTest {
         openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
         onView(withText(R.string.action_settings)).perform(click())
     }
-
 }

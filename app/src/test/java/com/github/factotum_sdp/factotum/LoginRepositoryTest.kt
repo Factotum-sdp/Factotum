@@ -25,14 +25,15 @@ class LoginRepositoryTest {
     @Test
     fun `test login success`() {
         // Given
-        val username = "testuser"
-        val password = "testpassword"
-        val fakeUser = LoggedInUser("123", username)
+        val username = "Jane Doe"
+        val useremail = "jane.doe@gmail.com"
+        val password = "123456"
+        val fakeUser = LoggedInUser(username, useremail)
 
-        `when`(dataSource.login(username, password)).thenReturn(Result.Success(fakeUser))
+        `when`(dataSource.login(useremail, password)).thenReturn(Result.Success(fakeUser))
 
         // When
-        val result = repository.login(username, password)
+        val result = repository.login(useremail, password)
 
         // Then
         assertThat(result, `is`(instanceOf(Result.Success::class.java)))

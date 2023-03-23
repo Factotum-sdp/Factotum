@@ -1,8 +1,8 @@
 package com.github.factotum_sdp.factotum
 
 import com.github.factotum_sdp.factotum.ui.login.LoggedInUserView
-import org.junit.Assert.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
 
 class LoggedInUserViewTest {
@@ -11,9 +11,10 @@ class LoggedInUserViewTest {
     fun `test constructor`() {
         // Given
         val expectedDisplayName = "John Doe"
+        val expectedEmail = "john.doe@gmail.com"
 
         // When
-        val userView = LoggedInUserView(expectedDisplayName)
+        val userView = LoggedInUserView(expectedDisplayName, expectedEmail)
 
         // Then
         assertEquals(expectedDisplayName, userView.displayName)
@@ -22,9 +23,9 @@ class LoggedInUserViewTest {
     @Test
     fun `test equals`() {
         // Given
-        val userView1 = LoggedInUserView("John Doe")
-        val userView2 = LoggedInUserView("John Doe")
-        val userView3 = LoggedInUserView("Jane Smith")
+        val userView1 = LoggedInUserView("John Doe", "john.doe@gmail.com")
+        val userView2 = LoggedInUserView("John Doe", "john.doe@gmail.com")
+        val userView3 = LoggedInUserView("Jane Smith", "jane.smith@gmail.com")
 
         // Then
         assertEquals(userView1, userView2)
@@ -34,9 +35,9 @@ class LoggedInUserViewTest {
     @Test
     fun `test hashCode`() {
         // Given
-        val userView1 = LoggedInUserView("John Doe")
-        val userView2 = LoggedInUserView("John Doe")
-        val userView3 = LoggedInUserView("Jane Smith")
+        val userView1 = LoggedInUserView("John Doe", "john.doe@gmail.com")
+        val userView2 = LoggedInUserView("John Doe", "john.doe@gmail.com")
+        val userView3 = LoggedInUserView("Jane Smith", "jane.smith@gmail.com")
 
         // Then
         assertEquals(userView1.hashCode(), userView2.hashCode())
@@ -47,12 +48,16 @@ class LoggedInUserViewTest {
     fun `test toString`() {
         // Given
         val expectedDisplayName = "John Doe"
-        val userView = LoggedInUserView(expectedDisplayName)
+        val expectedEmail = "john.doe@gmail.com"
+        val userView = LoggedInUserView(expectedDisplayName, expectedEmail)
 
         // When
         val userViewString = userView.toString()
 
         // Then
-        assertEquals("LoggedInUserView(displayName=$expectedDisplayName)", userViewString)
+        assertEquals(
+            "LoggedInUserView(displayName=$expectedDisplayName, displayName=$expectedEmail)",
+            userViewString
+        )
     }
 }

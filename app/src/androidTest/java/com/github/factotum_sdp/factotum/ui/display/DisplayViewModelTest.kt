@@ -4,19 +4,17 @@ import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.github.factotum_sdp.factotum.ui.display.utils.WAIT_TIME_INIT
+import com.github.factotum_sdp.factotum.ui.display.utils.WAIT_TIME_REFRESH
+import com.github.factotum_sdp.factotum.ui.display.utils.emptyStorageEmulator
+import com.github.factotum_sdp.factotum.ui.display.utils.uploadImageToStorageEmulator
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.UploadTask
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.suspendCancellableCoroutine
 import org.junit.*
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
-const val WAIT_TIME_REFRESH = 1000L
-const val WAIT_TIME_INIT = 1000L
 
 @RunWith(AndroidJUnit4::class)
 class DisplayViewModelTest {
@@ -35,29 +33,7 @@ class DisplayViewModelTest {
 
     @After
     fun tearDown() {
-        // Empty Firebase Storage
-        val latch = CountDownLatch(1)
-
-        Firebase.storage.reference.listAll().addOnSuccessListener { listResult ->
-            val itemsCount = listResult.items.size
-
-            if (itemsCount == 0) {
-                latch.countDown()
-            } else {
-                listResult.items.forEach { item ->
-                    item.delete().addOnSuccessListener {
-                        if (latch.count - 1 == 0L) {
-                            latch.countDown()
-                        } else {
-                            latch.countDown()
-                        }
-                    }
-                }
-            }
-        }
-
-        // Wait for all files to be deleted before proceeding to the next test
-        latch.await()
+        emptyStorageEmulator(Firebase.storage.reference)
     }
 
 
@@ -113,29 +89,6 @@ class DisplayViewModelTest {
         // Check that the photoReferences is not empty
         Assert.assertFalse("PhotosReference should not be empty.", displayViewModel.photoReferences.value?.isEmpty() ?: false)
     }
-}
 
-suspend fun uploadImageToStorageEmulator(
-    context: Context,
-    imagePath: String,
-    storagePath: String
-): UploadTask.TaskSnapshot = suspendCancellableCoroutine { continuation ->
-    try {
-        val storageReference = Firebase.storage.reference.child(storagePath)
-        val inputStream = context.assets.open(imagePath)
-
-        val uploadTask = storageReference.putStream(inputStream)
-        uploadTask.addOnSuccessListener { snapshot ->
-            continuation.resume(snapshot)
-        }.addOnFailureListener { exception ->
-            continuation.resumeWithException(exception)
-        }
-
-        continuation.invokeOnCancellation {
-            uploadTask.cancel()
-        }
-    } catch (exception: Exception) {
-        continuation.resumeWithException(exception)
-    }
 }
 

@@ -8,7 +8,7 @@ import com.github.factotum_sdp.factotum.data.DestinationRecord
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.google.firebase.database.DatabaseReference
 import java.text.SimpleDateFormat.getDateInstance
-import java.util.Calendar
+import java.util.*
 
 /**
  * The RoadBook ViewModel
@@ -45,6 +45,13 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
 
     fun backUp() {
         dbRef.setValue(_recordsList.value)
+    }
+
+    fun editRecord(pos: Int, newRec: DestinationRecord) {
+        val ls = arrayListOf<DestinationRecord>()
+        ls.addAll(_recordsList.value as Collection<DestinationRecord>)
+        ls[pos] = newRec
+        _recordsList.postValue(ls)
     }
 
     // Factory needed to assign a value at construction time to the class attribute

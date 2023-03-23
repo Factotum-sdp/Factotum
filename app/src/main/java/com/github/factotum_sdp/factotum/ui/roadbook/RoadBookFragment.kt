@@ -1,7 +1,12 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
+import android.annotation.SuppressLint
+import android.app.AlertDialog
+import android.content.ClipData
+import android.graphics.Color
 import android.os.Bundle
 import android.view.*
+import android.widget.EditText
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -10,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.*
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.data.DestinationRecord
 import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -23,6 +29,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
     private lateinit var rbViewModel: RoadBookViewModel
     private lateinit var viewP : View
+    private lateinit var rbRecyclerView: RecyclerView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,12 +52,75 @@ class RoadBookFragment : Fragment(), MenuProvider {
         setRoadBookEvents(rbViewModel, view)
 
         // Set up the RoadBook RecyclerView
-        val rbRecyclerView: RecyclerView = view.findViewById(R.id.list)
+        rbRecyclerView = view.findViewById(R.id.list)
         rbRecyclerView.layoutManager = LinearLayoutManager(context)
         rbRecyclerView.adapter = adapter
 
+        // Set ItemTouchHelper Callback to manage elaborate screen touch events
+        val itemTouchHelper = ItemTouchHelper(itemTHCallback)
+        itemTouchHelper.attachToRecyclerView(rbRecyclerView)
+
         return view
     }
+
+    private val itemTHCallback =
+        object :
+            ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+                ItemTouchHelper.RIGHT or ItemTouchHelper.ACTION_STATE_SWIPE ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                try {
+                    val fromPosition: Int = viewHolder.absoluteAdapterPosition
+                    val toPosition: Int = target.absoluteAdapterPosition
+
+                    recyclerView.adapter?.notifyItemMoved(fromPosition, toPosition)
+
+                    return true
+                } catch (e: java.lang.Exception){
+                    return false
+                }
+            }
+
+            @SuppressLint("NotifyDataSetChanged")
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+
+                when(direction){
+                    ItemTouchHelper.RIGHT -> {
+                        val recordVH = viewHolder as RoadBookViewAdapter.RecordViewHolder
+                        val position = recordVH.absoluteAdapterPosition
+                        val rec = rbViewModel.recordsListState.value!![position]
+
+                        val editdestId = EditText(context)
+                        editdestId.setText(rec.destID)
+
+                        val builder = AlertDialog.Builder(context)
+                        builder.setTitle("Change destination ID :")
+                        builder.setCancelable(true)
+                        builder.setView(editdestId)
+                        builder.setNegativeButton("cancel") { dialog, which ->
+                            rbRecyclerView.adapter!!.notifyItemChanged(position) // Update the screen, no changes to back-end
+                        }
+                        builder.setPositiveButton("update") { dialog, which ->
+                            rbViewModel.editRecord(
+                                position,
+                                DestinationRecord(
+                                    editdestId.text.toString(),
+                                    rec.timeStamp,
+                                    rec.waitingTime,
+                                    rec.rate,
+                                    rec.actions
+                                )
+                            )
+                        }
+                        builder.show()
+                    }
+                }
+            }
+
+        }
 
 
     override fun onPause() {
@@ -84,7 +154,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         val binding = ActivityMainBinding.inflate(layoutInflater)
         binding.drawerLayout.open()
         menuInflater.inflate(R.menu.main, menu)
-        menu.add("Edit RB")
+        val m = menu.add("Edit RB")
     }
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         // Needed to have onSupportNavigateUp() called

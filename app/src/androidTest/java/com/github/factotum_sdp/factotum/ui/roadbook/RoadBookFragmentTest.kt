@@ -2,11 +2,15 @@ package com.github.factotum_sdp.factotum.ui.roadbook
 
 import android.view.InputDevice
 import android.view.MotionEvent
+import androidx.navigation.fragment.NavHostFragment
+import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.*
 import androidx.test.espresso.action.ViewActions.*
+import androidx.test.espresso.assertion.PositionAssertions.isCompletelyAbove
+import androidx.test.espresso.assertion.PositionAssertions.isCompletelyBelow
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
@@ -295,5 +299,31 @@ class RoadBookFragmentTest {
         Thread.sleep(4000)
         onView(withText("X17")).check(matches(isDisplayed()))
         // Same record is displayed, without the edited text happened to his destRecordID
+    }
+
+    @Test
+    fun dragAndDropByInjectionIsWorking() {
+        // Not possible for the moment in to cover the onMove() of the ItemtTouchHelper Callback,
+        // However here, I simulate its behavior to triggers the ViewModel change.
+
+        onView(withText("X17")).check(isCompletelyAbove(withText("More1")))
+        testRule.scenario.onActivity {
+
+            val fragment = it.supportFragmentManager.fragments.first() as NavHostFragment
+
+            fragment.let {
+                val curr = it.childFragmentManager.primaryNavigationFragment as RoadBookFragment
+                val recyclerView = curr.view!!.findViewById<RecyclerView>(R.id.list)
+                recyclerView.adapter?.notifyItemMoved(2,3)
+                curr.getRBViewModelForTest().swapRecords(2,2)
+                recyclerView.adapter?.notifyItemMoved(3,4)
+                curr.getRBViewModelForTest().swapRecords(3,3)
+                curr.getRBViewModelForTest().pushSwapsResult()
+            }
+        }
+
+        onView(withText("X17")).check(matches(isDisplayed()))
+        Thread.sleep(4000) // This one is needed
+        onView(withText("X17")).check(isCompletelyBelow(withText("More1")))
     }
 }

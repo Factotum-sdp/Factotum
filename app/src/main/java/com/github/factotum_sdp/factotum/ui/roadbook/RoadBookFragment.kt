@@ -25,7 +25,6 @@ import com.google.android.material.snackbar.Snackbar
 class RoadBookFragment : Fragment(), MenuProvider {
 
     private lateinit var rbViewModel: RoadBookViewModel
-    private lateinit var viewP : View
     private lateinit var rbRecyclerView: RecyclerView
 
     override fun onCreateView(
@@ -34,7 +33,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
     ): View? {
 
         val view = inflater.inflate(R.layout.fragment_roadbook, container, false)
-        viewP = view
         val adapter = RoadBookViewAdapter()
         val dbRef = (activity as MainActivity).getDatabaseRef().child(ROADBOOK_DB_PATH)
         val rbFact = RoadBookViewModel.RoadBookViewModelFactory(dbRef)
@@ -188,5 +186,10 @@ class RoadBookFragment : Fragment(), MenuProvider {
         }
     companion object{
         private const val ROADBOOK_DB_PATH: String = "Sheet-shift"
+    }
+
+    /** Only use that access for testing purpose */
+    fun getRBViewModelForTest(): RoadBookViewModel {
+        return rbViewModel
     }
 }

@@ -158,14 +158,10 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
                 val builder = AlertDialog.Builder(context)
                 builder.setTitle(getString(R.string.editDialogTitle))
-                builder.setCancelable(true)
+                builder.setCancelable(false)
                 builder.setView(editDestId)
 
                 builder.setNegativeButton(getString(R.string.editDialogCancelB)) { _, _ ->
-                    // Update the screen, no changes to back-end
-                    rbRecyclerView.adapter!!.notifyItemChanged(position)
-                }
-                builder.setOnCancelListener {
                     // Update the screen, no changes to back-end
                     rbRecyclerView.adapter!!.notifyItemChanged(position)
                 }

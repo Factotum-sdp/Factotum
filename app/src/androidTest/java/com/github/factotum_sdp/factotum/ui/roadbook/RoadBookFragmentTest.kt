@@ -1,5 +1,7 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
+import android.view.InputDevice
+import android.view.MotionEvent
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider
@@ -195,30 +197,9 @@ class RoadBookFragmentTest {
         onView(withText(R.string.editDialogCancelB)).perform(click())
         // Same record is displayed, without the edited text happened to his destRecordID
         onView((withText("X17"))).check(matches(isDisplayed()))
+
     }
-
-    /* Don't work in CI
-    @Test
-    fun clickingOutsideTheDialogOnRecordEditionWorks() { // For setOnCancelListener() coverage
-        swipeRightTheRecordAt(2)
-        onView(withText(R.string.editDialogTitle)).check(matches(isDisplayed()))
-        onView(withText("X17")).perform(typeText("edited"))
-
-        onView(withText(R.string.editDialogUpdateB)).perform(actionWithAssertions(GeneralClickAction(Tap.SINGLE,
-            {
-                val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
-                val x = xy[0] + (it.width - 1) * 0f
-                val y = xy[1] + (it.height - 1) * 2f
-                floatArrayOf(x, y)
-            },
-            Press.FINGER,
-            InputDevice.SOURCE_UNKNOWN,
-            MotionEvent.BUTTON_PRIMARY)) )
-        Thread.sleep(2000)
-        onView(withText("X17")).check(matches(isDisplayed()))
-        // Same record is displayed, without the edited text happened to his destRecordID
-    }*/
-
+    
     @Test
     fun dragAndDropByInjectionIsWorking() {
         // Not possible for the moment in to cover the onMove() of the ItemtTouchHelper Callback,

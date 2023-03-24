@@ -1,6 +1,5 @@
 package com.github.factotum_sdp.factotum.ui.maps
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.location.Address
 import android.location.Geocoder
@@ -9,7 +8,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Build.VERSION_CODES.TIRAMISU
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,21 +19,12 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.testing.FragmentScenario.Companion.launch
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.data.Route
 import com.github.factotum_sdp.factotum.databinding.FragmentRoutesBinding
 import com.github.factotum_sdp.factotum.placeholder.RouteRecords.DUMMY_COURSE
 import com.github.factotum_sdp.factotum.placeholder.RouteRecords.DUMMY_ROUTE
-import com.google.android.gms.maps.model.LatLng
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import com.google.android.material.snackbar.Snackbar
 import java.io.IOException
 
 
@@ -46,6 +35,7 @@ class RouteFragment : Fragment() {
 
     companion object {
         const val MAPS_PKG = "com.google.android.apps.maps"
+        const val NO_RESULT = "No address found"
     }
     private var _binding: FragmentRoutesBinding? = null
     private val viewModel: MapsViewModel by activityViewModels()
@@ -152,7 +142,7 @@ class RouteFragment : Fragment() {
         geocoder.getFromLocationName(query, 1, GeocodeListener { addresses ->
             val toShow : String
             if (addresses.size == 0){
-                toShow = "No address found"
+                toShow = NO_RESULT
             }
             else{
                 val bestAddress = addresses[0]
@@ -160,7 +150,7 @@ class RouteFragment : Fragment() {
             }
 
             requireActivity().runOnUiThread{
-                Toast.makeText(context, toShow, Toast.LENGTH_LONG).show()
+                Snackbar.make(requireView(), toShow , Snackbar.LENGTH_LONG).show()
             }
         })
     }
@@ -173,7 +163,7 @@ class RouteFragment : Fragment() {
         } catch (e : IOException){
             e.printStackTrace()
         }
-        Toast.makeText(requireContext(), bestAddress.toString() , Toast.LENGTH_LONG).show()
+        Snackbar.make(requireView(), bestAddress.toString() , Snackbar.LENGTH_LONG).show()
         return bestAddress
 
     }

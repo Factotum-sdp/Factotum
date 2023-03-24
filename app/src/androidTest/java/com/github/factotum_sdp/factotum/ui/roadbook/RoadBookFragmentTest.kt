@@ -176,14 +176,12 @@ class RoadBookFragmentTest {
     @Test
     fun swipeRightTriggersEditScreen() {
         swipeRightTheRecordAt(4)
-        Thread.sleep(4000)
         onView(withText(R.string.editDialogTitle)).check(matches(isDisplayed()))
     }
 
     @Test
     fun editARecordDestIDWorks() {
         swipeRightTheRecordAt(2)
-        Thread.sleep(4000)
         onView(withText(R.string.editDialogTitle)).check(matches(isDisplayed()))
         onView(withText("X17")).perform(typeText("edited"))
         onView(withText(R.string.editDialogUpdateB)).perform(click())
@@ -222,7 +220,7 @@ class RoadBookFragmentTest {
         }
 
         onView(withText("X17")).check(matches(isDisplayed()))
-        Thread.sleep(4000) // This one is needed
+        Thread.sleep(4000) // This one is needed to let the Screen enough time to be updated
         onView(withText("X17")).check(isCompletelyBelow(withText("More1")))
     }
 }

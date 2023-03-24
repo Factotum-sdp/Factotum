@@ -1,7 +1,5 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
-import android.view.InputDevice
-import android.view.MotionEvent
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider
@@ -149,12 +147,11 @@ class RoadBookFragmentTest {
         }
     }
 
-    @Test
-    fun editOnSwipeRight() {
+    private fun swipeRightTheRecordAt(pos: Int) {
         onView(withId(R.id.list)).perform(
             longClick(),
             RecyclerViewActions.actionOnItemAtPosition<RoadBookViewAdapter.RecordViewHolder>(
-                4, GeneralSwipeAction(
+                pos, GeneralSwipeAction(
                     Swipe.SLOW,
                     {
                         val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
@@ -176,54 +173,14 @@ class RoadBookFragmentTest {
 
     @Test
     fun swipeRightTriggersEditScreen() {
-        onView(withId(R.id.list)).perform(
-            longClick(),
-            RecyclerViewActions.actionOnItemAtPosition<RoadBookViewAdapter.RecordViewHolder>(
-                4, GeneralSwipeAction(
-                    Swipe.SLOW,
-                    {
-                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
-                        val x = xy[0] + (it.width - 1) * 0.5f
-                        val y = xy[1] + (it.height - 1) * 1f
-                        floatArrayOf(x, y)
-                    },
-                    {
-                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
-                        val x = xy[0] + (it.width - 1) * 2f
-                        val y = xy[1] + (it.height - 1) * 1f
-                        floatArrayOf(x, y)
-                    },
-                    Press.PINPOINT
-                )
-            )
-        )
+        swipeRightTheRecordAt(4)
         Thread.sleep(4000)
         onView(withText(R.string.editDialogTitle)).check(matches(isDisplayed()))
     }
 
     @Test
     fun editARecordDestIDWorks() {
-        onView(withId(R.id.list)).perform(
-            longClick(),
-            RecyclerViewActions.actionOnItemAtPosition<RoadBookViewAdapter.RecordViewHolder>(
-                2, GeneralSwipeAction(
-                    Swipe.SLOW,
-                    {
-                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
-                        val x = xy[0] + (it.width - 1) * 0.5f
-                        val y = xy[1] + (it.height - 1) * 1f
-                        floatArrayOf(x, y)
-                    },
-                    {
-                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
-                        val x = xy[0] + (it.width - 1) * 2f
-                        val y = xy[1] + (it.height - 1) * 1f
-                        floatArrayOf(x, y)
-                    },
-                    Press.PINPOINT
-                )
-            )
-        )
+        swipeRightTheRecordAt(2)
         Thread.sleep(4000)
         onView(withText(R.string.editDialogTitle)).check(matches(isDisplayed()))
         onView(withText("X17")).perform(typeText("edited"))
@@ -232,27 +189,7 @@ class RoadBookFragmentTest {
     }
     @Test
     fun cancelOnRecordEditionWorks() {
-        onView(withId(R.id.list)).perform(
-            longClick(),
-            RecyclerViewActions.actionOnItemAtPosition<RoadBookViewAdapter.RecordViewHolder>(
-                2, GeneralSwipeAction(
-                    Swipe.SLOW,
-                    {
-                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
-                        val x = xy[0] + (it.width - 1) * 0.5f
-                        val y = xy[1] + (it.height - 1) * 1f
-                        floatArrayOf(x, y)
-                    },
-                    {
-                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
-                        val x = xy[0] + (it.width - 1) * 2f
-                        val y = xy[1] + (it.height - 1) * 1f
-                        floatArrayOf(x, y)
-                    },
-                    Press.PINPOINT
-                )
-            )
-        )
+        swipeRightTheRecordAt(2)
         onView(withText(R.string.editDialogTitle)).check(matches(isDisplayed()))
         onView(withText("X17")).perform(typeText("edited"))
         onView(withText(R.string.editDialogCancelB)).perform(click())
@@ -263,27 +200,7 @@ class RoadBookFragmentTest {
     /* Don't work in CI
     @Test
     fun clickingOutsideTheDialogOnRecordEditionWorks() { // For setOnCancelListener() coverage
-        onView(withId(R.id.list)).perform(
-            longClick(),
-            RecyclerViewActions.actionOnItemAtPosition<RoadBookViewAdapter.RecordViewHolder>(
-                2, GeneralSwipeAction(
-                    Swipe.SLOW,
-                    {
-                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
-                        val x = xy[0] + (it.width - 1) * 0.5f
-                        val y = xy[1] + (it.height - 1) * 1f
-                        floatArrayOf(x, y)
-                    },
-                    {
-                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
-                        val x = xy[0] + (it.width - 1) * 2f
-                        val y = xy[1] + (it.height - 1) * 1f
-                        floatArrayOf(x, y)
-                    },
-                    Press.PINPOINT
-                )
-            )
-        )
+        swipeRightTheRecordAt(2)
         onView(withText(R.string.editDialogTitle)).check(matches(isDisplayed()))
         onView(withText("X17")).perform(typeText("edited"))
 

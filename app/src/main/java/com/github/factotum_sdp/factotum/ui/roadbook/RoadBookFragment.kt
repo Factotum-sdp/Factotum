@@ -114,7 +114,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
                     val toPosition = target.absoluteAdapterPosition
 
                     // Only the front-end is updated when drag-travelling for a smoother UX
-                    recyclerView.adapter?.notifyItemMoved(fromPosition!!, toPosition!!)
+                    recyclerView.adapter?.notifyItemMoved(fromPosition, toPosition)
 
                     // Back-end swap job not published here, @see pushSwapsResult() call
                     if(toPosition < fromPosition) {

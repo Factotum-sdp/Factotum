@@ -1,9 +1,7 @@
 package com.github.factotum_sdp.factotum.ui.maps
 
 import android.content.Intent
-import android.location.Address
 import android.location.Geocoder
-import android.location.Geocoder.GeocodeListener
 import android.net.Uri
 import android.os.Build
 import android.os.Build.VERSION_CODES.TIRAMISU
@@ -14,7 +12,6 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ListView
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
@@ -25,7 +22,6 @@ import com.github.factotum_sdp.factotum.databinding.FragmentRoutesBinding
 import com.github.factotum_sdp.factotum.placeholder.RouteRecords.DUMMY_COURSE
 import com.github.factotum_sdp.factotum.placeholder.RouteRecords.DUMMY_ROUTE
 import com.google.android.material.snackbar.Snackbar
-import java.io.IOException
 
 
 /**
@@ -121,6 +117,8 @@ class RouteFragment : Fragment() {
                 query?.let {
                     if (it != ""){
                         val geocoder = Geocoder(requireContext())
+                        // must handle different versions because API33 requires another
+                        // version of getFromLocationName()
                         if (Build.VERSION.SDK_INT >= TIRAMISU) {
                             tiramisuResultHandler(query, geocoder)
                         } else{
@@ -128,7 +126,7 @@ class RouteFragment : Fragment() {
                         }
                     }
                 }
-                return false
+                return true
             }
             override fun onQueryTextChange(newText: String?): Boolean {
                 return false
@@ -138,33 +136,30 @@ class RouteFragment : Fragment() {
 
     @RequiresApi(TIRAMISU)
     private fun tiramisuResultHandler(query: String, geocoder: Geocoder) {
-        val context = requireContext()
-        geocoder.getFromLocationName(query, 1, GeocodeListener { addresses ->
-            val toShow : String
-            if (addresses.size == 0){
-                toShow = NO_RESULT
-            }
-            else{
+        geocoder.getFromLocationName(query, 1) { addresses ->
+            val toShow: String = if (addresses.size == 0) {
+                NO_RESULT
+            } else {
                 val bestAddress = addresses[0]
-                toShow = bestAddress.toString()
+                bestAddress.toString()
             }
 
-            requireActivity().runOnUiThread{
-                Snackbar.make(requireView(), toShow , Snackbar.LENGTH_LONG).show()
+            requireActivity().runOnUiThread {
+                Snackbar.make(requireView(), toShow, Snackbar.LENGTH_LONG).show()
             }
-        })
+        }
     }
 
-    private fun resultHandler(query: String, geocoder: Geocoder): Address? {
-        var bestAddress : Address? = null
-        try {
-            val bestAddresses = geocoder.getFromLocationName(query, 1)
-            bestAddress = bestAddresses?.get(0)
-        } catch (e : IOException){
+    private fun resultHandler(query: String, geocoder: Geocoder){
+        val toShow: String = try {
+            val bestAddress = geocoder.getFromLocationName(query, 1)?.get(0)
+            bestAddress?.toString() ?: NO_RESULT
+
+        } catch (e : Exception){
             e.printStackTrace()
+            NO_RESULT
         }
-        Snackbar.make(requireView(), bestAddress.toString() , Snackbar.LENGTH_LONG).show()
-        return bestAddress
+        Snackbar.make(requireView(), toShow , Snackbar.LENGTH_LONG).show()
 
     }
     override fun onDestroyView() {

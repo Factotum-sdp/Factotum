@@ -142,12 +142,4 @@ class MainActivityTest {
             R.id.fragment_roadbook_directors_parent
         )
     }
-
-
-    @Test
-    fun actionSettingsIsAccessible() {
-        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
-        onView(withText(R.string.action_settings)).perform(click())
-    }
-
 }

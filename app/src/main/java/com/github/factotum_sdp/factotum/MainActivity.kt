@@ -15,6 +15,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.FirebaseApp
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -43,7 +44,8 @@ class MainActivity : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.roadBookFragment, R.id.pictureFragment,
-                R.id.directoryFragment, R.id.loginFragment, R.id.routeFragment
+                R.id.directoryFragment, R.id.loginFragment, R.id.routeFragment,
+                R.id.displayFragment
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)

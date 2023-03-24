@@ -2,7 +2,9 @@ package com.github.factotum_sdp.factotum
 
 import android.os.Bundle
 import android.view.Menu
+import android.view.View
 import android.widget.TextView
+import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
@@ -63,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         setUserHeader()
 
         // Set listener on logout button
-        listenLogoutButton(drawerLayout, navController)
+        listenLogoutButton()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -101,11 +103,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun listenLogoutButton(drawerLayout: DrawerLayout, navController: NavController) {
+    private fun listenLogoutButton() {
         binding.navView.menu.findItem(R.id.signoutButton).setOnMenuItemClickListener {
             auth.signOut()
-            drawerLayout.closeDrawers()
-            navController.navigate(R.id.loginFragment)
+            finish()
+            startActivity(intent)
             true
         }
     }

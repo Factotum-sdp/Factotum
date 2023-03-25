@@ -1,8 +1,10 @@
 package com.github.factotum_sdp.factotum.ui.maps
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.github.factotum_sdp.factotum.data.localisation.Location
 import com.github.factotum_sdp.factotum.data.localisation.Route
 
 /**
@@ -13,8 +15,10 @@ class MapsViewModel : ViewModel() {
 
     private val _routes: MutableLiveData<List<Route>> = MutableLiveData(listOf())
     private val _runRoute : MutableLiveData<Route> = MutableLiveData()
+    private val _location : MutableLiveData<Location> = MutableLiveData()
     val routesState: LiveData<List<Route>> = _routes
     val runRouteState: LiveData<Route> = _runRoute
+    val location : LiveData<Location> = _location
 
     /**
      * Adds a route to be shown on the map
@@ -55,5 +59,17 @@ class MapsViewModel : ViewModel() {
      */
     fun setRunRoute(route: Route){
         _runRoute.postValue(route)
+    }
+
+    /**
+     * Sets the location
+     *
+     * @param query : String. Address to search location
+     * @param context : Context. Context in which this function is called
+     * @return returns the created location
+     */
+    fun setLocation(query: String, context: Context){
+        val location = Location(query, context)
+        _location.value = location
     }
 }

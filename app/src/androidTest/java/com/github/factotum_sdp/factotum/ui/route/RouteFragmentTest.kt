@@ -23,6 +23,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
 
 
 @RunWith(AndroidJUnit4::class)
@@ -97,6 +98,7 @@ class RouteFragmentTest {
         onView(withId(androidx.appcompat.R.id.search_src_text)).perform(typeText(city)).perform(pressKey(KeyEvent.KEYCODE_ENTER))
         val geocoder = Geocoder(getApplicationContext())
         var  result : String
+        val latch = CountDownLatch(1)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             geocoder.getFromLocationName(city, 1) { addresses ->
                 val bestAddress = addresses[0]
@@ -106,7 +108,9 @@ class RouteFragmentTest {
                         withText(result)
                     )
                 )
+                latch.countDown()
             }
+            latch.await()
         } else{
             val bestAddresses = geocoder.getFromLocationName(city, 1)
             result = bestAddresses?.get(0).toString()
@@ -117,7 +121,7 @@ class RouteFragmentTest {
 
     @Test
     fun wrongSearchShowsNoResultSnackbar(){
-        val city = "qwertz"
+        val city = "wrong_search"
         onView(withId(androidx.appcompat.R.id.search_src_text)).perform(typeText(city)).perform(pressKey(KeyEvent.KEYCODE_ENTER))
         onView(withId(com.google.android.material.R.id.snackbar_text))
             .check(matches(withText(NO_RESULT)))

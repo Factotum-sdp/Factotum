@@ -1,10 +1,7 @@
 package com.github.factotum_sdp.factotum.ui.maps
 
 import android.content.Intent
-import android.location.Geocoder
 import android.net.Uri
-import android.os.Build
-import android.os.Build.VERSION_CODES.TIRAMISU
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ListView
-import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -114,17 +110,10 @@ class RouteFragment : Fragment() {
         binding.searchBar.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
             override fun onQueryTextSubmit(query: String?): Boolean {
-                query?.let {
-                    if (it != ""){
-                        val geocoder = Geocoder(requireContext())
-                        // must handle different versions because API33 requires another
-                        // version of getFromLocationName()
-                        if (Build.VERSION.SDK_INT >= TIRAMISU) {
-                            tiramisuResultHandler(query, geocoder)
-                        } else{
-                            resultHandler(query, geocoder)
-                        }
-                    }
+                if (query != null) {
+                    viewModel.setLocation(query, requireContext())
+                    val toShow = viewModel.location.value?.address?.toString() ?: NO_RESULT
+                    Snackbar.make(requireView(), toShow, Snackbar.LENGTH_LONG).show()
                 }
                 return true
             }
@@ -134,34 +123,6 @@ class RouteFragment : Fragment() {
         })
     }
 
-    @RequiresApi(TIRAMISU)
-    private fun tiramisuResultHandler(query: String, geocoder: Geocoder) {
-        geocoder.getFromLocationName(query, 1) { addresses ->
-            val toShow: String = if (addresses.size == 0) {
-                NO_RESULT
-            } else {
-                val bestAddress = addresses[0]
-                bestAddress.toString()
-            }
-
-            requireActivity().runOnUiThread {
-                Snackbar.make(requireView(), toShow, Snackbar.LENGTH_LONG).show()
-            }
-        }
-    }
-
-    private fun resultHandler(query: String, geocoder: Geocoder){
-        val toShow: String = try {
-            val bestAddress = geocoder.getFromLocationName(query, 1)?.get(0)
-            bestAddress?.toString() ?: NO_RESULT
-
-        } catch (e : Exception){
-            e.printStackTrace()
-            NO_RESULT
-        }
-        Snackbar.make(requireView(), toShow , Snackbar.LENGTH_LONG).show()
-
-    }
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

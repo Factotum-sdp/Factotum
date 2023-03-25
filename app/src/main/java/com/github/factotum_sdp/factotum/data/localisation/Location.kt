@@ -8,7 +8,14 @@ import android.os.Build.VERSION_CODES.TIRAMISU
 import androidx.annotation.RequiresApi
 import java.util.concurrent.CountDownLatch
 
-
+/**
+ * Class that models a Location that has a name and an address
+ *
+ * @constructor : Constructs a Location
+ *
+ * @param query : String. Query of the address that we want to create
+ * @param context : Context. Context in which this constructor is called
+ */
 class Location(query: String, context : Context) {
 
     val address : Address?
@@ -28,6 +35,7 @@ class Location(query: String, context : Context) {
     private fun tiramisuResultHandler(query: String, geocoder: Geocoder): Address? {
         var result : Address? = null
         val latch = CountDownLatch(1)
+        // blocking
         geocoder.getFromLocationName(query, 1) { addresses ->
             result = if(addresses.size != 0) addresses[0] else null
             latch.countDown()

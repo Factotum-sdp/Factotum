@@ -1,7 +1,5 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
-import android.view.InputDevice
-import android.view.MotionEvent
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider
@@ -185,7 +183,7 @@ class RoadBookFragmentTest {
         onView(withText(R.string.editDialogTitle)).check(matches(isDisplayed()))
         onView(withText("X17")).perform(typeText("edited"))
         onView(withText(R.string.editDialogUpdateB)).perform(click())
-        onView((withText("X17edited"))).check(matches(isDisplayed()))
+        onView((withText("X17edited#1"))).check(matches(isDisplayed()))
     }
     @Test
     fun cancelOnRecordEditionWorks() {
@@ -194,7 +192,7 @@ class RoadBookFragmentTest {
         onView(withText("X17")).perform(typeText("edited"))
         onView(withText(R.string.editDialogCancelB)).perform(click())
         // Same record is displayed, without the edited text happened to his destRecordID
-        onView((withText("X17"))).check(matches(isDisplayed()))
+        onView((withText("X17#1"))).check(matches(isDisplayed()))
 
     }
     
@@ -203,7 +201,7 @@ class RoadBookFragmentTest {
         // Not possible for the moment in to cover the onMove() of the ItemtTouchHelper Callback,
         // However here, I simulate its behavior to triggers the ViewModel change.
 
-        onView(withText("X17")).check(isCompletelyAbove(withText("More1")))
+        onView(withText("X17#1")).check(isCompletelyAbove(withText("More#1")))
         testRule.scenario.onActivity {
 
             val fragment = it.supportFragmentManager.fragments.first() as NavHostFragment
@@ -219,8 +217,8 @@ class RoadBookFragmentTest {
             }
         }
 
-        onView(withText("X17")).check(matches(isDisplayed()))
+        onView(withText("X17#1")).check(matches(isDisplayed()))
         Thread.sleep(4000) // This one is needed to let the Screen enough time to be updated
-        onView(withText("X17")).check(isCompletelyBelow(withText("More1")))
+        onView(withText("X17#1")).check(isCompletelyBelow(withText("More#1")))
     }
 }

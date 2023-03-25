@@ -77,7 +77,7 @@
 
     <string name="rbLabelSwipeEdition">SwipeEditon</string>
     <string name="rbLabelDragDrop"><![CDATA[Drag&Drop]]></string>
-    <string name="editDialogTitle">Edit destination ID :</string>
+    <string name="editDialogTitle">Edit client ID :</string>
     <string name="editDialogCancelB">cancel</string>
     <string name="editDialogUpdateB">update</string>
     <string name="menu_view_proof_picture">View Proof Pictures</string>

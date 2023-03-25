@@ -13,7 +13,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.*
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.data.DestinationRecord
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
@@ -65,7 +64,8 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private fun setRoadBookEvents(rbViewModel: RoadBookViewModel, view: View) {
         // Add record on positive floating button click
         view.findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
-            rbViewModel.addRecord(DestinationRecords.RECORD_TO_ADD)
+            val rec = DestinationRecords.RECORD_TO_ADD
+            rbViewModel.addRecord(rec.clientID, rec.timeStamp, rec.waitingTime, rec.rate, rec.actions)
             Snackbar
                 .make(it, getString(R.string.snap_text_record_added), 700)
                 .setAction("Action", null).show()
@@ -153,13 +153,13 @@ class RoadBookFragment : Fragment(), MenuProvider {
                 val position = viewHolder.absoluteAdapterPosition
                 val rec = rbViewModel.recordsListState.value!![position]
 
-                val editDestId = EditText(context)
-                editDestId.setText(rec.destID)
+                val editClientID = EditText(context)
+                editClientID.setText(rec.clientID)
 
                 val builder = AlertDialog.Builder(context)
                 builder.setTitle(getString(R.string.editDialogTitle))
                 builder.setCancelable(false)
-                builder.setView(editDestId)
+                builder.setView(editClientID)
 
                 builder.setNegativeButton(getString(R.string.editDialogCancelB)) { _, _ ->
                     // Update the screen, no changes to back-end
@@ -168,13 +168,11 @@ class RoadBookFragment : Fragment(), MenuProvider {
                 builder.setPositiveButton(getString(R.string.editDialogUpdateB)) { _, _ ->
                     rbViewModel.editRecord(
                         position,
-                        DestinationRecord(
-                            editDestId.text.toString(),
-                            rec.timeStamp,
-                            rec.waitingTime,
-                            rec.rate,
-                            rec.actions
-                        )
+                        editClientID.text.toString(),
+                        rec.timeStamp,
+                        rec.waitingTime,
+                        rec.rate,
+                        rec.actions
                     )
                 }
                 return builder

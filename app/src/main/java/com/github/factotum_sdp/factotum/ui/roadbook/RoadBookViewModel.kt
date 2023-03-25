@@ -10,6 +10,7 @@ import com.google.firebase.database.DatabaseReference
 import java.text.SimpleDateFormat.getDateInstance
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 /**
  * The RoadBook ViewModel
@@ -20,29 +21,59 @@ import kotlin.collections.ArrayList
 class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
 
     private val _recordsList: MutableLiveData<List<DestinationRecord>> =
-        MutableLiveData(DestinationRecords.RECORDS)
-
+        MutableLiveData(emptyList())
     val recordsListState: LiveData<List<DestinationRecord>> = _recordsList
-    private val swapedRecords: ArrayList<DestinationRecord> = arrayListOf()
+
     private var dbRef: DatabaseReference
+    private val swapedRecords: ArrayList<DestinationRecord> = arrayListOf()
+    private val clientOccurences = HashMap<String, Int>()
+
     init {
         val date = Calendar.getInstance().time
         dbRef = _dbRef // ref path to register all back-ups from this RoadBook
                 .child(getDateInstance().format(date))
                 //.child(getTimeInstance().format(date).plus(Random.nextInt().toString()))
                 // Let uncommented for testing purpose. Uncomment it for back-up uniqueness in the DB
+        // Only for demo purpose :
+        addDemoRecords(DestinationRecords.RECORDS)
     }
 
     /**
      * Add a new DestinationRecord at the end of the recordsList
-     * @param destinationRecord DestinationRecord to be added
+     * @param clientID The Customer unique identifier associated to this DestinationRecord
+     * @param timeStamp The arrival time
+     * @param waitingTime The waiting time in minutes
+     * @param rate Rate as internal code notation
+     * @param actions The actions to be done on a destination
      */
-    fun addRecord(destinationRecord: DestinationRecord) {
+    fun addRecord(clientID: String, timeStamp: Date?, waitingTime: Int,
+                  rate: Int, actions: List<DestinationRecord.Action>) {
         val newList = arrayListOf<DestinationRecord>()
         newList.addAll(_recordsList.value as Collection<DestinationRecord>)
-        newList.add(destinationRecord)
+        val destID = computeDestID(clientID)
+        val rec = DestinationRecord(destID, clientID, timeStamp, waitingTime, rate, actions)
+        newList.add(rec)
         _recordsList.postValue(newList)
     }
+
+    //Needed to update the destIDOccurences cache
+    private fun addDemoRecords(ls: List<DestinationRecord>) {
+        val newList = arrayListOf<DestinationRecord>()
+        ls.forEach {
+            val destID = computeDestID(it.clientID)
+            newList.add(DestinationRecord(destID, it.clientID, it.timeStamp, it.waitingTime, it.rate, it.actions))
+        }
+        _recordsList.postValue(newList)
+    }
+
+    private fun computeDestID(clientID: String): String {
+        val occ = clientOccurences.compute(clientID) { _, oldOcc ->
+            var occ = oldOcc ?: 0
+            ++occ
+        }
+        return "$clientID#$occ"
+    }
+
 
     /**
      * Delete the last DestinationRecord of the recordsList
@@ -51,6 +82,17 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         val newList = arrayListOf<DestinationRecord>()
         newList.addAll(_recordsList.value as Collection<DestinationRecord>)
         if (newList.isNotEmpty()) newList.removeLast()
+        _recordsList.postValue(newList)
+    }
+
+    /**
+     * Delete the DestinationRecord at index "pos" in the recordsList
+     * @param pos: Int Index of the target record to delete
+     */
+    fun deleteRecordAt(pos: Int) {
+        val newList = arrayListOf<DestinationRecord>()
+        newList.addAll(_recordsList.value as Collection<DestinationRecord>)
+        newList.removeAt(pos)
         _recordsList.postValue(newList)
     }
 
@@ -90,11 +132,18 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
     }
 
     /**
-     * Edit the DestinationRecort at indec pos in the recordsList attribute
+     * Edit the DestinationRecord at index pos in the recordsList attribute
      * @param pos: Int position Index at which the current DestRecord will be override
      * @param newRec: DestinationRecord The record containing the new data
      */
-    fun editRecord(pos: Int, newRec: DestinationRecord) {
+    fun editRecord(pos: Int, clientID: String, timeStamp: Date?, waitingTime: Int,
+                   rate: Int, actions: List<DestinationRecord.Action>) {
+        val currentRec = _recordsList.value!![pos]
+        var destID = currentRec.destID
+        if(currentRec.clientID != clientID) {
+            destID = computeDestID(clientID)
+        }
+        val newRec = DestinationRecord(destID, clientID, timeStamp, waitingTime, rate, actions)
         val ls = arrayListOf<DestinationRecord>()
         ls.addAll(_recordsList.value as Collection<DestinationRecord>)
         ls[pos] = newRec

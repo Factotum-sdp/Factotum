@@ -4,7 +4,8 @@ import java.util.Date
 
 /**
  * Data design of a Destination Record
- * @property destID The destination unique identifier
+ * @property destID The DestinationRecord unique identifier
+ * @property clientID The Customer unique identifier associated to this DestinationRecord
  * @property timeStamp The arrival time
  * @property waitingTime The waiting time in minutes
  * @property rate Rate as internal code notation
@@ -14,6 +15,7 @@ import java.util.Date
  */
 data class DestinationRecord(
     val destID: String,
+    val clientID: String,
     val timeStamp: Date?,
     val waitingTime: Int,
     val rate: Int,

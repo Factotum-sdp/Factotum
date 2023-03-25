@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
-import com.github.factotum_sdp.factotum.data.Route
+import com.github.factotum_sdp.factotum.data.localisation.Route
 import com.github.factotum_sdp.factotum.databinding.FragmentMapsBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap

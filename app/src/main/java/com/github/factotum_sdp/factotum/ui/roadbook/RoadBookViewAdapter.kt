@@ -28,7 +28,7 @@ class RoadBookViewAdapter : RecyclerView.Adapter<RoadBookViewAdapter.RecordViewH
 
         override fun areContentsTheSame(oldItem: DestinationRecord,
                                         newItem: DestinationRecord): Boolean {
-            return oldItem == newItem
+            return oldItem.destID == newItem.destID
         }
     }
     private val asyncList = AsyncListDiffer(this, differCallback)

@@ -3,7 +3,7 @@ package com.github.factotum_sdp.factotum.ui.maps
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.github.factotum_sdp.factotum.data.Route
+import com.github.factotum_sdp.factotum.data.localisation.Route
 
 /**
  * viewModel of the routes and map fragments

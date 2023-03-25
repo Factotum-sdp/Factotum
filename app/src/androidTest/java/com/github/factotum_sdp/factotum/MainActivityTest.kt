@@ -124,6 +124,14 @@ class MainActivityTest {
     }
 
     @Test
+    fun clickOnDisplayProofPictureMenuItemLeadsToCorrectFragment() {
+        clickOnAMenuItemLeadsCorrectly(
+            R.id.displayFragment,
+            R.id.fragment_display_directors_parent
+        )
+    }
+
+    @Test
     fun navigateThroughDrawerMenuWorks() {
         clickOnAMenuItemLeadsCorrectly(
             R.id.directoryFragment,
@@ -134,11 +142,4 @@ class MainActivityTest {
             R.id.fragment_roadbook_directors_parent
         )
     }
-
-    @Test
-    fun actionSettingsIsAccessible() {
-        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
-        onView(withText(R.string.action_settings)).perform(click())
-    }
-
 }

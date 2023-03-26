@@ -53,7 +53,7 @@ class ContactsFragmentTest {
     @Test
     fun allContactsCanBeClickedOn() {
         val device = UiDevice.getInstance(getInstrumentation())
-        for (i in 0 until ContactsList.ITEMS.size) {
+        for (i in 0 until ContactsList.contacts.size) {
             onView(withId(R.id.contacts_recycler_view))
                 .perform(RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(i, click()))
             val contactName = device.findObject(UiSelector().descriptionContains("All contact Info"))

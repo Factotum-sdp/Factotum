@@ -13,7 +13,7 @@ import com.github.factotum_sdp.factotum.placeholder.ContactsList
 
 class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.ContactsViewHolder>() {
 
-    private val contacts = ContactsList.ITEMS //this is the list of contacts
+    private val contacts = ContactsList.contacts //this is the list of contacts
     //we consider the list of contacts to be constant so we don't need to worry about updating the recycler view
     //list of contact only changes when the app is restarted
 

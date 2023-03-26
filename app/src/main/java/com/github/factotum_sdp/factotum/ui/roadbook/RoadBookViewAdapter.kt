@@ -12,6 +12,7 @@ import com.github.factotum_sdp.factotum.data.DestinationRecord.Action
 import com.github.factotum_sdp.factotum.data.DestinationRecord
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * Adapter for the RecyclerView which will display a dynamic list of DestinationRecord
@@ -23,12 +24,12 @@ class RoadBookViewAdapter : RecyclerView.Adapter<RoadBookViewAdapter.RecordViewH
     private val differCallback = object : DiffUtil.ItemCallback<DestinationRecord>(){
         override fun areItemsTheSame(oldItem: DestinationRecord,
                                      newItem: DestinationRecord): Boolean {
-            return  oldItem.destID == newItem.destID
+            return  oldItem == newItem
         }
 
         override fun areContentsTheSame(oldItem: DestinationRecord,
                                         newItem: DestinationRecord): Boolean {
-            return oldItem.destID == newItem.destID
+            return oldItem == newItem
         }
     }
     private val asyncList = AsyncListDiffer(this, differCallback)
@@ -72,7 +73,7 @@ class RoadBookViewAdapter : RecyclerView.Adapter<RoadBookViewAdapter.RecordViewH
     // Only displayed if there is a non zero waiting time
     private fun waitingTimeStringFormat(waitTime: Int, label: String): String {
         if (waitTime != 0)
-            return "$label : $waitTime"
+            return "$label : $waitTime'"
         return ""
     }
     // arrival : _ or arrival : HH:MM:SS AM-PM
@@ -81,21 +82,27 @@ class RoadBookViewAdapter : RecyclerView.Adapter<RoadBookViewAdapter.RecordViewH
         if (date == null)
             return sb.append('_').toString()
         date.let {
-            sb.append(SimpleDateFormat.getTimeInstance().format(it)) }
+            sb.append(SimpleDateFormat.getTimeInstance().format(it))
+        }
         return sb.toString()
     }
     // actions : () or actions : (p | p | c)
     private fun actionsStringFormat(actions: List<Action>, label: String): String {
-        val sb = StringBuilder("$label : (")
-        if (actions.isEmpty())
-            return sb.append(" )").toString()
-        sb.append(actions.first())
+        val actionsWithOcc: EnumMap<Action, Int> = EnumMap(Action::class.java)
         actions.forEach {
-            sb.append(" | ")
-            sb.append(it)
+            actionsWithOcc.compute(it) { _, occ ->
+                var newOcc = occ ?: 0
+                ++newOcc
+            }
         }
-        sb.append(")")
-        return sb.toString()
+        val actionsFormatList = actionsWithOcc.map {
+            if (it.value == 1)
+                it.key.toString()
+            else
+                "${it.key} x${it.value}"
+        }
+
+        return actionsFormatList.joinToString("| ", "$label : (", ")")
     }
 
     override fun getItemCount(): Int = asyncList.currentList.size

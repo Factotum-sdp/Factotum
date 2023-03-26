@@ -77,9 +77,15 @@
 
     <string name="rbLabelSwipeEdition">SwipeEditon</string>
     <string name="rbLabelDragDrop"><![CDATA[Drag&Drop]]></string>
-    <string name="editDialogTitle">Edit client ID :</string>
+    <string name="editDialogTitle">Record edition</string>
     <string name="editDialogCancelB">cancel</string>
     <string name="editDialogUpdateB">update</string>
     <string name="menu_view_proof_picture">View Proof Pictures</string>
     <string name="refresh">Refresh</string>
+    <string name="hint_dialog_client_id">Client ID</string>
+    <string name="hint_dialog_timestamp">Timestamp</string>
+    <string name="hint_dialog_waiting_time">Waiting time</string>
+    <string name="hint_dialog_rate">Rate</string>
+    <string name="hint_dialog_actions">Actions</string>
+    <string name="hint_dialog_notes">Notes</string>
 </resources>

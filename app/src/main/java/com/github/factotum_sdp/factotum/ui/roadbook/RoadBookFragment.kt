@@ -2,9 +2,15 @@ package com.github.factotum_sdp.factotum.ui.roadbook
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.app.TimePickerDialog
 import android.os.Bundle
 import android.view.*
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.EditText
+import android.widget.MultiAutoCompleteTextView
+import android.widget.MultiAutoCompleteTextView.CommaTokenizer
+import android.widget.MultiAutoCompleteTextView.Tokenizer
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -13,9 +19,16 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.*
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.data.DestinationRecord
+import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
 
 
 /**
@@ -153,29 +166,97 @@ class RoadBookFragment : Fragment(), MenuProvider {
                 val position = viewHolder.absoluteAdapterPosition
                 val rec = rbViewModel.recordsListState.value!![position]
 
-                val editClientID = EditText(context)
-                editClientID.setText(rec.clientID)
-
                 val builder = AlertDialog.Builder(context)
-                builder.setTitle(getString(R.string.editDialogTitle))
                 builder.setCancelable(false)
-                builder.setView(editClientID)
+                val dialogView = requireActivity().layoutInflater.inflate(R.layout.edit_record_custom_dialog, null)
+                builder.setView(dialogView)
+
+                val clientIDView = dialogView.findViewById<AutoCompleteTextView>(R.id.autoCompleteClientID)
+                clientIDView.setText(rec.clientID)
+
+                // Here will need to get the clients IDs through a ViewModel instance initiated in the mainActivity and representing all the clients
+                var lsClientIDs = DestinationRecords.RECORDS.map { it.clientID }.toSet()
+                lsClientIDs = lsClientIDs.plus(DestinationRecords.RECORD_TO_ADD.clientID)
+                val clientIDsAdapter = ArrayAdapter(requireContext(), R.layout.pop_auto_complete_client_id, lsClientIDs.toList())
+                clientIDView.setAdapter(clientIDsAdapter)
+                clientIDView.threshold = 1
+
+                val timestampView = dialogView.findViewById<EditText>(R.id.editTextTimestamp)
+                val focusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+                    if (hasFocus) {
+                        TimePickerDialog(
+                            context,
+                            {   // OnSetListener argument
+                                _, hourOfDay, minutes ->
+                                val cal = Calendar.getInstance()
+                                cal.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                                cal.set(Calendar.MINUTE, minutes)
+                                timestampView.setText(SimpleDateFormat.getTimeInstance().format(cal.time))
+                            },
+                            Calendar.getInstance().get(Calendar.HOUR_OF_DAY),
+                            Calendar.getInstance().get(Calendar.MINUTE),
+                            false)
+                            .show()
+                    }
+                }
+                timestampView.onFocusChangeListener = focusChangeListener
+                val dateFormat = rec.timeStamp?.let { SimpleDateFormat.getTimeInstance().format(it) } ?: ""
+                timestampView.setText(dateFormat)
+
+                val waitingTimeView = dialogView.findViewById<EditText>(R.id.editTextWaitingTime)
+                waitingTimeView.setText(rec.waitingTime.toString())
+
+                val rateView = dialogView.findViewById<EditText>(R.id.editTextRate)
+                rateView.setText(rec.rate.toString())
+
+                val actionsView = dialogView.findViewById<MultiAutoCompleteTextView>(R.id.multiAutoCompleteActions)
+                actionsView.setText(rec.actions.toString().removePrefix("[").removeSuffix("]"))
+                val actionsAdapter = ArrayAdapter(requireContext(), R.layout.pop_auto_complete_action, DestinationRecord.Action.values())
+                actionsView.setAdapter(actionsAdapter)
+                actionsView.setTokenizer(CommaTokenizer())
+                actionsView.threshold = 1
+
+                val notesView = dialogView.findViewById<EditText>(R.id.editTextNotes)
+                //Need to set notesView after added to a DestinationRecord
 
                 builder.setNegativeButton(getString(R.string.editDialogCancelB)) { _, _ ->
                     // Update the screen, no changes to back-end
                     rbRecyclerView.adapter!!.notifyItemChanged(position)
                 }
                 builder.setPositiveButton(getString(R.string.editDialogUpdateB)) { _, _ ->
-                    rbViewModel.editRecord(
-                        position,
-                        editClientID.text.toString(),
-                        rec.timeStamp,
-                        rec.waitingTime,
-                        rec.rate,
-                        rec.actions
-                    )
+                    var recHasChanged = false
+                    try {
+                        recHasChanged =
+                            rbViewModel.editRecord(
+                                position,
+                                clientIDView.text.toString(),
+                                timestampFromString(timestampView.text.toString()),
+                                waitingTimeView.text.toString().toInt(),
+                                rateView.text.toString().toInt(),
+                                actionsFromString(actionsView.text.toString())
+                            )
+                    } catch(e: java.lang.Exception) {
+                        Snackbar
+                            .make(viewHolder.itemView, "Wrong format. Edition canceled", 1400)
+                            .setAction("Action", null).show()
+                    }
+                    if (!recHasChanged)
+                        rbRecyclerView.adapter!!.notifyItemChanged(position)
                 }
                 return builder
+            }
+
+            private fun timestampFromString(userEntry: String): Date? {
+                if (userEntry.isEmpty())
+                    return null
+                return SimpleDateFormat.getTimeInstance().parse(userEntry)
+            }
+
+            private fun actionsFromString(actions: String): List<DestinationRecord.Action> {
+                return actions
+                    .split(",")
+                    .map { DestinationRecord.Action.fromString(it.trim().lowercase()) }
+                    .filter { it != DestinationRecord.Action.UNKNOWN }
             }
         }
     companion object{

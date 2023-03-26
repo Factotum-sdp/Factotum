@@ -193,7 +193,6 @@ class RoadBookFragmentTest {
         onView(withText(R.string.editDialogCancelB)).perform(click())
         // Same record is displayed, without the edited text happened to his destRecordID
         onView((withText("X17#1"))).check(matches(isDisplayed()))
-
     }
     
     @Test

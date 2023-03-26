@@ -133,11 +133,17 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
 
     /**
      * Edit the DestinationRecord at index pos in the recordsList attribute
+     * If the new DestRecord computed is the same at the old one no value is posted and false is returned
      * @param pos: Int position Index at which the current DestRecord will be override
-     * @param newRec: DestinationRecord The record containing the new data
+     * @param clientID The Customer unique identifier associated to this DestinationRecord
+     * @param timeStamp The arrival time
+     * @param waitingTime The waiting time in minutes
+     * @param rate Rate as internal code notation
+     * @param actions The actions to be done on a destination
+     * @return true if according the args, there is a change and the _recordList is updated, false otherwise
      */
     fun editRecord(pos: Int, clientID: String, timeStamp: Date?, waitingTime: Int,
-                   rate: Int, actions: List<DestinationRecord.Action>) {
+                   rate: Int, actions: List<DestinationRecord.Action>): Boolean {
         val currentRec = _recordsList.value!![pos]
         var destID = currentRec.destID
         if(currentRec.clientID != clientID) {
@@ -147,7 +153,13 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         val ls = arrayListOf<DestinationRecord>()
         ls.addAll(_recordsList.value as Collection<DestinationRecord>)
         ls[pos] = newRec
-        _recordsList.postValue(ls)
+        if(currentRec != newRec) {
+            _recordsList.postValue(ls)
+            return true
+        }
+        // Prefer to be explicit with a boolean value, for the front-end to know it has to refresh, or act accordingly.
+        // ! Check the case where the destID is the same but
+        return false
     }
 
     // Factory needed to assign a value at construction time to the class attribute

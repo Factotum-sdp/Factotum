@@ -28,13 +28,26 @@ data class DestinationRecord(
         PICK,
         DELIVER,
         CONTACT,
-        RELAY;
+        RELAY,
+        UNKNOWN;
         override fun toString(): String =
             when (this) {
-                PICK -> "p"
-                DELIVER -> "d"
-                CONTACT -> "c"
-                RELAY -> "r"
+                PICK -> "pick"
+                DELIVER -> "deliver"
+                CONTACT -> "contact"
+                RELAY -> "relay"
+                UNKNOWN -> "unknown"
             }
+        companion object {
+            fun fromString(str: String): Action =
+                when (str) {
+                    "pick" -> PICK
+                    "deliver" -> DELIVER
+                    "contact" -> CONTACT
+                    "relay" -> RELAY
+                    else -> UNKNOWN
+                }
+
+        }
     }
 }

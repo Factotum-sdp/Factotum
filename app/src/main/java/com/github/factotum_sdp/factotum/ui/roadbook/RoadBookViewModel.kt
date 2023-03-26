@@ -56,7 +56,7 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         _recordsList.postValue(newList)
     }
 
-    //Needed to update the destIDOccurences cache
+    //Needed to update the destIDOccurrences cache
     private fun addDemoRecords(ls: List<DestinationRecord>) {
         val newList = arrayListOf<DestinationRecord>()
         ls.forEach {

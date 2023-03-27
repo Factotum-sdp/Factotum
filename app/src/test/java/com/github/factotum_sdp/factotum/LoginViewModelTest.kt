@@ -1,6 +1,5 @@
 package com.github.factotum_sdp.factotum
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.github.factotum_sdp.factotum.data.LoggedInUser
 import com.github.factotum_sdp.factotum.data.LoginRepository
 import com.github.factotum_sdp.factotum.data.Result
@@ -8,10 +7,6 @@ import com.github.factotum_sdp.factotum.ui.login.LoggedInUserView
 import com.github.factotum_sdp.factotum.ui.login.LoginFormState
 import com.github.factotum_sdp.factotum.ui.login.LoginResult
 import com.github.factotum_sdp.factotum.ui.login.LoginViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import org.junit.Rule
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

@@ -75,6 +75,12 @@
     <string name="file_provider">"com.github.factotum_sdp.factotum.file-provider"</string>
     <string name="camera_permission_not_granted">Permission needed to take a photo</string>
     <string name="sign_out">Sign Out</string>
+
+    <string name="rbLabelSwipeEdition">SwipeEditon</string>
+    <string name="rbLabelDragDrop"><![CDATA[Drag&Drop]]></string>
+    <string name="editDialogTitle">Edit destination ID :</string>
+    <string name="editDialogCancelB">cancel</string>
+    <string name="editDialogUpdateB">update</string>
     <string name="menu_view_proof_picture">View Proof Pictures</string>
     <string name="refresh">Refresh</string>
 </resources>

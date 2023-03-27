@@ -1,8 +1,8 @@
-package com.github.factotum_sdp.factotum.data.route
+package com.github.factotum_sdp.factotum.data.localisation
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.factotum_sdp.factotum.data.Route
 import com.github.factotum_sdp.factotum.ui.maps.MapsViewModel
 import com.google.android.gms.maps.model.LatLng
 import junit.framework.TestCase.assertEquals
@@ -109,5 +109,16 @@ class RouteTest {
         mapView.addRoute(route)
         mapView.deleteAll()
         assertEquals(0, mapView.routesState.value!!.size)
+    }
+
+    @Test
+    fun routeViewSetsLocation(){
+        val mapView = MapsViewModel()
+        val query =  "Lausanne"
+        val location = Location(query, getApplicationContext())
+        mapView.setLocation(query, getApplicationContext())
+        assertEquals(location.address!!.latitude, mapView.location.value!!.address!!.latitude)
+        assertEquals(location.address!!.longitude, mapView.location.value!!.address!!.longitude)
+
     }
 }

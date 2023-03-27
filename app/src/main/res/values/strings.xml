@@ -59,7 +59,7 @@
     <string name="action_sign_in">Access</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="welcome">"Welcome!"</string>
-    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_username">Not a valid email</string>
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
     <string name="web_client_id">"539052463718–6gefd2fnlvbb1h9aiq09kil6sip37i0u.apps.googleusercontent.com"</string>

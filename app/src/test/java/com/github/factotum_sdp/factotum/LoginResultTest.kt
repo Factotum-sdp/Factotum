@@ -3,7 +3,7 @@ import com.github.factotum_sdp.factotum.ui.login.LoggedInUserView
 import com.github.factotum_sdp.factotum.ui.login.LoginResult
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class LoginResultTest {
 

@@ -1,6 +1,5 @@
 package com.github.factotum_sdp.factotum.data
 
-import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import java.io.IOException
 import java.util.concurrent.CompletableFuture

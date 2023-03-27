@@ -3,9 +3,7 @@ package com.github.factotum_sdp.factotum.ui.login
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Button
 import android.widget.EditText
 import androidx.annotation.StringRes
@@ -16,6 +14,9 @@ import androidx.navigation.fragment.findNavController
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.databinding.FragmentLoginBinding
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import javax.inject.Singleton
 
 
 class LoginFragment : Fragment() {
@@ -52,18 +53,8 @@ class LoginFragment : Fragment() {
 
         observeLoginResult(loadingProgressBar)
 
-        val afterTextChangedListener = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-
-            override fun afterTextChanged(s: Editable) {
-                loginViewModel.loginDataChanged(
-                    usernameEditText.text.toString(),
-                    passwordEditText.text.toString()
-                )
-            }
-        }
+        val afterTextChangedListener =
+            createTextWatcher(loginViewModel, usernameEditText, passwordEditText)
 
         addListeners(usernameEditText, passwordEditText, afterTextChangedListener)
 
@@ -77,6 +68,25 @@ class LoginFragment : Fragment() {
 
         signupButton.setOnClickListener {
             findNavController().navigate(R.id.action_loginFragment_to_signUpFragment)
+        }
+    }
+
+    private fun createTextWatcher(
+        loginViewModel: LoginViewModel,
+        usernameEditText: EditText,
+        passwordEditText: EditText
+    ): TextWatcher {
+        return object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable) {
+                loginViewModel.loginDataChanged(
+                    usernameEditText.text.toString(),
+                    passwordEditText.text.toString()
+                )
+            }
         }
     }
 

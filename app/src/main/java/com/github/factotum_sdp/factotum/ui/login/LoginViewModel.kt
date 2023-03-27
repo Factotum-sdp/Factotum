@@ -1,7 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.login
 
-import android.util.Log
-import android.util.Patterns
+import androidx.core.util.PatternsCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.LoginRepository
 import com.github.factotum_sdp.factotum.data.Result
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -21,10 +21,12 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
     private val _loginResult = MutableLiveData<LoginResult>()
     val loginResult: LiveData<LoginResult> = _loginResult
 
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+
     fun login(userEmail: String, password: String) {
         // launch in a separate asynchronous job
         viewModelScope.launch {
-            val result = withContext(Dispatchers.IO) { loginRepository.login(userEmail, password) }
+            val result = withContext(dispatcher) { loginRepository.login(userEmail, password) }
             if (result is Result.Success) {
                 _loginResult.value =
                     LoginResult(
@@ -34,7 +36,6 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
                         )
                     )
             } else {
-                Log.d("LOGIN", result.toString());
                 _loginResult.value = LoginResult(error = R.string.login_failed)
             }
         }
@@ -52,11 +53,8 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
 
     // A placeholder username validation check
     private fun isUserNameValid(username: String): Boolean {
-        return if (username.contains("@")) {
-            Patterns.EMAIL_ADDRESS.matcher(username).matches()
-        } else {
-            username.isNotBlank()
-        }
+        return if (username.contains("@")) PatternsCompat.EMAIL_ADDRESS.matcher(username)
+            .matches() else false
     }
 
     // A placeholder password validation check

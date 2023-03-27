@@ -19,6 +19,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import org.hamcrest.CoreMatchers.startsWith
 import org.junit.Before
 import org.junit.Rule
@@ -26,6 +28,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.CompletableFuture
 
 
 @RunWith(AndroidJUnit4::class)
@@ -145,11 +148,11 @@ class RoadBookFragmentTest {
     // ============================================================================================
     // ================================== Update to Database Tests ================================
 
-    /*
+    private val db = Firebase.database.reference
     @Test
     fun roadBookIsBackedUpCorrectly() {
         val date = Calendar.getInstance().time
-        val ref = Firebase.database.reference
+        val ref = db
             .child("Sheet-shift")
             .child(SimpleDateFormat.getDateInstance().format(date))
 
@@ -182,8 +185,6 @@ class RoadBookFragmentTest {
             future.completeExceptionally(it)
         }
     }
-
-     */
 
     // ============================================================================================
     // ===================================== Edit Tests ===========================================

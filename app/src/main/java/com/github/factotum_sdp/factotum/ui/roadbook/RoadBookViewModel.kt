@@ -45,13 +45,14 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
      * @param waitingTime The waiting time in minutes
      * @param rate Rate as internal code notation
      * @param actions The actions to be done on a destination
+     * @param notes The additional notes concerning a destination
      */
     fun addRecord(clientID: String, timeStamp: Date?, waitingTime: Int,
-                  rate: Int, actions: List<DestinationRecord.Action>) {
+                  rate: Int, actions: List<DestinationRecord.Action>, notes: String) {
         val newList = arrayListOf<DestinationRecord>()
         newList.addAll(_recordsList.value as Collection<DestinationRecord>)
         val destID = computeDestID(clientID)
-        val rec = DestinationRecord(destID, clientID, timeStamp, waitingTime, rate, actions)
+        val rec = DestinationRecord(destID, clientID, timeStamp, waitingTime, rate, actions, notes)
         newList.add(rec)
         _recordsList.postValue(newList)
     }
@@ -61,7 +62,7 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         val newList = arrayListOf<DestinationRecord>()
         ls.forEach {
             val destID = computeDestID(it.clientID)
-            newList.add(DestinationRecord(destID, it.clientID, it.timeStamp, it.waitingTime, it.rate, it.actions))
+            newList.add(DestinationRecord(destID, it.clientID, it.timeStamp, it.waitingTime, it.rate, it.actions, it.notes))
         }
         _recordsList.postValue(newList)
     }
@@ -72,17 +73,6 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
             ++occ
         }
         return "$clientID#$occ"
-    }
-
-
-    /**
-     * Delete the last DestinationRecord of the recordsList
-     */
-    fun deleteLastRecord() {
-        val newList = arrayListOf<DestinationRecord>()
-        newList.addAll(_recordsList.value as Collection<DestinationRecord>)
-        if (newList.isNotEmpty()) newList.removeLast()
-        _recordsList.postValue(newList)
     }
 
     /**
@@ -140,16 +130,17 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
      * @param waitingTime The waiting time in minutes
      * @param rate Rate as internal code notation
      * @param actions The actions to be done on a destination
+     * @param notes The additional notes concerning a destination
      * @return true if according the args, there is a change and the _recordList is updated, false otherwise
      */
     fun editRecord(pos: Int, clientID: String, timeStamp: Date?, waitingTime: Int,
-                   rate: Int, actions: List<DestinationRecord.Action>): Boolean {
+                   rate: Int, actions: List<DestinationRecord.Action>, notes: String): Boolean {
         val currentRec = _recordsList.value!![pos]
         var destID = currentRec.destID
         if(currentRec.clientID != clientID) {
             destID = computeDestID(clientID)
         }
-        val newRec = DestinationRecord(destID, clientID, timeStamp, waitingTime, rate, actions)
+        val newRec = DestinationRecord(destID, clientID, timeStamp, waitingTime, rate, actions, notes)
         val ls = arrayListOf<DestinationRecord>()
         ls.addAll(_recordsList.value as Collection<DestinationRecord>)
         ls[pos] = newRec

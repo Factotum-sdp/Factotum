@@ -1,9 +1,9 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.*
-import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -66,24 +66,17 @@ class RoadBookFragment : Fragment(), MenuProvider {
                 .forNewRecordEdition()
                 .show()
         }
-
-        // Delete a record on negative floating button click
-        view.findViewById<FloatingActionButton>(R.id.fab_delete).setOnClickListener {
-            rbViewModel.deleteLastRecord()
-            Snackbar
-                .make(it, getString(R.string.snap_text_on_rec_delete), 700)
-                .setAction("Action", null).show()
-        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        (requireActivity() as MenuHost).addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
+        requireActivity().addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
         menuInflater.inflate(R.menu.main, menu)
-        menu.add(getString(R.string.rbLabelDragDrop))
-        menu.add(getString(R.string.rbLabelSwipeEdition))
+        menu.add(getString(R.string.rb_label_dragdrop))
+        menu.add(getString(R.string.rb_label_swipel_deletion))
+        menu.add(getString(R.string.rb_label_swiper_edition))
     }
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         // Needed to have the onSupportNavigateUp() called
@@ -98,7 +91,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private val itemTHCallback =
         object :
             ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN,
-                ItemTouchHelper.RIGHT or ItemTouchHelper.ACTION_STATE_SWIPE ) {
+                ItemTouchHelper.RIGHT or ItemTouchHelper.LEFT or ItemTouchHelper.ACTION_STATE_SWIPE ) {
 
             override fun onMove(
                 recyclerView: RecyclerView,
@@ -138,11 +131,27 @@ class RoadBookFragment : Fragment(), MenuProvider {
             @SuppressLint("NotifyDataSetChanged")
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 when(direction){
-                    ItemTouchHelper.RIGHT -> {
+                    ItemTouchHelper.RIGHT -> { // Record Edition
                         DRecordAlertDialogBuilder(context, requireParentFragment(),
                                                     rbViewModel, rbRecyclerView)
                             .forExistingRecordEdition(viewHolder)
                             .show()
+                    }
+                    ItemTouchHelper.LEFT -> { // Record Deletion
+                        val position = viewHolder.absoluteAdapterPosition
+                        val builder = AlertDialog.Builder(context)
+                        builder.setTitle(getString(R.string.delete_dialog_title))
+                        builder.setCancelable(false)
+                        builder.setPositiveButton(getString(R.string.delete_confirm_button_label)) { _, _ ->
+                            rbViewModel.deleteRecordAt(position)
+                            Snackbar
+                                .make(requireView(), getString(R.string.snap_text_on_rec_delete), 700)
+                                .setAction("Action", null).show()
+                        }
+                        builder.setNegativeButton(getString(R.string.delete_cancel_button_label)) { _, _ ->
+                            rbRecyclerView.adapter!!.notifyItemChanged(position)
+                        }
+                        builder.show()
                     }
                 }
             }

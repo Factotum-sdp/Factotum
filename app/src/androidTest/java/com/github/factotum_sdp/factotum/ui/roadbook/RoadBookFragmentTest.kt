@@ -48,19 +48,14 @@ class RoadBookFragmentTest {
     @Test
     fun radioButtonsAreAccessible() {
         Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
-        onView(withText(R.string.rbLabelDragDrop)).check(matches(isDisplayed()))
-        onView(withText(R.string.rbLabelSwipeEdition)).check(matches(isDisplayed()))
+        onView(withText(R.string.rb_label_dragdrop)).check(matches(isDisplayed()))
+        onView(withText(R.string.rb_label_swiper_edition)).check(matches(isDisplayed()))
+        onView(withText(R.string.rb_label_swipel_deletion)).check(matches(isDisplayed()))
     }
 
     @Test
     fun fabIsCorrectlyDisplayedOnFirstView() {
         onView(withId(R.id.fab))
-            .check(matches(isDisplayed()))
-    }
-
-    @Test
-    fun delButtonIsCorrectlyDisplayedOnFirstView() {
-        onView(withId(R.id.fab_delete))
             .check(matches(isDisplayed()))
     }
 
@@ -78,47 +73,60 @@ class RoadBookFragmentTest {
     }
 
     @Test
-    fun pressingFabCreatesNewRecord() {
+    fun newRecordIsDisplayedAtTheEnd() {
         onView(withText(DestinationRecords.RECORDS[0].destID))
             .check(matches(isDisplayed()))
-        onView(withId(R.id.fab)).perform(click())
+        newRecord()
         // Scroll to last position to see if the new record is displayed at the end
         onView(withId(R.id.list)).perform(
             click(),
             RecyclerViewActions.scrollToLastPosition<RoadBookViewAdapter.RecordViewHolder>(),
         )
-        onView((withText(DestinationRecords.RECORD_TO_ADD.destID)))
+        onView((withText("New#1")))
             .check(matches(isDisplayed()))
     }
 
     @Test
-    fun pressingDelDeleteLastRecord() {
-        onView(withId(R.id.fab)).perform(click())
-        onView(withId(R.id.list)).perform(
-            click(),
-            RecyclerViewActions.scrollToLastPosition<RoadBookViewAdapter.RecordViewHolder>(),
-        )
+    fun swipeLeftDeleteRecord() {
+
         // Record just added is displayed at the end of the list
-        onView((withText(DestinationRecords.RECORD_TO_ADD.destID)))
+        onView((withText(DestinationRecords.RECORDS[2].destID)))
             .check(matches(isDisplayed()))
-        onView(withId(R.id.fab_delete)).perform(click())
+
+        swipeLeftTheRecordAt(2)
+        onView(withText(R.string.delete_dialog_title))
+        onView(withText(R.string.delete_confirm_button_label)).perform(click())
 
         // Record added previously is now deleted
-        onView((withText(DestinationRecords.RECORD_TO_ADD.destID)))
+        onView((withText(DestinationRecords.RECORDS[2].destID)))
             .check(doesNotExist())
     }
 
-    private val db = Firebase.database.reference
+    @Test
+    fun swipeLeftButCancelLetTheRecord() {
+
+        // Record just added is displayed at the end of the list
+        onView((withText(DestinationRecords.RECORDS[2].destID)))
+            .check(matches(isDisplayed()))
+
+        swipeLeftTheRecordAt(2)
+        onView(withText(R.string.delete_dialog_title))
+        onView(withText(R.string.delete_cancel_button_label)).perform(click())
+
+        // Record added previously is now deleted
+        onView((withText(DestinationRecords.RECORDS[2].destID)))
+            .check(matches(isDisplayed()))
+    }
 
     @Test
     fun roadBookIsBackedUpCorrectly() {
-        //Navigate to an other Fragment
         val date = Calendar.getInstance().time
-        val ref = db
+        val ref = Firebase.database.reference
             .child("Sheet-shift")
             .child(SimpleDateFormat.getDateInstance().format(date))
 
-        onView(withId(R.id.fab)).perform(click()) // Add 1 record
+        // Add 1 record
+        newRecord()
 
         // Navigate out of the RoadBookFragment
         onView(withId(R.id.drawer_layout))
@@ -147,50 +155,25 @@ class RoadBookFragmentTest {
         }
     }
 
-    private fun swipeRightTheRecordAt(pos: Int) {
-        onView(withId(R.id.list)).perform(
-            longClick(),
-            RecyclerViewActions.actionOnItemAtPosition<RoadBookViewAdapter.RecordViewHolder>(
-                pos, GeneralSwipeAction(
-                    Swipe.SLOW,
-                    {
-                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
-                        val x = xy[0] + (it.width - 1) * 0.5f
-                        val y = xy[1] + (it.height - 1) * 1f
-                        floatArrayOf(x, y)
-                    },
-                    {
-                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
-                        val x = xy[0] + (it.width - 1) * 2f
-                        val y = xy[1] + (it.height - 1) * 1f
-                        floatArrayOf(x, y)
-                    },
-                    Press.PINPOINT
-                )
-            )
-        )
-    }
-
     @Test
     fun swipeRightTriggersEditScreen() {
         swipeRightTheRecordAt(4)
-        onView(withText(R.string.editDialogTitle)).check(matches(isDisplayed()))
+        onView(withText(R.string.edit_dialog_update_b)).check(matches(isDisplayed()))
+        onView(withText(R.string.edit_dialog_cancel_b)).check(matches(isDisplayed()))
     }
 
     @Test
     fun editARecordDestIDWorks() {
         swipeRightTheRecordAt(2)
-        onView(withText(R.string.editDialogTitle)).check(matches(isDisplayed()))
         onView(withText("X17")).perform(typeText("edited"))
-        onView(withText(R.string.editDialogUpdateB)).perform(click())
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
         onView((withText("X17edited#1"))).check(matches(isDisplayed()))
     }
     @Test
     fun cancelOnRecordEditionWorks() {
         swipeRightTheRecordAt(2)
-        onView(withText(R.string.editDialogTitle)).check(matches(isDisplayed()))
         onView(withText("X17")).perform(typeText("edited"))
-        onView(withText(R.string.editDialogCancelB)).perform(click())
+        onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
         // Same record is displayed, without the edited text happened to his destRecordID
         onView((withText("X17#1"))).check(matches(isDisplayed()))
     }
@@ -219,5 +202,44 @@ class RoadBookFragmentTest {
         onView(withText("X17#1")).check(matches(isDisplayed()))
         Thread.sleep(4000) // This one is needed to let the Screen enough time to be updated
         onView(withText("X17#1")).check(isCompletelyBelow(withText("More#1")))
+    }
+
+    private fun newRecord() {
+        onView(withId(R.id.fab)).perform(click())
+        onView(withId(R.id.autoCompleteClientID))
+            .perform(click(), typeText("New"), closeSoftKeyboard())
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+    }
+
+    private fun swipeRightTheRecordAt(pos: Int) {
+        swipeSlowActionOnRecyclerList(pos, 0.5f, 1f, 2f, 1f)
+    }
+
+    private fun swipeLeftTheRecordAt(pos: Int) {
+        swipeSlowActionOnRecyclerList(pos, 0.5f, 1f, -1f, 1f)
+    }
+
+    private fun swipeSlowActionOnRecyclerList(pos: Int, startX: Float, startY: Float, endX: Float, endY: Float) {
+        onView(withId(R.id.list)).perform(
+            longClick(),
+            RecyclerViewActions.actionOnItemAtPosition<RoadBookViewAdapter.RecordViewHolder>(
+                pos, GeneralSwipeAction(
+                    Swipe.SLOW,
+                    {
+                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
+                        val x = xy[0] + (it.width - 1) * startX
+                        val y = xy[1] + (it.height - 1) * startY
+                        floatArrayOf(x, y)
+                    },
+                    {
+                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
+                        val x = xy[0] + (it.width - 1) * endX
+                        val y = xy[1] + (it.height - 1) * endY
+                        floatArrayOf(x, y)
+                    },
+                    Press.PINPOINT
+                )
+            )
+        )
     }
 }

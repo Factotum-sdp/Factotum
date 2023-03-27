@@ -43,7 +43,6 @@ class DRecordAlertDialogBuilder(context: Context?,
         rateView = dialogView.findViewById(R.id.editTextRate)
         actionsView = dialogView.findViewById(R.id.multiAutoCompleteActions)
         notesView = dialogView.findViewById(R.id.editTextNotes)
-        //todo Need to set notesView after added to a DestinationRecord
     }
 
     override fun create(): AlertDialog {
@@ -63,16 +62,17 @@ class DRecordAlertDialogBuilder(context: Context?,
                 rbViewModel.addRecord(
                     clientIDView.text.toString(),
                     timestampFromString(timestampView.text.toString()),
-                    waitingTimeView.text.toString().toInt(),
-                    rateView.text.toString().toInt(),
-                    actionsFromString(actionsView.text.toString())
+                    waitTimeOrRateFromString(waitingTimeView.text.toString()),
+                    waitTimeOrRateFromString(rateView.text.toString()),
+                    actionsFromString(actionsView.text.toString()),
+                    notesView.text.toString()
                 )
                 Snackbar
                     .make(host.requireView(), host.getString(R.string.snap_text_record_added), 700)
                     .setAction("Action", null).show()
             } catch(e: java.lang.Exception) {
                 Snackbar
-                    .make(host.requireView(), "Wrong format. Edition canceled", 1400)
+                    .make(host.requireView(), host.getString(R.string.edit_rejected_snap_label), 1400)
                     .setAction("Action", null).show()
             }
         })
@@ -97,13 +97,18 @@ class DRecordAlertDialogBuilder(context: Context?,
                         position,
                         clientIDView.text.toString(),
                         timestampFromString(timestampView.text.toString()),
-                        waitingTimeView.text.toString().toInt(),
-                        rateView.text.toString().toInt(),
-                        actionsFromString(actionsView.text.toString())
+                        waitTimeOrRateFromString(waitingTimeView.text.toString()),
+                        waitTimeOrRateFromString(rateView.text.toString()),
+                        actionsFromString(actionsView.text.toString()),
+                        notesView.text.toString()
                     )
+                if (recHasChanged)
+                    Snackbar
+                        .make(host.requireView(), "Record edited", 700)
+                        .setAction("Action", null).show()
             } catch(e: java.lang.Exception) {
                 Snackbar
-                    .make(viewHolder.itemView, "Wrong format. Edition canceled", 1400)
+                    .make(viewHolder.itemView, host.getString(R.string.edit_rejected_snap_label), 1400)
                     .setAction("Action", null).show()
             }
             if (!recHasChanged)
@@ -121,12 +126,13 @@ class DRecordAlertDialogBuilder(context: Context?,
         waitingTimeView.setText(rec.waitingTime.toString())
         rateView.setText(rec.rate.toString())
         actionsView.setText(rec.actions.toString().removePrefix("[").removeSuffix("]"))
+        notesView.setText(rec.notes)
     }
 
     private fun setViewModelUpdates(onNegativeButton: DialogInterface.OnClickListener,
                                     onPositiveButton: DialogInterface.OnClickListener) {
-        setNegativeButton(host.getString(R.string.editDialogCancelB), onNegativeButton)
-        setPositiveButton(host.getString(R.string.editDialogUpdateB), onPositiveButton)
+        setNegativeButton(host.getString(R.string.edit_dialog_cancel_b), onNegativeButton)
+        setPositiveButton(host.getString(R.string.edit_dialog_update_b), onPositiveButton)
     }
 
     // Here we will need to get the clients IDs through a ViewModel instance
@@ -140,7 +146,6 @@ class DRecordAlertDialogBuilder(context: Context?,
         clientIDView.setAdapter(clientIDsAdapter)
         clientIDView.threshold = 1
     }
-
     private fun setTimestampTimePicker() {
         val focusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
@@ -161,7 +166,6 @@ class DRecordAlertDialogBuilder(context: Context?,
         }
         timestampView.onFocusChangeListener = focusChangeListener
     }
-
     private fun setActionsAdapter() {
         val actionsAdapter = ArrayAdapter(host.requireContext(),
                                             R.layout.pop_auto_complete_action,
@@ -170,13 +174,16 @@ class DRecordAlertDialogBuilder(context: Context?,
         actionsView.setTokenizer(MultiAutoCompleteTextView.CommaTokenizer())
         actionsView.threshold = 1
     }
-
+    private fun waitTimeOrRateFromString(userEntry: String): Int {
+        if (userEntry.isEmpty())
+            return 0
+        return userEntry.toInt()
+    }
     private fun timestampFromString(userEntry: String): Date? {
         if (userEntry.isEmpty())
             return null
         return SimpleDateFormat.getTimeInstance().parse(userEntry)
     }
-
     private fun actionsFromString(actions: String): List<DestinationRecord.Action> {
         return actions
             .split(",")

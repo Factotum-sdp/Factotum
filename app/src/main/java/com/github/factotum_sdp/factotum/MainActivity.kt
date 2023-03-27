@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.displayFragment
             ), drawerLayout
         )
+
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 

@@ -10,6 +10,7 @@ import java.util.Date
  * @property waitingTime The waiting time in minutes
  * @property rate Rate as internal code notation
  * @property actions The actions to be done on a destination
+ * @property notes Additional notes concerning a destination
  *
  * @See Action
  */
@@ -19,7 +20,8 @@ data class DestinationRecord(
     val timeStamp: Date?,
     val waitingTime: Int,
     val rate: Int,
-    val actions: List<Action>
+    val actions: List<Action>,
+    val notes: String
 ){
     /**
      * The possible actions to achieve on a destination

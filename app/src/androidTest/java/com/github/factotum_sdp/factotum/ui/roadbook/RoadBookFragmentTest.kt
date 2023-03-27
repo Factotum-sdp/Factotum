@@ -19,8 +19,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import org.hamcrest.CoreMatchers.startsWith
 import org.junit.Before
 import org.junit.Rule
@@ -124,6 +122,26 @@ class RoadBookFragmentTest {
             .check(matches(isDisplayed()))
     }
 
+    @Test
+    fun addWithWrongFormatISAborted() {
+        val clientID = DestinationRecords.RECORD_TO_ADD.clientID
+        onView(withId(R.id.fab)).perform(click())
+        onView(withId(R.id.autoCompleteClientID))
+            .perform(click(), typeText("$clientID "), closeSoftKeyboard())
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerCancelBLabel)).perform(click())
+
+        onView(withId(R.id.editTextTimestamp)).perform(typeText("2222"))
+        onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
+
+        onView(withId(R.id.list)).perform(
+            click(),
+            RecyclerViewActions.scrollToLastPosition<RoadBookViewAdapter.RecordViewHolder>(),
+        )
+        onView((withText("$clientID#1")))
+            .check(doesNotExist())
+    }
+
     // ============================================================================================
     // ================================== Update to Database Tests ================================
 
@@ -194,10 +212,36 @@ class RoadBookFragmentTest {
     }
 
     @Test
+    fun editWithAWrongFormatIsAborted() {
+        swipeRightTheRecordAt(2)
+        onView(withId(R.id.autoCompleteClientID))
+            .perform(click(), typeText("edited"), closeSoftKeyboard())
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerCancelBLabel)).perform(click())
+
+        onView(withId(R.id.editTextTimestamp)).perform(typeText("2222"))
+        onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
+
+        onView((withText("X17edited#1")))
+            .check(doesNotExist())
+    }
+
+    @Test
+    fun updateEditWithNoChange() {
+        swipeRightTheRecordAt(2)
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+        onView((withText(DestinationRecords.RECORDS[2].destID)))
+            .check(matches(isDisplayed()))
+    }
+
+    @Test
     fun eraseOnTimePickerResetTimestamp() {
         val cal: Calendar = Calendar.getInstance()
-        val formatTStamp = SimpleDateFormat.getTimeInstance().format(cal.time).substringBeforeLast(":")
-        onView(withText(startsWith("arrival : $formatTStamp"))).check(matches(isDisplayed())) // Remove seconds from the String format
+        val formatTStamp =
+            SimpleDateFormat.getTimeInstance().format(cal.time)
+                .substringBeforeLast(":")
+                .substringBeforeLast(":") // Remove seconds and minutes from the String format
+        onView(withText(startsWith("arrival : $formatTStamp"))).check(matches(isDisplayed()))
 
         eraseFirstRecTimestamp()
         onView(withText(startsWith("arrival : $formatTStamp"))).check(doesNotExist())
@@ -212,10 +256,13 @@ class RoadBookFragmentTest {
 
         val cal: Calendar = Calendar.getInstance()
         onView(withId(R.id.editTextTimestamp)).perform(click())
-        onView(withText("Cancel")).perform(click())
+        onView(withText(timePickerCancelBLabel)).perform(click())
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
 
-        val formatTStamp = SimpleDateFormat.getTimeInstance().format(cal.time).substringBeforeLast(":")
+        val formatTStamp =
+            SimpleDateFormat.getTimeInstance().format(cal.time)
+                .substringBeforeLast(":")
+                .substringBeforeLast(":")
         onView(withText(startsWith("arrival : $formatTStamp"))).check(doesNotExist())
     }
 
@@ -229,7 +276,7 @@ class RoadBookFragmentTest {
 
         val cal: Calendar = Calendar.getInstance()
         onView(withId(R.id.editTextTimestamp)).perform(click())
-        onView(withText("OK")).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click())
 
         onView(withId(R.id.editTextWaitingTime))
             .perform(click(), clearText(), typeText("5"), closeSoftKeyboard())
@@ -246,7 +293,11 @@ class RoadBookFragmentTest {
         onView(withText("New#1")).check(matches(isDisplayed()))
 
         eraseFirstRecTimestamp() // For having no ambiguity btw Timestamp on screen
-        val formatTStamp = SimpleDateFormat.getTimeInstance().format(cal.time).substringBeforeLast(":")
+        val formatTStamp =
+            SimpleDateFormat.getTimeInstance()
+                .format(cal.time)
+                .substringBeforeLast(":")
+                .substringBeforeLast(":")
         onView(withText(startsWith("arrival : $formatTStamp"))).check(matches(isDisplayed()))
         onView(withText("wait : 5'")).check(matches(isDisplayed()))
         onView(withText("rate : 7")).check(matches(isDisplayed()))
@@ -260,7 +311,7 @@ class RoadBookFragmentTest {
     private fun eraseFirstRecTimestamp() {
         swipeRightTheRecordAt(0)
         onView(withId(R.id.editTextTimestamp)).perform(click())
-        onView(withText("Erase")).perform(click())
+        onView(withText(timePickerEraseBLabel)).perform(click())
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
     }
 
@@ -305,6 +356,10 @@ class RoadBookFragmentTest {
     // ============================================================================================
     // ===================================== Helpers ==============================================
 
+    // Set by defaults by the TimePicker Instance, not stored in String Ressources
+    private val timePickerCancelBLabel = "Cancel"
+    private val timePickerUpdateBLabel = "OK"
+    private val timePickerEraseBLabel = "Erase"
     private fun newRecord() {
         onView(withId(R.id.fab)).perform(click())
         onView(withId(R.id.autoCompleteClientID))
@@ -320,7 +375,8 @@ class RoadBookFragmentTest {
         swipeSlowActionOnRecyclerList(pos, 0.5f, 1f, -1f, 1f)
     }
 
-    private fun swipeSlowActionOnRecyclerList(pos: Int, startX: Float, startY: Float, endX: Float, endY: Float) {
+    private fun swipeSlowActionOnRecyclerList(pos: Int, startX: Float, startY: Float,
+                                                        endX: Float, endY: Float) {
         onView(withId(R.id.list)).perform(
             longClick(),
             RecyclerViewActions.actionOnItemAtPosition<RoadBookViewAdapter.RecordViewHolder>(

@@ -1,9 +1,14 @@
 package com.github.factotum_sdp.factotum.ui.route
 
+import android.location.Geocoder
+import android.os.Build
+import android.view.KeyEvent
+import android.view.View
 import androidx.appcompat.widget.SearchView
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
@@ -12,12 +17,14 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
-import org.hamcrest.Matchers
+import com.github.factotum_sdp.factotum.ui.maps.RouteFragment.Companion.NO_RESULT
 import org.hamcrest.Matchers.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
+
 
 @RunWith(AndroidJUnit4::class)
 class RouteFragmentTest {
@@ -27,12 +34,16 @@ class RouteFragmentTest {
         MainActivity::class.java
     )
 
+    private var decorView : View? = null
     @Before
     fun setUp(){
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.routeFragment))
-            .perform(ViewActions.click())
+            .perform(click())
+        testRule.scenario.onActivity { activity ->
+            decorView = activity.window.decorView
+        }
     }
 
     @Test
@@ -48,8 +59,8 @@ class RouteFragmentTest {
     @Test
     fun buttonNextAppearsWhenPressed(){
         onView(withId(R.id.button_next)).check(matches(withEffectiveVisibility(Visibility.INVISIBLE)))
-        Espresso.onData(Matchers.anything()).inAdapterView(withId(R.id.list_view_routes)).atPosition(0).perform(
-            ViewActions.click()
+        Espresso.onData(anything()).inAdapterView(withId(R.id.list_view_routes)).atPosition(0).perform(
+            click()
         )
         onView(withId(R.id.button_next)).check(matches(isDisplayed()))
     }
@@ -66,8 +77,8 @@ class RouteFragmentTest {
     @Test
     fun buttonRunAppearsWhenPressed(){
         onView(withId(R.id.button_run)).check(matches(withEffectiveVisibility(Visibility.INVISIBLE)))
-        Espresso.onData(Matchers.anything()).inAdapterView(withId(R.id.list_view_routes)).atPosition(0).perform(
-            ViewActions.click()
+        Espresso.onData(anything()).inAdapterView(withId(R.id.list_view_routes)).atPosition(0).perform(
+            click()
         )
         onView(withId(R.id.button_run)).check(matches(isDisplayed()))
     }
@@ -79,5 +90,40 @@ class RouteFragmentTest {
     @Test
     fun searchBarDisplayed(){
         onView(allOf(withId(R.id.search_bar), isAssignableFrom(SearchView::class.java))).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun validSearchShowsAddressSnackBar(){
+        val city = "Lausanne"
+        onView(withId(androidx.appcompat.R.id.search_src_text)).perform(typeText(city)).perform(pressKey(KeyEvent.KEYCODE_ENTER))
+        val geocoder = Geocoder(getApplicationContext())
+        var  result : String
+        val latch = CountDownLatch(1)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            geocoder.getFromLocationName(city, 1) { addresses ->
+                val bestAddress = addresses[0]
+                result = bestAddress.toString()
+                onView(withId(com.google.android.material.R.id.snackbar_text)).check(
+                    matches(
+                        withText(result)
+                    )
+                )
+                latch.countDown()
+            }
+            latch.await()
+        } else{
+            val bestAddresses = geocoder.getFromLocationName(city, 1)
+            result = bestAddresses?.get(0).toString()
+            onView(withId(com.google.android.material.R.id.snackbar_text))
+                .check(matches(withText(result)))
+        }
+    }
+
+    @Test
+    fun wrongSearchShowsNoResultSnackbar(){
+        val city = "wrong_search"
+        onView(withId(androidx.appcompat.R.id.search_src_text)).perform(typeText(city)).perform(pressKey(KeyEvent.KEYCODE_ENTER))
+        onView(withId(com.google.android.material.R.id.snackbar_text))
+            .check(matches(withText(NO_RESULT)))
     }
 }

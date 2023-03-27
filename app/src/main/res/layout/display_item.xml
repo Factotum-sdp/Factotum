@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:text="@string/share"
         android:layout_margin="8dp"
-        android:background="@color/material_dynamic_neutral10"
+        android:background="@color/design_default_color_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

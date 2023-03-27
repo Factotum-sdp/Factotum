@@ -19,6 +19,24 @@ import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * That Class represent a DialogBuilder specifically designed to build a custom
+ * AlertDialog containing all the fields needed to edit a DestinationRecord.
+ *
+ * He has mainly two possibles usages :
+ * - The forNewRecordEdition() : To be call for building a Dialog with all fields empty
+ * - The forExistingRecordEdition : To be call for building a Dialog with the fields filled with the current RoadBookViewModel data
+ *
+ * Finally calling the inherited show() method will call create() and make the new custom concrete AlertDialog
+ *
+ * @param context: Context? The Context wherein this DialogBuilder is instanciated
+ * @param host: Fragment The Fragment which will hold the AlertDialog
+ * @param rbViewModel: RoadBookViewModel The RoadBookViewModel storing the observable data of each DestinationRecord
+ * @param rbRecyclerView: RecyclerView The RecyclerView as optimization to notify the screen representation when there is no edit changes,
+ * thus avoiding posting any useless value in the RoadBookViewModel
+ *
+ * @constructor : Constructs the DRecordAlertDialogBuilder
+ */
 class DRecordAlertDialogBuilder(context: Context?,
                                 private val host: Fragment,
                                 private val rbViewModel: RoadBookViewModel,
@@ -53,6 +71,11 @@ class DRecordAlertDialogBuilder(context: Context?,
         return super.create()
     }
 
+    /**
+     * Call it to build a custom AlertDialog with all the fields empty
+     * On edit validation, the RoadBookViewModel of this class will be notified by a
+     * RoadBookViewModel.addRecord() call
+     */
     fun forNewRecordEdition(): DRecordAlertDialogBuilder {
         setViewModelUpdates({ _, _ ->
             // On negative button do nothing
@@ -67,18 +90,24 @@ class DRecordAlertDialogBuilder(context: Context?,
                     actionsFromString(actionsView.text.toString()),
                     notesView.text.toString()
                 )
-                Snackbar
-                    .make(host.requireView(), host.getString(R.string.snap_text_record_added), 700)
-                    .setAction("Action", null).show()
+                setSnackBar(host.getString(R.string.snap_text_record_added), 700)
             } catch(e: java.lang.Exception) {
-                Snackbar
-                    .make(host.requireView(), host.getString(R.string.edit_rejected_snap_label), 1400)
-                    .setAction("Action", null).show()
+                setSnackBar(host.getString(R.string.edit_rejected_snap_label), 1400)
             }
         })
         return this
     }
 
+    /**
+     * Call it to build a custom AlertDialog with the fields filled with the current data of the viewHolder
+     * passed in argument.
+     * On edit validation, the RoadBookViewModel of this class will be notified by a
+     * RoadBookViewModel.edit() call
+     * On edition format errors or when the content did not change, only the RecyclerView is notified
+     * to swipe back the viewHolder of the DestinationRecord.
+     *
+     * @param viewHolder: ViewHolder The ViewHolder holding the starting DestinationRecord data
+     */
     fun forExistingRecordEdition(viewHolder: ViewHolder): DRecordAlertDialogBuilder {
         val position = viewHolder.absoluteAdapterPosition
         val rec = rbViewModel.recordsListState.value!![position]
@@ -103,18 +132,20 @@ class DRecordAlertDialogBuilder(context: Context?,
                         notesView.text.toString()
                     )
                 if (recHasChanged)
-                    Snackbar
-                        .make(host.requireView(), context.getString(R.string.edit_confirmed_snap_label), 700)
-                        .setAction("Action", null).show()
+                    setSnackBar(context.getString(R.string.edit_confirmed_snap_label), 700)
             } catch(e: java.lang.Exception) {
-                Snackbar
-                    .make(viewHolder.itemView, host.getString(R.string.edit_rejected_snap_label), 1400)
-                    .setAction("Action", null).show()
+                setSnackBar(host.getString(R.string.edit_rejected_snap_label), 1400)
             }
             if (!recHasChanged)
                 rbRecyclerView.adapter!!.notifyItemChanged(position)
         })
         return this
+    }
+
+    private fun setSnackBar(content: String, duration: Int) {
+        Snackbar
+            .make(host.requireView(), content, duration)
+            .setAction("Action", null).show()
     }
 
     private fun bindRecordDataToEditFields(rec: DestinationRecord) {
@@ -146,6 +177,8 @@ class DRecordAlertDialogBuilder(context: Context?,
         clientIDView.setAdapter(clientIDsAdapter)
         clientIDView.threshold = 1
     }
+
+    // A TimePicker Dialog to set the timestamp EditText field
     private fun setTimestampTimePicker() {
         val focusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
@@ -156,12 +189,13 @@ class DRecordAlertDialogBuilder(context: Context?,
                         val cal = Calendar.getInstance()
                         cal.set(Calendar.HOUR_OF_DAY, hourOfDay)
                         cal.set(Calendar.MINUTE, minutes)
+
                         timestampView.setText(SimpleDateFormat.getTimeInstance().format(cal.time))
                     },
                     Calendar.getInstance().get(Calendar.HOUR_OF_DAY),
                     Calendar.getInstance().get(Calendar.MINUTE),
                     false)
-                tp.setButton(DialogInterface.BUTTON_NEUTRAL, "Erase") { _, _ ->
+                tp.setButton(DialogInterface.BUTTON_NEUTRAL, ERASE_B_LABEL) { _, _ ->
                     timestampView.setText("")
                 }
                 tp.show()
@@ -192,5 +226,8 @@ class DRecordAlertDialogBuilder(context: Context?,
             .split(",")
             .map { DestinationRecord.Action.fromString(it.trim().lowercase()) }
             .filter { it != DestinationRecord.Action.UNKNOWN }
+    }
+    companion object{
+        private const val ERASE_B_LABEL = "Erase"
     }
 }

@@ -237,14 +237,9 @@ class RoadBookFragmentTest {
     @Test
     fun eraseOnTimePickerResetTimestamp() {
         val cal: Calendar = Calendar.getInstance()
-        val formatTStamp =
-            SimpleDateFormat.getTimeInstance().format(cal.time)
-                .substringBeforeLast(":")
-                .substringBeforeLast(":") // Remove seconds and minutes from the String format
-        onView(withText(startsWith("arrival : $formatTStamp"))).check(matches(isDisplayed()))
-
+        onView(withText(startsWith("arrival : ${timestampUntilHourFormat(cal)}"))).check(matches(isDisplayed()))
         eraseFirstRecTimestamp()
-        onView(withText(startsWith("arrival : $formatTStamp"))).check(doesNotExist())
+        onView(withText(startsWith("arrival : ${timestampUntilHourFormat(cal)}"))).check(doesNotExist())
     }
 
     @Test
@@ -259,11 +254,7 @@ class RoadBookFragmentTest {
         onView(withText(timePickerCancelBLabel)).perform(click())
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
 
-        val formatTStamp =
-            SimpleDateFormat.getTimeInstance().format(cal.time)
-                .substringBeforeLast(":")
-                .substringBeforeLast(":")
-        onView(withText(startsWith("arrival : $formatTStamp"))).check(doesNotExist())
+        onView(withText(startsWith("arrival : ${timestampUntilHourFormat(cal)}"))).check(doesNotExist())
     }
 
     @Test
@@ -271,13 +262,13 @@ class RoadBookFragmentTest {
         onView(withText(DestinationRecords.RECORDS[2].destID)).check(matches(isDisplayed()))
         swipeRightTheRecordAt(2)
 
+        // Edit all fields :
         onView(withId(R.id.autoCompleteClientID))
             .perform(click(), clearText(),  typeText("New "), closeSoftKeyboard())
 
         val cal: Calendar = Calendar.getInstance()
         onView(withId(R.id.editTextTimestamp)).perform(click())
-        onView(withText(timePickerUpdateBLabel)).perform(click())
-
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
         onView(withId(R.id.editTextWaitingTime))
             .perform(click(), clearText(), typeText("5"), closeSoftKeyboard())
         onView(withId(R.id.editTextRate))
@@ -287,18 +278,14 @@ class RoadBookFragmentTest {
         onView(withId(R.id.editTextNotes))
             .perform(click(),  typeText("Some notes about how SDP is fun"), closeSoftKeyboard())
 
+        // Confirm edition :
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
 
-        // Check edited record is corretly displayed
+        // Check edited record is corretly displayed :
         onView(withText("New#1")).check(matches(isDisplayed()))
 
         eraseFirstRecTimestamp() // For having no ambiguity btw Timestamp on screen
-        val formatTStamp =
-            SimpleDateFormat.getTimeInstance()
-                .format(cal.time)
-                .substringBeforeLast(":")
-                .substringBeforeLast(":")
-        onView(withText(startsWith("arrival : $formatTStamp"))).check(matches(isDisplayed()))
+        onView(withText(startsWith("arrival : ${timestampUntilHourFormat(cal)}"))).check(matches(isDisplayed()))
         onView(withText("wait : 5'")).check(matches(isDisplayed()))
         onView(withText("rate : 7")).check(matches(isDisplayed()))
         onView(withText("actions : (pick x2| deliver| contact)")).check(matches(isDisplayed()))
@@ -367,6 +354,16 @@ class RoadBookFragmentTest {
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
     }
 
+    // As we can't set the seconds currently,
+    // we use in our test the current time set by default in the time picker
+    // It's enough to match until the hours in our tests as at most one timestamp written at a time
+    // Retrieving it by text until the hours allows less false errors on the CI
+    private fun timestampUntilHourFormat(cal: Calendar): String {
+        return SimpleDateFormat.getTimeInstance()
+            .format(cal.time)
+            .substringBeforeLast(":")
+            .substringBeforeLast(":")
+    }
     private fun swipeRightTheRecordAt(pos: Int) {
         swipeSlowActionOnRecyclerList(pos, 0.5f, 1f, 2f, 1f)
     }

@@ -57,24 +57,6 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         _recordsList.postValue(newList)
     }
 
-    //Needed to update the destIDOccurrences cache
-    private fun addDemoRecords(ls: List<DestinationRecord>) {
-        val newList = arrayListOf<DestinationRecord>()
-        ls.forEach {
-            val destID = computeDestID(it.clientID)
-            newList.add(DestinationRecord(destID, it.clientID, it.timeStamp, it.waitingTime, it.rate, it.actions, it.notes))
-        }
-        _recordsList.postValue(newList)
-    }
-
-    private fun computeDestID(clientID: String): String {
-        val occ = clientOccurences.compute(clientID) { _, oldOcc ->
-            var occ = oldOcc ?: 0
-            ++occ
-        }
-        return "$clientID#$occ"
-    }
-
     /**
      * Delete the DestinationRecord at index "pos" in the recordsList
      * @param pos: Int Index of the target record to delete
@@ -151,6 +133,24 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         // Prefer to be explicit with a boolean value, for the front-end to know it has to refresh, or act accordingly.
         // ! Check the case where the destID is the same but
         return false
+    }
+
+    //Needed to update the destIDOccurrences cache
+    private fun addDemoRecords(ls: List<DestinationRecord>) {
+        val newList = arrayListOf<DestinationRecord>()
+        ls.forEach {
+            val destID = computeDestID(it.clientID)
+            newList.add(DestinationRecord(destID, it.clientID, it.timeStamp, it.waitingTime, it.rate, it.actions, it.notes))
+        }
+        _recordsList.postValue(newList)
+    }
+
+    private fun computeDestID(clientID: String): String {
+        val occ = clientOccurences.compute(clientID) { _, oldOcc ->
+            var occ = oldOcc ?: 0
+            ++occ
+        }
+        return "$clientID#$occ"
     }
 
     // Factory needed to assign a value at construction time to the class attribute

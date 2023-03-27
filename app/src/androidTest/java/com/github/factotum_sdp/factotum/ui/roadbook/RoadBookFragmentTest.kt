@@ -21,13 +21,13 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import org.hamcrest.CoreMatchers.startsWith
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.CompletableFuture
 
 
 @RunWith(AndroidJUnit4::class)
@@ -108,10 +108,9 @@ class RoadBookFragmentTest {
 
     // ============================================================================================
     // ================================== Add record Tests ========================================
-
-    /*
     @Test
     fun newRecordIsDisplayedAtTheEnd() {
+        val clientID = DestinationRecords.RECORD_TO_ADD.clientID
         onView(withText(DestinationRecords.RECORDS[0].destID))
             .check(matches(isDisplayed()))
         // Add a new record
@@ -121,10 +120,9 @@ class RoadBookFragmentTest {
             click(),
             RecyclerViewActions.scrollToLastPosition<RoadBookViewAdapter.RecordViewHolder>(),
         )
-        Thread.sleep(3000)
-        onView((withText("New#1")))
+        onView((withText("$clientID#1")))
             .check(matches(isDisplayed()))
-    }*/
+    }
 
     // ============================================================================================
     // ================================== Update to Database Tests ================================
@@ -187,12 +185,83 @@ class RoadBookFragmentTest {
     }
 
     @Test
-    fun changeEveryFieldsWorks() {
-        onView(withText(DestinationRecords.RECORDS[2].destID)).check(matches(isDisplayed()))
-        onView(withText(DestinationRecords.RECORDS[2].destID)).check(matches(isDisplayed()))
-        onView(withText(DestinationRecords.RECORDS[2].destID)).check(matches(isDisplayed()))
+    fun editWithAnExistingClientID() { // Means clientID already used by one record in the roadbook
+        val clientID = DestinationRecords.RECORDS[2].clientID
+        swipeRightTheRecordAt(3) // edit one record displayed below which has another clientID
+        onView(withId(R.id.autoCompleteClientID)).perform(clearText(), typeText(clientID)) // set for the same client that different record
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+        onView(withText("$clientID#2")).check(matches(isDisplayed())) // unique destID is computed
+    }
+
+    @Test
+    fun eraseOnTimePickerResetTimestamp() {
+        val cal: Calendar = Calendar.getInstance()
+        val formatTStamp = SimpleDateFormat.getTimeInstance().format(cal.time).substringBeforeLast(":")
+        onView(withText(startsWith("arrival : $formatTStamp"))).check(matches(isDisplayed())) // Remove seconds from the String format
+
+        eraseFirstRecTimestamp()
+        onView(withText(startsWith("arrival : $formatTStamp"))).check(doesNotExist())
+    }
+
+    @Test
+    fun cancelOnTimePickerWorks() {
+        eraseFirstRecTimestamp()
+        swipeRightTheRecordAt(2)
+        onView(withId(R.id.autoCompleteClientID))
+            .perform(click(), clearText(),  typeText("New "), closeSoftKeyboard())
+
+        val cal: Calendar = Calendar.getInstance()
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText("Cancel")).perform(click())
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        val formatTStamp = SimpleDateFormat.getTimeInstance().format(cal.time).substringBeforeLast(":")
+        onView(withText(startsWith("arrival : $formatTStamp"))).check(doesNotExist())
+    }
+
+    @Test
+    fun editEveryFieldsWorks() {
         onView(withText(DestinationRecords.RECORDS[2].destID)).check(matches(isDisplayed()))
         swipeRightTheRecordAt(2)
+
+        onView(withId(R.id.autoCompleteClientID))
+            .perform(click(), clearText(),  typeText("New "), closeSoftKeyboard())
+
+        val cal: Calendar = Calendar.getInstance()
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText("OK")).perform(click())
+
+        onView(withId(R.id.editTextWaitingTime))
+            .perform(click(), clearText(), typeText("5"), closeSoftKeyboard())
+        onView(withId(R.id.editTextRate))
+            .perform(click(), clearText(), typeText("7"), closeSoftKeyboard())
+        onView(withId(R.id.multiAutoCompleteActions))
+            .perform(click(), clearText(), typeText("deliver, pick, pick, contact"), closeSoftKeyboard())
+        onView(withId(R.id.editTextNotes))
+            .perform(click(),  typeText("Some notes about how SDP is fun"), closeSoftKeyboard())
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        // Check edited record is corretly displayed
+        onView(withText("New#1")).check(matches(isDisplayed()))
+
+        eraseFirstRecTimestamp() // For having no ambiguity btw Timestamp on screen
+        val formatTStamp = SimpleDateFormat.getTimeInstance().format(cal.time).substringBeforeLast(":")
+        onView(withText(startsWith("arrival : $formatTStamp"))).check(matches(isDisplayed()))
+        onView(withText("wait : 5'")).check(matches(isDisplayed()))
+        onView(withText("rate : 7")).check(matches(isDisplayed()))
+        onView(withText("actions : (pick x2| deliver| contact)")).check(matches(isDisplayed()))
+
+        //Check notes were edited :
+        swipeRightTheRecordAt(2)
+        onView(withText("Some notes about how SDP is fun")).check(matches(isDisplayed()))
+    }
+
+    private fun eraseFirstRecTimestamp() {
+        swipeRightTheRecordAt(0)
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText("Erase")).perform(click())
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
     }
 
     @Test

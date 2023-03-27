@@ -95,7 +95,7 @@ class DRecordAlertDialogBuilder(context: Context?,
                 recHasChanged =
                     rbViewModel.editRecord(
                         position,
-                        clientIDView.text.toString(),
+                        clientIDView.text.toString().trim(),
                         timestampFromString(timestampView.text.toString()),
                         waitTimeOrRateFromString(waitingTimeView.text.toString()),
                         waitTimeOrRateFromString(rateView.text.toString()),
@@ -104,7 +104,7 @@ class DRecordAlertDialogBuilder(context: Context?,
                     )
                 if (recHasChanged)
                     Snackbar
-                        .make(host.requireView(), "Record edited", 700)
+                        .make(host.requireView(), context.getString(R.string.edit_confirmed_snap_label), 700)
                         .setAction("Action", null).show()
             } catch(e: java.lang.Exception) {
                 Snackbar
@@ -149,7 +149,7 @@ class DRecordAlertDialogBuilder(context: Context?,
     private fun setTimestampTimePicker() {
         val focusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
-                TimePickerDialog(
+                val tp = TimePickerDialog(
                     context,
                     {   // OnSetListener argument
                             _, hourOfDay, minutes ->
@@ -161,7 +161,10 @@ class DRecordAlertDialogBuilder(context: Context?,
                     Calendar.getInstance().get(Calendar.HOUR_OF_DAY),
                     Calendar.getInstance().get(Calendar.MINUTE),
                     false)
-                    .show()
+                tp.setButton(DialogInterface.BUTTON_NEUTRAL, "Erase") { _, _ ->
+                    timestampView.setText("")
+                }
+                tp.show()
             }
         }
         timestampView.onFocusChangeListener = focusChangeListener

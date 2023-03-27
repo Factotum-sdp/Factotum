@@ -13,7 +13,7 @@ object DestinationRecords {
 
     val RECORDS: MutableList<DestinationRecord> = ArrayList()
     val RECORD_TO_ADD: DestinationRecord =
-        DestinationRecord("new#1", "new",null, 0, 2, arrayListOf(Action.PICK), "")
+        DestinationRecord("New#1", "New",null, 0, 2, arrayListOf(Action.PICK), "")
 
     init {
         val cal: Calendar = Calendar.getInstance()

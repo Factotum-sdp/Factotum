@@ -92,4 +92,5 @@
     <string name="delete_cancel_button_label">Cancel</string>
     <string name="delete_dialog_title">Delete the swiped record ?</string>
     <string name="edit_rejected_snap_label">Wrong format. Edition canceled</string>
+    <string name="edit_confirmed_snap_label">Record edited</string>
 </resources>

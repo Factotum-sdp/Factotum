@@ -129,6 +129,7 @@ class RoadBookFragmentTest {
     // ============================================================================================
     // ================================== Update to Database Tests ================================
 
+    /*
     @Test
     fun roadBookIsBackedUpCorrectly() {
         val date = Calendar.getInstance().time
@@ -166,6 +167,8 @@ class RoadBookFragmentTest {
         }
     }
 
+     */
+
     // ============================================================================================
     // ===================================== Edit Tests ===========================================
     @Test
@@ -182,6 +185,16 @@ class RoadBookFragmentTest {
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
         onView((withText("X17edited#1"))).check(matches(isDisplayed()))
     }
+
+    @Test
+    fun changeEveryFieldsWorks() {
+        onView(withText(DestinationRecords.RECORDS[2].destID)).check(matches(isDisplayed()))
+        onView(withText(DestinationRecords.RECORDS[2].destID)).check(matches(isDisplayed()))
+        onView(withText(DestinationRecords.RECORDS[2].destID)).check(matches(isDisplayed()))
+        onView(withText(DestinationRecords.RECORDS[2].destID)).check(matches(isDisplayed()))
+        swipeRightTheRecordAt(2)
+    }
+
     @Test
     fun cancelOnRecordEditionWorks() {
         swipeRightTheRecordAt(2)

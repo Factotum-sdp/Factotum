@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.data.DestinationRecord
 import com.github.factotum_sdp.factotum.data.DestinationRecord.Action
+import com.github.factotum_sdp.factotum.data.DestinationRecord
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -28,11 +28,9 @@ class RoadBookViewAdapter : RecyclerView.Adapter<RoadBookViewAdapter.RecordViewH
             return oldItem.destID == newItem.destID
         }
 
-        override fun areContentsTheSame(
-            oldItem: DestinationRecord,
-            newItem: DestinationRecord
-        ): Boolean {
-            return oldItem == newItem
+        override fun areContentsTheSame(oldItem: DestinationRecord,
+                                        newItem: DestinationRecord): Boolean {
+            return oldItem.destID == newItem.destID
         }
     }
     private val asyncList = AsyncListDiffer(this, differCallback)

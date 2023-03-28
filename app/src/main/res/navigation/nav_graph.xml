@@ -74,4 +74,9 @@
             android:id="@+id/action_contactDetailsFragment2_to_directoryFragment"
             app:destination="@id/directoryFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/displayFragment"
+        android:name="com.github.factotum_sdp.factotum.ui.display.DisplayFragment"
+        android:label="DisplayFragment"
+        tools:layout="@layout/fragment_display" />
 </navigation>

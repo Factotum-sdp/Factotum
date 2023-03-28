@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ListView
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -16,6 +17,7 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.databinding.FragmentRoutesBinding
 import com.github.factotum_sdp.factotum.placeholder.RouteRecords.DUMMY_COURSE
 import com.github.factotum_sdp.factotum.placeholder.RouteRecords.DUMMY_ROUTE
+import com.google.android.material.snackbar.Snackbar
 
 
 /**
@@ -25,6 +27,7 @@ class RouteFragment : Fragment() {
 
     companion object {
         const val MAPS_PKG = "com.google.android.apps.maps"
+        const val NO_RESULT = "No address found"
     }
     private var _binding: FragmentRoutesBinding? = null
     private val viewModel: MapsViewModel by activityViewModels()
@@ -52,6 +55,8 @@ class RouteFragment : Fragment() {
         setListenerList()
 
         setListenerButtons()
+
+        setListenerSearch()
 
 
     }
@@ -82,13 +87,11 @@ class RouteFragment : Fragment() {
             findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
         }
         binding.buttonAll.setOnClickListener{
-            for(route in DUMMY_ROUTE){
-                viewModel.addRoute(route)
-            }
+            viewModel.addAll(DUMMY_ROUTE)
             findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
         }
         binding.buttonRun.setOnClickListener{
-            val route = viewModel.runRoute.value!!
+            val route = viewModel.runRouteState.value!!
             val googleMapsUrl = StringBuilder()
                 .append("http://maps.google.com/maps?")
                 .append("saddr=${route.src.latitude},${route.src.longitude} &")
@@ -103,6 +106,22 @@ class RouteFragment : Fragment() {
         }
     }
 
+    private fun setListenerSearch(){
+        binding.searchBar.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                if (query != null) {
+                    viewModel.setLocation(query, requireContext())
+                    val toShow = viewModel.location.value?.address?.toString() ?: NO_RESULT
+                    Snackbar.make(requireView(), toShow, Snackbar.LENGTH_LONG).show()
+                }
+                return true
+            }
+            override fun onQueryTextChange(newText: String?): Boolean {
+                return false
+            }
+        })
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

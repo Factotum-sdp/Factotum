@@ -16,10 +16,6 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class LoginFragmentTest {
 
-    private val usernameInput = onView(withId(R.id.username))
-    private val passwordInput = onView(withId(R.id.password))
-    private val loginButton = onView(withId(R.id.login))
-
     @get:Rule
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
@@ -27,15 +23,29 @@ class LoginFragmentTest {
 
     @Test
     fun loginFormInitialStateIsEmpty() {
-        usernameInput.check(matches(withText("")))
-        passwordInput.check(matches(withText("")))
-        loginButton.check(matches(not(isEnabled())))
+        onView(withId(R.id.username)).check(matches(withText("")))
+        onView(withId(R.id.password)).check(matches(withText("")))
+        onView(withId(R.id.login)).check(matches(not(isEnabled())))
     }
 
     @Test
     fun loginFormWithoutPassword() {
-        usernameInput.perform(typeText("user.name@gmail.com"))
-        loginButton.check(matches(not(isEnabled())))
+        onView(withId(R.id.username)).perform(typeText("user.name@gmail.com"))
+        onView(withId(R.id.login)).check(matches(not(isEnabled())))
     }
 
+    fun correctUserEntryLeadsToRoadBook() {
+        onView(withId(R.id.username)).perform(typeText("jane.doe@gmail.com"))
+        closeSoftKeyboard()
+        onView(withId(R.id.password)).perform(typeText("123456"))
+        closeSoftKeyboard()
+        onView(withId(R.id.login)).perform(click())
+        onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun clickOnSignUpLeadsToSignUpFragment() {
+        onView(withId(R.id.signup)).perform(click())
+        onView(withId(R.id.fragment_signup_directors_parent)).check(matches(isDisplayed()))
+    }
 }

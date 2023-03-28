@@ -19,7 +19,7 @@ data class DestinationRecord(
     val waitingTime: Int,
     val rate: Int,
     val actions: List<Action>
-) {
+){
     /**
      * The possible actions to achieve on a destination
      */
@@ -38,4 +38,3 @@ data class DestinationRecord(
             }
     }
 }
-

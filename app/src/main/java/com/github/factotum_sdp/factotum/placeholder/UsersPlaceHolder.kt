@@ -1,7 +1,7 @@
 package com.github.factotum_sdp.factotum.placeholder
 
-import com.github.factotum_sdp.factotum.data.model.Role
-import com.github.factotum_sdp.factotum.data.model.User
+import com.github.factotum_sdp.factotum.data.Role
+import com.github.factotum_sdp.factotum.data.LoggedInUser
 
 /**
  * Temporary PlaceHolder object for fake users data
@@ -9,9 +9,9 @@ import com.github.factotum_sdp.factotum.data.model.User
  */
 object UsersPlaceHolder {
     val USER1 =
-        User("00-00", "Valentino Rossi", "valentino.rossi@epfl.ch", Role.BOSS)
+        LoggedInUser("Valentino Rossi", "valentino.rossi@epfl.ch", Role.BOSS)
     val USER2 =
-        User("12-34", "Fabian Cancellara", "fabian.cancellara@tour-de-france.fr", Role.COURIER)
+        LoggedInUser("Fabian Cancellara", "fabian.cancellara@tour-de-france.fr", Role.COURIER)
     val USER3 =
-        User("56-78", "Tadej Pogacar", "tadej.pogacar@la-vuuelta.es", Role.COURIER)
+        LoggedInUser( "Tadej Pogacar", "tadej.pogacar@la-vuuelta.es", Role.COURIER)
 }

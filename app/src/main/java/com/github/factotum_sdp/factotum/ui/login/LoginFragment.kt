@@ -3,10 +3,7 @@ package com.github.factotum_sdp.factotum.ui.login
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
+import android.view.*
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
@@ -18,6 +15,9 @@ import androidx.navigation.fragment.findNavController
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.databinding.FragmentLoginBinding
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import javax.inject.Singleton
 
 
 class LoginFragment : Fragment() {
@@ -47,17 +47,37 @@ class LoginFragment : Fragment() {
         val usernameEditText = binding.username
         val passwordEditText = binding.password
         val loginButton = binding.login
-        val loadingProgressBar = binding.loading
         val signupButton = binding.signup
-        val pwdForgotButton = binding.pwdForgot
-        val googleSignInButton = binding.signInButton
+        val loadingProgressBar = binding.loading
 
+        observeLoginFormState(loginButton, usernameEditText, passwordEditText)
 
+        observeLoginResult(loadingProgressBar)
 
-        observe(loginButton, usernameEditText, passwordEditText)
-        addListeners(loadingProgressBar)
+        val afterTextChangedListener =
+            createTextWatcher(loginViewModel, usernameEditText, passwordEditText)
 
-        val afterTextChangedListener = object : TextWatcher {
+        addListeners(usernameEditText, passwordEditText, afterTextChangedListener)
+
+        loginButton.setOnClickListener {
+            loadingProgressBar.visibility = View.VISIBLE
+            loginViewModel.login(
+                usernameEditText.text.toString(),
+                passwordEditText.text.toString()
+            )
+        }
+
+        signupButton.setOnClickListener {
+            findNavController().navigate(R.id.action_loginFragment_to_signUpFragment)
+        }
+    }
+
+    private fun createTextWatcher(
+        loginViewModel: LoginViewModel,
+        usernameEditText: EditText,
+        passwordEditText: EditText
+    ): TextWatcher {
+        return object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
@@ -69,18 +89,9 @@ class LoginFragment : Fragment() {
                 )
             }
         }
-
-        addListeners(usernameEditText, passwordEditText, afterTextChangedListener)
-        loginButton.setOnClickListener {
-            findNavController().navigate(R.id.action_loginFragment_to_roadBookFragment2)
-        }
-
-        signupButton.setOnClickListener {
-            findNavController().navigate(R.id.action_loginFragment_to_signUpFragment)
-        }
     }
 
-    private fun observe(
+    private fun observeLoginFormState(
         loginButton: Button,
         usernameEditText: EditText,
         passwordEditText: EditText
@@ -100,7 +111,7 @@ class LoginFragment : Fragment() {
             })
     }
 
-    private fun addListeners(loadingProgressBar: ProgressBar) {
+    private fun observeLoginResult(loadingProgressBar: View) {
         loginViewModel.loginResult.observe(viewLifecycleOwner,
             Observer { loginResult ->
                 loginResult ?: return@Observer
@@ -121,15 +132,6 @@ class LoginFragment : Fragment() {
     ) {
         usernameEditText.addTextChangedListener(afterTextChangedListener)
         passwordEditText.addTextChangedListener(afterTextChangedListener)
-        passwordEditText.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                loginViewModel.login(
-                    usernameEditText.text.toString(),
-                    passwordEditText.text.toString()
-                )
-            }
-            false
-        }
     }
 
     private fun login(
@@ -149,8 +151,9 @@ class LoginFragment : Fragment() {
     }
 
     private fun updateUiWithUser(model: LoggedInUserView) {
-        val welcome = getString(R.string.welcome) + " " + model.displayName
+        val welcome = getString(R.string.welcome) + " " + model.email
         Snackbar.make(requireView(), welcome, Snackbar.LENGTH_LONG).show()
+        findNavController().navigate(R.id.action_loginFragment_to_roadBookFragment2)
     }
 
     private fun showLoginFailed(@StringRes errorString: Int) {

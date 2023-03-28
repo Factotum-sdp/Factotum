@@ -1,8 +1,5 @@
 <resources>
     <string name="app_name">Factotum</string>
-    <string name="validate">validate</string>
-    <string name="your_name">Your name</string>
-    <string name="greetings">Greetings !</string>
     <string name="title_activity_maps">Map with Marker</string>
     <string name="title_activity_basic">BasicActivity</string>
     <!-- Strings used for fragments for navigation -->
@@ -43,14 +40,18 @@
     <string name="actions_text_view">actions</string>
 
     <string name="main_diary_activity">Main Diary Activity</string>
-    <string name="contact_name">Name</string>
-    <string name="contact_role">Role</string>
+    <string name="contact_name">John Doe</string>
+    <string name="contact_role">Example Role</string>
     <string name="contact_image">Contact_image</string>
-    <string name="contact_address">Address</string>
-    <string name="contact_phone">Phone number</string>
-    <string name="contact_details">Details of contact</string>
-    <string name="back_to_list_button">Back to List</string>
+    <string name="contact_address">123 Example Street 1022 Lausanne</string>
+    <string name="contact_phone">+4178*******</string>
+    <string name="contact_details">Might just be a fun fact ;-)</string>
+    <string name="back_to_list_button">Back to List of Contacts</string>
     <string name="all_contact_info">All contact Info</string>
+    <string name="contact_details_intro">Contact Details</string>
+    <string name="address_ex_layout">Address :</string>
+    <string name="phone_nb_ex_layout">Phone Number :</string>
+    <string name="notes_ex_layout">Notes :</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">email@gmail.com</string>
@@ -58,7 +59,7 @@
     <string name="action_sign_in">Access</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="welcome">"Welcome!"</string>
-    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_username">Not a valid email</string>
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
     <string name="web_client_id">"539052463718–6gefd2fnlvbb1h9aiq09kil6sip37i0u.apps.googleusercontent.com"</string>
@@ -73,4 +74,13 @@
     <string name="sign_up_text">Sign Up</string>
     <string name="file_provider">"com.github.factotum_sdp.factotum.file-provider"</string>
     <string name="camera_permission_not_granted">Permission needed to take a photo</string>
+    <string name="sign_out">Sign Out</string>
+
+    <string name="rbLabelSwipeEdition">SwipeEditon</string>
+    <string name="rbLabelDragDrop"><![CDATA[Drag&Drop]]></string>
+    <string name="editDialogTitle">Edit destination ID :</string>
+    <string name="editDialogCancelB">cancel</string>
+    <string name="editDialogUpdateB">update</string>
+    <string name="menu_view_proof_picture">View Proof Pictures</string>
+    <string name="refresh">Refresh</string>
 </resources>

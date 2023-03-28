@@ -1,8 +1,8 @@
-package com.github.factotum_sdp.factotum.data.route
+package com.github.factotum_sdp.factotum.data.localisation
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.factotum_sdp.factotum.data.Route
 import com.github.factotum_sdp.factotum.ui.maps.MapsViewModel
 import com.google.android.gms.maps.model.LatLng
 import junit.framework.TestCase.assertEquals
@@ -66,15 +66,30 @@ class RouteTest {
     @Test
     fun routeViewInitializesCorrectly(){
         val mapView = MapsViewModel()
-        assertEquals(0, mapView.routes.value!!.size)
+        assertEquals(0, mapView.routesState.value!!.size)
     }
 
     @Test
     fun routeViewAdd(){
         val mapView = MapsViewModel()
         val route = Route(10.0, 10.0, 10.0, 10.0)
+        val route2 = Route(10.0, 10.0, 10.0, 10.0)
+        val route3 = Route(10.0, 10.0, 10.0, 10.0)
         mapView.addRoute(route)
-        assertEquals(1, mapView.routes.value!!.size)
+        mapView.addRoute(route2)
+        mapView.addRoute(route3)
+        assertEquals(3, mapView.routesState.value!!.size)
+    }
+
+    @Test
+    fun routeViewAddAll(){
+        val mapView = MapsViewModel()
+        val route = Route(10.0, 10.0, 10.0, 10.0)
+        val route2 = Route(10.0, 10.0, 10.0, 10.0)
+        val route3 = Route(10.0, 10.0, 10.0, 10.0)
+        val ls = listOf(route, route2, route3)
+        mapView.addAll(ls)
+        assertEquals(3, mapView.routesState.value!!.size)
     }
 
     @get:Rule
@@ -84,7 +99,7 @@ class RouteTest {
         val mapView = MapsViewModel()
         val route = Route(10.0, 10.0, 10.0, 10.0)
         mapView.setRunRoute(route)
-        assertEquals(route, mapView.runRoute.value)
+        assertEquals(route, mapView.runRouteState.value)
     }
 
     @Test
@@ -93,6 +108,17 @@ class RouteTest {
         val route = Route(10.0, 10.0, 10.0, 10.0)
         mapView.addRoute(route)
         mapView.deleteAll()
-        assertEquals(0, mapView.routes.value!!.size)
+        assertEquals(0, mapView.routesState.value!!.size)
+    }
+
+    @Test
+    fun routeViewSetsLocation(){
+        val mapView = MapsViewModel()
+        val query =  "Lausanne"
+        val location = Location(query, getApplicationContext())
+        mapView.setLocation(query, getApplicationContext())
+        assertEquals(location.address!!.latitude, mapView.location.value!!.address!!.latitude)
+        assertEquals(location.address!!.longitude, mapView.location.value!!.address!!.longitude)
+
     }
 }

@@ -7,6 +7,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
+import android.Manifest
+import android.content.pm.PackageManager
+import android.util.Log
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import com.github.factotum_sdp.factotum.data.localisation.Route
 import com.github.factotum_sdp.factotum.databinding.FragmentMapsBinding
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -26,10 +31,19 @@ class MapsFragment : Fragment() {
         private const val ZOOM_PADDING = 100
         private const val minZoom = 6.0f
         private const val maxZoom = 14.0f
+
     }
 
     private var _binding: FragmentMapsBinding? = null
     private val viewModel: MapsViewModel by activityViewModels()
+    private lateinit var mMap : GoogleMap
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ){ isGranted ->
+        if (isGranted){
+            checkAndActivateLocation()
+        }
+    }
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -48,11 +62,19 @@ class MapsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setMapProperties()
+
     }
 
     private fun setMapProperties() {
         val mapFragment = binding.map.getFragment() as SupportMapFragment
         mapFragment.getMapAsync { googleMap ->
+            mMap = googleMap
+
+            if (!checkAndActivateLocation()){
+                requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
+            googleMap.uiSettings.isMyLocationButtonEnabled = true
+
             // clears map from previous markers
             googleMap.clear()
 
@@ -86,6 +108,21 @@ class MapsFragment : Fragment() {
             ?: CameraUpdateFactory.newLatLngZoom(EPFL_LOC, 8f)
 
         googleMap.moveCamera(cuf)
+    }
+
+    private fun checkAndActivateLocation() :Boolean{
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            mMap.isMyLocationEnabled = true
+            return true
+        }
+        return false
     }
 
     override fun onDestroyView() {

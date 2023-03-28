@@ -2,18 +2,15 @@ package com.github.factotum_sdp.factotum.placeholder
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.github.factotum_sdp.factotum.ui.directory.ContactsDataSource
-import com.github.factotum_sdp.factotum.ui.directory.FirebaseContactsDataSource
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import com.github.factotum_sdp.factotum.R
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.CompletableDeferred
 
-val database = Firebase.database
 private const val CONTACTS_PREFS = "contacts_prefs"
 private const val CONTACTS_KEY = "contacts_key"
 
@@ -23,13 +20,15 @@ private const val CONTACTS_KEY = "contacts_key"
 object ContactsList {
 
     val contacts = mutableListOf<Contact>()
-    private lateinit var dataSource: ContactsDataSource
+    val randomContacts = mutableListOf<Contact>()
+    private lateinit var dataSource: FirebaseDatabase
+    val size get() = contacts.size
 
-    fun init(dataSource: ContactsDataSource = FirebaseContactsDataSource()) {
+    fun init(dataSource: FirebaseDatabase) {
         this.dataSource = dataSource
     }
 
-    /*
+
     //fake data --> to be replaced with connection to database
     private val randomNames = listOf("John Smith", "Jane Doe", "Bob Builder")
     private val roles = listOf("Boss", "Courier", "Client")
@@ -37,17 +36,17 @@ object ContactsList {
     private val randomPhones = listOf("123456789", "987654321", "123987456")
     private val randomDetails = listOf("I am a boss", "I am a courier", "I am a client")
 
-     */
+    private const val image = R.drawable.contact_image
 
-    //private const val image = R.drawable.contact_image
+    private const val COUNT = 5
 
 
     //Trivial method for now but will be useful when connecting to database
     private fun addItem(item: Contact) {
-        contacts.add(item)
+        randomContacts.add(item)
     }
 
-    /*
+
     private fun createContact(position: Int): Contact {
         return Contact(
             "$position",
@@ -56,7 +55,12 @@ object ContactsList {
                 randomPhones[position % randomPhones.size],
                 randomDetails[position % randomDetails.size])
     }
-     */
+
+    private fun createRandomContacts() {
+        for (i in 0 until COUNT) {
+            addItem(createContact(i))
+        }
+    }
 
     /**
      * Saves the contacts list to a local storage.
@@ -113,7 +117,7 @@ object ContactsList {
      */
     suspend fun syncContactsFromFirebase(context: Context) {
         // Get a reference to the database node
-        val contactsRef = dataSource.getContactsReference()
+        val contactsRef = dataSource.getReference("contacts")
 
         // Create a CompletableDeferred object to wait for the completion of the onDataChange method
         val deferred = CompletableDeferred<Unit>()
@@ -153,14 +157,16 @@ object ContactsList {
     }
 
 
-    /*
+
     /**
-     * Saves the contacts to the realtime database.
+     * Populates the database with random contacts.
      */
-    suspend fun saveContactsToRealtimeDatabase() {
+    suspend fun populateDatabase() {
         val deferred = CompletableDeferred<Unit>()
 
-        db.child("contacts").setValue(contacts)
+        createRandomContacts()
+
+        dataSource.getReference("contacts").setValue(randomContacts)
             .addOnSuccessListener {
                 deferred.complete(Unit)
             }
@@ -169,7 +175,7 @@ object ContactsList {
             }
 
         deferred.await()
-    }       */
+    }
 
 
 
@@ -186,6 +192,6 @@ object ContactsList {
         val phone: String,
         val details: String? = null)
     {
-        constructor() : this("", "", "", 0, "", "", null)
+        //constructor() : this("", "", "", 0, "", "", null)
     }
 }

@@ -10,18 +10,21 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.ContactsList
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 class DirectoryFragment : Fragment() {
 
     private val mainScope = MainScope()
+    private val db = Firebase.database
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        ContactsList.init()
+        ContactsList.init(db)
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_contacts, container, false)
     }

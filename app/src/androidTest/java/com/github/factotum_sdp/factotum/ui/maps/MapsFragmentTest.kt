@@ -1,5 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.maps
 
+import android.Manifest
 import android.content.Intent
 import androidx.test.espresso.Espresso.onData
 import androidx.test.espresso.Espresso.onView
@@ -13,6 +14,7 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.By.descContains
 import androidx.test.uiautomator.By.textContains
 import androidx.test.uiautomator.UiDevice
@@ -37,6 +39,11 @@ class MapsFragmentTest {
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
     )
+    @get:Rule
+    val permission = GrantPermissionRule.grant(
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION)
+
 
     @Before fun setUp(){
         onView(withId(R.id.drawer_layout))

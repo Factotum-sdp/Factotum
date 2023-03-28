@@ -20,7 +20,7 @@ android {
         targetSdk 33
         versionCode 1
         versionName "1.0"
-
+        testInstrumentationRunnerArguments clearPackageData: 'true'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -38,6 +38,12 @@ android {
     testOptions {
         unitTests.all {
             useJUnitPlatform()
+        }
+
+        execution 'ANDROIDX_TEST_ORCHESTRATOR'
+
+        unitTests {
+            includeAndroidResources = true
         }
     }
 
@@ -89,6 +95,7 @@ dependencies {
     androidTestImplementation 'androidx.arch.core:core-testing:2.2.0'
     implementation 'com.google.firebase:firebase-storage-ktx:20.1.0'
     implementation "androidx.lifecycle:lifecycle-common-java8:2.6.0"
+    androidTestUtil 'androidx.test:orchestrator:1.4.2'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
@@ -108,11 +115,13 @@ tasks.withType(Test) {
     jacoco.excludes = ['jdk.internal.*', '**/databinding/*']
 }
 
+
 task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'createDebugCoverageReport']) {
     reports {
         xml.required = true
         html.required = true
     }
+
 
     def fileFilter = [
         '**/R.class',

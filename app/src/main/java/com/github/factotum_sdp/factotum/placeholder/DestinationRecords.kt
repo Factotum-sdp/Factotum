@@ -34,7 +34,7 @@ object DestinationRecords {
         for (i in 1..15)
             RECORDS.add(
                 DestinationRecord(
-                    "More",
+                    "More$i",
                     null,
                     0,
                     1,

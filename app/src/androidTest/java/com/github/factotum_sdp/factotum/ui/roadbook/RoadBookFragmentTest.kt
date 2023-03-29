@@ -1,7 +1,16 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
+import android.view.InputDevice
+import android.view.MotionEvent
+import androidx.navigation.fragment.NavHostFragment
+import androidx.recyclerview.widget.RecyclerView
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.*
+import androidx.test.espresso.action.ViewActions.*
+import androidx.test.espresso.assertion.PositionAssertions.isCompletelyAbove
+import androidx.test.espresso.assertion.PositionAssertions.isCompletelyBelow
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
@@ -22,6 +31,7 @@ import org.junit.runner.RunWith
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.CompletableFuture
+
 
 @RunWith(AndroidJUnit4::class)
 class RoadBookFragmentTest {
@@ -47,6 +57,13 @@ class RoadBookFragmentTest {
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))
             .perform(click())
+    }
+
+    @Test
+    fun radioButtonsAreAccessible() {
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rbLabelDragDrop)).check(matches(isDisplayed()))
+        onView(withText(R.string.rbLabelSwipeEdition)).check(matches(isDisplayed()))
     }
 
     @Test
@@ -140,5 +157,80 @@ class RoadBookFragmentTest {
         }.addOnFailureListener {
             future.completeExceptionally(it)
         }
+    }
+
+    private fun swipeRightTheRecordAt(pos: Int) {
+        onView(withId(R.id.list)).perform(
+            longClick(),
+            RecyclerViewActions.actionOnItemAtPosition<RoadBookViewAdapter.RecordViewHolder>(
+                pos, GeneralSwipeAction(
+                    Swipe.SLOW,
+                    {
+                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
+                        val x = xy[0] + (it.width - 1) * 0.5f
+                        val y = xy[1] + (it.height - 1) * 1f
+                        floatArrayOf(x, y)
+                    },
+                    {
+                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
+                        val x = xy[0] + (it.width - 1) * 2f
+                        val y = xy[1] + (it.height - 1) * 1f
+                        floatArrayOf(x, y)
+                    },
+                    Press.PINPOINT
+                )
+            )
+        )
+    }
+
+    @Test
+    fun swipeRightTriggersEditScreen() {
+        swipeRightTheRecordAt(4)
+        onView(withText(R.string.editDialogTitle)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun editARecordDestIDWorks() {
+        swipeRightTheRecordAt(2)
+        onView(withText(R.string.editDialogTitle)).check(matches(isDisplayed()))
+        onView(withText("X17")).perform(typeText("edited"))
+        onView(withText(R.string.editDialogUpdateB)).perform(click())
+        onView((withText("X17edited"))).check(matches(isDisplayed()))
+    }
+    @Test
+    fun cancelOnRecordEditionWorks() {
+        swipeRightTheRecordAt(2)
+        onView(withText(R.string.editDialogTitle)).check(matches(isDisplayed()))
+        onView(withText("X17")).perform(typeText("edited"))
+        onView(withText(R.string.editDialogCancelB)).perform(click())
+        // Same record is displayed, without the edited text happened to his destRecordID
+        onView((withText("X17"))).check(matches(isDisplayed()))
+
+    }
+
+    @Test
+    fun dragAndDropByInjectionIsWorking() {
+        // Not possible for the moment in to cover the onMove() of the ItemtTouchHelper Callback,
+        // However here, I simulate its behavior to triggers the ViewModel change.
+
+        onView(withText("X17")).check(isCompletelyAbove(withText("More1")))
+        testRule.scenario.onActivity {
+
+            val fragment = it.supportFragmentManager.fragments.first() as NavHostFragment
+
+            fragment.let {
+                val curr = it.childFragmentManager.primaryNavigationFragment as RoadBookFragment
+                val recyclerView = curr.view!!.findViewById<RecyclerView>(R.id.list)
+                recyclerView.adapter?.notifyItemMoved(2,3)
+                curr.getRBViewModelForTest().swapRecords(2,2)
+                recyclerView.adapter?.notifyItemMoved(3,4)
+                curr.getRBViewModelForTest().swapRecords(3,3)
+                curr.getRBViewModelForTest().pushSwapsResult()
+            }
+        }
+
+        onView(withText("X17")).check(matches(isDisplayed()))
+        Thread.sleep(4000) // This one is needed to let the Screen enough time to be updated
+        onView(withText("X17")).check(isCompletelyBelow(withText("More1")))
     }
 }

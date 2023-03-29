@@ -1,6 +1,7 @@
 package com.github.factotum_sdp.factotum.ui.display
 
 import android.content.Context
+import android.content.Intent
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -8,6 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -38,11 +41,13 @@ class DisplayFragmentTest {
         scenario = launchFragmentInContainer(themeResId = R.style.Theme_Factotum)
         Firebase.storage.useEmulator("10.0.2.2", 9199)
         context = InstrumentationRegistry.getInstrumentation().context
+        Intents.init()
     }
 
     @After
     fun tearDown() {
-       emptyStorageEmulator(Firebase.storage.reference)
+        emptyStorageEmulator(Firebase.storage.reference)
+        Intents.release()
     }
 
     @Test
@@ -92,5 +97,24 @@ class DisplayFragmentTest {
             val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
             assert(recyclerView.adapter?.itemCount == 1)
         }
+    }
+
+    @Test
+    fun displayFragment_sharingPhotoWorks() {
+        runBlocking {
+            val imagePath = "test_image1.jpg"
+            uploadImageToStorageEmulator(context, imagePath, "test_image1.jpg")
+        }
+
+        Thread.sleep(WAIT_TIME_INIT)
+
+        onView(withId(R.id.refreshButton)).perform(click())
+
+        Thread.sleep(WAIT_TIME_REFRESH)
+
+        onView(withId(R.id.shareButton)).perform(click())
+
+        //Check if the intent of sharing has been called
+        Intents.intended(hasAction(Intent.ACTION_CHOOSER))
     }
 }

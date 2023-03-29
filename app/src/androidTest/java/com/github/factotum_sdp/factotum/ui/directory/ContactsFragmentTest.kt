@@ -16,23 +16,50 @@ import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.ContactsList
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
+import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class ContactsFragmentTest {
-    @get:Rule
-    var activityRule = ActivityScenarioRule(MainActivity::class.java)
+    private val WAITFORANIMATION = 500L
 
+    @get:Rule
+    var testRule = ActivityScenarioRule(
+        MainActivity::class.java
+    )
+
+    companion object {
+        @BeforeClass
+        @JvmStatic
+        fun setUpDatabase() {
+            val database = Firebase.database
+            database.useEmulator("10.0.2.2", 9000)
+            MainActivity.setDatabase(database)
+
+            emptyFirebaseDatabase(database)
+
+            ContactsList.init(database)
+
+            runBlocking {
+                ContactsList.populateDatabase()
+            }
+        }
+    }
     @Before
-    fun goToContacts() {
+    fun setUp() {
+
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.directoryFragment))
             .perform(click())
+
     }
 
     @Test
@@ -53,12 +80,13 @@ class ContactsFragmentTest {
     @Test
     fun allContactsCanBeClickedOn() {
         val device = UiDevice.getInstance(getInstrumentation())
-        for (i in 0 until ContactsList.contacts.size) {
+        for (i in 0 until ContactsList.size) {
             onView(withId(R.id.contacts_recycler_view))
                 .perform(RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(i, click()))
             val contactName = device.findObject(UiSelector().descriptionContains("All contact Info"))
             assertTrue(contactName.exists())
             device.pressBack()
+            Thread.sleep(WAITFORANIMATION)
         }
     }
 }

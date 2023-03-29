@@ -2,6 +2,7 @@ package com.github.factotum_sdp.factotum.placeholder
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import com.github.factotum_sdp.factotum.R
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -56,7 +57,7 @@ object ContactsList {
                 randomDetails[position % randomDetails.size])
     }
 
-    private fun createRandomContacts() {
+    fun createRandomContacts() {
         for (i in 0 until COUNT) {
             addItem(createContact(i))
         }
@@ -149,6 +150,7 @@ object ContactsList {
             override fun onCancelled(databaseError: DatabaseError) {
                 // Mark the CompletableDeferred as failed with an exception
                 deferred.completeExceptionally(databaseError.toException())
+                Log.d("ContactsList", "onCancelled: ${databaseError.toException()}")
             }
         })
 
@@ -192,6 +194,6 @@ object ContactsList {
         val phone: String,
         val details: String? = null)
     {
-        //constructor() : this("", "", "", 0, "", "", null)
+        constructor() : this("", "", "", 0, "", "", null)
     }
 }

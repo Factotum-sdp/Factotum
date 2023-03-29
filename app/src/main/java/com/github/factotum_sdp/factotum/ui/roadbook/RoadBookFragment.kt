@@ -27,7 +27,7 @@ class RoadBookFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_roadbook, container, false)
         val adapter = RoadBookViewAdapter()
-        val dbRef = (activity as MainActivity).getDatabaseRef().child(ROADBOOK_DB_PATH)
+        val dbRef = MainActivity.getDatabase().reference.child(ROADBOOK_DB_PATH)
         val rbFact = RoadBookViewModel.RoadBookViewModelFactory(dbRef)
         rbViewModel = ViewModelProvider(this, rbFact)[RoadBookViewModel::class.java]
 

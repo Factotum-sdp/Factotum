@@ -2,23 +2,29 @@ package com.github.factotum_sdp.factotum.ui.directory
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.ContactsList
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 class DirectoryFragment : Fragment() {
 
     private val mainScope = MainScope()
-    private val db = Firebase.database
+    private lateinit var db: FirebaseDatabase
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        db = MainActivity.getDatabase()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,14 +44,18 @@ class DirectoryFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
             adapter = ContactsRecyclerAdapter()
         }
+        Log.d("Contacts", "here" + ContactsList.contacts.toString())
 
         // Load contacts from local storage
         ContactsList.loadContactsLocally(requireContext())
+
+        Log.d("Contacts", "here2" + ContactsList.contacts.toString())
 
         // Sync contacts from Firebase when connected to the internet
         mainScope.launch {
             ContactsList.syncContactsFromFirebase(requireContext())
             recycler.adapter?.notifyDataSetChanged()
+            Log.d("Contacts", "There" + ContactsList.contacts.toString())
         }
     }
 

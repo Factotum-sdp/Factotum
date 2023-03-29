@@ -1,6 +1,8 @@
 package com.github.factotum_sdp.factotum.ui.directory
 
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.placeholder.ContactsList
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -10,8 +12,8 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runTest
-import org.junit.After
-import org.junit.Before
+import org.junit.AfterClass
+import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.coroutines.resume
@@ -20,18 +22,24 @@ import kotlin.coroutines.suspendCoroutine
 
 @RunWith(AndroidJUnit4::class)
 class ContactsListOnlineTest {
-    private lateinit var database: FirebaseDatabase
 
-    @Before
-    fun setUp() {
+    companion object {
+        private var database: FirebaseDatabase = Firebase.database
 
-        database = Firebase.database
-        //database.useEmulator("10.0.2.2", 9000)
+        @BeforeClass
+        @JvmStatic
+        fun setUpDatabase() {
+            database.useEmulator("10.0.2.2", 9000)
+            MainActivity.setDatabase(database)
 
-        emptyFirebaseDatabase(database)
+            ContactsList.init(database)
+        }
 
-        ContactsList.init(database)
-
+        @AfterClass
+        @JvmStatic
+        fun emptyDatabase() {
+            emptyFirebaseDatabase(database)
+        }
     }
 
     @ExperimentalCoroutinesApi
@@ -55,9 +63,15 @@ class ContactsListOnlineTest {
         assert(dataSnapshot.hasChildren())
     }
 
-    @After
-    fun tearDown() {
-        emptyFirebaseDatabase(database)
+    @ExperimentalCoroutinesApi
+    @Test
+    fun testSyncContactsFromFirebase() = runTest {
+        // First, populate the database with contacts
+        ContactsList.populateDatabase()
+        // Then, synchronize the contacts list with Firebase
+        ContactsList.syncContactsFromFirebase(ApplicationProvider.getApplicationContext())
+        // Now, check if the local contacts list is not empty
+        assert(ContactsList.contacts.isNotEmpty())
     }
 
 }

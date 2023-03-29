@@ -28,7 +28,7 @@ class MapsFragment : Fragment() {
     companion object {
         private val EPFL_LOC = LatLng(46.520536, 6.568318)
         private const val ZOOM_PADDING = 100
-        private const val minZoom = 6.0
+        private const val minZoom = 6.0f
     }
 
     private var _binding: FragmentMapsBinding? = null

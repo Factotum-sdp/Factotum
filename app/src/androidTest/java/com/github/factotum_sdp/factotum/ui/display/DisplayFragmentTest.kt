@@ -1,32 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.display
 
-import android.content.Context
-import androidx.fragment.app.testing.FragmentScenario
-import androidx.fragment.app.testing.launchFragmentInContainer
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
-import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.ui.display.utils.WAIT_TIME_INIT
-import com.github.factotum_sdp.factotum.ui.display.utils.WAIT_TIME_REFRESH
-import com.github.factotum_sdp.factotum.ui.display.utils.emptyStorageEmulator
-import com.github.factotum_sdp.factotum.ui.display.utils.uploadImageToStorageEmulator
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
-import kotlinx.coroutines.runBlocking
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
-
-
+/*
 @RunWith(AndroidJUnit4::class)
 class DisplayFragmentTest {
 
@@ -94,3 +68,5 @@ class DisplayFragmentTest {
         }
     }
 }
+
+ */

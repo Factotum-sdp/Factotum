@@ -14,6 +14,8 @@ import com.github.factotum_sdp.factotum.databinding.FragmentDisplayBinding
 import com.github.factotum_sdp.factotum.ui.display.utils.PhotoAdapter
 import com.google.firebase.storage.StorageReference
 
+const val PHONE_NUMBER = "1234567890"
+
 // Fragment responsible for displaying a list of images from Firebase Storage
 class DisplayFragment : Fragment() {
 
@@ -31,7 +33,7 @@ class DisplayFragment : Fragment() {
 
         // Set up the recycler view with a photo adapter
         val photoAdapter = PhotoAdapter() { storageReference ->
-            shareImage(storageReference, "1234567890")
+            shareImage(storageReference, PHONE_NUMBER)
         }
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(context)
@@ -84,10 +86,7 @@ class DisplayFragment : Fragment() {
                 putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(whatsappIntent, smsIntent))
             }
 
-
             startActivity(chooserIntent)
-        }.addOnFailureListener {
-            // Handle failure here
         }
     }
 

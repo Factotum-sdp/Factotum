@@ -12,7 +12,6 @@ import com.github.factotum_sdp.factotum.data.DestinationRecord.Action
 import com.github.factotum_sdp.factotum.data.DestinationRecord
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.HashMap
 
 /**
  * Adapter for the RecyclerView which will display a dynamic list of DestinationRecord
@@ -78,13 +77,11 @@ class RoadBookViewAdapter : RecyclerView.Adapter<RoadBookViewAdapter.RecordViewH
     }
     // arrival : _ or arrival : HH:MM:SS AM-PM
     private fun timestampStringFormat(date: Date?, label: String): String {
-        val sb = java.lang.StringBuilder("$label : ")
-        if (date == null)
-            return sb.append('_').toString()
-        date.let {
-            sb.append(SimpleDateFormat.getTimeInstance().format(it))
-        }
-        return sb.toString()
+        val timestamp =
+            date?.let {
+                SimpleDateFormat.getTimeInstance().format(it)
+            } ?: "_"
+        return "$label : $timestamp"
     }
     // actions : () or actions : (p | p | c)
     private fun actionsStringFormat(actions: List<Action>, label: String): String {

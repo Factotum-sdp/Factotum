@@ -1,5 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.route
 
+import android.Manifest
 import android.location.Geocoder
 import android.os.Build
 import android.view.KeyEvent
@@ -15,6 +16,7 @@ import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.rule.GrantPermissionRule
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.ui.maps.RouteFragment.Companion.NO_RESULT
@@ -33,6 +35,11 @@ class RouteFragmentTest {
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
     )
+
+    @get:Rule
+    val permission = GrantPermissionRule.grant(
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION)
 
     private var decorView : View? = null
     @Before
@@ -126,4 +133,6 @@ class RouteFragmentTest {
         onView(withId(com.google.android.material.R.id.snackbar_text))
             .check(matches(withText(NO_RESULT)))
     }
+
+
 }

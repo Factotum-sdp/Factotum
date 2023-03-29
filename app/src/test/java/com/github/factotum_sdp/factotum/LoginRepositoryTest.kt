@@ -1,10 +1,6 @@
 package com.github.factotum_sdp.factotum
 
-import com.github.factotum_sdp.factotum.data.LoginDataSource
-import com.github.factotum_sdp.factotum.data.LoginRepository
-import com.github.factotum_sdp.factotum.data.LoggedInUser
-import com.github.factotum_sdp.factotum.data.Result
-import com.github.factotum_sdp.factotum.data.model.Role
+import com.github.factotum_sdp.factotum.data.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Assertions.*
@@ -29,7 +25,7 @@ class LoginRepositoryTest {
         val username = "Jane Doe"
         val useremail = "jane.doe@gmail.com"
         val password = "123456"
-        val fakeUser = LoggedInUser(username, useremail)
+        val fakeUser = LoggedInUser(username, useremail, Role.CLIENT)
 
         `when`(dataSource.login(useremail, password)).thenReturn(Result.Success(fakeUser))
 
@@ -39,7 +35,7 @@ class LoginRepositoryTest {
         // Then
         assertThat(result, `is`(instanceOf(Result.Success::class.java)))
         val user = (result as Result.Success).data
-        assertThat(user.name, `is`(equalTo(username)))
+        assertThat(user.displayName, `is`(equalTo(username)))
         assertTrue(repository.isLoggedIn)
         assertThat(repository.user, `is`(equalTo(fakeUser)))
     }

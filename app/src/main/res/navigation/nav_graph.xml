@@ -23,13 +23,22 @@
 
         <action
             android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/routeFragment" />
+            app:destination="@id/routeFragment"/>
     </fragment>
     <fragment
         android:id="@+id/roadBookFragment"
         android:name="com.github.factotum_sdp.factotum.ui.roadbook.RoadBookFragment"
         android:label="RoadBook"
-        tools:layout="@layout/fragment_roadbook" />
+        tools:layout="@layout/fragment_roadbook">
+        <action
+            android:id="@+id/action_roadBookFragment_to_DRecordDetailsFragment"
+            app:destination="@id/dRecordDetailsFragment"/>
+    </fragment>
+    <fragment
+        android:id="@+id/dRecordDetailsFragment"
+        android:name="com.github.factotum_sdp.factotum.ui.roadbook.DRecordDetailsFragment"
+        android:label="Record details"
+        tools:layout="@layout/fragment_drecord_details"/>
     <fragment
         android:id="@+id/pictureFragment"
         android:name="com.github.factotum_sdp.factotum.ui.picture.PictureFragment"

@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.app.TimePickerDialog
 import android.content.Context
 import android.content.DialogInterface
+import android.view.ContextThemeWrapper
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
@@ -29,7 +30,7 @@ import java.util.*
  *
  * Finally calling the inherited show() method will call create() and make the new custom concrete AlertDialog
  *
- * @param context: Context? The Context wherein this DialogBuilder is instanciated
+ * @param context: Context? The Context wherein this DialogBuilder is instanced
  * @param host: Fragment The Fragment which will hold the AlertDialog
  * @param rbViewModel: RoadBookViewModel The RoadBookViewModel storing the observable data of each DestinationRecord
  * @param rbRecyclerView: RecyclerView The RecyclerView as optimization to notify the screen representation when there is no edit changes,
@@ -40,7 +41,8 @@ import java.util.*
 class DRecordAlertDialogBuilder(context: Context?,
                                 private val host: Fragment,
                                 private val rbViewModel: RoadBookViewModel,
-                                private val rbRecyclerView: RecyclerView) : AlertDialog.Builder(context) {
+                                private val rbRecyclerView: RecyclerView) :
+    AlertDialog.Builder(ContextThemeWrapper(context, android.R.style.Theme_Holo_Dialog)) {
 
     private val clientIDView: AutoCompleteTextView
     private val timestampView: EditText

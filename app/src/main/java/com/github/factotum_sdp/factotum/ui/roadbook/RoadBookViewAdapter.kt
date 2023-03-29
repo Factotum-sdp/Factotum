@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -12,7 +13,6 @@ import com.github.factotum_sdp.factotum.data.DestinationRecord.Action
 import com.github.factotum_sdp.factotum.data.DestinationRecord
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.HashMap
 
 /**
  * Adapter for the RecyclerView which will display a dynamic list of DestinationRecord
@@ -37,7 +37,8 @@ class RoadBookViewAdapter : RecyclerView.Adapter<RoadBookViewAdapter.RecordViewH
     // Inflate a new view hierarchy according to fragment_destrecord.xml design
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecordViewHolder {
         val view =
-            LayoutInflater.from(parent.context)
+            LayoutInflater
+                .from(parent.context)
                 .inflate(R.layout.fragment_destrecord, parent, false)
         return RecordViewHolder(view)
     }
@@ -116,6 +117,12 @@ class RoadBookViewAdapter : RecyclerView.Adapter<RoadBookViewAdapter.RecordViewH
         val waitingTime: TextView = itemView.findViewById(R.id.waiting_time)
         val rate: TextView = itemView.findViewById(R.id.rate)
         val actions: TextView = itemView.findViewById(R.id.dest_actions)
-    }
 
+        init {
+            itemView.setOnClickListener {
+                val navController = it.findNavController()
+                navController.navigate(R.id.action_roadBookFragment_to_DRecordDetailsFragment)
+            }
+        }
+    }
 }

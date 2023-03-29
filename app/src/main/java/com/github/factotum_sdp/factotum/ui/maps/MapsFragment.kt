@@ -29,8 +29,6 @@ class MapsFragment : Fragment() {
         private val EPFL_LOC = LatLng(46.520536, 6.568318)
         private const val ZOOM_PADDING = 100
         private const val minZoom = 6.0f
-        private const val maxZoom = 14.0f
-
     }
 
     private var _binding: FragmentMapsBinding? = null
@@ -97,7 +95,6 @@ class MapsFragment : Fragment() {
 
         // Sets zoom preferences
         googleMap.setMinZoomPreference(minZoom)
-        googleMap.setMaxZoomPreference(maxZoom)
     }
 
     private fun placeMarkers(routes: LiveData<List<Route>>, googleMap: GoogleMap) {

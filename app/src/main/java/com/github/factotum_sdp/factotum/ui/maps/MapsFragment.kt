@@ -69,26 +69,35 @@ class MapsFragment : Fragment() {
         mapFragment.getMapAsync { googleMap ->
             mMap = googleMap
 
-            if (!checkAndActivateLocation()){
-                requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-            }
-            googleMap.uiSettings.isMyLocationButtonEnabled = true
-            // clears map from previous markers
-            googleMap.clear()
+            initMapLocation(googleMap)
 
-            // places markers on the map and centers the camera
-            placeMarkers(viewModel.routesState, googleMap)
-
-            // Add zoom controls to the map
-            googleMap.uiSettings.isZoomControlsEnabled = true
-
-            // Add zoom gestures to the map
-            googleMap.uiSettings.isZoomGesturesEnabled = true
-
-            // Sets zoom preferences
-            googleMap.setMinZoomPreference(minZoom)
-            googleMap.setMaxZoomPreference(maxZoom)
+            initMapUI(googleMap)
         }
+    }
+
+    private fun initMapLocation(googleMap: GoogleMap){
+        if (!checkAndActivateLocation()){
+            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+        googleMap.uiSettings.isMyLocationButtonEnabled = true
+    }
+
+    private fun initMapUI(googleMap: GoogleMap){
+        // clears map from previous markers
+        googleMap.clear()
+
+        // places markers on the map and centers the camera
+        placeMarkers(viewModel.routesState, googleMap)
+
+        // Add zoom controls to the map
+        googleMap.uiSettings.isZoomControlsEnabled = true
+
+        // Add zoom gestures to the map
+        googleMap.uiSettings.isZoomGesturesEnabled = true
+
+        // Sets zoom preferences
+        googleMap.setMinZoomPreference(minZoom)
+        googleMap.setMaxZoomPreference(maxZoom)
     }
 
     private fun placeMarkers(routes: LiveData<List<Route>>, googleMap: GoogleMap) {

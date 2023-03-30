@@ -3,8 +3,8 @@
     <string name="title_activity_maps">Map with Marker</string>
     <string name="title_activity_basic">BasicActivity</string>
     <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
+    <string name="routes_fragment_label">Routes</string>
+    <string name="maps_fragment_label">Maps</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
@@ -30,7 +30,7 @@
     <string name="fab_add_description">add_floating_button</string>
     <string name="snap_text_record_added">Record added</string>
     <string name="del_button_text">Del</string>
-    <string name="snap_text_on_rec_delete">Last record deleted</string>
+    <string name="snap_text_on_rec_delete">Record deleted</string>
     <string name="temp_delete_action_button">temp_delete_action_button</string>
     <string name="menu_maps">Maps</string>
     <string name="run">Run</string>
@@ -75,11 +75,23 @@
     <string name="file_provider">"com.github.factotum_sdp.factotum.file-provider"</string>
     <string name="camera_permission_not_granted">Permission needed to take a photo</string>
 
-    <string name="rbLabelSwipeEdition">SwipeEditon</string>
-    <string name="rbLabelDragDrop"><![CDATA[Drag&Drop]]></string>
-    <string name="editDialogTitle">Edit destination ID :</string>
-    <string name="editDialogCancelB">cancel</string>
-    <string name="editDialogUpdateB">update</string>
+    <string name="rb_label_swiper_edition">SwipeR Editon</string>
+    <string name="rb_label_dragdrop"><![CDATA[Drag&Drop]]></string>
+    <string name="edit_dialog_cancel_b">cancel</string>
+    <string name="edit_dialog_update_b">update</string>
     <string name="menu_view_proof_picture">View Proof Pictures</string>
     <string name="refresh">Refresh</string>
+    <string name="hint_dialog_client_id">Client ID</string>
+    <string name="hint_dialog_timestamp">Timestamp</string>
+    <string name="hint_dialog_waiting_time">Waiting time</string>
+    <string name="hint_dialog_rate">Rate</string>
+    <string name="hint_dialog_actions">Actions</string>
+    <string name="hint_dialog_notes">Notes</string>
+    <string name="rb_label_swipel_deletion">SwipeL Deletion</string>
+    <string name="delete_confirm_button_label">Confirm</string>
+    <string name="delete_cancel_button_label">Cancel</string>
+    <string name="delete_dialog_title">Delete the swiped record ?</string>
+    <string name="edit_rejected_snap_label">Wrong format. Edition canceled</string>
+    <string name="edit_confirmed_snap_label">Record edited</string>
+    <string name="share">Share</string>
 </resources>

@@ -4,6 +4,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.placeholder.ContactsList
+import com.github.factotum_sdp.factotum.utils.ContactsUtils
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -38,7 +39,7 @@ class ContactsListOnlineTest {
         @AfterClass
         @JvmStatic
         fun emptyDatabase() {
-            emptyFirebaseDatabase(database)
+            ContactsUtils.emptyFirebaseDatabase(database)
         }
     }
 

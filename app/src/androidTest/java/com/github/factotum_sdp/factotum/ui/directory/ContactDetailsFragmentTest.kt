@@ -12,6 +12,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.ContactsList
+import com.github.factotum_sdp.factotum.utils.ContactsUtils
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.runBlocking
@@ -34,7 +35,7 @@ class ContactDetailsFragmentTest {
             database.useEmulator("10.0.2.2", 9000)
             MainActivity.setDatabase(database)
 
-            emptyFirebaseDatabase(database)
+            ContactsUtils.emptyFirebaseDatabase(database)
 
             ContactsList.init(database)
 

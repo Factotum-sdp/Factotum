@@ -96,7 +96,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
         val rbSR = menu.findItem(R.id.rbSwipeREdition)
         val rbTC = menu.findItem(R.id.rbTouchClick)
 
-
         // fetch saved States
         fetchRadioButtonState(DRAG_N_DROP_SHARED_KEY, rbDD)
         fetchRadioButtonState(SWIPE_L_SHARED_KEY, rbSL)
@@ -109,6 +108,15 @@ class RoadBookFragment : Fragment(), MenuProvider {
         isSREnabled = rbSR.isChecked
         isTClickEnabled = rbTC.isChecked
 
+        setRBonClickListeners(rbDD, rbSL, rbSR, rbTC)
+
+        // Only at menu initialization
+        val itemTouchHelper = ItemTouchHelper(newItemTHCallBack())
+        itemTouchHelper.attachToRecyclerView(rbRecyclerView)
+    }
+
+    private fun setRBonClickListeners(rbDD: MenuItem, rbSL: MenuItem,
+                                      rbSR: MenuItem, rbTC: MenuItem) {
         rbDD.setOnMenuItemClickListener {
             it.isChecked = !it.isChecked
             isDDropEnabled = !isDDropEnabled
@@ -129,10 +137,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
             isTClickEnabled = !isTClickEnabled
             true
         }
-
-        // Only at menu initialization
-        val itemTouchHelper = ItemTouchHelper(newItemTHCallBack())
-        itemTouchHelper.attachToRecyclerView(rbRecyclerView)
     }
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         // Needed to have the onSupportNavigateUp() called

@@ -1,5 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
+import android.content.Context
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider
@@ -23,6 +24,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import org.hamcrest.CoreMatchers.startsWith
 import org.junit.Before
+import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -33,13 +35,41 @@ import java.util.concurrent.CompletableFuture
 
 @RunWith(AndroidJUnit4::class)
 class RoadBookFragmentTest {
+
     @get:Rule
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
     )
 
+    companion object {
+        private const val SWIPE_L_SHARED_KEY = "SwipeLeftButton"
+        private const val SWIPE_R_SHARED_KEY = "SwipeRightButton"
+        private const val DRAG_N_DROP_SHARED_KEY = "DragNDropButton"
+        private const val TOUCH_CLICK_SHARED_KEY = "TouchClickButton"
+
+        @BeforeClass
+        @JvmStatic
+        fun setUpDatabase() {
+            val database = Firebase.database
+            //database.useEmulator("10.0.2.2", 9000)
+            MainActivity.setDatabase(database)
+        }
+    }
+    private fun setPrefs(sharedKey: String, activity: MainActivity, value: Boolean) {
+        val sp = activity.getSharedPreferences(sharedKey, Context.MODE_PRIVATE)
+        val edit = sp.edit()
+        edit.putBoolean(sharedKey, value)
+        edit.apply()
+    }
+
     @Before
     fun toRoadBookFragment() {
+        testRule.scenario.onActivity {
+            setPrefs(SWIPE_L_SHARED_KEY, it, true)
+            setPrefs(SWIPE_R_SHARED_KEY, it, true)
+            setPrefs(DRAG_N_DROP_SHARED_KEY, it, true)
+            setPrefs(TOUCH_CLICK_SHARED_KEY, it, false)
+        }
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))
@@ -78,7 +108,7 @@ class RoadBookFragmentTest {
 
     @Test
     fun swipeLeftDeleteRecord() {
-        // Record just added is displayed at the end of the list
+        // Record is there
         onView((withText(DestinationRecords.RECORDS[2].destID)))
             .check(matches(isDisplayed()))
 
@@ -148,11 +178,10 @@ class RoadBookFragmentTest {
     // ============================================================================================
     // ================================== Update to Database Tests ================================
 
-    private val db = Firebase.database.reference
     @Test
     fun roadBookIsBackedUpCorrectly() {
         val date = Calendar.getInstance().time
-        val ref = db
+        val ref = MainActivity.getDatabase().reference
             .child("Sheet-shift")
             .child(SimpleDateFormat.getDateInstance().format(date))
 
@@ -162,9 +191,9 @@ class RoadBookFragmentTest {
         // Navigate out of the RoadBookFragment
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
-        onView(withId(R.id.directoryFragment))
+        onView(withId(R.id.routeFragment))
             .perform(click())
-        onView(withId(R.id.fragment_directory_directors_parent))
+        onView(withId(R.id.fragment_route_directors_parent))
             .check(matches(isDisplayed()))
 
         // Our target value to fetch
@@ -340,6 +369,149 @@ class RoadBookFragmentTest {
         Thread.sleep(4000) // This one is needed to let the Screen enough time to be updated
         onView(withText("X17#1")).check(isCompletelyBelow(withText("More#1")))
     }
+
+    // ============================================================================================
+    // ================================= OptionMenu RB settings ===================================
+
+    @Test
+    fun rbSwipeLeftCorrectlyDisableDeletion() {
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_swipel_deletion)).perform(click())
+        swipeLeftTheRecordAt(2)
+        onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
+    }
+
+    @Test
+    fun rbSwipeRightCorrectlyDisableEdition() {
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_swiper_edition)).perform(click())
+        swipeRightTheRecordAt(2)
+        onView(withText(R.string.edit_dialog_update_b)).check(doesNotExist())
+        onView(withText(R.string.edit_dialog_cancel_b)).check(doesNotExist())
+    }
+
+    @Test
+    fun rbDragNDrop() { // Still can't test the drag & drop touch action
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_swiper_edition)).perform(click())
+    }
+
+    @Test
+    fun rbTouchClickCorrectlyDisableNavigation() {
+        // Disabled in sharedPref by setUp() @before routine
+        onView(withText(DestinationRecords.RECORDS[2].destID)).perform(click())
+        onView(withId(R.id.fragment_drecord_details_directors_parent)).check(doesNotExist())
+
+        // Check two times to disable it during a Fragment's LifeCycle
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_touch_click)).perform(click())
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_touch_click)).perform(click())
+
+        // Check it is still disabled
+        onView(withText(DestinationRecords.RECORDS[2].destID)).perform(click())
+        onView(withId(R.id.fragment_drecord_details_directors_parent)).check(doesNotExist())
+    }
+
+    @Test
+    fun rbSLeftEnabledAgainWorks() {
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_swipel_deletion)).perform(click())
+        swipeLeftTheRecordAt(2)
+        onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
+
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_swipel_deletion)).perform(click())
+        swipeLeftTheRecordAt(2)
+        onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
+    }
+    @Test
+    fun rbSwipeREnabledAgainWorks() {
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_swiper_edition)).perform(click())
+        swipeRightTheRecordAt(2)
+        onView(withText(R.string.edit_dialog_update_b)).check(doesNotExist())
+        onView(withText(R.string.edit_dialog_cancel_b)).check(doesNotExist())
+
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_swiper_edition)).perform(click())
+        swipeRightTheRecordAt(2)
+        onView(withText(R.string.edit_dialog_update_b)).check(matches(isDisplayed()))
+        onView(withText(R.string.edit_dialog_cancel_b)).check(matches(isDisplayed()))
+    }
+    @Test
+    fun rbDragNDropEnabledAgainWorks() { // Still can't test the drag & drop touch action
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_swiper_edition)).perform(click())
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_swiper_edition)).perform(click())
+    }
+
+    // Check that moving somewhere else in the app keep the sharedPref alive.
+    @Test
+    fun movingOutsideRBFragmentKeepsButtonStates() {
+        // Set some states :
+        // Turn SwipeLeft disabled
+        // Keep SwipeRight, DragNDrop enabled and Touch Navigation disabled
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_swipel_deletion)).perform(click())
+
+        // Check features :
+        // Swipe Left disabled
+        swipeLeftTheRecordAt(2)
+        onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
+
+        // SwipeRight enabled
+        swipeRightTheRecordAt(2)
+        onView(withText(R.string.edit_dialog_update_b)).check(matches(isDisplayed()))
+        onView(withText(R.string.edit_dialog_cancel_b)).check(matches(isDisplayed()))
+        onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
+
+        // Navigation on Click disabled
+        onView(withText(DestinationRecords.RECORDS[2].destID)).perform(click())
+        onView(withId(R.id.fragment_drecord_details_directors_parent)).check(doesNotExist())
+
+        // Navigate outside and come back
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.routeFragment))
+            .perform(click())
+        onView(withId(R.id.fragment_route_directors_parent))
+            .check(matches(isDisplayed()))
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.roadBookFragment))
+            .perform(click())
+
+        // Check features again :
+        // Swipe Left disabled
+        swipeLeftTheRecordAt(2)
+        onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
+
+        // SwipeRight enabled
+        swipeRightTheRecordAt(2)
+        onView(withText(R.string.edit_dialog_update_b)).check(matches(isDisplayed()))
+        onView(withText(R.string.edit_dialog_cancel_b)).check(matches(isDisplayed()))
+        onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
+
+        // Navigation on Click disabled
+        onView(withText(DestinationRecords.RECORDS[2].destID)).perform(click())
+        onView(withId(R.id.fragment_drecord_details_directors_parent)).check(doesNotExist())
+    }
+
+
+    // ============================================================================================
+    // ================================= Navigation to DRecordDetails =============================
+
+    @Test
+    fun clickingOnADestRecordLeadsToADRecordDetailsFragment() {
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_touch_click)).perform(click())
+        onView(withText(DestinationRecords.RECORDS[2].destID)).perform(click())
+        onView(withId(R.id.fragment_drecord_details_directors_parent)).check(matches(isDisplayed()))
+    }
+
+
 
     // ============================================================================================
     // ===================================== Helpers ==============================================

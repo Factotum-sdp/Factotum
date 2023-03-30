@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group
+        android:checkableBehavior="all"
+        android:menuCategory="alternative">
+        <item
+            android:id="@+id/rbDragDrop"
+            android:title="@string/rb_label_dragdrop" />
+        <item
+            android:id="@+id/rbSwipeLDeletion"
+            android:title="@string/rb_label_swipel_deletion" />
+        <item
+            android:id="@+id/rbSwipeREdition"
+            android:title="@string/rb_label_swiper_edition" />
+        <item
+            android:id="@+id/rbTouchClick"
+            android:title="@string/rb_label_touch_click" />
+    </group>
 </menu>
+

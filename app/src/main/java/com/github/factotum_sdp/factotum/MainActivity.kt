@@ -23,6 +23,7 @@ import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.FirebaseApp
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
@@ -36,7 +37,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        db = Firebase.database.reference
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.appBarMain.toolbar)
@@ -104,6 +104,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
     private fun listenLogoutButton() {
         binding.navView.menu.findItem(R.id.signoutButton).setOnMenuItemClickListener {
             auth.signOut()
@@ -115,5 +116,16 @@ class MainActivity : AppCompatActivity() {
 
     fun getDatabaseRef(): DatabaseReference {
         return db
+        
+    companion object {
+        private var database: FirebaseDatabase = Firebase.database
+        fun getDatabase(): FirebaseDatabase {
+            return database
+        }
+
+        fun setDatabase(database: FirebaseDatabase) {
+            this.database = database
+        }
     }
+
 }

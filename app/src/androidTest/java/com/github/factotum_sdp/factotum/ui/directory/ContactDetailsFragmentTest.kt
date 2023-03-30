@@ -12,7 +12,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.ContactsList
+import com.github.factotum_sdp.factotum.utils.ContactsUtils
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
+import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,6 +26,24 @@ import org.junit.runner.RunWith
 class ContactDetailsFragmentTest {
     @get:Rule
     var activityRule = ActivityScenarioRule(MainActivity::class.java)
+
+    companion object {
+        @BeforeClass
+        @JvmStatic
+        fun setUpDatabase() {
+            val database = Firebase.database
+            database.useEmulator("10.0.2.2", 9000)
+            MainActivity.setDatabase(database)
+
+            ContactsUtils.emptyFirebaseDatabase(database)
+
+            ContactsList.init(database)
+
+            runBlocking {
+                ContactsList.populateDatabase()
+            }
+        }
+    }
 
     @Before
     fun goToContactDetails() {
@@ -47,16 +70,16 @@ class ContactDetailsFragmentTest {
     @Test
     fun correctInfoIsDisplayed() {
         onView(withId(R.id.contact_name))
-            .check(matches(withText(ContactsList.ITEMS[0].name)))
+            .check(matches(withText(ContactsList.contacts[0].name)))
         onView(withId(R.id.contact_phone))
-            .check(matches(withText(ContactsList.ITEMS[0].phone)))
+            .check(matches(withText(ContactsList.contacts[0].phone)))
         onView(withId(R.id.contact_role))
-            .check(matches(withText(ContactsList.ITEMS[0].role)))
+            .check(matches(withText(ContactsList.contacts[0].role)))
         onView(withId(R.id.contact_address))
-            .check(matches(withText(ContactsList.ITEMS[0].address)))
-        if (ContactsList.ITEMS[0].details != null) {
+            .check(matches(withText(ContactsList.contacts[0].address)))
+        if (ContactsList.contacts[0].details != null) {
             onView(withId(R.id.contact_details))
-                .check(matches(withText(ContactsList.ITEMS[0].details)))
+                .check(matches(withText(ContactsList.contacts[0].details)))
         }
     }
 

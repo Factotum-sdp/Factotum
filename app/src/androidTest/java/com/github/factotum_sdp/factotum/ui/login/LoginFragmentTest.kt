@@ -34,13 +34,25 @@ class LoginFragmentTest {
         onView(withId(R.id.login)).check(matches(not(isEnabled())))
     }
 
+    @Test
     fun correctUserEntryLeadsToRoadBook() {
         onView(withId(R.id.username)).perform(typeText("jane.doe@gmail.com"))
         closeSoftKeyboard()
         onView(withId(R.id.password)).perform(typeText("123456"))
         closeSoftKeyboard()
         onView(withId(R.id.login)).perform(click())
+        Thread.sleep(10000)
         onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun incorrectUserEntryLeadsToFailedLogin() {
+        onView(withId(R.id.username)).perform(typeText("jane.doe@gmail.com"))
+        closeSoftKeyboard()
+        onView(withId(R.id.password)).perform(typeText("12345678"))
+        closeSoftKeyboard()
+        onView(withId(R.id.login)).perform(click())
+        onView(withId(R.id.fragment_login_directors_parent)).check(matches(isDisplayed()))
     }
 
     @Test

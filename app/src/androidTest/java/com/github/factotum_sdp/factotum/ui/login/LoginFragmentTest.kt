@@ -41,7 +41,6 @@ class LoginFragmentTest {
         closeSoftKeyboard()
         onView(withId(R.id.password)).perform(typeText("123456"))
         closeSoftKeyboard()
-        Thread.sleep(10000)
         onView(withId(R.id.login)).perform(click())
 
         FirebaseAuth.AuthStateListener { firebaseAuth ->
@@ -57,7 +56,6 @@ class LoginFragmentTest {
         closeSoftKeyboard()
         onView(withId(R.id.password)).perform(typeText("12345678"))
         closeSoftKeyboard()
-        Thread.sleep(10000)
         onView(withId(R.id.login)).perform(click())
         FirebaseAuth.AuthStateListener { firebaseAuth ->
             if (firebaseAuth.currentUser == null) {

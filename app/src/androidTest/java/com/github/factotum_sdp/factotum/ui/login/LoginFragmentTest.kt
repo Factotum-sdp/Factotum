@@ -38,9 +38,14 @@ class LoginFragmentTest {
     @Test
     fun correctUserEntryLeadsToRoadBook() {
         onView(withId(R.id.username)).perform(typeText("jane.doe@gmail.com"))
-        closeSoftKeyboard()
+        onView(withId(R.id.fragment_login_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
         onView(withId(R.id.password)).perform(typeText("123456"))
-        closeSoftKeyboard()
+        //close soft keyboard in fragment
+        onView(withId(R.id.fragment_login_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
         onView(withId(R.id.login)).perform(click())
 
         FirebaseAuth.AuthStateListener { firebaseAuth ->
@@ -53,9 +58,13 @@ class LoginFragmentTest {
     @Test
     fun incorrectUserEntryLeadsToFailedLogin() {
         onView(withId(R.id.username)).perform(typeText("jane.doe@gmail.com"))
-        closeSoftKeyboard()
+        onView(withId(R.id.fragment_login_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
         onView(withId(R.id.password)).perform(typeText("12345678"))
-        closeSoftKeyboard()
+        onView(withId(R.id.fragment_login_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
         onView(withId(R.id.login)).perform(click())
         FirebaseAuth.AuthStateListener { firebaseAuth ->
             if (firebaseAuth.currentUser == null) {

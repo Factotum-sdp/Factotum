@@ -72,7 +72,7 @@ class ContactsListOnlineTest {
         // Then, synchronize the contacts list with Firebase
         ContactsList.syncContactsFromFirebase(ApplicationProvider.getApplicationContext())
         // Now, check if the local contacts list is not empty
-        assert(ContactsList.contacts.isNotEmpty())
+        assert(ContactsList.getItems().isNotEmpty())
     }
 
 }

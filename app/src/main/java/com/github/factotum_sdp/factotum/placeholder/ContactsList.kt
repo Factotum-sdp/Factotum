@@ -23,11 +23,10 @@ object ContactsList {
     /**
      * An array of sample contacts.
      */
-    private val ITEMS: MutableList<Contact> = ArrayList()
-    val contacts = mutableListOf<Contact>()
+    private val contacts = mutableListOf<Contact>()
     private val randomContacts = mutableListOf<Contact>()
     private lateinit var dataSource: FirebaseDatabase
-    val size get() = contacts.size
+    val size get() = this.contacts.size
 
     fun init(dataSource: FirebaseDatabase) {
         this.dataSource = dataSource
@@ -47,7 +46,12 @@ object ContactsList {
 
 
     fun getItems(): List<Contact> {
-        return ITEMS
+        return this.contacts
+    }
+
+    fun setItems(items: List<Contact>) {
+        this.contacts.clear()
+        this.contacts.addAll(items)
     }
 
     //Trivial method for now but will be useful when connecting to database
@@ -85,7 +89,7 @@ object ContactsList {
         val gson = Gson()
 
         // Serialize the contacts list into a JSON string
-        val jsonContacts = gson.toJson(contacts)
+        val jsonContacts = gson.toJson(this.contacts)
 
         // Save the JSON string into SharedPreferences with the key CONTACTS_KEY
         editor.putString(CONTACTS_KEY, jsonContacts)
@@ -114,10 +118,10 @@ object ContactsList {
             val type = object : TypeToken<List<Contact>>() {}.type
 
             // Clear the current contacts list
-            contacts.clear()
+            this.contacts.clear()
 
             // Deserialize the JSON string and add the contacts to the list
-            contacts.addAll(gson.fromJson(jsonContacts, type))
+            this.contacts.addAll(gson.fromJson(jsonContacts, type))
         }
     }
 
@@ -142,7 +146,7 @@ object ContactsList {
         return object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 // Clear the current contacts list
-                contacts.clear()
+                this@ContactsList.contacts.clear()
 
                 // Iterate through each child (contact) in dataSnapshot
                 for (contactSnapshot in dataSnapshot.children) {
@@ -151,7 +155,7 @@ object ContactsList {
 
                     // Check if the contact is not null and add it to the contacts list
                     if (contact != null) {
-                        contacts.add(contact)
+                        this@ContactsList.contacts.add(contact)
                     }
                 }
 

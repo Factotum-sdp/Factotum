@@ -2,12 +2,12 @@ package com.github.factotum_sdp.factotum.ui.directory
 
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.RecyclerViewActions
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.contrib.RecyclerViewActions.scrollToHolder
+import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
@@ -102,4 +102,16 @@ class DirectoryFragmentTest {
             Thread.sleep(_waitForAnimation)
         }
     }
+
+    @Test
+    fun correctContactsShownWithMatchingQuery() {
+        // Type a search query in the search view and close the soft keyboard
+        onView(withId(R.id.contacts_search_view))
+            .perform(typeText("John"), closeSoftKeyboard())
+
+        // Check if the expected contact is visible in the RecyclerView
+        onView(withId(R.id.contacts_recycler_view))
+            .perform(scrollToHolder(ContactsUtils.withHolderContactName("John Smith")))
+    }
+
 }

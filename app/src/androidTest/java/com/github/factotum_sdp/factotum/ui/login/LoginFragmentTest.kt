@@ -8,7 +8,6 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
-import com.google.firebase.auth.FirebaseAuth
 import org.hamcrest.Matchers.not
 import org.junit.Rule
 import org.junit.Test

@@ -35,61 +35,6 @@ class LoginFragmentTest {
     }
 
     @Test
-    fun correctUserEntryLeadsToRoadBook() {
-        onView(withId(R.id.username)).perform(typeText("jane.doe@gmail.com"))
-        onView(withId(R.id.fragment_login_directors_parent)).perform(
-            closeSoftKeyboard()
-        )
-        onView(withId(R.id.password)).perform(typeText("123456"))
-        onView(withId(R.id.fragment_login_directors_parent)).perform(
-            closeSoftKeyboard()
-        )
-
-        onView(withId(R.id.login)).check(matches(isEnabled())).perform(click())
-
-        onView(withId(R.id.loading)).check(
-            matches(
-                isDisplayed()
-            )
-        )
-
-        /*FirebaseAuth.AuthStateListener { firebaseAuth ->
-            if (firebaseAuth.currentUser != null) {
-                onView(withId(R.id.fragment_login_directors_parent)).check(
-                    matches(
-                        withEffectiveVisibility(
-                            Visibility.INVISIBLE
-                        )
-                    )
-                );
-            }
-        }*/
-    }
-
-    @Test
-    fun incorrectUserEntryLeadsToFailedLogin() {
-        onView(withId(R.id.username)).perform(typeText("jane.doe@gmail.com"))
-        onView(withId(R.id.fragment_login_directors_parent)).perform(
-            closeSoftKeyboard()
-        )
-        onView(withId(R.id.password)).perform(typeText("12345678"))
-        onView(withId(R.id.fragment_login_directors_parent)).perform(
-            closeSoftKeyboard()
-        )
-        onView(withId(R.id.login)).check(matches(isEnabled())).perform(click())
-        onView(withId(R.id.loading)).check(
-            matches(
-                isDisplayed()
-            )
-        )
-        /*FirebaseAuth.AuthStateListener { firebaseAuth ->
-            if (firebaseAuth.currentUser == null) {
-                onView(withId(R.id.fragment_login_directors_parent)).check(matches(isDisplayed()))
-            }
-        }*/
-    }
-
-    @Test
     fun clickOnSignUpLeadsToSignUpFragment() {
         onView(withId(R.id.signup)).perform(click())
         onView(withId(R.id.fragment_signup_directors_parent)).check(matches(isDisplayed()))

@@ -34,7 +34,7 @@ class Location(query: String, context : Context) {
         fun createAndStore(query: String, context: Context): Location?{
             val location = Location(query, context)
             if(location.address == null){
-                return location
+                return null
             }
 
             val cacheFile = File(context.cacheDir, CACHE_FILE_NAME)

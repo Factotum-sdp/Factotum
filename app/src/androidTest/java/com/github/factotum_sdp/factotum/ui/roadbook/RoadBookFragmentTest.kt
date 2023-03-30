@@ -23,6 +23,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import org.hamcrest.CoreMatchers.startsWith
 import org.junit.Before
+import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,6 +38,17 @@ class RoadBookFragmentTest {
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
     )
+
+    companion object {
+        @BeforeClass
+        @JvmStatic
+        fun setUpDatabase() {
+            val database = Firebase.database
+            //database.useEmulator("10.0.2.2", 9000)
+            MainActivity.setDatabase(database)
+        }
+    }
+
 
     @Before
     fun toRoadBookFragment() {
@@ -148,11 +160,10 @@ class RoadBookFragmentTest {
     // ============================================================================================
     // ================================== Update to Database Tests ================================
 
-    private val db = Firebase.database.reference
     @Test
     fun roadBookIsBackedUpCorrectly() {
         val date = Calendar.getInstance().time
-        val ref = db
+        val ref = MainActivity.getDatabase().reference
             .child("Sheet-shift")
             .child(SimpleDateFormat.getDateInstance().format(date))
 
@@ -162,9 +173,9 @@ class RoadBookFragmentTest {
         // Navigate out of the RoadBookFragment
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
-        onView(withId(R.id.directoryFragment))
+        onView(withId(R.id.routeFragment))
             .perform(click())
-        onView(withId(R.id.fragment_directory_directors_parent))
+        onView(withId(R.id.fragment_route_directors_parent))
             .check(matches(isDisplayed()))
 
         // Our target value to fetch

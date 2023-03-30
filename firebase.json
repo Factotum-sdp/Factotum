@@ -1,5 +1,25 @@
 {
   "storage": {
     "rules": "storage.rules"
+  },
+  "emulators": {
+    "firestore": {
+      "port": 8080
+    },
+    "database": [
+      {
+        "port": 9000
+      },
+      {
+        "port": 9001
+      }
+    ],
+    "storage": {
+      "port": 9199
+    },
+    "ui": {
+      "enabled": true
+    },
+    "singleProjectMode": true
   }
 }

@@ -1,7 +1,5 @@
 package com.github.factotum_sdp.factotum.data
 
-import android.util.Log
-import com.github.factotum_sdp.factotum.MainActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -19,26 +17,7 @@ class LoginDataSource {
     fun login(userEmail: String, password: String): Result<LoggedInUser> {
         val authResultFuture = CompletableFuture<Result<LoggedInUser>>()
 
-        var roles: Map<String, Role> = mapOf()
-
-        dbRef.child("profile-dispatch").get().addOnSuccessListener {
-            val profiles = it.value as List<*>
-            roles = profiles.associate { profile ->
-                val profileMap = profile as Map<*, *>
-                val email = profileMap["email"] as String
-                val role = Role.valueOf(profileMap["role"] as String)
-                email to role
-            }
-        }.addOnFailureListener {
-            authResultFuture.complete(
-                Result.Error(
-                    IOException(
-                        "Error fetching profiles",
-                        it
-                    )
-                )
-            )
-        }
+        val roles = retrieveRoles(authResultFuture)
 
         auth.signInWithEmailAndPassword(userEmail, password)
             .addOnCompleteListener { authTask ->
@@ -63,6 +42,29 @@ class LoginDataSource {
             }
 
         return authResultFuture.get()
+    }
+
+    private fun retrieveRoles(authResultFuture: CompletableFuture<Result<LoggedInUser>>): Map<String, Role> {
+        var roles: Map<String, Role> = mapOf()
+        dbRef.child("profile-dispatch").get().addOnSuccessListener {
+            val profiles = it.value as List<*>
+            roles = profiles.associate { profile ->
+                val profileMap = profile as Map<*, *>
+                val email = profileMap["email"] as String
+                val role = Role.valueOf(profileMap["role"] as String)
+                email to role
+            }
+        }.addOnFailureListener {
+            authResultFuture.complete(
+                Result.Error(
+                    IOException(
+                        "Error fetching profiles",
+                        it
+                    )
+                )
+            )
+        }
+        return roles
     }
 
 }

@@ -1,5 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,7 +19,7 @@ import java.util.*
  * Adapter for the RecyclerView which will display a dynamic list of DestinationRecord
  * Choice of the RecyclerView instead of a ListAdapter for later facilities with drageNdrop
  */
-class RoadBookViewAdapter(private val onItemViewHolderL: View.OnClickListener?) :
+class RoadBookViewAdapter(private val onItemViewHolderLFromClientId: (Int) -> View.OnClickListener?) :
     RecyclerView.Adapter<RoadBookViewAdapter.RecordViewHolder>() {
 
     // Call back needed to instantiate the async list attribute
@@ -54,6 +55,7 @@ class RoadBookViewAdapter(private val onItemViewHolderL: View.OnClickListener?) 
     // Bind each displayed Record to the corresponding current async list slot
     override fun onBindViewHolder(holder: RecordViewHolder, position: Int) {
         val item = asyncList.currentList[position]
+        val itemView = holder.itemView
         val context = holder.itemView.context
 
         // Format and bind the TextViews
@@ -66,6 +68,8 @@ class RoadBookViewAdapter(private val onItemViewHolderL: View.OnClickListener?) 
             rateStringFormat(item.rate, context.getString(R.string.rate_text_view))
         holder.actions.text =
             actionsStringFormat(item.actions, context.getString(R.string.actions_text_view))
+
+        itemView.setOnClickListener(onItemViewHolderLFromClientId(position))
     }
 
     private fun rateStringFormat(rate: Int, label: String): String {
@@ -116,9 +120,5 @@ class RoadBookViewAdapter(private val onItemViewHolderL: View.OnClickListener?) 
         val waitingTime: TextView = itemView.findViewById(R.id.waiting_time)
         val rate: TextView = itemView.findViewById(R.id.rate)
         val actions: TextView = itemView.findViewById(R.id.dest_actions)
-
-        init {
-            itemView.setOnClickListener(onItemViewHolderL)
-        }
     }
 }

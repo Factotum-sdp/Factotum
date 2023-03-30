@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
@@ -21,9 +22,11 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
  */
 class RoadBookFragment : Fragment(), MenuProvider {
 
-    private lateinit var rbViewModel: RoadBookViewModel
     private lateinit var rbRecyclerView: RecyclerView
     private lateinit var fragMenu: Menu
+    private val rbViewModel: RoadBookViewModel by activityViewModels() {
+        RoadBookViewModel.RoadBookViewModelFactory((activity as MainActivity).getDatabaseRef().child(ROADBOOK_DB_PATH))
+    }
 
     // Checked OptionMenu States with default values
     // overridden by the device saved SharedPreference
@@ -38,9 +41,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
         val view = inflater.inflate(R.layout.fragment_roadbook, container, false)
         val adapter = RoadBookViewAdapter(setOnDRecordClickListener())
-        val dbRef = (activity as MainActivity).getDatabaseRef().child(ROADBOOK_DB_PATH)
-        val rbFact = RoadBookViewModel.RoadBookViewModelFactory(dbRef)
-        rbViewModel = ViewModelProvider(this, rbFact)[RoadBookViewModel::class.java]
 
         // Observe the roadbook ViewModel, to detect data changes
         // and update the displayed RecyclerView accordingly
@@ -63,12 +63,18 @@ class RoadBookFragment : Fragment(), MenuProvider {
         super.onPause()
     }
 
-    private fun setOnDRecordClickListener(): View.OnClickListener {
-        return View.OnClickListener { v ->
-            if(isTClickEnabled) {
-                v
-                    ?.findNavController()
-                    ?.navigate(R.id.action_roadBookFragment_to_DRecordDetailsFragment)
+    private fun setOnDRecordClickListener(): (Int) -> View.OnClickListener {
+        return {
+            View.OnClickListener { v ->
+                if(isTClickEnabled) {
+                    v
+                        ?.findNavController()
+                        ?.navigate(R.id.action_roadBookFragment_to_DRecordDetailsFragment,
+                            Bundle().apply {
+                                putInt("RecPos", it)
+                            }
+                        )
+                }
             }
         }
     }

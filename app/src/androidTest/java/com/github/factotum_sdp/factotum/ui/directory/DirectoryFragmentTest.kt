@@ -16,6 +16,7 @@ import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.ContactsList
+import com.github.factotum_sdp.factotum.utils.ContactsUtils
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import junit.framework.TestCase.assertTrue
@@ -43,7 +44,7 @@ class DirectoryFragmentTest {
             database.useEmulator("10.0.2.2", 9000)
             MainActivity.setDatabase(database)
 
-            emptyFirebaseDatabase(database)
+            ContactsUtils.emptyFirebaseDatabase(database)
 
             ContactsList.init(database)
 

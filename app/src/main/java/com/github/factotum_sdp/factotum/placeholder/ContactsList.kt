@@ -21,7 +21,7 @@ private const val CONTACTS_KEY = "contacts_key"
 object ContactsList {
 
     val contacts = mutableListOf<Contact>()
-    val randomContacts = mutableListOf<Contact>()
+    private val randomContacts = mutableListOf<Contact>()
     private lateinit var dataSource: FirebaseDatabase
     val size get() = contacts.size
 
@@ -57,7 +57,7 @@ object ContactsList {
                 randomDetails[position % randomDetails.size])
     }
 
-    fun createRandomContacts() {
+    private fun createRandomContacts() {
         for (i in 0 until COUNT) {
             addItem(createContact(i))
         }
@@ -124,7 +124,14 @@ object ContactsList {
         val deferred = CompletableDeferred<Unit>()
 
         // Add a ValueEventListener for a single read from Firebase Realtime Database
-        contactsRef.addListenerForSingleValueEvent(object : ValueEventListener {
+        contactsRef.addListenerForSingleValueEvent(createValueEventListener(deferred, context))
+
+        // Wait for the completion of the onDataChange method
+        deferred.await()
+    }
+
+    private fun createValueEventListener(deferred: CompletableDeferred<Unit>, context: Context): ValueEventListener {
+        return object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 // Clear the current contacts list
                 contacts.clear()
@@ -146,16 +153,12 @@ object ContactsList {
                 // Mark the CompletableDeferred as complete
                 deferred.complete(Unit)
             }
-
             override fun onCancelled(databaseError: DatabaseError) {
                 // Mark the CompletableDeferred as failed with an exception
                 deferred.completeExceptionally(databaseError.toException())
                 Log.d("ContactsList", "onCancelled: ${databaseError.toException()}")
             }
-        })
-
-        // Wait for the completion of the onDataChange method
-        deferred.await()
+        }
     }
 
 

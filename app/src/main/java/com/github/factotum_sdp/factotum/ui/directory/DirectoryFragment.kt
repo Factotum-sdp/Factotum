@@ -2,7 +2,6 @@ package com.github.factotum_sdp.factotum.ui.directory
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -44,18 +43,14 @@ class DirectoryFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
             adapter = ContactsRecyclerAdapter()
         }
-        Log.d("Contacts", "here" + ContactsList.contacts.toString())
 
         // Load contacts from local storage
         ContactsList.loadContactsLocally(requireContext())
-
-        Log.d("Contacts", "here2" + ContactsList.contacts.toString())
 
         // Sync contacts from Firebase when connected to the internet
         mainScope.launch {
             ContactsList.syncContactsFromFirebase(requireContext())
             recycler.adapter?.notifyDataSetChanged()
-            Log.d("Contacts", "There" + ContactsList.contacts.toString())
         }
     }
 

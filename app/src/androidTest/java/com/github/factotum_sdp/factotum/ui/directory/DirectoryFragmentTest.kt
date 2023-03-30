@@ -27,8 +27,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class ContactsFragmentTest {
-    private val WAITFORANIMATION = 500L
+class DirectoryFragmentTest {
+    private val _waitForAnimation = 500L
 
     @get:Rule
     var testRule = ActivityScenarioRule(
@@ -52,6 +52,7 @@ class ContactsFragmentTest {
             }
         }
     }
+
     @Before
     fun setUp() {
 
@@ -72,7 +73,12 @@ class ContactsFragmentTest {
     fun goesToContactDetails() {
         val device = UiDevice.getInstance(getInstrumentation())
         onView(withId(R.id.contacts_recycler_view))
-            .perform(RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(0, click()))
+            .perform(
+                RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
+                    0,
+                    click()
+                )
+            )
         val contactName = device.findObject(UiSelector().descriptionContains("All contact Info"))
         assertTrue(contactName.exists())
     }
@@ -82,11 +88,17 @@ class ContactsFragmentTest {
         val device = UiDevice.getInstance(getInstrumentation())
         for (i in 0 until ContactsList.size) {
             onView(withId(R.id.contacts_recycler_view))
-                .perform(RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(i, click()))
-            val contactName = device.findObject(UiSelector().descriptionContains("All contact Info"))
+                .perform(
+                    RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
+                        i,
+                        click()
+                    )
+                )
+            val contactName =
+                device.findObject(UiSelector().descriptionContains("All contact Info"))
             assertTrue(contactName.exists())
             device.pressBack()
-            Thread.sleep(WAITFORANIMATION)
+            Thread.sleep(_waitForAnimation)
         }
     }
 }

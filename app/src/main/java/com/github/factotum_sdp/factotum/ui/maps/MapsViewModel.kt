@@ -1,6 +1,5 @@
 package com.github.factotum_sdp.factotum.ui.maps
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -68,8 +67,7 @@ class MapsViewModel : ViewModel() {
      * @param context : Context. Context in which this function is called
      * @return returns the created location
      */
-    fun setLocation(query: String, context: Context){
-        val location = Location(query, context)
+    fun setLocation(location: Location){
         _location.value = location
     }
 }

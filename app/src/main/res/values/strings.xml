@@ -94,4 +94,5 @@
     <string name="edit_rejected_snap_label">Wrong format. Edition canceled</string>
     <string name="edit_confirmed_snap_label">Record edited</string>
     <string name="rb_label_touch_click">Touch click</string>
+    <string name="share">Share</string>
 </resources>

@@ -80,13 +80,11 @@ class RoadBookViewAdapter(private val onItemViewHolderL: View.OnClickListener?) 
     }
     // arrival : _ or arrival : HH:MM:SS AM-PM
     private fun timestampStringFormat(date: Date?, label: String): String {
-        val sb = java.lang.StringBuilder("$label : ")
-        if (date == null)
-            return sb.append('_').toString()
-        date.let {
-            sb.append(SimpleDateFormat.getTimeInstance().format(it))
-        }
-        return sb.toString()
+        val timestamp =
+            date?.let {
+                SimpleDateFormat.getTimeInstance().format(it)
+            } ?: "_"
+        return "$label : $timestamp"
     }
     // actions : () or actions : (p | p | c)
     private fun actionsStringFormat(actions: List<Action>, label: String): String {

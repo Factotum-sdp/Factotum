@@ -45,9 +45,16 @@ class LoginFragmentTest {
         onView(withId(R.id.fragment_login_directors_parent)).perform(
             closeSoftKeyboard()
         )
-        onView(withId(R.id.login)).perform(click())
 
-        FirebaseAuth.AuthStateListener { firebaseAuth ->
+        onView(withId(R.id.login)).check(matches(isEnabled())).perform(click())
+
+        onView(withId(R.id.loading)).check(
+            matches(
+                isDisplayed()
+            )
+        )
+
+        /*FirebaseAuth.AuthStateListener { firebaseAuth ->
             if (firebaseAuth.currentUser != null) {
                 onView(withId(R.id.fragment_login_directors_parent)).check(
                     matches(
@@ -57,10 +64,10 @@ class LoginFragmentTest {
                     )
                 );
             }
-        }
+        }*/
     }
 
-    /*@Test
+    @Test
     fun incorrectUserEntryLeadsToFailedLogin() {
         onView(withId(R.id.username)).perform(typeText("jane.doe@gmail.com"))
         onView(withId(R.id.fragment_login_directors_parent)).perform(
@@ -70,13 +77,18 @@ class LoginFragmentTest {
         onView(withId(R.id.fragment_login_directors_parent)).perform(
             closeSoftKeyboard()
         )
-        onView(withId(R.id.login)).perform(click())
-        FirebaseAuth.AuthStateListener { firebaseAuth ->
+        onView(withId(R.id.login)).check(matches(isEnabled())).perform(click())
+        onView(withId(R.id.loading)).check(
+            matches(
+                isDisplayed()
+            )
+        )
+        /*FirebaseAuth.AuthStateListener { firebaseAuth ->
             if (firebaseAuth.currentUser == null) {
                 onView(withId(R.id.fragment_login_directors_parent)).check(matches(isDisplayed()))
             }
-        }
-    }*/
+        }*/
+    }
 
     @Test
     fun clickOnSignUpLeadsToSignUpFragment() {

@@ -75,8 +75,8 @@
     <string name="file_provider">"com.github.factotum_sdp.factotum.file-provider"</string>
     <string name="camera_permission_not_granted">Permission needed to take a photo</string>
 
-    <string name="rb_label_swiper_edition">SwipeR Editon</string>
-    <string name="rb_label_dragdrop"><![CDATA[Drag&Drop]]></string>
+    <string name="rb_label_swiper_edition">Swipe R. Editon</string>
+    <string name="rb_label_dragdrop"><![CDATA[Drag & Drop]]></string>
     <string name="edit_dialog_cancel_b">cancel</string>
     <string name="edit_dialog_update_b">update</string>
     <string name="menu_view_proof_picture">View Proof Pictures</string>
@@ -87,11 +87,12 @@
     <string name="hint_dialog_rate">Rate</string>
     <string name="hint_dialog_actions">Actions</string>
     <string name="hint_dialog_notes">Notes</string>
-    <string name="rb_label_swipel_deletion">SwipeL Deletion</string>
+    <string name="rb_label_swipel_deletion">Swipe L. Deletion</string>
     <string name="delete_confirm_button_label">Confirm</string>
     <string name="delete_cancel_button_label">Cancel</string>
     <string name="delete_dialog_title">Delete the swiped record ?</string>
     <string name="edit_rejected_snap_label">Wrong format. Edition canceled</string>
     <string name="edit_confirmed_snap_label">Record edited</string>
+    <string name="rb_label_touch_click">Touch click</string>
     <string name="share">Share</string>
 </resources>

@@ -23,7 +23,7 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         MutableLiveData(DestinationRecords.RECORDS)
 
     val recordsListState: LiveData<List<DestinationRecord>> = _recordsList
-    private val swapedRecords: ArrayList<DestinationRecord> = arrayListOf()
+    private val swappedRecords: ArrayList<DestinationRecord> = arrayListOf()
     private var dbRef: DatabaseReference
     init {
         val date = Calendar.getInstance().time
@@ -70,9 +70,9 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
      */
     fun swapRecords(from: Int, to: Int) {
         assert(from <= to)
-        if(swapedRecords.isEmpty())
-            swapedRecords.addAll(_recordsList.value as Collection<DestinationRecord>)
-        Collections.swap(swapedRecords, from, to)
+        if(swappedRecords.isEmpty())
+            swappedRecords.addAll(_recordsList.value as Collection<DestinationRecord>)
+        Collections.swap(swappedRecords, from, to)
     }
 
     /**
@@ -81,11 +81,11 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
      * in order to show the result to some possible observers.
      */
     fun pushSwapsResult() {
-        if(swapedRecords.isNotEmpty()) {
+        if(swappedRecords.isNotEmpty()) {
             var ls = listOf<DestinationRecord>()
-            ls = ls.plus(swapedRecords)
+            ls = ls.plus(swappedRecords)
             _recordsList.postValue(ls)
-            swapedRecords.clear()
+            swappedRecords.clear()
         }
     }
 

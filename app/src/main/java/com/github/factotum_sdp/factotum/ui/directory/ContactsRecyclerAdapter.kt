@@ -1,9 +1,13 @@
 package com.github.factotum_sdp.factotum.ui.directory
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.navigation.findNavController
@@ -11,11 +15,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.ContactsList
 
-class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.ContactsViewHolder>() {
+class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.ContactsViewHolder>(), Filterable {
 
-    private val contacts = ContactsList.ITEMS //this is the list of contacts
-    //we consider the list of contacts to be constant so we don't need to worry about updating the recycler view
-    //list of contact only changes when the app is restarted
+    private val originalContacts = ArrayList(ContactsList.getItems()) // Store the original contacts list
+    private var contacts = ArrayList<ContactsList.Contact>() // Use this list for displaying filtered data
+
+    init {
+        contacts.addAll(originalContacts) // Initialize the contacts list with the original data
+    }
 
     inner class ContactsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) { //this is the view holder for the recycler view
 
@@ -51,5 +58,37 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
 
     override fun getItemCount(): Int { //simple getter for the number of contacts
         return contacts.size
+    }
+
+    override fun getFilter(): Filter {
+        return object : Filter() {
+            override fun performFiltering(constraint: CharSequence?): FilterResults {
+                Log.d("filter", "Before filter size : " + contacts.size)
+                val filteredList = ArrayList<ContactsList.Contact>()
+                if (constraint == null || constraint.isEmpty()) {
+                    filteredList.addAll(originalContacts) // Use the originalContacts list here
+                } else {
+                    val filterPattern = constraint.toString().lowercase().trim()
+                    for (item in originalContacts) { // Use the originalContacts list for filtering
+                        if (item.name.lowercase().contains(filterPattern)) {
+                            Log.d("filter", "Found match : " + item.name)
+                            filteredList.add(item)
+                        }
+                    }
+                }
+                val results = FilterResults()
+                results.values = filteredList
+                return results
+            }
+
+            @SuppressLint("NotifyDataSetChanged")
+            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+                Log.d("filter", "Results : " + results?.values.toString())
+                contacts.clear()
+                contacts.addAll(results?.values as ArrayList<ContactsList.Contact>)
+                Log.d("filter", "Contacts : " + contacts.joinToString { it.name })
+                notifyDataSetChanged()
+            }
+        }
     }
 }

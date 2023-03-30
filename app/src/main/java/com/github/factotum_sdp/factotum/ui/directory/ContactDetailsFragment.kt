@@ -23,7 +23,7 @@ class ContactDetailsFragment : Fragment() {
         val button = mainView.findViewById<Button>(R.id.button) // connect the button to the layout
         button.setOnClickListener { view ->
             view.findNavController().navigate(R.id.action_contactDetailsFragment2_to_directoryFragment)} // go back to the list of contacts when the button is clicked
-        setContactDetails(mainView, ContactsList.ITEMS[arguments?.getInt("id")!!]) //links the contact details to the layout
+        setContactDetails(mainView, ContactsList.getItems()[arguments?.getInt("id")!!]) //links the contact details to the layout
 
         return mainView
     }

@@ -10,7 +10,7 @@ object ContactsList {
     /**
      * An array of sample contacts.
      */
-    val ITEMS: MutableList<Contact> = ArrayList()
+    private val ITEMS: MutableList<Contact> = ArrayList()
 
     //fake data --> to be replaced with connection to database
     private val randomNames = listOf("John Smith", "Jane Doe", "Bob Builder")
@@ -28,6 +28,10 @@ object ContactsList {
         for (i in 1..COUNT) {
             addItem(createContact(i))
         }
+    }
+
+    fun getItems(): List<Contact> {
+        return ITEMS
     }
 
     //Trivial method for now but will be useful when connecting to database

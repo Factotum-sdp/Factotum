@@ -17,7 +17,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
+import com.github.factotum_sdp.factotum.placeholder.ContactsList
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matchers.allOf
+import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -33,6 +38,18 @@ class MainActivityTest {
 
     @get:Rule
     val permissionsRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
+
+    companion object {
+        @BeforeClass
+        @JvmStatic
+        fun setUpDatabase() {
+            val database = Firebase.database
+            database.useEmulator("10.0.2.2", 9000)
+            MainActivity.setDatabase(database)
+            ContactsList.init(database)
+            runBlocking { ContactsList.populateDatabase() }
+        }
+    }
 
     //========================================================================================
     // Entry view checks :

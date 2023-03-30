@@ -25,16 +25,19 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private lateinit var rbRecyclerView: RecyclerView
     private lateinit var fragMenu: Menu
 
-    private var sl = true
-    private var sr = true
-    private var dd = true
+    // Checked OptionMenu States with default values
+    // overridden by the device saved SharedPreference
+    private var isSLEnabled = true
+    private var isSREnabled = true
+    private var isDDropEnabled = true
+    private var isTClickEnabled = true
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
 
         val view = inflater.inflate(R.layout.fragment_roadbook, container, false)
-        val adapter = RoadBookViewAdapter(null)
+        val adapter = RoadBookViewAdapter(setOnDRecordClickListener())
         val dbRef = (activity as MainActivity).getDatabaseRef().child(ROADBOOK_DB_PATH)
         val rbFact = RoadBookViewModel.RoadBookViewModelFactory(dbRef)
         rbViewModel = ViewModelProvider(this, rbFact)[RoadBookViewModel::class.java]
@@ -62,9 +65,11 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
     private fun setOnDRecordClickListener(): View.OnClickListener {
         return View.OnClickListener { v ->
-            v
-                ?.findNavController()
-                ?.navigate(R.id.action_roadBookFragment_to_DRecordDetailsFragment)
+            if(isTClickEnabled) {
+                v
+                    ?.findNavController()
+                    ?.navigate(R.id.action_roadBookFragment_to_DRecordDetailsFragment)
+            }
         }
     }
 
@@ -89,31 +94,39 @@ class RoadBookFragment : Fragment(), MenuProvider {
         val rbDD = menu.findItem(R.id.rbDragDrop)
         val rbSL = menu.findItem(R.id.rbSwipeLDeletion)
         val rbSR = menu.findItem(R.id.rbSwipeREdition)
+        val rbTC = menu.findItem(R.id.rbTouchClick)
 
 
         // fetch saved States
         fetchRadioButtonState(DRAG_N_DROP_SHARED_KEY, rbDD)
         fetchRadioButtonState(SWIPE_L_SHARED_KEY, rbSL)
         fetchRadioButtonState(SWIPE_R_SHARED_KEY, rbSR)
+        fetchRadioButtonState(TOUCH_CLICK_SHARED_KEY, rbTC)
 
         // init globals to saved preference state
-        dd = rbDD.isChecked
-        sl = rbSL.isChecked
-        sr = rbSR.isChecked
+        isDDropEnabled = rbDD.isChecked
+        isSLEnabled = rbSL.isChecked
+        isSREnabled = rbSR.isChecked
+        isTClickEnabled = rbTC.isChecked
 
         rbDD.setOnMenuItemClickListener {
             it.isChecked = !it.isChecked
-            dd = !dd
+            isDDropEnabled = !isDDropEnabled
             true
         }
         rbSL.setOnMenuItemClickListener {
             it.isChecked = !it.isChecked
-            sl = !sl
+            isSLEnabled = !isSLEnabled
             true
         }
         rbSR.setOnMenuItemClickListener {
             it.isChecked = !it.isChecked
-            sr = !sr
+            isSREnabled = !isSREnabled
+            true
+        }
+        rbTC.setOnMenuItemClickListener {
+            it.isChecked = !it.isChecked
+            isTClickEnabled = !isTClickEnabled
             true
         }
 
@@ -150,7 +163,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder
             ): Int {
-                if (!dd) // setting IDLE setting to disable drag up or down detection
+                if (!isDDropEnabled) // setting IDLE setting to disable drag up or down detection
                     return ACTION_STATE_IDLE
                 return super.getDragDirs(recyclerView, viewHolder)
             }
@@ -160,8 +173,8 @@ class RoadBookFragment : Fragment(), MenuProvider {
                 viewHolder: RecyclerView.ViewHolder
             ): Int {
                 var swipeFlags = ACTION_STATE_SWIPE
-                if (sl) swipeFlags = swipeFlags or LEFT
-                if (sr) swipeFlags = swipeFlags or RIGHT
+                if (isSLEnabled) swipeFlags = swipeFlags or LEFT
+                if (isSREnabled) swipeFlags = swipeFlags or RIGHT
 
                 return swipeFlags
             }
@@ -175,6 +188,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         private const val SWIPE_L_SHARED_KEY = "SwipeLeftButton"
         private const val SWIPE_R_SHARED_KEY = "SwipeRightButton"
         private const val DRAG_N_DROP_SHARED_KEY = "DragNDropButton"
+        private const val TOUCH_CLICK_SHARED_KEY = "TouchClickButton"
     }
 
     /** Only use that access for testing purpose */
@@ -186,6 +200,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         saveRadioButtonState(SWIPE_R_SHARED_KEY, R.id.rbSwipeREdition)
         saveRadioButtonState(SWIPE_L_SHARED_KEY, R.id.rbSwipeLDeletion)
         saveRadioButtonState(DRAG_N_DROP_SHARED_KEY, R.id.rbDragDrop)
+        saveRadioButtonState(TOUCH_CLICK_SHARED_KEY, R.id.rbTouchClick)
         super.onDestroyView()
     }
 

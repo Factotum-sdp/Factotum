@@ -12,6 +12,9 @@
         <item
             android:id="@+id/rbSwipeREdition"
             android:title="@string/rb_label_swiper_edition" />
+        <item
+            android:id="@+id/rbTouchClick"
+            android:title="@string/rb_label_touch_click" />
     </group>
 </menu>
 

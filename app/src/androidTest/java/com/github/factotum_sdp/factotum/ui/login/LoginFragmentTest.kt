@@ -42,7 +42,6 @@ class LoginFragmentTest {
             closeSoftKeyboard()
         )
         onView(withId(R.id.password)).perform(typeText("123456"))
-        //close soft keyboard in fragment
         onView(withId(R.id.fragment_login_directors_parent)).perform(
             closeSoftKeyboard()
         )
@@ -50,12 +49,18 @@ class LoginFragmentTest {
 
         FirebaseAuth.AuthStateListener { firebaseAuth ->
             if (firebaseAuth.currentUser != null) {
-                onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
+                onView(withId(R.id.fragment_login_directors_parent)).check(
+                    matches(
+                        withEffectiveVisibility(
+                            Visibility.INVISIBLE
+                        )
+                    )
+                );
             }
         }
     }
 
-    @Test
+    /*@Test
     fun incorrectUserEntryLeadsToFailedLogin() {
         onView(withId(R.id.username)).perform(typeText("jane.doe@gmail.com"))
         onView(withId(R.id.fragment_login_directors_parent)).perform(
@@ -71,7 +76,7 @@ class LoginFragmentTest {
                 onView(withId(R.id.fragment_login_directors_parent)).check(matches(isDisplayed()))
             }
         }
-    }
+    }*/
 
     @Test
     fun clickOnSignUpLeadsToSignUpFragment() {

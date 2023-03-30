@@ -5,7 +5,5 @@ import androidx.fragment.app.activityViewModels
 import com.github.factotum_sdp.factotum.ui.maps.MapsViewModel
 
 class DRecordDetailsFragment: Fragment() {
-    private val rbViewModel: MapsViewModel by activityViewModels()
-
-
+    private val rbViewModel: RoadBookViewModel by activityViewModels()
 }

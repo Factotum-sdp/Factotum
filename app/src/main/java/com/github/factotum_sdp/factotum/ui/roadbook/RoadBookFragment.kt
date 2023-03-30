@@ -1,16 +1,19 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
+import android.content.Context
 import android.os.Bundle
 import android.view.*
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.*
+import androidx.recyclerview.widget.ItemTouchHelper.*
+import androidx.recyclerview.widget.RecyclerView.OnItemTouchListener
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-
 
 
 /**
@@ -20,14 +23,18 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
     private lateinit var rbViewModel: RoadBookViewModel
     private lateinit var rbRecyclerView: RecyclerView
+    private lateinit var fragMenu: Menu
 
+    private var sl = true
+    private var sr = true
+    private var dd = true
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
 
         val view = inflater.inflate(R.layout.fragment_roadbook, container, false)
-        val adapter = RoadBookViewAdapter()
+        val adapter = RoadBookViewAdapter(null)
         val dbRef = (activity as MainActivity).getDatabaseRef().child(ROADBOOK_DB_PATH)
         val rbFact = RoadBookViewModel.RoadBookViewModelFactory(dbRef)
         rbViewModel = ViewModelProvider(this, rbFact)[RoadBookViewModel::class.java]
@@ -45,14 +52,20 @@ class RoadBookFragment : Fragment(), MenuProvider {
         rbRecyclerView.layoutManager = LinearLayoutManager(context)
         rbRecyclerView.adapter = adapter
 
-        // Set ItemTouchHelper Callback to manage Drag&Drop and SwipeRight edition
-        setItemTHCallBack(false, false, false)
-
         return view
     }
+
     override fun onPause() {
         rbViewModel.backUp()
         super.onPause()
+    }
+
+    private fun setOnDRecordClickListener(): View.OnClickListener {
+        return View.OnClickListener { v ->
+            v
+                ?.findNavController()
+                ?.navigate(R.id.action_roadBookFragment_to_DRecordDetailsFragment)
+        }
     }
 
     private fun setRoadBookEvents(rbViewModel: RoadBookViewModel, view: View) {
@@ -71,24 +84,42 @@ class RoadBookFragment : Fragment(), MenuProvider {
     }
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
         menuInflater.inflate(R.menu.main, menu)
+        fragMenu = menu
+
         val rbDD = menu.findItem(R.id.rbDragDrop)
         val rbSL = menu.findItem(R.id.rbSwipeLDeletion)
         val rbSR = menu.findItem(R.id.rbSwipeREdition)
+
+
+        // fetch saved States
+        fetchRadioButtonState(DRAG_N_DROP_SHARED_KEY, rbDD)
+        fetchRadioButtonState(SWIPE_L_SHARED_KEY, rbSL)
+        fetchRadioButtonState(SWIPE_R_SHARED_KEY, rbSR)
+
+        // init globals to saved preference state
+        dd = rbDD.isChecked
+        sl = rbSL.isChecked
+        sr = rbSR.isChecked
+
         rbDD.setOnMenuItemClickListener {
             it.isChecked = !it.isChecked
-            setItemTHCallBack(it.isChecked, rbSL.isChecked, rbSR.isChecked)
-            false
+            dd = !dd
+            true
         }
         rbSL.setOnMenuItemClickListener {
             it.isChecked = !it.isChecked
-            setItemTHCallBack(rbDD.isChecked, rbSL.isChecked, rbSR.isChecked)
-            false
+            sl = !sl
+            true
         }
         rbSR.setOnMenuItemClickListener {
             it.isChecked = !it.isChecked
-            setItemTHCallBack(rbDD.isChecked, rbSL.isChecked, rbSR.isChecked)
-            false
+            sr = !sr
+            true
         }
+
+        // Only at menu initialization
+        val itemTouchHelper = ItemTouchHelper(newItemTHCallBack())
+        itemTouchHelper.attachToRecyclerView(rbRecyclerView)
     }
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         // Needed to have the onSupportNavigateUp() called
@@ -98,48 +129,78 @@ class RoadBookFragment : Fragment(), MenuProvider {
         }
         return true
     }
-    private fun setItemTHCallBack(isDragNDrop: Boolean, isSwipeLeft: Boolean, isSwipeRight: Boolean) {
+    private fun newItemTHCallBack(): Callback {
 
+        // Overriding the getDragDirs and getSwipeDirs() to
+        // manage touch features proposed by RoadBookTHCallback()
         val itemTHCallback = object : RoadBookTHCallback() {
             override fun getRbViewModel(): RoadBookViewModel {
                 return rbViewModel
             }
+
             override fun getHost(): Fragment {
                 return requireParentFragment()
             }
+
             override fun getRecyclerView(): RecyclerView {
                 return rbRecyclerView
             }
+
             override fun getDragDirs(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder
             ): Int {
-                if(!isDragNDrop)
-                    return ItemTouchHelper.ACTION_STATE_IDLE
+                if (!dd) // setting IDLE setting to disable drag up or down detection
+                    return ACTION_STATE_IDLE
                 return super.getDragDirs(recyclerView, viewHolder)
             }
+
             override fun getSwipeDirs(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder
             ): Int {
-                if (!isSwipeLeft && !isSwipeRight)
-                    return ItemTouchHelper.ACTION_STATE_IDLE
-                var swipeDirs = ItemTouchHelper.ACTION_STATE_SWIPE
-                if (isSwipeLeft) swipeDirs += ItemTouchHelper.LEFT
-                if (isSwipeRight) swipeDirs += ItemTouchHelper.RIGHT
-                return swipeDirs
+                var swipeFlags = ACTION_STATE_SWIPE
+                if (sl) swipeFlags = swipeFlags or LEFT
+                if (sr) swipeFlags = swipeFlags or RIGHT
+
+                return swipeFlags
             }
+
         }
-        val itemTouchHelper = ItemTouchHelper(itemTHCallback)
-        itemTouchHelper.attachToRecyclerView(rbRecyclerView)
+        return itemTHCallback
     }
 
     companion object{
         private const val ROADBOOK_DB_PATH: String = "Sheet-shift"
+        private const val SWIPE_L_SHARED_KEY = "SwipeLeftButton"
+        private const val SWIPE_R_SHARED_KEY = "SwipeRightButton"
+        private const val DRAG_N_DROP_SHARED_KEY = "DragNDropButton"
     }
 
     /** Only use that access for testing purpose */
     fun getRBViewModelForTest(): RoadBookViewModel {
         return rbViewModel
+    }
+
+    override fun onDestroyView() {
+        saveRadioButtonState(SWIPE_R_SHARED_KEY, R.id.rbSwipeREdition)
+        saveRadioButtonState(SWIPE_L_SHARED_KEY, R.id.rbSwipeLDeletion)
+        saveRadioButtonState(DRAG_N_DROP_SHARED_KEY, R.id.rbDragDrop)
+        super.onDestroyView()
+    }
+
+    private fun fetchRadioButtonState(sharedKey: String, radioButton: MenuItem) {
+        val sp = requireActivity().getSharedPreferences(sharedKey ,Context.MODE_PRIVATE)
+        val savedState = sp.getBoolean(sharedKey, true)
+        radioButton.setChecked(savedState)
+    }
+    private fun saveRadioButtonState(sharedKey: String, radioButtonId: Int) {
+        val sp = requireActivity().getSharedPreferences(sharedKey,Context.MODE_PRIVATE)
+        val edit = sp.edit()
+        val radioButton = fragMenu.findItem(radioButtonId)
+        radioButton?.let {
+            edit.putBoolean(sharedKey, radioButton.isChecked)
+            edit.apply()
+        }
     }
 }

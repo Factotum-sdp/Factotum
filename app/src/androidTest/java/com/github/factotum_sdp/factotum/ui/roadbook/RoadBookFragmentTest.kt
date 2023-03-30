@@ -1,5 +1,12 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
+import android.content.Context
+import android.view.InputDevice
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.MotionEvent
+import androidx.appcompat.view.menu.ActionMenuItemView
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider
@@ -22,6 +29,7 @@ import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import org.hamcrest.CoreMatchers.startsWith
+import org.hamcrest.Matchers.allOf
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -33,13 +41,29 @@ import java.util.concurrent.CompletableFuture
 
 @RunWith(AndroidJUnit4::class)
 class RoadBookFragmentTest {
+
     @get:Rule
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
     )
 
+    private val SWIPE_L_SHARED_KEY = "SwipeLeftButton"
+    private val SWIPE_R_SHARED_KEY = "SwipeRightButton"
+    private val DRAG_N_DROP_SHARED_KEY = "DragNDropButton"
+
+    private fun setPrefs(sharedKey: String, activity: MainActivity, value: Boolean) {
+        val sp = activity.getSharedPreferences(sharedKey, Context.MODE_PRIVATE)
+        val edit = sp.edit()
+        edit.putBoolean(sharedKey, value)
+        edit.apply()
+    }
     @Before
     fun toRoadBookFragment() {
+        testRule.scenario.onActivity {
+            setPrefs(SWIPE_L_SHARED_KEY, it, true)
+            setPrefs(SWIPE_R_SHARED_KEY, it, true)
+            setPrefs(DRAG_N_DROP_SHARED_KEY, it, true)
+        }
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))
@@ -78,7 +102,7 @@ class RoadBookFragmentTest {
 
     @Test
     fun swipeLeftDeleteRecord() {
-        // Record just added is displayed at the end of the list
+        // Record is there
         onView((withText(DestinationRecords.RECORDS[2].destID)))
             .check(matches(isDisplayed()))
 
@@ -340,6 +364,40 @@ class RoadBookFragmentTest {
         Thread.sleep(4000) // This one is needed to let the Screen enough time to be updated
         onView(withText("X17#1")).check(isCompletelyBelow(withText("More#1")))
     }
+
+    // ============================================================================================
+    // ================================= OptionMenu RB settings ===================================
+
+    @Test
+    fun preferencesAreWellFetched() { // from setUp() set all RButtons to true
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView((withText(R.string.rb_label_swiper_edition))).check(matches(isEnabled()))
+    }
+    @Test
+    fun rbSwipeLeftCorrectlyDisableDeletion() {
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_swipel_deletion)).perform(click())
+        swipeLeftTheRecordAt(2)
+        onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
+    }
+
+    @Test
+    fun rbSwipeRightCorrectlyDisableEdition() {
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_swiper_edition)).perform(click())
+        swipeLeftTheRecordAt(2)
+        onView(withText(R.string.edit_dialog_update_b)).check(doesNotExist())
+        onView(withText(R.string.edit_dialog_cancel_b)).check(doesNotExist())
+    }
+
+    @Test
+    fun rbDragNDrop() { // Still can't test the drag & drop touch action
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_swiper_edition)).perform(click())
+    }
+
+
+
 
     // ============================================================================================
     // ===================================== Helpers ==============================================

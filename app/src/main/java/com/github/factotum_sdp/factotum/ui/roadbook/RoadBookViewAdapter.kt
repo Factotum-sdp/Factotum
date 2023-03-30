@@ -18,7 +18,8 @@ import java.util.*
  * Adapter for the RecyclerView which will display a dynamic list of DestinationRecord
  * Choice of the RecyclerView instead of a ListAdapter for later facilities with drageNdrop
  */
-class RoadBookViewAdapter : RecyclerView.Adapter<RoadBookViewAdapter.RecordViewHolder>() {
+class RoadBookViewAdapter(private val onItemViewHolderL: View.OnClickListener?) :
+    RecyclerView.Adapter<RoadBookViewAdapter.RecordViewHolder>() {
 
     // Call back needed to instantiate the async list attribute
     private val differCallback = object : DiffUtil.ItemCallback<DestinationRecord>(){
@@ -119,10 +120,7 @@ class RoadBookViewAdapter : RecyclerView.Adapter<RoadBookViewAdapter.RecordViewH
         val actions: TextView = itemView.findViewById(R.id.dest_actions)
 
         init {
-            itemView.setOnClickListener {
-                val navController = it.findNavController()
-                navController.navigate(R.id.action_roadBookFragment_to_DRecordDetailsFragment)
-            }
+            itemView.setOnClickListener(onItemViewHolderL)
         }
     }
 }

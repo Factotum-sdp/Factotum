@@ -8,7 +8,6 @@ import java.util.concurrent.CompletableFuture
  * Class that handles authentication w/ login credentials and retrieves user information.
  */
 class LoginDataSource {
-
     private val auth = FirebaseAuth.getInstance()
 
     fun login(userEmail: String, password: String): Result<LoggedInUser> {
@@ -34,5 +33,4 @@ class LoginDataSource {
 
         return authResultFuture.get()
     }
-
 }

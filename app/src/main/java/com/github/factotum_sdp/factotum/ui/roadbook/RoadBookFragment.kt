@@ -4,8 +4,6 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.os.Bundle
 import android.view.*
-import android.widget.EditText
-import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -13,8 +11,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.*
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.data.DestinationRecord
-import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 
@@ -65,29 +61,22 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private fun setRoadBookEvents(rbViewModel: RoadBookViewModel, view: View) {
         // Add record on positive floating button click
         view.findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
-            rbViewModel.addRecord(DestinationRecords.RECORD_TO_ADD)
-            Snackbar
-                .make(it, getString(R.string.snap_text_record_added), 700)
-                .setAction("Action", null).show()
-        }
-
-        // Delete a record on negative floating button click
-        view.findViewById<FloatingActionButton>(R.id.fab_delete).setOnClickListener {
-            rbViewModel.deleteLastRecord()
-            Snackbar
-                .make(it, getString(R.string.snap_text_on_rec_delete), 700)
-                .setAction("Action", null).show()
+            DRecordAlertDialogBuilder(context, requireParentFragment(),
+                                            rbViewModel, rbRecyclerView)
+                .forNewRecordEdition()
+                .show()
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        (requireActivity() as MenuHost).addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
+        requireActivity().addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
         menuInflater.inflate(R.menu.main, menu)
-        menu.add(getString(R.string.rbLabelDragDrop))
-        menu.add(getString(R.string.rbLabelSwipeEdition))
+        menu.add(getString(R.string.rb_label_dragdrop))
+        menu.add(getString(R.string.rb_label_swipel_deletion))
+        menu.add(getString(R.string.rb_label_swiper_edition))
     }
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         // Needed to have the onSupportNavigateUp() called
@@ -102,7 +91,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private val itemTHCallback =
         object :
             ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN,
-                ItemTouchHelper.RIGHT or ItemTouchHelper.ACTION_STATE_SWIPE ) {
+                ItemTouchHelper.RIGHT or ItemTouchHelper.LEFT or ItemTouchHelper.ACTION_STATE_SWIPE ) {
 
             override fun onMove(
                 recyclerView: RecyclerView,
@@ -142,42 +131,29 @@ class RoadBookFragment : Fragment(), MenuProvider {
             @SuppressLint("NotifyDataSetChanged")
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 when(direction){
-                    ItemTouchHelper.RIGHT -> {
-                        buildAlertDialog(viewHolder).show()
+                    ItemTouchHelper.RIGHT -> { // Record Edition
+                        DRecordAlertDialogBuilder(context, requireParentFragment(),
+                                                    rbViewModel, rbRecyclerView)
+                            .forExistingRecordEdition(viewHolder)
+                            .show()
+                    }
+                    ItemTouchHelper.LEFT -> { // Record Deletion
+                        val position = viewHolder.absoluteAdapterPosition
+                        val builder = AlertDialog.Builder(context)
+                        builder.setTitle(getString(R.string.delete_dialog_title))
+                        builder.setCancelable(false)
+                        builder.setPositiveButton(getString(R.string.delete_confirm_button_label)) { _, _ ->
+                            rbViewModel.deleteRecordAt(position)
+                            Snackbar
+                                .make(requireView(), getString(R.string.snap_text_on_rec_delete), 700)
+                                .setAction("Action", null).show()
+                        }
+                        builder.setNegativeButton(getString(R.string.delete_cancel_button_label)) { _, _ ->
+                            rbRecyclerView.adapter!!.notifyItemChanged(position)
+                        }
+                        builder.show()
                     }
                 }
-            }
-
-            // Dialog for editing a DestinationRecord
-            private fun buildAlertDialog(viewHolder: RecyclerView.ViewHolder): AlertDialog.Builder {
-                val position = viewHolder.absoluteAdapterPosition
-                val rec = rbViewModel.recordsListState.value!![position]
-
-                val editDestId = EditText(context)
-                editDestId.setText(rec.destID)
-
-                val builder = AlertDialog.Builder(context)
-                builder.setTitle(getString(R.string.editDialogTitle))
-                builder.setCancelable(false)
-                builder.setView(editDestId)
-
-                builder.setNegativeButton(getString(R.string.editDialogCancelB)) { _, _ ->
-                    // Update the screen, no changes to back-end
-                    rbRecyclerView.adapter!!.notifyItemChanged(position)
-                }
-                builder.setPositiveButton(getString(R.string.editDialogUpdateB)) { _, _ ->
-                    rbViewModel.editRecord(
-                        position,
-                        DestinationRecord(
-                            editDestId.text.toString(),
-                            rec.timeStamp,
-                            rec.waitingTime,
-                            rec.rate,
-                            rec.actions
-                        )
-                    )
-                }
-                return builder
             }
         }
     companion object{

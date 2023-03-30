@@ -22,7 +22,6 @@ object ContactsList {
     private const val image = R.drawable.contact_image
 
     private const val COUNT = 10
-
     init {
         // Add some sample items.
         for (i in 1..COUNT) {

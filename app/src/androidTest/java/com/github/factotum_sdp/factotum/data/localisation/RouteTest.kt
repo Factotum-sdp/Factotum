@@ -116,7 +116,7 @@ class RouteTest {
         val mapView = MapsViewModel()
         val query =  "Lausanne"
         val location = Location(query, getApplicationContext())
-        mapView.setLocation(query, getApplicationContext())
+        mapView.setLocation(location)
         assertEquals(location.address!!.latitude, mapView.location.value!!.address!!.latitude)
         assertEquals(location.address!!.longitude, mapView.location.value!!.address!!.longitude)
 

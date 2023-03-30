@@ -72,9 +72,9 @@ abstract class RoadBookTHCallback() :
         }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
+    @SuppressLint("NotifyDataSetChanged") // Don't update the front-end, want to keep the hole
     override fun onSwiped(viewHolder: ViewHolder, direction: Int) {
-        when(direction){
+        when(direction) {
             RIGHT -> { // Record Edition
                 editOnSwipeRight(viewHolder)
             }

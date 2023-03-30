@@ -41,11 +41,27 @@ class LoginFragmentTest {
         closeSoftKeyboard()
         onView(withId(R.id.password)).perform(typeText("123456"))
         closeSoftKeyboard()
+        Thread.sleep(10000)
         onView(withId(R.id.login)).perform(click())
 
         FirebaseAuth.AuthStateListener { firebaseAuth ->
             if (firebaseAuth.currentUser != null) {
                 onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
+            }
+        }
+    }
+
+    @Test
+    fun incorrectUserEntryLeadsToFailedLogin() {
+        onView(withId(R.id.username)).perform(typeText("jane.doe@gmail.com"))
+        closeSoftKeyboard()
+        onView(withId(R.id.password)).perform(typeText("12345678"))
+        closeSoftKeyboard()
+        Thread.sleep(10000)
+        onView(withId(R.id.login)).perform(click())
+        FirebaseAuth.AuthStateListener { firebaseAuth ->
+            if (firebaseAuth.currentUser == null) {
+                onView(withId(R.id.fragment_login_directors_parent)).check(matches(isDisplayed()))
             }
         }
     }

@@ -37,12 +37,11 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
 
             itemView.setOnClickListener {   //when a contact is clicked, go to the contact details fragment
                 itemView.findNavController().navigate(R.id.action_directoryFragment_to_contactDetailsFragment2, Bundle().apply {
-                    putInt("id", bindingAdapterPosition) //pass the id of the contact to the contact details fragment so that it can display the correct contact
+                    putInt("id", bindingAdapterPosition) // pass the id of the contact to the contact details fragment so that it can display the correct contact
                 })
             }
         }
     }
-
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, i: Int): ContactsViewHolder {
         val v = LayoutInflater.from(viewGroup.context)

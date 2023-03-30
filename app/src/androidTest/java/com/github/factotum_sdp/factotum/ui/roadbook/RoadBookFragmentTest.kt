@@ -1,7 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
-import android.view.InputDevice
-import android.view.MotionEvent
+import android.content.Context
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider
@@ -23,7 +22,9 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import org.hamcrest.CoreMatchers.startsWith
 import org.junit.Before
+import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,13 +35,41 @@ import java.util.concurrent.CompletableFuture
 
 @RunWith(AndroidJUnit4::class)
 class RoadBookFragmentTest {
+
     @get:Rule
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
     )
 
+    companion object {
+        private const val SWIPE_L_SHARED_KEY = "SwipeLeftButton"
+        private const val SWIPE_R_SHARED_KEY = "SwipeRightButton"
+        private const val DRAG_N_DROP_SHARED_KEY = "DragNDropButton"
+        private const val TOUCH_CLICK_SHARED_KEY = "TouchClickButton"
+
+        @BeforeClass
+        @JvmStatic
+        fun setUpDatabase() {
+            val database = Firebase.database
+            //database.useEmulator("10.0.2.2", 9000)
+            MainActivity.setDatabase(database)
+        }
+    }
+    private fun setPrefs(sharedKey: String, activity: MainActivity, value: Boolean) {
+        val sp = activity.getSharedPreferences(sharedKey, Context.MODE_PRIVATE)
+        val edit = sp.edit()
+        edit.putBoolean(sharedKey, value)
+        edit.apply()
+    }
+
     @Before
     fun toRoadBookFragment() {
+        testRule.scenario.onActivity {
+            setPrefs(SWIPE_L_SHARED_KEY, it, true)
+            setPrefs(SWIPE_R_SHARED_KEY, it, true)
+            setPrefs(DRAG_N_DROP_SHARED_KEY, it, true)
+            setPrefs(TOUCH_CLICK_SHARED_KEY, it, false)
+        }
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))
@@ -50,19 +79,14 @@ class RoadBookFragmentTest {
     @Test
     fun radioButtonsAreAccessible() {
         Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
-        onView(withText(R.string.rbLabelDragDrop)).check(matches(isDisplayed()))
-        onView(withText(R.string.rbLabelSwipeEdition)).check(matches(isDisplayed()))
+        onView(withText(R.string.rb_label_dragdrop)).check(matches(isDisplayed()))
+        onView(withText(R.string.rb_label_swiper_edition)).check(matches(isDisplayed()))
+        onView(withText(R.string.rb_label_swipel_deletion)).check(matches(isDisplayed()))
     }
 
     @Test
     fun fabIsCorrectlyDisplayedOnFirstView() {
         onView(withId(R.id.fab))
-            .check(matches(isDisplayed()))
-    }
-
-    @Test
-    fun delButtonIsCorrectlyDisplayedOnFirstView() {
-        onView(withId(R.id.fab_delete))
             .check(matches(isDisplayed()))
     }
 
@@ -79,55 +103,97 @@ class RoadBookFragmentTest {
                 .check(matches(isDisplayed()))
     }
 
+    // ============================================================================================
+    // ===================================== Delete Tests =========================================
+
     @Test
-    fun pressingFabCreatesNewRecord() {
+    fun swipeLeftDeleteRecord() {
+        // Record is there
+        onView((withText(DestinationRecords.RECORDS[2].destID)))
+            .check(matches(isDisplayed()))
+
+        swipeLeftTheRecordAt(2)
+        onView(withText(R.string.delete_dialog_title))
+        onView(withText(R.string.delete_confirm_button_label)).perform(click())
+
+        // Record added previously is now deleted
+        onView((withText(DestinationRecords.RECORDS[2].destID)))
+            .check(doesNotExist())
+    }
+
+    @Test
+    fun swipeLeftButCancelLetTheRecord() {
+
+        // Record just added is displayed at the end of the list
+        onView((withText(DestinationRecords.RECORDS[2].destID)))
+            .check(matches(isDisplayed()))
+
+        swipeLeftTheRecordAt(2)
+        onView(withText(R.string.delete_dialog_title))
+        onView(withText(R.string.delete_cancel_button_label)).perform(click())
+
+        // Record added previously is now deleted
+        onView((withText(DestinationRecords.RECORDS[2].destID)))
+            .check(matches(isDisplayed()))
+    }
+
+    // ============================================================================================
+    // ================================== Add record Tests ========================================
+    @Test
+    fun newRecordIsDisplayedAtTheEnd() {
+        val clientID = DestinationRecords.RECORD_TO_ADD.clientID
         onView(withText(DestinationRecords.RECORDS[0].destID))
             .check(matches(isDisplayed()))
-        onView(withId(R.id.fab)).perform(click())
+        // Add a new record
+        newRecord()
         // Scroll to last position to see if the new record is displayed at the end
         onView(withId(R.id.list)).perform(
             click(),
             RecyclerViewActions.scrollToLastPosition<RoadBookViewAdapter.RecordViewHolder>(),
         )
-        onView((withText(DestinationRecords.RECORD_TO_ADD.destID)))
+        onView((withText("$clientID#1")))
             .check(matches(isDisplayed()))
     }
 
     @Test
-    fun pressingDelDeleteLastRecord() {
+    fun addWithWrongFormatISAborted() {
+        val clientID = DestinationRecords.RECORD_TO_ADD.clientID
         onView(withId(R.id.fab)).perform(click())
+        onView(withId(R.id.autoCompleteClientID))
+            .perform(click(), typeText("$clientID "), closeSoftKeyboard())
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerCancelBLabel)).perform(click())
+
+        onView(withId(R.id.editTextTimestamp)).perform(typeText("2222"))
+        onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
+
         onView(withId(R.id.list)).perform(
             click(),
             RecyclerViewActions.scrollToLastPosition<RoadBookViewAdapter.RecordViewHolder>(),
         )
-        // Record just added is displayed at the end of the list
-        onView((withText(DestinationRecords.RECORD_TO_ADD.destID)))
-            .check(matches(isDisplayed()))
-        onView(withId(R.id.fab_delete)).perform(click())
-
-        // Record added previously is now deleted
-        onView((withText(DestinationRecords.RECORD_TO_ADD.destID)))
+        onView((withText("$clientID#1")))
             .check(doesNotExist())
     }
 
-    private val db = Firebase.database.reference
+    // ============================================================================================
+    // ================================== Update to Database Tests ================================
 
     @Test
     fun roadBookIsBackedUpCorrectly() {
-        //Navigate to an other Fragment
         val date = Calendar.getInstance().time
-        val ref = db
+        val ref = MainActivity.getDatabase().reference
             .child("Sheet-shift")
             .child(SimpleDateFormat.getDateInstance().format(date))
 
-        onView(withId(R.id.fab)).perform(click()) // Add 1 record
+        // Add 1 record
+        newRecord()
 
         // Navigate out of the RoadBookFragment
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
-        onView(withId(R.id.directoryFragment))
+        onView(withId(R.id.routeFragment))
             .perform(click())
-        onView(withId(R.id.fragment_directory_directors_parent))
+        onView(withId(R.id.fragment_route_directors_parent))
             .check(matches(isDisplayed()))
 
         // Our target value to fetch
@@ -149,61 +215,141 @@ class RoadBookFragmentTest {
         }
     }
 
-    private fun swipeRightTheRecordAt(pos: Int) {
-        onView(withId(R.id.list)).perform(
-            longClick(),
-            RecyclerViewActions.actionOnItemAtPosition<RoadBookViewAdapter.RecordViewHolder>(
-                pos, GeneralSwipeAction(
-                    Swipe.SLOW,
-                    {
-                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
-                        val x = xy[0] + (it.width - 1) * 0.5f
-                        val y = xy[1] + (it.height - 1) * 1f
-                        floatArrayOf(x, y)
-                    },
-                    {
-                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
-                        val x = xy[0] + (it.width - 1) * 2f
-                        val y = xy[1] + (it.height - 1) * 1f
-                        floatArrayOf(x, y)
-                    },
-                    Press.PINPOINT
-                )
-            )
-        )
-    }
-
+    // ============================================================================================
+    // ===================================== Edit Tests ===========================================
     @Test
     fun swipeRightTriggersEditScreen() {
         swipeRightTheRecordAt(4)
-        onView(withText(R.string.editDialogTitle)).check(matches(isDisplayed()))
+        onView(withText(R.string.edit_dialog_update_b)).check(matches(isDisplayed()))
+        onView(withText(R.string.edit_dialog_cancel_b)).check(matches(isDisplayed()))
     }
 
     @Test
     fun editARecordDestIDWorks() {
         swipeRightTheRecordAt(2)
-        onView(withText(R.string.editDialogTitle)).check(matches(isDisplayed()))
         onView(withText("X17")).perform(typeText("edited"))
-        onView(withText(R.string.editDialogUpdateB)).perform(click())
-        onView((withText("X17edited"))).check(matches(isDisplayed()))
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+        onView((withText("X17edited#1"))).check(matches(isDisplayed()))
     }
+
+    @Test
+    fun editWithAnExistingClientID() { // Means clientID already used by one record in the roadbook
+        val clientID = DestinationRecords.RECORDS[2].clientID
+        swipeRightTheRecordAt(3) // edit one record displayed below which has another clientID
+        onView(withId(R.id.autoCompleteClientID)).perform(clearText(), typeText(clientID)) // set for the same client that different record
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+        onView(withText("$clientID#2")).check(matches(isDisplayed())) // unique destID is computed
+    }
+
+    @Test
+    fun editWithAWrongFormatIsAborted() {
+        swipeRightTheRecordAt(2)
+        onView(withId(R.id.autoCompleteClientID))
+            .perform(click(), typeText("edited"), closeSoftKeyboard())
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerCancelBLabel)).perform(click())
+
+        onView(withId(R.id.editTextTimestamp)).perform(typeText("2222"))
+        onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
+
+        onView((withText("X17edited#1")))
+            .check(doesNotExist())
+    }
+
+    @Test
+    fun updateEditWithNoChange() {
+        swipeRightTheRecordAt(2)
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+        onView((withText(DestinationRecords.RECORDS[2].destID)))
+            .check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun eraseOnTimePickerResetTimestamp() {
+        val cal: Calendar = Calendar.getInstance()
+        onView(withText(startsWith("arrival : ${timestampUntilHourFormat(cal)}"))).check(matches(isDisplayed()))
+        eraseFirstRecTimestamp()
+        onView(withText(startsWith("arrival : ${timestampUntilHourFormat(cal)}"))).check(doesNotExist())
+    }
+
+    @Test
+    fun cancelOnTimePickerWorks() {
+        eraseFirstRecTimestamp()
+        swipeRightTheRecordAt(2)
+        onView(withId(R.id.autoCompleteClientID))
+            .perform(click(), clearText(),  typeText("New "), closeSoftKeyboard())
+
+        val cal: Calendar = Calendar.getInstance()
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerCancelBLabel)).perform(click())
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        onView(withText(startsWith("arrival : ${timestampUntilHourFormat(cal)}"))).check(doesNotExist())
+    }
+
+    @Test
+    fun editEveryFieldsWorks() {
+        onView(withText(DestinationRecords.RECORDS[2].destID)).check(matches(isDisplayed()))
+        swipeRightTheRecordAt(2)
+
+        // Edit all fields :
+        onView(withId(R.id.autoCompleteClientID))
+            .perform(click(), clearText(),  typeText("New "), closeSoftKeyboard())
+
+        val cal: Calendar = Calendar.getInstance()
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
+        onView(withId(R.id.editTextWaitingTime))
+            .perform(click(), clearText(), typeText("5"), closeSoftKeyboard())
+        onView(withId(R.id.editTextRate))
+            .perform(click(), clearText(), typeText("7"), closeSoftKeyboard())
+        onView(withId(R.id.multiAutoCompleteActions))
+            .perform(click(), clearText(), typeText("deliver, pick, pick, contact"), closeSoftKeyboard())
+        onView(withId(R.id.editTextNotes))
+            .perform(click(),  typeText("Some notes about how SDP is fun"), closeSoftKeyboard())
+
+        // Confirm edition :
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        // Check edited record is corretly displayed :
+        onView(withText("New#1")).check(matches(isDisplayed()))
+
+        eraseFirstRecTimestamp() // For having no ambiguity btw Timestamp on screen
+        onView(withText(startsWith("arrival : ${timestampUntilHourFormat(cal)}"))).check(matches(isDisplayed()))
+        onView(withText("wait : 5'")).check(matches(isDisplayed()))
+        onView(withText("rate : 7")).check(matches(isDisplayed()))
+        onView(withText("actions : (pick x2| deliver| contact)")).check(matches(isDisplayed()))
+
+        //Check notes were edited :
+        swipeRightTheRecordAt(2)
+        onView(withText("Some notes about how SDP is fun")).check(matches(isDisplayed()))
+    }
+
+    private fun eraseFirstRecTimestamp() {
+        swipeRightTheRecordAt(0)
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerEraseBLabel)).perform(click())
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+    }
+
     @Test
     fun cancelOnRecordEditionWorks() {
         swipeRightTheRecordAt(2)
-        onView(withText(R.string.editDialogTitle)).check(matches(isDisplayed()))
         onView(withText("X17")).perform(typeText("edited"))
-        onView(withText(R.string.editDialogCancelB)).perform(click())
+        onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
         // Same record is displayed, without the edited text happened to his destRecordID
-        onView((withText("X17"))).check(matches(isDisplayed()))
-
+        onView((withText("X17#1"))).check(matches(isDisplayed()))
     }
-    
+
+    // ============================================================================================
+    // ================================== Move records Tests ======================================
+
     @Test
     fun dragAndDropByInjectionIsWorking() {
         // Not possible for the moment in to cover the onMove() of the ItemtTouchHelper Callback,
         // However here, I simulate its behavior to triggers the ViewModel change.
 
-        onView(withText("X17")).check(isCompletelyAbove(withText("More1")))
+        onView(withText("X17#1")).check(isCompletelyAbove(withText("More#1")))
         testRule.scenario.onActivity {
 
             val fragment = it.supportFragmentManager.fragments.first() as NavHostFragment
@@ -219,8 +365,208 @@ class RoadBookFragmentTest {
             }
         }
 
-        onView(withText("X17")).check(matches(isDisplayed()))
+        onView(withText("X17#1")).check(matches(isDisplayed()))
         Thread.sleep(4000) // This one is needed to let the Screen enough time to be updated
-        onView(withText("X17")).check(isCompletelyBelow(withText("More1")))
+        onView(withText("X17#1")).check(isCompletelyBelow(withText("More#1")))
+    }
+
+    // ============================================================================================
+    // ================================= OptionMenu RB settings ===================================
+
+    @Test
+    fun rbSwipeLeftCorrectlyDisableDeletion() {
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_swipel_deletion)).perform(click())
+        swipeLeftTheRecordAt(2)
+        onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
+    }
+
+    @Test
+    fun rbSwipeRightCorrectlyDisableEdition() {
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_swiper_edition)).perform(click())
+        swipeRightTheRecordAt(2)
+        onView(withText(R.string.edit_dialog_update_b)).check(doesNotExist())
+        onView(withText(R.string.edit_dialog_cancel_b)).check(doesNotExist())
+    }
+
+    @Test
+    fun rbDragNDrop() { // Still can't test the drag & drop touch action
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_swiper_edition)).perform(click())
+    }
+
+    @Test
+    fun rbTouchClickCorrectlyDisableNavigation() {
+        // Disabled in sharedPref by setUp() @before routine
+        onView(withText(DestinationRecords.RECORDS[2].destID)).perform(click())
+        onView(withId(R.id.fragment_drecord_details_directors_parent)).check(doesNotExist())
+
+        // Check two times to disable it during a Fragment's LifeCycle
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_touch_click)).perform(click())
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_touch_click)).perform(click())
+
+        // Check it is still disabled
+        onView(withText(DestinationRecords.RECORDS[2].destID)).perform(click())
+        onView(withId(R.id.fragment_drecord_details_directors_parent)).check(doesNotExist())
+    }
+
+    @Test
+    fun rbSLeftEnabledAgainWorks() {
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_swipel_deletion)).perform(click())
+        swipeLeftTheRecordAt(2)
+        onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
+
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_swipel_deletion)).perform(click())
+        swipeLeftTheRecordAt(2)
+        onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
+    }
+    @Test
+    fun rbSwipeREnabledAgainWorks() {
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_swiper_edition)).perform(click())
+        swipeRightTheRecordAt(2)
+        onView(withText(R.string.edit_dialog_update_b)).check(doesNotExist())
+        onView(withText(R.string.edit_dialog_cancel_b)).check(doesNotExist())
+
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_swiper_edition)).perform(click())
+        swipeRightTheRecordAt(2)
+        onView(withText(R.string.edit_dialog_update_b)).check(matches(isDisplayed()))
+        onView(withText(R.string.edit_dialog_cancel_b)).check(matches(isDisplayed()))
+    }
+    @Test
+    fun rbDragNDropEnabledAgainWorks() { // Still can't test the drag & drop touch action
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_swiper_edition)).perform(click())
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_swiper_edition)).perform(click())
+    }
+
+    // Check that moving somewhere else in the app keep the sharedPref alive.
+    @Test
+    fun movingOutsideRBFragmentKeepsButtonStates() {
+        // Set some states :
+        // Turn SwipeLeft disabled
+        // Keep SwipeRight, DragNDrop enabled and Touch Navigation disabled
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_swipel_deletion)).perform(click())
+
+        // Check features :
+        // Swipe Left disabled
+        swipeLeftTheRecordAt(2)
+        onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
+
+        // SwipeRight enabled
+        swipeRightTheRecordAt(2)
+        onView(withText(R.string.edit_dialog_update_b)).check(matches(isDisplayed()))
+        onView(withText(R.string.edit_dialog_cancel_b)).check(matches(isDisplayed()))
+        onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
+
+        // Navigation on Click disabled
+        onView(withText(DestinationRecords.RECORDS[2].destID)).perform(click())
+        onView(withId(R.id.fragment_drecord_details_directors_parent)).check(doesNotExist())
+
+        // Navigate outside and come back
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.routeFragment))
+            .perform(click())
+        onView(withId(R.id.fragment_route_directors_parent))
+            .check(matches(isDisplayed()))
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.roadBookFragment))
+            .perform(click())
+
+        // Check features again :
+        // Swipe Left disabled
+        swipeLeftTheRecordAt(2)
+        onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
+
+        // SwipeRight enabled
+        swipeRightTheRecordAt(2)
+        onView(withText(R.string.edit_dialog_update_b)).check(matches(isDisplayed()))
+        onView(withText(R.string.edit_dialog_cancel_b)).check(matches(isDisplayed()))
+        onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
+
+        // Navigation on Click disabled
+        onView(withText(DestinationRecords.RECORDS[2].destID)).perform(click())
+        onView(withId(R.id.fragment_drecord_details_directors_parent)).check(doesNotExist())
+    }
+
+
+    // ============================================================================================
+    // ================================= Navigation to DRecordDetails =============================
+
+    @Test
+    fun clickingOnADestRecordLeadsToADRecordDetailsFragment() {
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_touch_click)).perform(click())
+        onView(withText(DestinationRecords.RECORDS[2].destID)).perform(click())
+        onView(withId(R.id.fragment_drecord_details_directors_parent)).check(matches(isDisplayed()))
+    }
+
+
+
+    // ============================================================================================
+    // ===================================== Helpers ==============================================
+
+    // Set by defaults by the TimePicker Instance, not stored in String Ressources
+    private val timePickerCancelBLabel = "Cancel"
+    private val timePickerUpdateBLabel = "OK"
+    private val timePickerEraseBLabel = "Erase"
+    private fun newRecord() {
+        onView(withId(R.id.fab)).perform(click())
+        onView(withId(R.id.autoCompleteClientID))
+            .perform(click(), typeText("New"), closeSoftKeyboard())
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+    }
+
+    // As we can't set the seconds currently,
+    // we use in our test the current time set by default in the time picker
+    // It's enough to match until the hours in our tests as at most one timestamp written at a time
+    // Retrieving it by text until the hours allows less false errors on the CI
+    private fun timestampUntilHourFormat(cal: Calendar): String {
+        return SimpleDateFormat.getTimeInstance()
+            .format(cal.time)
+            .substringBeforeLast(":")
+            .substringBeforeLast(":")
+    }
+    private fun swipeRightTheRecordAt(pos: Int) {
+        swipeSlowActionOnRecyclerList(pos, 0.5f, 1f, 2f, 1f)
+    }
+
+    private fun swipeLeftTheRecordAt(pos: Int) {
+        swipeSlowActionOnRecyclerList(pos, 0.5f, 1f, -1f, 1f)
+    }
+
+    private fun swipeSlowActionOnRecyclerList(pos: Int, startX: Float, startY: Float,
+                                                        endX: Float, endY: Float) {
+        onView(withId(R.id.list)).perform(
+            longClick(),
+            RecyclerViewActions.actionOnItemAtPosition<RoadBookViewAdapter.RecordViewHolder>(
+                pos, GeneralSwipeAction(
+                    Swipe.SLOW,
+                    {
+                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
+                        val x = xy[0] + (it.width - 1) * startX
+                        val y = xy[1] + (it.height - 1) * startY
+                        floatArrayOf(x, y)
+                    },
+                    {
+                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
+                        val x = xy[0] + (it.width - 1) * endX
+                        val y = xy[1] + (it.height - 1) * endY
+                        floatArrayOf(x, y)
+                    },
+                    Press.PINPOINT
+                )
+            )
+        )
     }
 }

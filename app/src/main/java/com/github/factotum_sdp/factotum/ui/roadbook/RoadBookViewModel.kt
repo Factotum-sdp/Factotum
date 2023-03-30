@@ -10,6 +10,7 @@ import com.google.firebase.database.DatabaseReference
 import java.text.SimpleDateFormat.getDateInstance
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 /**
  * The RoadBook ViewModel
@@ -20,37 +21,50 @@ import kotlin.collections.ArrayList
 class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
 
     private val _recordsList: MutableLiveData<List<DestinationRecord>> =
-        MutableLiveData(DestinationRecords.RECORDS)
-
+        MutableLiveData(emptyList())
     val recordsListState: LiveData<List<DestinationRecord>> = _recordsList
-    private val swappedRecords: ArrayList<DestinationRecord> = arrayListOf()
+
     private var dbRef: DatabaseReference
+    private val swapedRecords: ArrayList<DestinationRecord> = arrayListOf()
+    private val clientOccurences = HashMap<String, Int>()
+
     init {
         val date = Calendar.getInstance().time
         dbRef = _dbRef // ref path to register all back-ups from this RoadBook
                 .child(getDateInstance().format(date))
                 //.child(getTimeInstance().format(date).plus(Random.nextInt().toString()))
                 // Let uncommented for testing purpose. Uncomment it for back-up uniqueness in the DB
+        // Only for demo purpose :
+        addDemoRecords(DestinationRecords.RECORDS)
     }
 
     /**
      * Add a new DestinationRecord at the end of the recordsList
-     * @param destinationRecord DestinationRecord to be added
+     * @param clientID The Customer unique identifier associated to this DestinationRecord
+     * @param timeStamp The arrival time
+     * @param waitingTime The waiting time in minutes
+     * @param rate Rate as internal code notation
+     * @param actions The actions to be done on a destination
+     * @param notes The additional notes concerning a destination
      */
-    fun addRecord(destinationRecord: DestinationRecord) {
+    fun addRecord(clientID: String, timeStamp: Date?, waitingTime: Int,
+                  rate: Int, actions: List<DestinationRecord.Action>, notes: String) {
         val newList = arrayListOf<DestinationRecord>()
         newList.addAll(_recordsList.value as Collection<DestinationRecord>)
-        newList.add(destinationRecord)
+        val destID = computeDestID(clientID)
+        val rec = DestinationRecord(destID, clientID, timeStamp, waitingTime, rate, actions, notes)
+        newList.add(rec)
         _recordsList.postValue(newList)
     }
 
     /**
-     * Delete the last DestinationRecord of the recordsList
+     * Delete the DestinationRecord at index "pos" in the recordsList
+     * @param pos: Int Index of the target record to delete
      */
-    fun deleteLastRecord() {
+    fun deleteRecordAt(pos: Int) {
         val newList = arrayListOf<DestinationRecord>()
         newList.addAll(_recordsList.value as Collection<DestinationRecord>)
-        if (newList.isNotEmpty()) newList.removeLast()
+        newList.removeAt(pos)
         _recordsList.postValue(newList)
     }
 
@@ -70,9 +84,9 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
      */
     fun swapRecords(from: Int, to: Int) {
         assert(from <= to)
-        if(swappedRecords.isEmpty())
-            swappedRecords.addAll(_recordsList.value as Collection<DestinationRecord>)
-        Collections.swap(swappedRecords, from, to)
+        if(swapedRecords.isEmpty())
+            swapedRecords.addAll(_recordsList.value as Collection<DestinationRecord>)
+        Collections.swap(swapedRecords, from, to)
     }
 
     /**
@@ -81,24 +95,62 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
      * in order to show the result to some possible observers.
      */
     fun pushSwapsResult() {
-        if(swappedRecords.isNotEmpty()) {
+        if(swapedRecords.isNotEmpty()) {
             var ls = listOf<DestinationRecord>()
-            ls = ls.plus(swappedRecords)
+            ls = ls.plus(swapedRecords)
             _recordsList.postValue(ls)
-            swappedRecords.clear()
+            swapedRecords.clear()
         }
     }
 
     /**
-     * Edit the DestinationRecort at indec pos in the recordsList attribute
+     * Edit the DestinationRecord at index pos in the recordsList attribute
+     * If the new DestRecord computed is the same at the old one no value is posted and false is returned
      * @param pos: Int position Index at which the current DestRecord will be override
-     * @param newRec: DestinationRecord The record containing the new data
+     * @param clientID The Customer unique identifier associated to this DestinationRecord
+     * @param timeStamp The arrival time
+     * @param waitingTime The waiting time in minutes
+     * @param rate Rate as internal code notation
+     * @param actions The actions to be done on a destination
+     * @param notes The additional notes concerning a destination
+     * @return true if according the args, there is a change and the _recordList is updated, false otherwise
      */
-    fun editRecord(pos: Int, newRec: DestinationRecord) {
+    fun editRecord(pos: Int, clientID: String, timeStamp: Date?, waitingTime: Int,
+                   rate: Int, actions: List<DestinationRecord.Action>, notes: String): Boolean {
+        val currentRec = _recordsList.value!![pos]
+        var destID = currentRec.destID
+        if(currentRec.clientID != clientID) {
+            destID = computeDestID(clientID)
+        }
+        val newRec = DestinationRecord(destID, clientID, timeStamp, waitingTime, rate, actions, notes)
         val ls = arrayListOf<DestinationRecord>()
         ls.addAll(_recordsList.value as Collection<DestinationRecord>)
         ls[pos] = newRec
-        _recordsList.postValue(ls)
+        if(currentRec != newRec) {
+            _recordsList.postValue(ls)
+            return true
+        }
+        // Prefer to be explicit with a boolean value, for the front-end to know it has to refresh, or act accordingly.
+        // ! Check the case where the destID is the same but
+        return false
+    }
+
+    //Needed to update the destIDOccurrences cache
+    private fun addDemoRecords(ls: List<DestinationRecord>) {
+        val newList = arrayListOf<DestinationRecord>()
+        ls.forEach {
+            val destID = computeDestID(it.clientID)
+            newList.add(DestinationRecord(destID, it.clientID, it.timeStamp, it.waitingTime, it.rate, it.actions, it.notes))
+        }
+        _recordsList.postValue(newList)
+    }
+
+    private fun computeDestID(clientID: String): String {
+        val occ = clientOccurences.compute(clientID) { _, oldOcc ->
+            var occ = oldOcc ?: 0
+            ++occ
+        }
+        return "$clientID#$occ"
     }
 
     // Factory needed to assign a value at construction time to the class attribute

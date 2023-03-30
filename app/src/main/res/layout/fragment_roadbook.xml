@@ -5,7 +5,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment_roadbook_directors_parent"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:visibility="visible"
+    tools:visibility="visible">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list"
@@ -15,36 +17,18 @@
         android:background="#FF003549"
         app:layoutManager="LinearLayoutManager"
         tools:context=".ui.roadbook.RoadBookFragment"
-        tools:listitem="@layout/fragment_destrecord">
-    </androidx.recyclerview.widget.RecyclerView>
+        tools:listitem="@layout/fragment_destrecord" />
 
-    <LinearLayout
-        android:layout_width="64dp"
-        android:layout_height="131dp"
-        android:layout_marginEnd="16dp"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="@dimen/fab_margin"
         android:layout_marginBottom="16dp"
-        android:orientation="vertical"
+        app:srcCompat="@android:drawable/ic_input_add"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_delete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:contentDescription="@string/temp_delete_action_button"
-            android:focusable="true"
-            app:srcCompat="@android:drawable/ic_delete" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:contentDescription="@string/fab_add_description"
-            android:focusable="true"
-            app:srcCompat="@android:drawable/ic_input_add" />
-    </LinearLayout>
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

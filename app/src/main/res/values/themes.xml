@@ -19,7 +19,18 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+
     <style name="Theme.Factotum.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.Factotum.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="AppTheme.Dialog" parent="ThemeOverlay.MaterialComponents.Dialog">
+
+        <!-- add a minimun width to the dialog, so it's not too narrow -->
+        <item name="android:windowMinWidthMajor">@dimen/abc_dialog_min_width_major</item>
+        <item name="android:windowMinWidthMinor">@dimen/abc_dialog_min_width_minor</item>
+
+        <!-- display the title for dialogs -->
+        <item name="android:windowNoTitle">false</item>
+
+    </style>
 </resources>

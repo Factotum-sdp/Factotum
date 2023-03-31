@@ -34,16 +34,15 @@ class ContactsListOfflineTest {
 
 
         // Save the sample list of contacts to shared preferences
-        ContactsList.contacts.clear()
-        ContactsList.contacts.addAll(originalContactsList)
+        ContactsList.setItems(originalContactsList)
         ContactsList.saveContactsLocally(ApplicationProvider.getApplicationContext())
 
         // Clear the current list and load contacts from shared preferences
-        ContactsList.contacts.clear()
+        ContactsList.setItems(emptyList())
         ContactsList.loadContactsLocally(ApplicationProvider.getApplicationContext())
 
         // Check if the loaded contacts match the original sample list
-        assertEquals(originalContactsList, ContactsList.contacts)
+        assertEquals(originalContactsList, ContactsList.getItems())
     }
 }
 

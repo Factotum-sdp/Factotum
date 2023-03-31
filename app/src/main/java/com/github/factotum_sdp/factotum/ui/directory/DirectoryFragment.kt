@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SearchView
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,6 +21,8 @@ class DirectoryFragment : Fragment() {
 
     private val mainScope = MainScope()
     private lateinit var db: FirebaseDatabase
+    private lateinit var adapter: ContactsRecyclerAdapter
+    private lateinit var emptyContactsMessage: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,12 +41,6 @@ class DirectoryFragment : Fragment() {
     @SuppressLint("NotifyDataSetChanged") //We are updating the entire list at launch so we are not worried about wasted performance
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val recycler = view.findViewById<RecyclerView>(R.id.contacts_recycler_view)
-
-        recycler.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = ContactsRecyclerAdapter()
-        }
 
         // Load contacts from local storage
         ContactsList.loadContactsLocally(requireContext())
@@ -50,8 +48,37 @@ class DirectoryFragment : Fragment() {
         // Sync contacts from Firebase when connected to the internet
         mainScope.launch {
             ContactsList.syncContactsFromFirebase(requireContext())
-            recycler.adapter?.notifyDataSetChanged()
         }
+
+        val recycler = view.findViewById <RecyclerView>(R.id.contacts_recycler_view) // connect the recycler view to the layout
+        val searchView = view.findViewById <SearchView>(R.id.contacts_search_view) // connect the search view to the layout
+        emptyContactsMessage = view.findViewById(R.id.empty_contacts_message)
+
+        adapter = ContactsRecyclerAdapter(ContactsList.getItems())
+        //the recycler is just the way we chose to represent the list of contacts
+        recycler.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = this@DirectoryFragment.adapter
+        }
+
+        adapter.onDataSetChangedListener = object : ContactsRecyclerAdapter.OnDataSetChangedListener {
+            override fun onDataSetChanged(itemCount: Int) {
+                emptyContactsMessage.visibility = if (itemCount == 0) View.VISIBLE else View.GONE
+            }
+        }
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                // You can handle the search submission here if needed
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                // Filter the RecyclerView when the text changes
+                adapter.filter.filter(newText)
+                return true
+            }
+        })
     }
 
     override fun onPause() {

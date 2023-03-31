@@ -14,91 +14,93 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Destination ID"
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
 
         <EditText
             android:id="@+id/editTextDestID"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:enabled="false"/>
+            android:enabled="false" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Client ID"
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
 
         <EditText
             android:id="@+id/editTextClientID"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:enabled="false"/>
+            android:enabled="false" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Timestamp"
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
 
         <EditText
             android:id="@+id/editTextTimestamp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:enabled="false"/>
+            android:enabled="false" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Waiting Time"
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
 
         <EditText
             android:id="@+id/editTextWaitingTime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:enabled="false"/>
+            android:enabled="false" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Rate"
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
 
         <EditText
             android:id="@+id/editTextRate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:enabled="false"/>
+            android:enabled="false" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Actions"
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
 
         <EditText
             android:id="@+id/editTextActions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:enabled="false"/>
+            android:enabled="false" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Notes"
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
 
         <EditText
             android:id="@+id/editTextNotes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:enabled="false"/>
-
+            android:enabled="false" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

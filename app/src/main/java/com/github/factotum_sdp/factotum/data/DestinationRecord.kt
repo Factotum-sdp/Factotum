@@ -25,6 +25,15 @@ data class DestinationRecord(
     val notes: String
 ){
     companion object {
+
+        /**
+         * Usual String Format to display a Date object belonging to a DestinationRecord
+         *
+         * Format : "HH:MM:SS AM-PM" / if timeStamp Date is null : _
+         *
+         * @param timeStamp: Date?
+         * @return the timeStamp String format
+         */
         fun timeStampFormat(timeStamp: Date?): String {
             val result =
                 timeStamp?.let {
@@ -33,9 +42,21 @@ data class DestinationRecord(
             return result
         }
 
+        /**
+         * Usual String Format to display a list of Action objects
+         *
+         * The same Action object occurrences in a List<Action>, are collected to be displayed
+         * in a parenthesis format with '|' as separator.
+         *
+         * Example for a List(PICK, CONTACT, PICK) : (contact, pick x2)
+         *
+         * @param actions: List<Action>
+         * @return the actions String format
+         */
         fun actionsFormat(actions: List<Action>): String {
+
             val actionsWithOcc: EnumMap<Action, Int> = EnumMap(Action::class.java)
-            actions.forEach {
+            actions.forEach {// Collect the occurrences
                 actionsWithOcc.compute(it) { _, occ ->
                     var newOcc = occ ?: 0
                     ++newOcc
@@ -43,7 +64,7 @@ data class DestinationRecord(
             }
             val actionsFormatList = actionsWithOcc.map {
                 if (it.value == 1)
-                    it.key.toString()
+                    it.key.toString()// If only one occurrences do not display the x character
                 else
                     "${it.key} x${it.value}"
             }

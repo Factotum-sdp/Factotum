@@ -20,6 +20,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
+import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeLeftTheRecordAt
+import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightTheRecordAt
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import org.hamcrest.CoreMatchers.startsWith
@@ -42,10 +44,11 @@ class RoadBookFragmentTest {
     )
 
     companion object {
-        private const val SWIPE_L_SHARED_KEY = "SwipeLeftButton"
-        private const val SWIPE_R_SHARED_KEY = "SwipeRightButton"
-        private const val DRAG_N_DROP_SHARED_KEY = "DragNDropButton"
-        private const val TOUCH_CLICK_SHARED_KEY = "TouchClickButton"
+
+        const val SWIPE_L_SHARED_KEY = "SwipeLeftButton"
+        const val SWIPE_R_SHARED_KEY = "SwipeRightButton"
+        const val DRAG_N_DROP_SHARED_KEY = "DragNDropButton"
+        const val TOUCH_CLICK_SHARED_KEY = "TouchClickButton"
 
         @BeforeClass
         @JvmStatic
@@ -537,36 +540,5 @@ class RoadBookFragmentTest {
             .substringBeforeLast(":")
             .substringBeforeLast(":")
     }
-    private fun swipeRightTheRecordAt(pos: Int) {
-        swipeSlowActionOnRecyclerList(pos, 0.5f, 1f, 2f, 1f)
-    }
 
-    private fun swipeLeftTheRecordAt(pos: Int) {
-        swipeSlowActionOnRecyclerList(pos, 0.5f, 1f, -1f, 1f)
-    }
-
-    private fun swipeSlowActionOnRecyclerList(pos: Int, startX: Float, startY: Float,
-                                                        endX: Float, endY: Float) {
-        onView(withId(R.id.list)).perform(
-            longClick(),
-            RecyclerViewActions.actionOnItemAtPosition<RoadBookViewAdapter.RecordViewHolder>(
-                pos, GeneralSwipeAction(
-                    Swipe.SLOW,
-                    {
-                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
-                        val x = xy[0] + (it.width - 1) * startX
-                        val y = xy[1] + (it.height - 1) * startY
-                        floatArrayOf(x, y)
-                    },
-                    {
-                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
-                        val x = xy[0] + (it.width - 1) * endX
-                        val y = xy[1] + (it.height - 1) * endY
-                        floatArrayOf(x, y)
-                    },
-                    Press.PINPOINT
-                )
-            )
-        )
-    }
 }

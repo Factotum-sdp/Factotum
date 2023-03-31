@@ -5,12 +5,11 @@ import android.os.Bundle
 import android.view.*
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.ItemTouchHelper.*
-import androidx.recyclerview.widget.RecyclerView.OnItemTouchListener
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -21,9 +20,13 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
  */
 class RoadBookFragment : Fragment(), MenuProvider {
 
-    private lateinit var rbViewModel: RoadBookViewModel
     private lateinit var rbRecyclerView: RecyclerView
     private lateinit var fragMenu: Menu
+    private val rbViewModel: RoadBookViewModel by activityViewModels() {
+        RoadBookViewModel.RoadBookViewModelFactory(
+            MainActivity.getDatabase().reference.child(ROADBOOK_DB_PATH)
+        )
+    }
 
     // Checked OptionMenu States with default values
     // overridden by the device saved SharedPreference
@@ -38,10 +41,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
         val view = inflater.inflate(R.layout.fragment_roadbook, container, false)
         val adapter = RoadBookViewAdapter(setOnDRecordClickListener())
-        val dbRef = MainActivity.getDatabase().reference.child(ROADBOOK_DB_PATH)
-
-        val rbFact = RoadBookViewModel.RoadBookViewModelFactory(dbRef)
-        rbViewModel = ViewModelProvider(this, rbFact)[RoadBookViewModel::class.java]
 
         // Observe the roadbook ViewModel, to detect data changes
         // and update the displayed RecyclerView accordingly
@@ -64,12 +63,18 @@ class RoadBookFragment : Fragment(), MenuProvider {
         super.onPause()
     }
 
-    private fun setOnDRecordClickListener(): View.OnClickListener {
-        return View.OnClickListener { v ->
-            if(isTClickEnabled) {
-                v
-                    ?.findNavController()
-                    ?.navigate(R.id.action_roadBookFragment_to_DRecordDetailsFragment)
+    private fun setOnDRecordClickListener(): (String) -> View.OnClickListener {
+        return {
+            View.OnClickListener { v ->
+                if(isTClickEnabled) {
+                    v
+                        ?.findNavController()
+                        ?.navigate(R.id.action_roadBookFragment_to_DRecordDetailsFragment,
+                            Bundle().apply {
+                                putString(DEST_ID_NAV_ARG_KEY, it)
+                            }
+                        )
+                }
             }
         }
     }
@@ -195,6 +200,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         private const val SWIPE_R_SHARED_KEY = "SwipeRightButton"
         private const val DRAG_N_DROP_SHARED_KEY = "DragNDropButton"
         private const val TOUCH_CLICK_SHARED_KEY = "TouchClickButton"
+        const val DEST_ID_NAV_ARG_KEY = "destID"
     }
 
     /** Only use that access for testing purpose */

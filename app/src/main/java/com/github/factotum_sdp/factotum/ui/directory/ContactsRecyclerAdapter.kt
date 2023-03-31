@@ -1,9 +1,13 @@
 package com.github.factotum_sdp.factotum.ui.directory
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.navigation.findNavController
@@ -11,13 +15,19 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.ContactsList
 
-class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.ContactsViewHolder>() {
+class ContactsRecyclerAdapter (private val originalContacts: List<ContactsList.Contact>) : RecyclerView.Adapter<ContactsRecyclerAdapter.ContactsViewHolder>(), Filterable {
 
-    private val contacts = ContactsList.contacts //this is the list of contacts
-    //we consider the list of contacts to be constant so we don't need to worry about updating the recycler view
-    //list of contact only changes when the app is restarted
+    interface OnDataSetChangedListener {
+        fun onDataSetChanged(itemCount: Int)
+    }
 
-    inner class ContactsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) { //this is the view holder for the recycler view
+    private var filteredContacts = ArrayList<ContactsList.Contact>()
+    var onDataSetChangedListener: OnDataSetChangedListener? = null
+
+    init {
+        filteredContacts.addAll(originalContacts) // Use the originalContacts list here
+    }
+    class ContactsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) { //this is the view holder for the recycler view
 
         val itemRole : TextView //these are the views that we want to display for each contact
         val itemName : TextView
@@ -43,12 +53,44 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
     }
 
     override fun onBindViewHolder(holder: ContactsViewHolder, i: Int) {
-        holder.itemRole.text = contacts[i].role //set the text for each view
-        holder.itemName.text = contacts[i].name
-        holder.itemImage.setImageResource(contacts[i].profile_pic_id)
+        holder.itemRole.text = filteredContacts[i].role //set the text for each view
+        holder.itemName.text = filteredContacts[i].name
+        holder.itemImage.setImageResource(filteredContacts[i].profile_pic_id)
     }
 
     override fun getItemCount(): Int { //simple getter for the number of contacts
-        return contacts.size
+        return filteredContacts.size
+    }
+
+    override fun getFilter(): Filter {
+        return object : Filter() {
+            override fun performFiltering(constraint: CharSequence?): FilterResults {
+                val filteredList = ArrayList<ContactsList.Contact>()
+                if (constraint == null || constraint.isEmpty()) {
+                    filteredList.addAll(originalContacts) // Use the originalContacts list here
+                } else {
+                    val filterPattern = constraint.toString().lowercase().trim()
+                    for (item in originalContacts) { // Use the originalContacts list for filtering
+                        if (item.name.lowercase().contains(filterPattern)) {
+                            filteredList.add(item)
+                        }
+                    }
+                }
+                val results = FilterResults()
+                results.values = filteredList
+                results.count = filteredList.size
+                return results
+            }
+
+            @SuppressLint("NotifyDataSetChanged")
+            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+                Log.d("filter", "Results : " + results?.values.toString())
+                filteredContacts.clear()
+                filteredContacts.addAll(results?.values as ArrayList<ContactsList.Contact>)
+                Log.d("filter", "Contacts : " + filteredContacts.joinToString { it.name })
+                notifyDataSetChanged()
+                onDataSetChangedListener?.onDataSetChanged(filteredContacts.size)
+            }
+        }
     }
 }

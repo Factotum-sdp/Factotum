@@ -95,4 +95,5 @@
     <string name="edit_confirmed_snap_label">Record edited</string>
     <string name="rb_label_touch_click">Touch click</string>
     <string name="share">Share</string>
+    <string name="no_contacts_found">No contacts found</string>
 </resources>

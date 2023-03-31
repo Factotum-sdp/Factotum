@@ -70,16 +70,16 @@ class ContactDetailsFragmentTest {
     @Test
     fun correctInfoIsDisplayed() {
         onView(withId(R.id.contact_name))
-            .check(matches(withText(ContactsList.contacts[0].name)))
+            .check(matches(withText(ContactsList.getItems()[0].name)))
         onView(withId(R.id.contact_phone))
-            .check(matches(withText(ContactsList.contacts[0].phone)))
+            .check(matches(withText(ContactsList.getItems()[0].phone)))
         onView(withId(R.id.contact_role))
-            .check(matches(withText(ContactsList.contacts[0].role)))
+            .check(matches(withText(ContactsList.getItems()[0].role)))
         onView(withId(R.id.contact_address))
-            .check(matches(withText(ContactsList.contacts[0].address)))
-        if (ContactsList.contacts[0].details != null) {
+            .check(matches(withText(ContactsList.getItems()[0].address)))
+        if (ContactsList.getItems()[0].details != null) {
             onView(withId(R.id.contact_details))
-                .check(matches(withText(ContactsList.contacts[0].details)))
+                .check(matches(withText(ContactsList.getItems()[0].details)))
         }
     }
 

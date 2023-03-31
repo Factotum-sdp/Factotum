@@ -113,9 +113,6 @@ class MainActivity : AppCompatActivity() {
             true
         }
     }
-
-    fun getDatabaseRef(): DatabaseReference {
-        return db
         
     companion object {
         private var database: FirebaseDatabase = Firebase.database

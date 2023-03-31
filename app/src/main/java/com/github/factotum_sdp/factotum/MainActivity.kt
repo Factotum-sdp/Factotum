@@ -1,16 +1,11 @@
 package com.github.factotum_sdp.factotum
 
 import android.os.Bundle
-import android.view.Menu
-import android.view.View
 import android.widget.TextView
-import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
-import androidx.navigation.NavController
-import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -21,7 +16,6 @@ import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.FirebaseApp
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
@@ -68,7 +62,7 @@ class MainActivity : AppCompatActivity() {
         // Set listener on logout button
         listenLogoutButton()
     }
-    
+
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
@@ -107,7 +101,7 @@ class MainActivity : AppCompatActivity() {
             true
         }
     }
-        
+
     companion object {
         private var database: FirebaseDatabase = Firebase.database
         fun getDatabase(): FirebaseDatabase {

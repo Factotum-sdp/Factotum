@@ -7,11 +7,9 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.ItemTouchHelper.*
-import androidx.recyclerview.widget.RecyclerView.OnItemTouchListener
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -25,7 +23,9 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private lateinit var rbRecyclerView: RecyclerView
     private lateinit var fragMenu: Menu
     private val rbViewModel: RoadBookViewModel by activityViewModels() {
-        RoadBookViewModel.RoadBookViewModelFactory((activity as MainActivity).getDatabaseRef().child(ROADBOOK_DB_PATH))
+        RoadBookViewModel.RoadBookViewModelFactory(
+            (activity as MainActivity).getDatabaseRef().child(ROADBOOK_DB_PATH)
+        )
     }
 
     // Checked OptionMenu States with default values
@@ -63,7 +63,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         super.onPause()
     }
 
-    private fun setOnDRecordClickListener(): (Int) -> View.OnClickListener {
+    private fun setOnDRecordClickListener(): (String) -> View.OnClickListener {
         return {
             View.OnClickListener { v ->
                 if(isTClickEnabled) {
@@ -71,7 +71,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
                         ?.findNavController()
                         ?.navigate(R.id.action_roadBookFragment_to_DRecordDetailsFragment,
                             Bundle().apply {
-                                putInt("RecPos", it)
+                                putString("destID", it)
                             }
                         )
                 }

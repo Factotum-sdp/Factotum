@@ -1,25 +1,22 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.navigation.findNavController
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.DestinationRecord.Action
 import com.github.factotum_sdp.factotum.data.DestinationRecord
-import java.text.SimpleDateFormat
 import java.util.*
 
 /**
  * Adapter for the RecyclerView which will display a dynamic list of DestinationRecord
  * Choice of the RecyclerView instead of a ListAdapter for later facilities with drageNdrop
  */
-class RoadBookViewAdapter(private val onItemViewHolderLFromClientId: (Int) -> View.OnClickListener?) :
+class RoadBookViewAdapter(private val onClickListenerFromDestId: (String) -> View.OnClickListener?) :
     RecyclerView.Adapter<RoadBookViewAdapter.RecordViewHolder>() {
 
     // Call back needed to instantiate the async list attribute
@@ -69,7 +66,9 @@ class RoadBookViewAdapter(private val onItemViewHolderLFromClientId: (Int) -> Vi
         holder.actions.text =
             actionsStringFormat(item.actions, context.getString(R.string.actions_text_view))
 
-        itemView.setOnClickListener(onItemViewHolderLFromClientId(position))
+        // Note that transition has to be done through ID and not the position
+        // as there is some asynchrony between displayed list and the RBViewModel's one
+        itemView.setOnClickListener(onClickListenerFromDestId(holder.destID.text.toString()))
     }
 
     private fun rateStringFormat(rate: Int, label: String): String {
@@ -84,29 +83,11 @@ class RoadBookViewAdapter(private val onItemViewHolderLFromClientId: (Int) -> Vi
     }
     // arrival : _ or arrival : HH:MM:SS AM-PM
     private fun timestampStringFormat(date: Date?, label: String): String {
-        val timestamp =
-            date?.let {
-                SimpleDateFormat.getTimeInstance().format(it)
-            } ?: "_"
-        return "$label : $timestamp"
+        return "$label : ${DestinationRecord.timeStampFormat(date)}"
     }
-    // actions : () or actions : (p | p | c)
+    // actions : () or actions : (pick x2 |contact)
     private fun actionsStringFormat(actions: List<Action>, label: String): String {
-        val actionsWithOcc: EnumMap<Action, Int> = EnumMap(Action::class.java)
-        actions.forEach {
-            actionsWithOcc.compute(it) { _, occ ->
-                var newOcc = occ ?: 0
-                ++newOcc
-            }
-        }
-        val actionsFormatList = actionsWithOcc.map {
-            if (it.value == 1)
-                it.key.toString()
-            else
-                "${it.key} x${it.value}"
-        }
-
-        return actionsFormatList.joinToString("| ", "$label : (", ")")
+        return "$label : ${DestinationRecord.actionsFormat(actions)}"
     }
 
     override fun getItemCount(): Int = asyncList.currentList.size

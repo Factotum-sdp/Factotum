@@ -144,6 +144,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
             true
         }
     }
+
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         // Needed to have the onSupportNavigateUp() called
         // when clicking on the home button after an onMenuItemSelected() override

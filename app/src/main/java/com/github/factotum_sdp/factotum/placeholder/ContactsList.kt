@@ -1,16 +1,34 @@
 package com.github.factotum_sdp.factotum.placeholder
 
+import android.content.Context
+import android.content.SharedPreferences
+import android.util.Log
 import com.github.factotum_sdp.factotum.R
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.CompletableDeferred
+
+private const val CONTACTS_PREFS = "contacts_prefs"
+private const val CONTACTS_KEY = "contacts_key"
 
 /**
  * Class representing a list of contacts.
  */
 object ContactsList {
 
-    /**
-     * An array of sample contacts.
-     */
-    val ITEMS: MutableList<Contact> = ArrayList()
+    val contacts = mutableListOf<Contact>()
+    private val randomContacts = mutableListOf<Contact>()
+    private lateinit var dataSource: FirebaseDatabase
+    val size get() = contacts.size
+
+    fun init(dataSource: FirebaseDatabase) {
+        this.dataSource = dataSource
+    }
+
 
     //fake data --> to be replaced with connection to database
     private val randomNames = listOf("John Smith", "Jane Doe", "Bob Builder")
@@ -21,31 +39,164 @@ object ContactsList {
 
     private const val image = R.drawable.contact_image
 
-    private const val COUNT = 10
-    init {
-        // Add some sample items.
-        for (i in 1..COUNT) {
-            addItem(createContact(i))
-        }
-    }
+    private const val COUNT = 5
+
 
     //Trivial method for now but will be useful when connecting to database
     private fun addItem(item: Contact) {
-        ITEMS.add(item)
+        randomContacts.add(item)
     }
+
 
     private fun createContact(position: Int): Contact {
         return Contact(
+            "$position",
             roles[position % roles.size], randomNames[position % randomNames.size], image,
                 randomAddresses[position % randomAddresses.size],
                 randomPhones[position % randomPhones.size],
                 randomDetails[position % randomDetails.size])
     }
 
+    private fun createRandomContacts() {
+        for (i in 0 until COUNT) {
+            addItem(createContact(i))
+        }
+    }
+
+    /**
+     * Saves the contacts list to a local storage.
+     */
+    fun saveContactsLocally(context: Context) {
+        // Get an instance of SharedPreferences with a specific name (CONTACTS_PREFS) and mode (private)
+        val sharedPreferences: SharedPreferences = context.getSharedPreferences(CONTACTS_PREFS, Context.MODE_PRIVATE)
+
+        // Get an editor for SharedPreferences to make changes
+        val editor: SharedPreferences.Editor = sharedPreferences.edit()
+
+        // Create a Gson object to convert the contacts list into a JSON string
+        val gson = Gson()
+
+        // Serialize the contacts list into a JSON string
+        val jsonContacts = gson.toJson(contacts)
+
+        // Save the JSON string into SharedPreferences with the key CONTACTS_KEY
+        editor.putString(CONTACTS_KEY, jsonContacts)
+
+        // Apply the changes to SharedPreferences
+        editor.apply()
+    }
+
+
+    /**
+     * Loads the contacts list from local storage.
+     */
+    fun loadContactsLocally(context: Context) {
+        // Get an instance of SharedPreferences with the specific name (CONTACTS_PREFS) and mode (private)
+        val sharedPreferences: SharedPreferences = context.getSharedPreferences(CONTACTS_PREFS, Context.MODE_PRIVATE)
+
+        // Create a Gson object to convert the JSON string back to the contacts list
+        val gson = Gson()
+
+        // Retrieve the JSON string from SharedPreferences using the key CONTACTS_KEY
+        val jsonContacts = sharedPreferences.getString(CONTACTS_KEY, null)
+
+        // Check if the JSON string is not null (meaning there are contacts saved in SharedPreferences)
+        if (jsonContacts != null) {
+            // Define the type for deserialization (List<Contact>)
+            val type = object : TypeToken<List<Contact>>() {}.type
+
+            // Clear the current contacts list
+            contacts.clear()
+
+            // Deserialize the JSON string and add the contacts to the list
+            contacts.addAll(gson.fromJson(jsonContacts, type))
+        }
+    }
+
+    /**
+     * Synchronizes the contacts list with Firebase Realtime Database.
+     */
+    suspend fun syncContactsFromFirebase(context: Context) {
+        // Get a reference to the database node
+        val contactsRef = dataSource.getReference("contacts")
+
+        // Create a CompletableDeferred object to wait for the completion of the onDataChange method
+        val deferred = CompletableDeferred<Unit>()
+
+        // Add a ValueEventListener for a single read from Firebase Realtime Database
+        contactsRef.addListenerForSingleValueEvent(createValueEventListener(deferred, context))
+
+        // Wait for the completion of the onDataChange method
+        deferred.await()
+    }
+
+    private fun createValueEventListener(deferred: CompletableDeferred<Unit>, context: Context): ValueEventListener {
+        return object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // Clear the current contacts list
+                contacts.clear()
+
+                // Iterate through each child (contact) in dataSnapshot
+                for (contactSnapshot in dataSnapshot.children) {
+                    // Deserialize the contactSnapshot into a Contact object
+                    val contact = contactSnapshot.getValue(Contact::class.java)
+
+                    // Check if the contact is not null and add it to the contacts list
+                    if (contact != null) {
+                        contacts.add(contact)
+                    }
+                }
+
+                // Save the updated contacts list to local storage
+                saveContactsLocally(context)
+
+                // Mark the CompletableDeferred as complete
+                deferred.complete(Unit)
+            }
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Mark the CompletableDeferred as failed with an exception
+                deferred.completeExceptionally(databaseError.toException())
+                Log.d("ContactsList", "onCancelled: ${databaseError.toException()}")
+            }
+        }
+    }
+
+
+
+    /**
+     * Populates the database with random contacts.
+     */
+    suspend fun populateDatabase() {
+        val deferred = CompletableDeferred<Unit>()
+
+        createRandomContacts()
+
+        dataSource.getReference("contacts").setValue(randomContacts)
+            .addOnSuccessListener {
+                deferred.complete(Unit)
+            }
+            .addOnFailureListener { exception ->
+                deferred.completeExceptionally(exception)
+            }
+
+        deferred.await()
+    }
+
+
+
+
     /**
      * A data class representing a contact.
      */
-    data class Contact(val role: String, val name: String, val profile_pic_id: Int, val address: String, val phone: String, val details: String? = null) {
-        //override fun toString(): String = "$role: $name"
+    data class Contact(
+        val id: String,
+        val role: String,
+        val name: String,
+        val profile_pic_id: Int,
+        val address: String,
+        val phone: String,
+        val details: String? = null)
+    {
+        constructor() : this("", "", "", 0, "", "", null)
     }
 }

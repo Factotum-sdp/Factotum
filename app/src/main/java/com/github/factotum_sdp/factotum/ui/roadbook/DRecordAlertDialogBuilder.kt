@@ -30,7 +30,7 @@ import java.util.*
  *
  * Finally calling the inherited show() method will call create() and make the new custom concrete AlertDialog
  *
- * @param context: Context? The Context wherein this DialogBuilder is instanced
+ * @param context: Context? The Context wherein this DialogBuilder is instantiated
  * @param host: Fragment The Fragment which will hold the AlertDialog
  * @param rbViewModel: RoadBookViewModel The RoadBookViewModel storing the observable data of each DestinationRecord
  * @param rbRecyclerView: RecyclerView The RecyclerView as optimization to notify the screen representation when there is no edit changes,

@@ -26,6 +26,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import org.hamcrest.CoreMatchers.startsWith
 import org.junit.Before
+import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -43,10 +44,19 @@ class RoadBookFragmentTest {
     )
 
     companion object {
-        const val SWIPE_L_SHARED_KEY = "SwipeLeftButton"
-        const val SWIPE_R_SHARED_KEY = "SwipeRightButton"
-        const val DRAG_N_DROP_SHARED_KEY = "DragNDropButton"
-        const val TOUCH_CLICK_SHARED_KEY = "TouchClickButton"
+
+        private const val SWIPE_L_SHARED_KEY = "SwipeLeftButton"
+        private const val SWIPE_R_SHARED_KEY = "SwipeRightButton"
+        private const val DRAG_N_DROP_SHARED_KEY = "DragNDropButton"
+        private const val TOUCH_CLICK_SHARED_KEY = "TouchClickButton"
+
+        @BeforeClass
+        @JvmStatic
+        fun setUpDatabase() {
+            val database = Firebase.database
+            //database.useEmulator("10.0.2.2", 9000)
+            MainActivity.setDatabase(database)
+        }
     }
     private fun setPrefs(sharedKey: String, activity: MainActivity, value: Boolean) {
         val sp = activity.getSharedPreferences(sharedKey, Context.MODE_PRIVATE)
@@ -54,6 +64,7 @@ class RoadBookFragmentTest {
         edit.putBoolean(sharedKey, value)
         edit.apply()
     }
+
     @Before
     fun toRoadBookFragment() {
         testRule.scenario.onActivity {
@@ -170,11 +181,10 @@ class RoadBookFragmentTest {
     // ============================================================================================
     // ================================== Update to Database Tests ================================
 
-    private val db = Firebase.database.reference
     @Test
     fun roadBookIsBackedUpCorrectly() {
         val date = Calendar.getInstance().time
-        val ref = db
+        val ref = MainActivity.getDatabase().reference
             .child("Sheet-shift")
             .child(SimpleDateFormat.getDateInstance().format(date))
 
@@ -184,9 +194,9 @@ class RoadBookFragmentTest {
         // Navigate out of the RoadBookFragment
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
-        onView(withId(R.id.directoryFragment))
+        onView(withId(R.id.routeFragment))
             .perform(click())
-        onView(withId(R.id.fragment_directory_directors_parent))
+        onView(withId(R.id.fragment_route_directors_parent))
             .check(matches(isDisplayed()))
 
         // Our target value to fetch

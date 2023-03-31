@@ -24,7 +24,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private lateinit var fragMenu: Menu
     private val rbViewModel: RoadBookViewModel by activityViewModels() {
         RoadBookViewModel.RoadBookViewModelFactory(
-            (activity as MainActivity).getDatabaseRef().child(ROADBOOK_DB_PATH)
+            MainActivity.getDatabase().reference.child(ROADBOOK_DB_PATH)
         )
     }
 
@@ -71,7 +71,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
                         ?.findNavController()
                         ?.navigate(R.id.action_roadBookFragment_to_DRecordDetailsFragment,
                             Bundle().apply {
-                                putString("destID", it)
+                                putString(DEST_ID_NAV_ARG_KEY, it)
                             }
                         )
                 }
@@ -200,6 +200,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         private const val SWIPE_R_SHARED_KEY = "SwipeRightButton"
         private const val DRAG_N_DROP_SHARED_KEY = "DragNDropButton"
         private const val TOUCH_CLICK_SHARED_KEY = "TouchClickButton"
+        const val DEST_ID_NAV_ARG_KEY = "destID"
     }
 
     /** Only use that access for testing purpose */

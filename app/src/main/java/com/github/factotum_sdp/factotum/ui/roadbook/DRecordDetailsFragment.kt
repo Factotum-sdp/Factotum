@@ -19,7 +19,7 @@ class DRecordDetailsFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_drecord_details, container, false)
-        val arg = arguments?.getString("destID") ?: "UNKNOWN"
+        val arg = arguments?.getString(RoadBookFragment.DEST_ID_NAV_ARG_KEY) ?: "UNKNOWN"
         rbViewModel.recordsListState.value?.let {
             val rec = it.first { d -> d.destID == arg }
             setEditTexts(rec, view)

@@ -45,10 +45,10 @@ class RoadBookFragmentTest {
 
     companion object {
 
-        private const val SWIPE_L_SHARED_KEY = "SwipeLeftButton"
-        private const val SWIPE_R_SHARED_KEY = "SwipeRightButton"
-        private const val DRAG_N_DROP_SHARED_KEY = "DragNDropButton"
-        private const val TOUCH_CLICK_SHARED_KEY = "TouchClickButton"
+        const val SWIPE_L_SHARED_KEY = "SwipeLeftButton"
+        const val SWIPE_R_SHARED_KEY = "SwipeRightButton"
+        const val DRAG_N_DROP_SHARED_KEY = "DragNDropButton"
+        const val TOUCH_CLICK_SHARED_KEY = "TouchClickButton"
 
         @BeforeClass
         @JvmStatic

@@ -166,10 +166,4 @@ class MainActivityTest {
         )
     }
 
-    /*@Test
-    fun actionSettingsIsAccessible() {
-        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
-        onView(withText(R.string.action_settings)).perform(click())
-    }*/
-
 }

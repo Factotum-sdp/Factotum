@@ -10,8 +10,6 @@ class LoginRepository(val dataSource: LoginDataSource) {
     // in-memory cache of the loggedInUser object
     private var user: LoggedInUser? = null
 
-    private val isLoggedIn: Boolean = user != null
-
     init {
         // If user credentials will be cached in local storage, it is recommended it be encrypted
         // @see https://developer.android.com/training/articles/keystore

@@ -63,6 +63,7 @@ class LoginFragment : Fragment() {
                 usernameEditText.text.toString(),
                 passwordEditText.text.toString()
             )
+
         }
 
         signupButton.setOnClickListener {

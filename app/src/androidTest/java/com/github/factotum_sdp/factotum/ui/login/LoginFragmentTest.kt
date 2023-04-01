@@ -32,26 +32,6 @@ class LoginFragmentTest {
     }
 
     @Test
-    fun correctUserEntryLeadsToRoadBook() {
-        onView(withId(R.id.username)).perform(typeText("jane.doe@gmail.com"))
-        onView(withId(R.id.fragment_login_directors_parent)).perform(
-            closeSoftKeyboard()
-        )
-        onView(withId(R.id.password)).perform(typeText("123456"))
-        //close soft keyboard in fragment
-        onView(withId(R.id.fragment_login_directors_parent)).perform(
-            closeSoftKeyboard()
-        )
-        onView(withId(R.id.login)).perform(click())
-
-        FirebaseAuth.AuthStateListener { firebaseAuth ->
-            if (firebaseAuth.currentUser != null) {
-                onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
-            }
-        }
-    }
-
-    @Test
     fun incorrectUserEntryLeadsToFailedLogin() {
         onView(withId(R.id.username)).perform(typeText("jane.doe@gmail.com"))
         onView(withId(R.id.fragment_login_directors_parent)).perform(
@@ -65,6 +45,24 @@ class LoginFragmentTest {
         FirebaseAuth.AuthStateListener { firebaseAuth ->
             if (firebaseAuth.currentUser == null) {
                 onView(withId(R.id.fragment_login_directors_parent)).check(matches(isDisplayed()))
+            }
+        }
+    }
+
+    fun correctUserEntryLeadsToRoadBook() {
+        onView(withId(R.id.username)).perform(typeText("jane.doe@gmail.com"))
+        onView(withId(R.id.fragment_login_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.password)).perform(typeText("123456"))
+        onView(withId(R.id.fragment_login_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.login)).perform(click())
+
+        FirebaseAuth.AuthStateListener { firebaseAuth ->
+            if (firebaseAuth.currentUser != null) {
+                onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
             }
         }
     }

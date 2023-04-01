@@ -3,7 +3,6 @@ package com.github.factotum_sdp.factotum
 import android.Manifest
 import android.provider.MediaStore
 import android.view.Gravity
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.*
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -37,7 +36,7 @@ class MainActivityTest {
     )
 
     @get:Rule
-    val permissionsRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
+    val permissionsRule: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
 
     companion object {
         @BeforeClass
@@ -132,6 +131,13 @@ class MainActivityTest {
     }
 
     @Test
+    fun clickOnSignOutMenuItemLeadsToCorrectFragment() {
+        clickOnAMenuItemLeadsCorrectly(
+            R.id.signoutButton,
+            R.id.fragment_login_directors_parent
+        )
+    }
+
     fun clickOnDisplayProofPictureMenuItemLeadsToCorrectFragment() {
         clickOnAMenuItemLeadsCorrectly(
             R.id.displayFragment,
@@ -150,4 +156,5 @@ class MainActivityTest {
             R.id.fragment_roadbook_directors_parent
         )
     }
+
 }

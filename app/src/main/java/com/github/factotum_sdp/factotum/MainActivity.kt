@@ -15,6 +15,8 @@ import androidx.navigation.ui.setupWithNavController
 import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -23,6 +25,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
+    private lateinit var db: DatabaseReference
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -53,6 +58,9 @@ class MainActivity : AppCompatActivity() {
 
         // Bind user data displayed in the Navigation Header
         setUserHeader()
+
+        // Set listener on logout button
+        listenLogoutButton()
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -69,15 +77,28 @@ class MainActivity : AppCompatActivity() {
 
         // Instantiate the current user
         val userFact =
-            UserViewModel.UserViewModelFactory(UsersPlaceHolder.USER1.name, UsersPlaceHolder.USER1.email)
+            UserViewModel.UserViewModelFactory(
+                UsersPlaceHolder.USER1.name,
+                UsersPlaceHolder.USER1.email
+            )
         val user = ViewModelProvider(this, userFact)[UserViewModel::class.java]
         binding.navView.findViewTreeLifecycleOwner()?.let { lco ->
-            user.name.observe(lco){
+            user.name.observe(lco) {
                 userName.text = it
             }
-            user.email.observe(lco){
+            user.email.observe(lco) {
                 email.text = it
             }
+        }
+    }
+
+
+    private fun listenLogoutButton() {
+        binding.navView.menu.findItem(R.id.signoutButton).setOnMenuItemClickListener {
+            auth.signOut()
+            finish()
+            startActivity(intent)
+            true
         }
     }
 

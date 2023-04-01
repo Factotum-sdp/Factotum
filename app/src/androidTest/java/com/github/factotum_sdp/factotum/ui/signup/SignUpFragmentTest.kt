@@ -47,15 +47,30 @@ class SignUpFragmentTest {
     @Test
     fun signUpFormWithoutRole() {
         onView(withId(R.id.username)).perform(ViewActions.typeText("Jane Doe"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
         onView(withId(R.id.email)).perform(ViewActions.typeText("jane.doe@gmail.com"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
         onView(withId(R.id.password)).perform(ViewActions.typeText("123456"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
         onView(withId(R.id.signup)).check(ViewAssertions.matches(not(ViewMatchers.isEnabled())))
     }
 
     @Test
     fun signUpFormWithoutPassword() {
         onView(withId(R.id.username)).perform(ViewActions.typeText("Jane Doe"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
         onView(withId(R.id.email)).perform(ViewActions.typeText("jane.doe@gmail.com"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
         onView(withId(R.id.fragment_signup_directors_parent)).perform(
             closeSoftKeyboard()
         )
@@ -67,7 +82,13 @@ class SignUpFragmentTest {
     @Test
     fun signUpFormWithoutEmail() {
         onView(withId(R.id.username)).perform(ViewActions.typeText("Jane Doe"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
         onView(withId(R.id.password)).perform(ViewActions.typeText("123456"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
         onView(withId(R.id.fragment_signup_directors_parent)).perform(
             closeSoftKeyboard()
         )
@@ -79,6 +100,9 @@ class SignUpFragmentTest {
     @Test
     fun signUpFormWithoutUsername() {
         onView(withId(R.id.email)).perform(ViewActions.typeText("jane.doe@gmail.com"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
         onView(withId(R.id.password)).perform(ViewActions.typeText("123456"))
         onView(withId(R.id.fragment_signup_directors_parent)).perform(
             closeSoftKeyboard()
@@ -91,7 +115,13 @@ class SignUpFragmentTest {
     @Test
     fun signUpFormWithAllFields() {
         onView(withId(R.id.username)).perform(ViewActions.typeText("Jane Doe"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
         onView(withId(R.id.email)).perform(ViewActions.typeText("jane.doe@gmail.com"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
         onView(withId(R.id.password)).perform(ViewActions.typeText("123456"))
         onView(withId(R.id.fragment_signup_directors_parent)).perform(
             closeSoftKeyboard()

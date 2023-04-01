@@ -29,7 +29,7 @@ class SignUpViewModel : ViewModel() {
     private fun isUserNameValid(username: String): Boolean {
         return username.isNotBlank()
     }
-    
+
     // A placeholder email validation check
     private fun isEmailValid(email: String): Boolean {
         return if (email.contains("@")) PatternsCompat.EMAIL_ADDRESS.matcher(email)

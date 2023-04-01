@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 class ResultTest {
 
     @Test
-    fun `test success result`() {
+    fun `success result`() {
         // Given
         val expectedData = "Test Data"
         val result = Result.Success(expectedData)
@@ -18,7 +18,7 @@ class ResultTest {
     }
 
     @Test
-    fun `test error result`() {
+    fun `error result`() {
         // Given
         val expectedException = RuntimeException("Test Exception")
         val result = Result.Error(expectedException)
@@ -29,7 +29,7 @@ class ResultTest {
     }
 
     @Test
-    fun `test toString for success result`() {
+    fun `toString for success result`() {
         // Given
         val expectedData = "Test Data"
         val result = Result.Success(expectedData)
@@ -42,7 +42,7 @@ class ResultTest {
     }
 
     @Test
-    fun `test toString for error result`() {
+    fun `toString for error result`() {
         // Given
         val expectedException = RuntimeException("Test Exception")
         val result = Result.Error(expectedException)

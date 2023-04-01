@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 class LoginResultTest {
 
     @Test
-    fun testSuccess() {
+    fun `login success`() {
         // given
         val userView = LoggedInUserView("Alice", "alice@gmail.com")
 
@@ -21,7 +21,7 @@ class LoginResultTest {
     }
 
     @Test
-    fun testError() {
+    fun `login error`() {
         // given
         val errorCode = 401
 
@@ -34,7 +34,7 @@ class LoginResultTest {
     }
 
     @Test
-    fun testNoData() {
+    fun `login no data`() {
         // when
         val result = LoginResult()
 

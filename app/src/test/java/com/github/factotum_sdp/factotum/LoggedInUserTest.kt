@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 class LoggedInUserTest {
 
     @Test
-    fun `test constructor`() {
+    fun `constructor is correct`() {
         // Given
         val expectedDisplayName = "John Doe"
         val expectedEmail = "john.doe@gmail.com"
@@ -21,7 +21,7 @@ class LoggedInUserTest {
     }
 
     @Test
-    fun `test equals`() {
+    fun `equals is correct`() {
         // Given
         val user1 = LoggedInUser("John Doe", "john.doe@gmail.com")
         val user2 = LoggedInUser("John Doe", "john.doe@gmail.com")
@@ -33,7 +33,7 @@ class LoggedInUserTest {
     }
 
     @Test
-    fun `test hashCode`() {
+    fun `hashCode is correct`() {
         // Given
         val user1 = LoggedInUser("John Doe", "john.doe@gmail.com")
         val user2 = LoggedInUser("John Doe", "john.doe@gmail.com")
@@ -45,7 +45,7 @@ class LoggedInUserTest {
     }
 
     @Test
-    fun `test toString`() {
+    fun `toString is correct`() {
         // Given
         val expectedDisplayName = "John Doe"
         val expectedEmail = "john.doe@gmail.com"

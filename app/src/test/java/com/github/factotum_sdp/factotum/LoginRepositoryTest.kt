@@ -23,7 +23,7 @@ class LoginRepositoryTest {
     }
 
     @Test
-    fun `test login success`() {
+    fun `login success`() {
         // Given
         val username = "Jane Doe"
         val useremail = "jane.doe@gmail.com"
@@ -44,7 +44,7 @@ class LoginRepositoryTest {
     }
 
     @Test
-    fun `test login error`() {
+    fun `login error`() {
         // Given
         val username = "testuser"
         val password = "testpassword"

@@ -8,11 +8,9 @@ package com.github.factotum_sdp.factotum.data
 class LoginRepository(val dataSource: LoginDataSource) {
 
     // in-memory cache of the loggedInUser object
-    var user: LoggedInUser? = null
-        private set
+    private var user: LoggedInUser? = null
 
-    val isLoggedIn: Boolean
-        get() = user != null
+    private val isLoggedIn: Boolean = user != null
 
     init {
         // If user credentials will be cached in local storage, it is recommended it be encrypted

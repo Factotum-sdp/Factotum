@@ -48,20 +48,13 @@ class SignUpFragment : Fragment() {
 
         observe(signUpButton, usernameEditText, emailEditText, passwordEditText)
 
-        val afterTextChangedListener = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-
-            override fun afterTextChanged(s: Editable) {
-                viewModel.signUpDataChanged(
-                    usernameEditText.text.toString(),
-                    emailEditText.text.toString(),
-                    passwordEditText.text.toString(),
-                    roleAutoCompleteTextView.text.toString()
-                )
-            }
-        }
+        val afterTextChangedListener = createTextWatcher(
+            viewModel,
+            usernameEditText,
+            emailEditText,
+            passwordEditText,
+            roleAutoCompleteTextView
+        )
 
         addListeners(
             usernameEditText,
@@ -98,6 +91,29 @@ class SignUpFragment : Fragment() {
                     passwordEditText.error = getString(it)
                 }
             })
+    }
+
+    private fun createTextWatcher(
+        viewModel: SignUpViewModel,
+        usernameEditText: EditText,
+        emailEditText: EditText,
+        passwordEditText: EditText,
+        roleAutoCompleteTextView: EditText
+    ): TextWatcher {
+        return object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable) {
+                viewModel.signUpDataChanged(
+                    usernameEditText.text.toString(),
+                    emailEditText.text.toString(),
+                    passwordEditText.text.toString(),
+                    roleAutoCompleteTextView.text.toString()
+                )
+            }
+        }
     }
 
     private fun addListeners(

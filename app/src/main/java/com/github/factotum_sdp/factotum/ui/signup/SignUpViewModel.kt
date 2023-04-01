@@ -1,6 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.signup
 
-import android.util.Patterns
+import androidx.core.util.PatternsCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -29,13 +29,11 @@ class SignUpViewModel : ViewModel() {
     private fun isUserNameValid(username: String): Boolean {
         return username.isNotBlank()
     }
-
+    
+    // A placeholder email validation check
     private fun isEmailValid(email: String): Boolean {
-        return if (email.contains("@")) {
-            Patterns.EMAIL_ADDRESS.matcher(email).matches()
-        } else {
-            email.isNotBlank()
-        }
+        return if (email.contains("@")) PatternsCompat.EMAIL_ADDRESS.matcher(email)
+            .matches() else false
     }
 
     // A placeholder password validation check

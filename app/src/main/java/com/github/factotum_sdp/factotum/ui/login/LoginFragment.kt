@@ -29,7 +29,7 @@ class LoginFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -81,7 +81,7 @@ class LoginFragment : Fragment() {
                     return@Observer
                 }
                 loginButton.isEnabled = loginFormState.isDataValid
-                loginFormState.usernameError?.let {
+                loginFormState.emailError?.let {
                     usernameEditText.error = getString(it)
                 }
                 loginFormState.passwordError?.let {

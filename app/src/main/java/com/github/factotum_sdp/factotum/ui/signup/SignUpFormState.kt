@@ -1,12 +1,13 @@
 package com.github.factotum_sdp.factotum.ui.signup
 
+import com.github.factotum_sdp.factotum.ui.auth.BaseAuthState
+
 /**
  * Data validation state of the signup form.
  */
-class SignUpFormState (
+data class SignUpFormState (
     val usernameError: Int? = null,
-    val emailError: Int? = null,
-    val passwordError: Int? = null,
-    val roleError: Int? = null,
-    val isDataValid: Boolean = false
-)
+    override val emailError: Int? = null,
+    override val passwordError: Int? = null,
+    override val isDataValid: Boolean = false
+) : BaseAuthState()

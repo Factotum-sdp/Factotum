@@ -66,6 +66,25 @@ class LoginFragmentTest {
     }
 
     @Test
+    fun userNotInProfileDispatchUserNotFoundMessage() {
+        onView(withId(R.id.email)).perform(typeText("lee.harmon@gmail.com"))
+        onView(withId(R.id.fragment_login_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.password)).perform(typeText("123456"))
+        onView(withId(R.id.fragment_login_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.login)).perform(click())
+
+        FirebaseAuth.AuthStateListener {
+            onView(withId(R.id.fragment_login_directors_parent)).check(matches(isDisplayed()))
+            onView(withId(com.google.android.material.R.id.snackbar_text))
+                .check(matches(withText(R.string.user_not_found)))
+        }
+    }
+
+    @Test
     fun loginFormWithoutPassword() {
         onView(withId(R.id.email)).perform(typeText("user.name@gmail.com"))
         onView(withId(R.id.login)).check(matches(not(isEnabled())))

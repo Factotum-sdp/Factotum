@@ -62,6 +62,8 @@
     <string name="invalid_username">Not a valid email</string>
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
+    <string name="retrieve_profiles_failed">"Error retrieving profiles"</string>
+    <string name="retrieve_profiles_success">"Profiles retrieved successfully"</string>
     <string name="web_client_id">"539052463718–6gefd2fnlvbb1h9aiq09kil6sip37i0u.apps.googleusercontent.com"</string>
     <string name="forgot_my_password_text">Forgot my password</string>
     <string name="password_text">Password</string>

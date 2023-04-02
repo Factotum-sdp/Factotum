@@ -52,11 +52,13 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
             if (result is Result.Success) {
                 _retrieveProfilesResult.value =
                     RetrieveProfilesResult(
-                        success = "Profiles retrieved successfully"
+                        success = R.string.retrieve_profiles_success
                     )
             } else {
                 _retrieveProfilesResult.value =
-                    RetrieveProfilesResult(error = "Error retrieving profiles")
+                    RetrieveProfilesResult(
+                        error = R.string.retrieve_profiles_failed
+                    )
             }
         }
     }
@@ -86,8 +88,8 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
      * Profile retrieval result : success or error message.
      */
     data class RetrieveProfilesResult(
-        val success: String? = null,
-        val error: String? = null
+        val success: Int? = null,
+        val error: Int? = null
     )
 
     /**

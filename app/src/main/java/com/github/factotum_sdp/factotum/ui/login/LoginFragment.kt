@@ -1,6 +1,7 @@
 package com.github.factotum_sdp.factotum.ui.login
 
 import android.os.Bundle
+import android.os.Message
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -91,16 +92,12 @@ class LoginFragment : Fragment() {
     }
 
     private fun observeRetrieveProfilesResult() {
-        loginViewModel.retrieveProfilesResult.observe(viewLifecycleOwner,
-            Observer { profileRetrievalResult ->
-                profileRetrievalResult ?: return@Observer
-                profileRetrievalResult.error?.let {
-                    Snackbar.make(requireView(), it, Snackbar.LENGTH_LONG).show()
-                }
-                profileRetrievalResult.success?.let {
-                    Snackbar.make(requireView(), it, Snackbar.LENGTH_LONG).show()
-                }
-            })
+        loginViewModel.retrieveProfilesResult.observe(viewLifecycleOwner) { profileRetrievalResult ->
+            profileRetrievalResult?.run {
+                success?.let(::showSnackBar)
+                error?.let(::showSnackBar)
+            }
+        }
     }
 
     private fun observeLoginFormState(
@@ -129,7 +126,7 @@ class LoginFragment : Fragment() {
                 loginResult ?: return@Observer
                 loadingProgressBar.visibility = View.GONE
                 loginResult.error?.let {
-                    showLoginFailed(it)
+                    showSnackBar(it)
                 }
                 loginResult.success?.let {
                     updateUiWithUser(it)
@@ -165,8 +162,8 @@ class LoginFragment : Fragment() {
         findNavController().navigate(R.id.action_loginFragment_to_roadBookFragment2)
     }
 
-    private fun showLoginFailed(@StringRes errorString: Int) {
-        Snackbar.make(requireView(), errorString, Snackbar.LENGTH_LONG).show()
+    private fun showSnackBar(@StringRes message: Int) {
+        Snackbar.make(requireView(), message, Snackbar.LENGTH_LONG).show()
     }
 
     override fun onDestroyView() {

@@ -61,7 +61,7 @@
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.github.factotum_sdp.factotum.ui.login.LoginFragment"
-        android:label="fragment_login"
+        android:label="Login"
         tools:layout="@layout/fragment_login" >
         <action
             android:id="@+id/action_loginFragment_to_roadBookFragment2"
@@ -73,7 +73,7 @@
     <fragment
         android:id="@+id/signUpFragment"
         android:name="com.github.factotum_sdp.factotum.ui.signup.SignUpFragment"
-        android:label="fragment_signup"
+        android:label="Sign Up"
         tools:layout="@layout/fragment_signup" />
     <fragment
         android:id="@+id/contactDetailsFragment2"

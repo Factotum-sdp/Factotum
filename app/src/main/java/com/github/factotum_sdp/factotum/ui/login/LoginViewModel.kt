@@ -21,6 +21,9 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
     private val _loginResult = MutableLiveData<LoginResult>()
     val loginResult: LiveData<LoginResult> = _loginResult
 
+    private val _retrieveProfilesResult = MutableLiveData<RetrieveProfilesResult>()
+    val retrieveProfilesResult: LiveData<RetrieveProfilesResult> = _retrieveProfilesResult
+
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 
     fun login(userEmail: String, password: String) {
@@ -32,7 +35,8 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
                     LoginResult(
                         success = LoggedInUserView(
                             displayName = result.data.displayName,
-                            email = result.data.email
+                            email = result.data.email,
+                            role = result.data.role
                         )
                     )
             } else {
@@ -41,9 +45,25 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
         }
     }
 
+    fun retrieveProfiles() {
+        // launch in a separate asynchronous job
+        viewModelScope.launch {
+            val result = withContext(dispatcher) { loginRepository.retrieveProfiles() }
+            if (result is Result.Success) {
+                _retrieveProfilesResult.value =
+                    RetrieveProfilesResult(
+                        success = "Profiles retrieved successfully"
+                    )
+            } else {
+                _retrieveProfilesResult.value =
+                    RetrieveProfilesResult(error = "Error retrieving profiles")
+            }
+        }
+    }
+
     fun loginDataChanged(username: String, password: String) {
-        if (!isUserNameValid(username)) {
-            _loginForm.value = LoginFormState(usernameError = R.string.invalid_username)
+        if (!isEmailValid(username)) {
+            _loginForm.value = LoginFormState(emailError = R.string.invalid_username)
         } else if (!isPasswordValid(password)) {
             _loginForm.value = LoginFormState(passwordError = R.string.invalid_password)
         } else {
@@ -51,8 +71,8 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
         }
     }
 
-    // A placeholder username validation check
-    private fun isUserNameValid(username: String): Boolean {
+    // A placeholder email validation check
+    private fun isEmailValid(username: String): Boolean {
         return if (username.contains("@")) PatternsCompat.EMAIL_ADDRESS.matcher(username)
             .matches() else false
     }
@@ -61,4 +81,20 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
     private fun isPasswordValid(password: String): Boolean {
         return password.length > 5
     }
+
+    /**
+     * Profile retrieval result : success or error message.
+     */
+    data class RetrieveProfilesResult(
+        val success: String? = null,
+        val error: String? = null
+    )
+
+    /**
+     * Authentication result : success (user details) or error message.
+     */
+    data class LoginResult(
+        val success: LoggedInUserView? = null,
+        val error: Int? = null
+    )
 }

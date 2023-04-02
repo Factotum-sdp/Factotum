@@ -3,7 +3,6 @@ package com.github.factotum_sdp.factotum.ui.login
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -11,7 +10,6 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.google.firebase.auth.FirebaseAuth
 import org.hamcrest.Matchers.not
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,14 +24,14 @@ class LoginFragmentTest {
 
     @Test
     fun loginFormInitialStateIsEmpty() {
-        onView(withId(R.id.username)).check(matches(withText("")))
+        onView(withId(R.id.email)).check(matches(withText("")))
         onView(withId(R.id.password)).check(matches(withText("")))
         onView(withId(R.id.login)).check(matches(not(isEnabled())))
     }
 
     @Test
     fun incorrectUserEntryLeadsToFailedLogin() {
-        onView(withId(R.id.username)).perform(typeText("jane.doe@gmail.com"))
+        onView(withId(R.id.email)).perform(typeText("jane.doe@gmail.com"))
         onView(withId(R.id.fragment_login_directors_parent)).perform(
             closeSoftKeyboard()
         )
@@ -50,7 +48,7 @@ class LoginFragmentTest {
     }
 
     fun correctUserEntryLeadsToRoadBook() {
-        onView(withId(R.id.username)).perform(typeText("jane.doe@gmail.com"))
+        onView(withId(R.id.email)).perform(typeText("jane.doe@gmail.com"))
         onView(withId(R.id.fragment_login_directors_parent)).perform(
             closeSoftKeyboard()
         )
@@ -69,7 +67,7 @@ class LoginFragmentTest {
 
     @Test
     fun loginFormWithoutPassword() {
-        onView(withId(R.id.username)).perform(typeText("user.name@gmail.com"))
+        onView(withId(R.id.email)).perform(typeText("user.name@gmail.com"))
         onView(withId(R.id.login)).check(matches(not(isEnabled())))
     }
 

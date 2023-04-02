@@ -5,5 +5,6 @@ package com.github.factotum_sdp.factotum.data
  */
 data class LoggedInUser(
     val displayName: String,
-    val email: String
+    val email: String,
+    val role : Role
 )

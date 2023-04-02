@@ -1,8 +1,9 @@
 package com.github.factotum_sdp.factotum
 
+import com.github.factotum_sdp.factotum.data.LoggedInUser
 import com.github.factotum_sdp.factotum.data.LoginDataSource
 import com.github.factotum_sdp.factotum.data.Result
-import com.github.factotum_sdp.factotum.data.LoggedInUser
+import com.github.factotum_sdp.factotum.data.Role
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
@@ -19,27 +20,38 @@ class LoginDataSourceTest {
     @Mock
     private lateinit var loginDataSource: LoginDataSource
 
-    private val username = "Jane Doe"
-    private val useremail = "jane.doe@gmail.com"
+    private val userName = "Jane Doe"
+    private val userEmail = "jane.doe@gmail.com"
+    private val userRole = Role.CLIENT
     private val validPassword = "123456"
     private val invalidPassword = "azerty"
 
     @Test
     fun `login with correct credentials returns a LoggedInUser`() {
         // given
-        val expectedUser = LoggedInUser(username, useremail)
+        val expectedUser = LoggedInUser(userName, userEmail, userRole)
 
         loginDataSource = mock(LoginDataSource::class.java)
-        `when`(loginDataSource.login(username, validPassword)).thenReturn(
+        `when`(
+            loginDataSource.login(
+                userEmail,
+                validPassword,
+                LoginDataSource.User(userName, userEmail, userRole)
+            )
+        ).thenReturn(
             Result.Success(
                 expectedUser
             )
         )
         // when
-        val result = loginDataSource.login(username, validPassword)
+        val result = loginDataSource.login(
+            userName, validPassword, LoginDataSource.User(userName, userEmail, userRole)
+        )
 
         // then
-        assertThat(result, `is`(Result.Success(expectedUser)))
+        assertThat(
+            result, `is`(Result.Success(expectedUser))
+        )
     }
 
     @Test
@@ -49,10 +61,20 @@ class LoginDataSourceTest {
 
         // when
         loginDataSource = mock(LoginDataSource::class.java)
-        `when`(loginDataSource.login(username, invalidPassword)).thenReturn(Result.Error(exception))
-        val result = loginDataSource.login(username, invalidPassword)
+        `when`(
+            loginDataSource.login(
+                userEmail,
+                invalidPassword,
+                LoginDataSource.User(userName, userEmail, userRole)
+            )
+        ).thenReturn(Result.Error(exception))
+        val result = loginDataSource.login(
+            userName, invalidPassword, LoginDataSource.User(userName, userEmail, userRole)
+        )
 
         // then
-        assertThat(result, `is`(Result.Error(exception)))
+        assertThat(
+            result, `is`(Result.Error(exception))
+        )
     }
 }

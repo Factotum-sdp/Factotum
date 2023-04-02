@@ -52,7 +52,10 @@ class ContactDetailsFragmentTest {
         onView(withId(R.id.directoryFragment))
             .perform(click())
         onView(withId(R.id.contacts_recycler_view))
-            .perform(RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(0, click()))
+            .perform(
+                RecyclerViewActions
+                    .actionOnItemAtPosition<RecyclerView.ViewHolder>(0, click())
+            )
     }
 
     @Test

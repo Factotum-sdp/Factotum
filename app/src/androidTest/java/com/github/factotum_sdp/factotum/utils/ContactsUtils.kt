@@ -1,6 +1,5 @@
 package com.github.factotum_sdp.factotum.utils
 
-import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
@@ -24,7 +23,8 @@ class ContactsUtils {
                 }
 
                 override fun matchesSafely(item: RecyclerView.ViewHolder): Boolean {
-                    val holderName = item.itemView.findViewById<TextView>(R.id.contact_name).text.toString()
+                    val holderName =
+                        item.itemView.findViewById<TextView>(R.id.contact_name).text.toString()
                     if (holderName == name && isFirstMatch) {
                         isFirstMatch = false
                         return true

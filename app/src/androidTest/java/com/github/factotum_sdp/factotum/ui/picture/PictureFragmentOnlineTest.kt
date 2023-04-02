@@ -11,6 +11,11 @@ import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.ui.picture.*
+import com.github.factotum_sdp.factotum.utils.PictureUtils.Companion.TIME_WAIT_DONE_OR_CANCEL
+import com.github.factotum_sdp.factotum.utils.PictureUtils.Companion.TIME_WAIT_SHUTTER
+import com.github.factotum_sdp.factotum.utils.PictureUtils.Companion.TIME_WAIT_UPLOAD
+import com.github.factotum_sdp.factotum.utils.PictureUtils.Companion.emptyFirebaseStorage
+import com.github.factotum_sdp.factotum.utils.PictureUtils.Companion.emptyLocalFiles
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
@@ -27,7 +32,8 @@ class PictureFragmentOnlineTest {
     private lateinit var scenario: FragmentScenario<PictureFragment>
     private lateinit var storage: FirebaseStorage
     private val externalDir = Environment.getExternalStorageDirectory()
-    private val picturesDir = File(externalDir, "/Android/data/com.github.factotum_sdp.factotum/files/Pictures")
+    private val picturesDir =
+        File(externalDir, "/Android/data/com.github.factotum_sdp.factotum/files/Pictures")
 
 
     @get:Rule
@@ -75,7 +81,7 @@ class PictureFragmentOnlineTest {
             assertTrue(listResult.items.isNotEmpty())
             //Check that the local picture directory is empty
             assertTrue(picturesDir.listFiles()?.isEmpty() ?: false)
-        }.addOnFailureListener{ except ->
+        }.addOnFailureListener { except ->
             fail(except.message)
         }
     }
@@ -102,7 +108,7 @@ class PictureFragmentOnlineTest {
             assertTrue(listResult.items.isEmpty())
             //Check that the local picture directory is empty
             assertTrue(picturesDir.listFiles()?.isEmpty() ?: false)
-        }.addOnFailureListener{ except ->
+        }.addOnFailureListener { except ->
             fail(except.message)
         }
     }

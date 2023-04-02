@@ -1,7 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.login
 
 import android.os.Bundle
-import android.os.Message
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -35,7 +34,7 @@ class LoginFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -46,27 +45,35 @@ class LoginFragment : Fragment() {
         loginViewModel =
             ViewModelProvider(this, LoginViewModelFactory())[LoginViewModel::class.java]
 
+        // Define the UI elements
         val emailEditText = binding.email
         val passwordEditText = binding.password
         val loginButton = binding.login
         val signupButton = binding.signup
         val loadingProgressBar = binding.loading
 
+        // Retrieve profiles of all users in the database
         loginViewModel.retrieveProfiles()
 
+        // Observe the result of retrieving profiles and show it in a snackbar.
         observeRetrieveProfilesResult()
 
+        // Observe the login form state and enable/disable the login button accordingly
         observeLoginFormState(loginButton, emailEditText, passwordEditText)
 
+        // Observe the login result and show it in a snackbar
         observeLoginResult(loadingProgressBar)
 
         val afterTextChangedListener =
             createTextWatcher(loginViewModel, emailEditText, passwordEditText)
 
+        // Add listeners to edit text fields
         addListeners(emailEditText, passwordEditText, afterTextChangedListener)
 
+        // Add listener to login button
         listenToLoginButton(loginButton, emailEditText, passwordEditText)
 
+        // Add listener to signup button
         signupButton.setOnClickListener {
             findNavController().navigate(R.id.action_loginFragment_to_signUpFragment)
         }
@@ -135,11 +142,11 @@ class LoginFragment : Fragment() {
     }
 
     private fun addListeners(
-        usernameEditText: EditText,
+        emailEditText: EditText,
         passwordEditText: EditText,
         afterTextChangedListener: TextWatcher
     ) {
-        usernameEditText.addTextChangedListener(afterTextChangedListener)
+        emailEditText.addTextChangedListener(afterTextChangedListener)
         passwordEditText.addTextChangedListener(afterTextChangedListener)
     }
 
@@ -163,7 +170,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun showSnackBar(@StringRes message: Int) {
-        Snackbar.make(requireView(), message, Snackbar.LENGTH_LONG).show()
+        Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
     }
 
     override fun onDestroyView() {

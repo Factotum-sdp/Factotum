@@ -58,9 +58,11 @@
     <string name="prompt_password">••••••</string>
     <string name="action_sign_in">Access</string>
     <string name="action_sign_in_short">Sign in</string>
-    <string name="welcome">"Welcome"</string>
-    <string name="invalid_username">Not a valid email</string>
+    <string name="welcome">"Welcome!"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_email">Not a valid email</string>
     <string name="invalid_password">Password must be >5 characters</string>
+    <string name="no_role_selected">Please select a role</string>
     <string name="login_failed">"Login failed"</string>
     <string name="user_not_found">"User not found"</string>
     <string name="retrieve_profiles_failed">"Error retrieving profiles"</string>
@@ -99,4 +101,8 @@
     <string name="rb_label_touch_click">Touch click</string>
     <string name="share">Share</string>
     <string name="no_contacts_found">No contacts found</string>
+    <string name="welcome_text">Welcome</string>
+    <string name="full_name_text">Full Name</string>
+    <string name="create_account_text">Create Account</string>
+    <string name="select_role_text">Select Role</string>
 </resources>

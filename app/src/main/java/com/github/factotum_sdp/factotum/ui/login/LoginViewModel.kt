@@ -40,7 +40,13 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
                         )
                     )
             } else {
-                _loginResult.value = LoginResult(error = R.string.login_failed)
+                _loginResult.value = LoginResult(
+                    error = if ((result as Result.Error).exception.message == "User not found") {
+                        R.string.user_not_found
+                    } else {
+                        R.string.login_failed
+                    }
+                )
             }
         }
     }

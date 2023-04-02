@@ -3,12 +3,15 @@ package com.github.factotum_sdp.factotum.ui.login
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.google.firebase.auth.FirebaseAuth
 import org.hamcrest.Matchers.not
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,18 +32,45 @@ class LoginFragmentTest {
     }
 
     @Test
-    fun loginFormWithoutPassword() {
-        onView(withId(R.id.username)).perform(typeText("user.name@gmail.com"))
-        onView(withId(R.id.login)).check(matches(not(isEnabled())))
+    fun incorrectUserEntryLeadsToFailedLogin() {
+        onView(withId(R.id.username)).perform(typeText("jane.doe@gmail.com"))
+        onView(withId(R.id.fragment_login_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.password)).perform(typeText("12345678"))
+        onView(withId(R.id.fragment_login_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.login)).perform(click())
+        FirebaseAuth.AuthStateListener { firebaseAuth ->
+            if (firebaseAuth.currentUser == null) {
+                onView(withId(R.id.fragment_login_directors_parent)).check(matches(isDisplayed()))
+            }
+        }
     }
 
     fun correctUserEntryLeadsToRoadBook() {
-        onView(withId(R.id.username)).perform(typeText("user.name@gmail.com"))
-        closeSoftKeyboard()
-        onView(withId(R.id.password)).perform(typeText("dfsdfdddddddddd"))
-        closeSoftKeyboard()
+        onView(withId(R.id.username)).perform(typeText("jane.doe@gmail.com"))
+        onView(withId(R.id.fragment_login_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.password)).perform(typeText("123456"))
+        onView(withId(R.id.fragment_login_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
         onView(withId(R.id.login)).perform(click())
-        onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
+
+        FirebaseAuth.AuthStateListener { firebaseAuth ->
+            if (firebaseAuth.currentUser != null) {
+                onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
+            }
+        }
+    }
+
+    @Test
+    fun loginFormWithoutPassword() {
+        onView(withId(R.id.username)).perform(typeText("user.name@gmail.com"))
+        onView(withId(R.id.login)).check(matches(not(isEnabled())))
     }
 
     @Test

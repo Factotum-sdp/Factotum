@@ -14,7 +14,7 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
 
     fun loginDataChanged(email: String, password: String) {
         if (!BaseAuthState.isEmailValid(email)) {
-            _loginForm.value = LoginFormState(emailError = R.string.invalid_username)
+            _loginForm.value = LoginFormState(emailError = R.string.invalid_email)
         } else if (!BaseAuthState.isPasswordValid(password)) {
             _loginForm.value = LoginFormState(passwordError = R.string.invalid_password)
         } else {

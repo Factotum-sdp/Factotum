@@ -39,7 +39,7 @@ class LoginDataSource {
 
     fun retrieveProfiles(): Result<MutableList<User>> {
         val profilesResultFuture = CompletableFuture<Result<MutableList<User>>>()
-        var profiles = mutableListOf<User>()
+        var profiles: MutableList<User>
 
         dbRef.child(DISPATCH_DB_PATH).get().addOnSuccessListener {
             val profileList = it.value as List<*>

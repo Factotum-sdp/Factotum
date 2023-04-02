@@ -1,6 +1,5 @@
 package com.github.factotum_sdp.factotum
 
-import com.github.factotum_sdp.factotum.data.LoggedInUser
 import com.github.factotum_sdp.factotum.data.LoginDataSource
 import com.github.factotum_sdp.factotum.data.Result
 import com.github.factotum_sdp.factotum.data.Role
@@ -22,55 +21,39 @@ class LoginDataSourceTest {
 
     private val userName = "Jane Doe"
     private val userEmail = "jane.doe@gmail.com"
-    private val userRole = Role.CLIENT
-    private val validPassword = "123456"
-    private val invalidPassword = "azerty"
+    private val userRole = Role.BOSS
 
     @Test
-    fun `login with correct credentials returns a LoggedInUser`() {
+    fun `retrieve profiles returns a list of users`() {
         // given
-        val expectedUser = LoggedInUser(userName, userEmail, userRole)
+        val users = listOf(
+            LoginDataSource.User(userName, userEmail, userRole),
+            LoginDataSource.User("William Taylor", "william.taylor@gmail.com", Role.COURIER),
+            LoginDataSource.User("Helen Bates", "helen.bates@gmail.com", Role.COURIER)
+        )
 
         loginDataSource = mock(LoginDataSource::class.java)
-        `when`(
-            loginDataSource.login(
-                userEmail,
-                validPassword,
-                LoginDataSource.User(userName, userEmail, userRole)
-            )
-        ).thenReturn(
-            Result.Success(
-                expectedUser
-            )
-        )
+
+        doReturn(Result.Success(users)).`when`(loginDataSource).retrieveProfiles()
         // when
-        val result = loginDataSource.login(
-            userName, validPassword, LoginDataSource.User(userName, userEmail, userRole)
-        )
+        val result = loginDataSource.retrieveProfiles()
 
         // then
         assertThat(
-            result, `is`(Result.Success(expectedUser))
+            result, `is`(Result.Success(users))
         )
     }
 
     @Test
-    fun `login with incorrect credentials returns an error`() {
+    fun `retrieve profiles returns an error`() {
         // given
-        val exception = IOException("Error logging in")
+        val exception = IOException("Error retrieving profiles")
+
+        loginDataSource = mock(LoginDataSource::class.java)
 
         // when
-        loginDataSource = mock(LoginDataSource::class.java)
-        `when`(
-            loginDataSource.login(
-                userEmail,
-                invalidPassword,
-                LoginDataSource.User(userName, userEmail, userRole)
-            )
-        ).thenReturn(Result.Error(exception))
-        val result = loginDataSource.login(
-            userName, invalidPassword, LoginDataSource.User(userName, userEmail, userRole)
-        )
+        doReturn(Result.Error(exception)).`when`(loginDataSource).retrieveProfiles()
+        val result = loginDataSource.retrieveProfiles()
 
         // then
         assertThat(

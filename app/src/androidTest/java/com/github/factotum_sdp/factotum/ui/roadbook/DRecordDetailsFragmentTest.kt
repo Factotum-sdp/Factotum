@@ -40,8 +40,6 @@ class DRecordDetailsFragmentTest {
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))
             .perform(click())
-        //wait for the previous snackbar to disappear
-        Thread.sleep(5000)
     }
 
     private fun setPrefs(sharedKey: String, activity: MainActivity, value: Boolean) {

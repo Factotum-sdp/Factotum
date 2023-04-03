@@ -58,8 +58,6 @@ class MapsFragmentTest {
             .perform(DrawerActions.open())
         onView(withId(R.id.routeFragment))
             .perform(click())
-        //wait for the previous snackbar to disappear
-        Thread.sleep(5000)
     }
 
     @Test

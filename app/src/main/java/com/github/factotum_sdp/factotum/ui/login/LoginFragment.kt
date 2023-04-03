@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -25,6 +26,8 @@ class LoginFragment : Fragment() {
 
     private lateinit var loginViewModel: LoginViewModel
     private var _binding: FragmentLoginBinding? = null
+
+    private var isProfileRetrieved = false
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -51,12 +54,13 @@ class LoginFragment : Fragment() {
         val loginButton = binding.login
         val signupButton = binding.signup
         val loadingProgressBar = binding.loading
+        val profileRetrieveErrorText = binding.profileRetrivalError
 
         // Retrieve profiles of all users in the database
         loginViewModel.retrieveProfiles()
 
         // Observe the result of retrieving profiles and show it in a snackbar.
-        observeRetrieveProfilesResult()
+        observeRetrieveProfilesResult(profileRetrieveErrorText)
 
         // Observe the login form state and enable/disable the login button accordingly
         observeLoginFormState(loginButton, emailEditText, passwordEditText)
@@ -98,11 +102,14 @@ class LoginFragment : Fragment() {
         }
     }
 
-    private fun observeRetrieveProfilesResult() {
+    private fun observeRetrieveProfilesResult(profileRetrieveErrorText: TextView) {
         loginViewModel.retrieveProfilesResult.observe(viewLifecycleOwner) { profileRetrievalResult ->
-            profileRetrievalResult?.run {
-                success?.let(::showSnackBar)
-                error?.let(::showSnackBar)
+            profileRetrievalResult ?: return@observe
+            profileRetrievalResult.error?.let {
+                profileRetrieveErrorText.visibility = View.VISIBLE
+            }
+            profileRetrievalResult.success?.let {
+                isProfileRetrieved = true
             }
         }
     }
@@ -117,7 +124,7 @@ class LoginFragment : Fragment() {
                 if (loginFormState == null) {
                     return@Observer
                 }
-                loginButton.isEnabled = loginFormState.isDataValid
+                loginButton.isEnabled = loginFormState.isDataValid && isProfileRetrieved
                 loginFormState.emailError?.let {
                     usernameEditText.error = getString(it)
                 }

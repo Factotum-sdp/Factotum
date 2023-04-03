@@ -53,8 +53,6 @@ class RouteFragmentTest {
         testRule.scenario.onActivity { activity ->
             decorView = activity.window.decorView
         }
-        //wait for the previous snackbar to disappear
-        Thread.sleep(5000)
     }
 
     @Test

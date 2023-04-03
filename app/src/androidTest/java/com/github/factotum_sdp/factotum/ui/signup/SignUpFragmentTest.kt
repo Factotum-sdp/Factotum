@@ -33,8 +33,6 @@ class SignUpFragmentTest {
     @Before
     fun setUp() {
         onView(withId(R.id.signup)).perform(click())
-        //wait for the previous snackbar to disappear
-        Thread.sleep(5000)
     }
 
     @Test

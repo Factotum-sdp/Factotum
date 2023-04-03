@@ -77,8 +77,6 @@ class RoadBookFragmentTest {
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))
             .perform(click())
-        //wait for the previous snackbar to disappear
-        Thread.sleep(5000)
     }
 
     @Test

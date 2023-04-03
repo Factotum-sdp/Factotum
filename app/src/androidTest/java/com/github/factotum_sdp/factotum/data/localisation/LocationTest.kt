@@ -89,4 +89,9 @@ class LocationTest {
         val cacheSizeAfter = cacheFile.length()
         assertEquals(cacheSizeBefore, cacheSizeAfter)
     }
+
+    @Test
+    fun rightQueryReturnsMultiplesResults(){
+        TODO()
+    }
 }

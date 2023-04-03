@@ -12,7 +12,7 @@ import java.util.concurrent.CountDownLatch
 /**
  * Class that models a Location that has a name and an address
  *
- * @constructor : Constructs a Location
+ * @constructor : Constructs a Location with the best result
  *
  * @param query : String. Query of the address that we want to create
  * @param context : Context. Context in which this constructor is called
@@ -22,6 +22,7 @@ class Location(query: String, context : Context) {
     companion object {
         const val CACHE_FILE_NAME = "locations.txt"
         const val CACHE_FILE_SEPARATOR = "|"
+        const val MAX_RESULT = 4
 
         /**
          * Creates a location and stores it in a file named CACHE_FILE_NAME in cache if an address was found.
@@ -63,30 +64,31 @@ class Location(query: String, context : Context) {
         // must handle differently depending on SDK.
         // getLocationFromName(String, int) deprecated in SDK 33
         address = if (Build.VERSION.SDK_INT >= TIRAMISU) {
-            tiramisuResultHandler(query, geocoder)
+            tiramisuResultHandler(query, geocoder)?.get(0)
         } else{
-            resultHandler(query, geocoder)
+            resultHandler(query, geocoder)?.get(0)
         }
         addressName = address?.getAddressLine(0)
     }
 
     @RequiresApi(TIRAMISU)
-    private fun tiramisuResultHandler(query: String, geocoder: Geocoder): Address? {
-        var result : Address? = null
+    private fun tiramisuResultHandler(query: String, geocoder: Geocoder): List<Address>? {
+        var result : List<Address>? = listOf()
         val latch = CountDownLatch(1)
         // blocking
-        geocoder.getFromLocationName(query, 1) { addresses ->
-            result = if(addresses.size != 0) addresses[0] else null
+        geocoder.getFromLocationName(query, MAX_RESULT) { addresses ->
+            result = if(addresses.size > 0) addresses else null
             latch.countDown()
         }
         latch.await()
         return result
     }
 
-    private fun resultHandler(query: String, geocoder: Geocoder): Address? {
-        var result : Address? = null
+    private fun resultHandler(query: String, geocoder: Geocoder): List<Address>? {
+        var result : List<Address>? = listOf()
         try {
-            result = geocoder.getFromLocationName(query, 1)?.get(0)
+            val geocodeResult = geocoder.getFromLocationName(query, MAX_RESULT)
+            result = if (geocodeResult == null || geocodeResult.isEmpty()) null else geocodeResult
         } catch (e : Exception){
             e.printStackTrace()
         }

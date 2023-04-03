@@ -48,25 +48,24 @@ class LoginDataSource {
                 return@addOnSuccessListener
             }
             val profileList = it.value as List<*>
-            profiles = profileList.map { profile ->
-                val profileMap = profile as Map<*, *>
-                val displayName = profileMap["username"] as String
-                val email = profileMap["email"] as String
-                val role = Role.valueOf(profileMap["role"] as String)
-                User(displayName, email, role)
-            }.toMutableList()
+            profiles = profilesToUsers(profileList)
             profilesResultFuture.complete(Result.Success(profiles))
         }.addOnFailureListener {
             profilesResultFuture.complete(
-                Result.Error(
-                    IOException(
-                        "Error retrieving profiles",
-                        it
-                    )
-                )
+                Result.Error(IOException("Error retrieving profiles", it))
             )
         }
         return profilesResultFuture.get()
+    }
+
+    private fun profilesToUsers(profileList: List<*>): MutableList<User> {
+        return profileList.map { profile ->
+            val profileMap = profile as Map<*, *>
+            val displayName = profileMap["username"] as String
+            val email = profileMap["email"] as String
+            val role = Role.valueOf(profileMap["role"] as String)
+            User(displayName, email, role)
+        }.toMutableList()
     }
 
     companion object {

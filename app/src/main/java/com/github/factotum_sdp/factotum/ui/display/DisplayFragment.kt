@@ -32,9 +32,15 @@ class DisplayFragment : Fragment() {
         _binding = FragmentDisplayBinding.inflate(inflater, container, false)
 
         // Set up the recycler view with a photo adapter
-        val photoAdapter = PhotoAdapter() { storageReference ->
-            shareImage(storageReference, PHONE_NUMBER)
-        }
+        val photoAdapter = PhotoAdapter(
+            onShareClick = { storageReference ->
+                shareImage(storageReference, PHONE_NUMBER)
+            },
+            onCardClick = { uri ->
+                openImage(uri)
+            }
+        )
+
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = photoAdapter
@@ -89,6 +95,15 @@ class DisplayFragment : Fragment() {
             startActivity(chooserIntent)
         }
     }
+
+    private fun openImage(imageUri: Uri) {
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(imageUri, "image/*")
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        startActivity(intent)
+    }
+
 
 
 }

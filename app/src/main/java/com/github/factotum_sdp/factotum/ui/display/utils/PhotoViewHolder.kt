@@ -1,26 +1,36 @@
 package com.github.factotum_sdp.factotum.ui.display.utils
 
-import android.widget.ImageButton
+import android.net.Uri
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.databinding.DisplayItemBinding
 import com.google.firebase.storage.StorageReference
 
-class PhotoViewHolder(private val binding: DisplayItemBinding, private val onShareClick: (StorageReference) -> Unit) : RecyclerView.ViewHolder(binding.root) {
-
-    private val shareButton: ImageButton = binding.shareButton
+class PhotoViewHolder(private val binding: DisplayItemBinding,
+                      private val onShareClick: (StorageReference) -> Unit,
+                      private val onCardClick: (Uri) -> Unit)
+    : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(storageReference: StorageReference) {
         // Extract the date, hour, and minute from the photo name
-        val photoName = storageReference.name
-        val dateTimeRegex = Regex("""\d{2}-\d{2}-\d{4}_\d{2}:\d{2}""")
-        val dateTimeMatch = dateTimeRegex.find(photoName)
-        val dateTime = dateTimeMatch?.value?.replace("_", " | ")?.replace('-', ':') ?: "Unknown date and time"
-
+        val dateTime = extractNewName(storageReference.name)
         // Set the text of the TextView to the photo date, hour, and minute
         binding.displayItemView.text = dateTime
 
-        shareButton.setOnClickListener {
+        binding.shareButton.setOnClickListener {
             onShareClick(storageReference)
         }
+
+        binding.cardView.setOnClickListener {
+            storageReference.downloadUrl.addOnSuccessListener { uri ->
+                onCardClick(uri)
+            }
+        }
+    }
+
+    // Extract the date, hour, and minute from the photo name
+    private fun extractNewName(name : String) : String {
+        val regex = Regex("""\d{2}-\d{2}-\d{4}_\d{2}:\d{2}""")
+        val match = regex.find(name)
+        return match?.value?.replace("_", " | ")?.replace('-', ':') ?: "Unknown date and time"
     }
 }

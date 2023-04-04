@@ -8,6 +8,7 @@ import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.Comparator
@@ -58,11 +59,22 @@ class DisplayViewModel : ViewModel() {
     // Sort the list of images by date in descending order
     private fun sortByDate(ref1: StorageReference, ref2: StorageReference): Int {
         val dateFormat = SimpleDateFormat("dd-MM-yyyy_HH:mm:ss", Locale.getDefault())
-        val date1 =
-            dateFormat.parse(ref1.name.substringAfter("USER_").substringBeforeLast("."))
-        val date2 =
-            dateFormat.parse(ref2.name.substringAfter("USER_").substringBeforeLast("."))
+        val dateString1 = ref1.name.substringAfter("USER_").substringBeforeLast(".")
+        val dateString2 = ref2.name.substringAfter("USER_").substringBeforeLast(".")
+
+        val date1 = try {
+            dateFormat.parse(dateString1)
+        } catch (e: ParseException) {
+            Date(0) // Set to Unix epoch time (January 1, 1970) if the date format is not as expected
+        }
+
+        val date2 = try {
+            dateFormat.parse(dateString2)
+        } catch (e: ParseException) {
+            Date(0) // Set to Unix epoch time (January 1, 1970) if the date format is not as expected
+        }
         return date2.compareTo(date1)
     }
+
 
 }

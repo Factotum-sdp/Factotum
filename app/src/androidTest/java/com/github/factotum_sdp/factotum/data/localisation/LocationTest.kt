@@ -92,6 +92,8 @@ class LocationTest {
 
     @Test
     fun rightQueryReturnsMultiplesResults(){
-        TODO()
+        val query = "rue de Genève"
+        val result = Location.geocoderQuery(query, getApplicationContext())
+        assertEquals(Location.MAX_RESULT, result!!.size)
     }
 }

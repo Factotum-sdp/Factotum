@@ -54,46 +54,54 @@ class Location(query: String, context : Context) {
             if(!alreadyExists) cacheFile.appendText(toStore)
             return location
         }
+
+        fun geocoderQuery(query: String, context: Context): List<Address>?{
+            // must handle differently depending on SDK.
+            // getLocationFromName(String, int) deprecated in SDK 33
+            val geocoder = Geocoder(context)
+            return if (Build.VERSION.SDK_INT >= TIRAMISU) {
+                tiramisuResultHandler(query, geocoder)
+            } else{
+                resultHandler(query, geocoder)
+            }
+        }
+
+        @RequiresApi(TIRAMISU)
+        private fun tiramisuResultHandler(query: String, geocoder: Geocoder): List<Address>? {
+            var result : List<Address>? = listOf()
+            val latch = CountDownLatch(1)
+            // blocking
+            geocoder.getFromLocationName(query, MAX_RESULT) { addresses ->
+                result = if(addresses.size > 0) addresses else null
+                latch.countDown()
+            }
+            latch.await()
+            return result
+        }
+
+        private fun resultHandler(query: String, geocoder: Geocoder): List<Address>? {
+            var result : List<Address>? = listOf()
+            try {
+                val geocodeResult = geocoder.getFromLocationName(query, MAX_RESULT)
+                result = if (geocodeResult == null || geocodeResult.isEmpty()) null else geocodeResult
+            } catch (e : Exception){
+                e.printStackTrace()
+            }
+            return result
+        }
     }
 
     val address : Address?
     val addressName : String?
 
     init {
-        val geocoder = Geocoder(context)
-        // must handle differently depending on SDK.
-        // getLocationFromName(String, int) deprecated in SDK 33
-        address = if (Build.VERSION.SDK_INT >= TIRAMISU) {
-            tiramisuResultHandler(query, geocoder)?.get(0)
-        } else{
-            resultHandler(query, geocoder)?.get(0)
-        }
+        address = geocoderQuery(query, context)?.get(0)
         addressName = address?.getAddressLine(0)
     }
 
-    @RequiresApi(TIRAMISU)
-    private fun tiramisuResultHandler(query: String, geocoder: Geocoder): List<Address>? {
-        var result : List<Address>? = listOf()
-        val latch = CountDownLatch(1)
-        // blocking
-        geocoder.getFromLocationName(query, MAX_RESULT) { addresses ->
-            result = if(addresses.size > 0) addresses else null
-            latch.countDown()
-        }
-        latch.await()
-        return result
-    }
 
-    private fun resultHandler(query: String, geocoder: Geocoder): List<Address>? {
-        var result : List<Address>? = listOf()
-        try {
-            val geocodeResult = geocoder.getFromLocationName(query, MAX_RESULT)
-            result = if (geocodeResult == null || geocodeResult.isEmpty()) null else geocodeResult
-        } catch (e : Exception){
-            e.printStackTrace()
-        }
-        return result
-    }
+
+
 
 
 

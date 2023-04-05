@@ -120,6 +120,10 @@ class RouteFragment : Fragment() {
                 return true
             }
             override fun onQueryTextChange(newText: String?): Boolean {
+                if (newText != null){
+                    val results = Location.geocoderQuery(newText, requireContext())
+
+                }
                 return false
             }
         })

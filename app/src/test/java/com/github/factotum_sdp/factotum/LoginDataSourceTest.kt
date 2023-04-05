@@ -1,5 +1,6 @@
 package com.github.factotum_sdp.factotum
 
+import com.github.factotum_sdp.factotum.data.LoggedInUser
 import com.github.factotum_sdp.factotum.data.LoginDataSource
 import com.github.factotum_sdp.factotum.data.Result
 import com.github.factotum_sdp.factotum.data.Role
@@ -22,6 +23,41 @@ class LoginDataSourceTest {
     private val userName = "Jane Doe"
     private val userEmail = "jane.doe@gmail.com"
     private val userRole = Role.BOSS
+    private val validPassword = "123456"
+    private val invalidPassword = "123456789"
+    private val profile = LoginDataSource.User(userName, userEmail, userRole)
+
+    @Test
+    fun `login with correct credentials returns a LoggedInUser`() {
+        // given
+        val expectedUser = LoggedInUser(userName, userEmail, userRole)
+
+        loginDataSource = mock(LoginDataSource::class.java)
+        `when`(loginDataSource.login(userName, validPassword, profile)).thenReturn(
+            Result.Success(
+                expectedUser
+            )
+        )
+        // when
+        val result = loginDataSource.login(userName, validPassword, profile)
+
+        // then
+        assertThat(result, `is`(Result.Success(expectedUser)))
+    }
+
+    @Test
+    fun `login with incorrect credentials returns an error`() {
+        // given
+        val exception = IOException("Error logging in")
+
+        // when
+        loginDataSource = mock(LoginDataSource::class.java)
+        `when`(loginDataSource.login(userName, invalidPassword, profile)).thenReturn(Result.Error(exception))
+        val result = loginDataSource.login(userName, invalidPassword, profile)
+
+        // then
+        assertThat(result, `is`(Result.Error(exception)))
+    }
 
     @Test
     fun `retrieve profiles returns a list of users`() {

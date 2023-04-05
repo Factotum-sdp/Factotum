@@ -38,7 +38,7 @@ class LoginDataSource {
     }
 
     fun retrieveProfiles(): Result<MutableList<User>> {
-        val profilesResultFuture = CompletableFuture<Result<MutableList<User>>>()
+        /*val profilesResultFuture = CompletableFuture<Result<MutableList<User>>>()
         var profiles: MutableList<User>
         dbRef.child(DISPATCH_DB_PATH).get().addOnSuccessListener {
             if (!it.exists()) {
@@ -54,8 +54,12 @@ class LoginDataSource {
             profilesResultFuture.complete(
                 Result.Error(IOException("Error retrieving profiles", it))
             )
-        }
-        return profilesResultFuture.get()
+        }*/
+        return Result.Success(
+            mutableListOf(
+                User("Jane Doe", "jane.doe@gmail.com", Role.BOSS)
+            )
+        )
     }
 
     private fun profilesToUsers(profileList: List<*>): MutableList<User> {

@@ -42,26 +42,25 @@ import java.util.concurrent.TimeUnit
 class MapsFragmentTest {
 
     val device = UiDevice.getInstance(getInstrumentation())
-    val buttonTextAllow = when (Locale.getDefault().language) {
+    val buttonTextAllow = when(Locale.getDefault().language){
         Locale.FRENCH.language -> "Uniquement cette fois-ci"
         else -> "Only this time"
     }
-
     @get:Rule
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
     )
 
-    @Before
-    fun setUp() {
+    @Before fun setUp(){
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.routeFragment))
             .perform(click())
+
     }
 
     @Test
-    fun a_permissionAskPopUp() {
+    fun a_permissionAskPopUp(){
         onData(anything())
             .inAdapterView(withId(R.id.list_view_routes)).atPosition(0).perform(
                 click()
@@ -69,9 +68,8 @@ class MapsFragmentTest {
         onView(withId(R.id.button_next)).perform(click())
         assertTrue(device.findObject(UiSelector().textContains(buttonTextAllow)).exists())
     }
-
     @Test
-    fun b_permissionAllowShowLocation() {
+    fun b_permissionAllowShowLocation(){
         onData(anything())
             .inAdapterView(withId(R.id.list_view_routes)).atPosition(0).perform(
                 click()
@@ -80,21 +78,18 @@ class MapsFragmentTest {
         device.findObject(UiSelector().textContains(buttonTextAllow)).click()
         assertTrue(checkLocationEnabled(testRule))
     }
-
     @Test
-    fun goesToSecondFragement() {
-        onData(anything()).inAdapterView(withId(R.id.list_view_routes)).atPosition(0)
-            .perform(click())
+    fun goesToSecondFragement(){
+        onData(anything()).inAdapterView(withId(R.id.list_view_routes)).atPosition(0).perform(click())
         val nextButton = onView(withId(R.id.button_next))
         nextButton.perform(click())
         onView(withId(R.id.fragment_maps_directors_parent)).check(matches(isDisplayed()))
     }
 
     @Test
-    fun showsDestinationMarker() {
+    fun showsDestinationMarker(){
 
-        onData(anything()).inAdapterView(withId(R.id.list_view_routes)).atPosition(0)
-            .perform(click())
+        onData(anything()).inAdapterView(withId(R.id.list_view_routes)).atPosition(0).perform(click())
         val nextButton = onView(withId(R.id.button_next))
         nextButton.perform(click())
         val endMarker = device.findObject(UiSelector().descriptionContains("Destination"))
@@ -102,43 +97,38 @@ class MapsFragmentTest {
     }
 
     @Test
-    fun showsAllDest() {
+    fun showsAllDest(){
         val nbRoutes = device.findObjects(textContains("->")).size
         val showAll = onView(withId(R.id.button_all))
         showAll.perform(click())
         var endMarker = device.findObjects(descContains("Destination"))
         val endTime = System.nanoTime() + TimeUnit.SECONDS.toNanos(5)
-        while (endMarker.size == 0 && System.nanoTime() < endTime) {
+        while(endMarker.size == 0 && System.nanoTime() < endTime) {
             endMarker = device.findObjects(descContains("Destination"))
         }
         assertEquals(nbRoutes, endMarker.size)
     }
 
     @Test
-    fun runLaunchesMaps() {
+    fun runLaunchesMaps(){
         Intents.init()
         device.findObject(UiSelector().textContains("->")).click()
         val runButton = onView(withId(R.id.button_run))
         runButton.perform(click())
-        intended(
-            allOf(
-                hasAction(Intent.ACTION_VIEW),
-                toPackage(RouteFragment.MAPS_PKG)
-            )
-        )
+        intended(allOf(hasAction(Intent.ACTION_VIEW),
+            toPackage(RouteFragment.MAPS_PKG)
+        ))
         Intents.release()
 
     }
-
-    private fun checkLocationEnabled(rule: ActivityScenarioRule<MainActivity>): Boolean {
+    private fun checkLocationEnabled(rule:  ActivityScenarioRule<MainActivity>) : Boolean {
         var isEnabled = false
         val latch = CountDownLatch(1)
         rule.scenario.onActivity {
-            val navHostFragment =
-                it.supportFragmentManager.primaryNavigationFragment as NavHostFragment
+            val navHostFragment = it.supportFragmentManager.primaryNavigationFragment as NavHostFragment
             val mapsFragment = navHostFragment.childFragmentManager.fragments[0]
             val mapFragment = mapsFragment.childFragmentManager.fragments[0] as SupportMapFragment
-            mapFragment.getMapAsync {
+            mapFragment.getMapAsync{
                 isEnabled = it.isMyLocationEnabled
                 latch.countDown()
             }

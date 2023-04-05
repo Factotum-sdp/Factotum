@@ -37,15 +37,13 @@ class RouteFragmentTest {
     )
 
     @get:Rule
-    val permission: GrantPermissionRule = GrantPermissionRule.grant(
+    val permission = GrantPermissionRule.grant(
         Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.ACCESS_COARSE_LOCATION
-    )
+        Manifest.permission.ACCESS_COARSE_LOCATION)
 
-    private var decorView: View? = null
-
+    private var decorView : View? = null
     @Before
-    fun setUp() {
+    fun setUp(){
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.routeFragment))
@@ -56,64 +54,57 @@ class RouteFragmentTest {
     }
 
     @Test
-    fun buttonNextExists() {
+    fun buttonNextExists(){
         onView(withId(R.id.button_next)).check(matches(not(doesNotExist())))
     }
 
     @Test
-    fun buttonNextInvisible() {
+    fun buttonNextInvisible(){
         onView(withId(R.id.button_next)).check(matches(withEffectiveVisibility(Visibility.INVISIBLE)))
     }
 
     @Test
-    fun buttonNextAppearsWhenPressed() {
+    fun buttonNextAppearsWhenPressed(){
         onView(withId(R.id.button_next)).check(matches(withEffectiveVisibility(Visibility.INVISIBLE)))
-        Espresso.onData(anything()).inAdapterView(withId(R.id.list_view_routes)).atPosition(0)
-            .perform(
-                click()
-            )
+        Espresso.onData(anything()).inAdapterView(withId(R.id.list_view_routes)).atPosition(0).perform(
+            click()
+        )
         onView(withId(R.id.button_next)).check(matches(isDisplayed()))
     }
-
     @Test
-    fun buttonRunExists() {
+    fun buttonRunExists(){
         onView(withId(R.id.button_run)).check(matches(not(doesNotExist())))
     }
 
     @Test
-    fun buttonRunInvisible() {
+    fun buttonRunInvisible(){
         onView(withId(R.id.button_run)).check(matches(withEffectiveVisibility(Visibility.INVISIBLE)))
     }
 
     @Test
-    fun buttonRunAppearsWhenPressed() {
+    fun buttonRunAppearsWhenPressed(){
         onView(withId(R.id.button_run)).check(matches(withEffectiveVisibility(Visibility.INVISIBLE)))
-        Espresso.onData(anything()).inAdapterView(withId(R.id.list_view_routes)).atPosition(0)
-            .perform(
-                click()
-            )
+        Espresso.onData(anything()).inAdapterView(withId(R.id.list_view_routes)).atPosition(0).perform(
+            click()
+        )
         onView(withId(R.id.button_run)).check(matches(isDisplayed()))
     }
-
     @Test
-    fun buttonShowDstDisplayed() {
+    fun buttonShowDstDisplayed(){
         onView(withId(R.id.button_all)).check(matches(isDisplayed()))
     }
 
     @Test
-    fun searchBarDisplayed() {
-        onView(allOf(withId(R.id.search_bar), isAssignableFrom(SearchView::class.java))).check(
-            matches(isDisplayed())
-        )
+    fun searchBarDisplayed(){
+        onView(allOf(withId(R.id.search_bar), isAssignableFrom(SearchView::class.java))).check(matches(isDisplayed()))
     }
 
     @Test
-    fun validSearchShowsAddressSnackBar() {
+    fun validSearchShowsAddressSnackBar(){
         val city = "Lausanne"
-        onView(withId(androidx.appcompat.R.id.search_src_text)).perform(typeText(city))
-            .perform(pressKey(KeyEvent.KEYCODE_ENTER))
+        onView(withId(androidx.appcompat.R.id.search_src_text)).perform(typeText(city)).perform(pressKey(KeyEvent.KEYCODE_ENTER))
         val geocoder = Geocoder(getApplicationContext())
-        var result: String
+        var  result : String
         val latch = CountDownLatch(1)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             geocoder.getFromLocationName(city, 1) { addresses ->
@@ -127,7 +118,7 @@ class RouteFragmentTest {
                 latch.countDown()
             }
             latch.await()
-        } else {
+        } else{
             val bestAddresses = geocoder.getFromLocationName(city, 1)
             result = bestAddresses?.get(0).toString()
             onView(withId(com.google.android.material.R.id.snackbar_text))
@@ -136,11 +127,9 @@ class RouteFragmentTest {
     }
 
     @Test
-    fun wrongSearchShowsNoResultSnackbar() {
+    fun wrongSearchShowsNoResultSnackbar(){
         val city = "wrong_search"
-        onView(withId(androidx.appcompat.R.id.search_src_text))
-            .perform(typeText(city))
-            .perform(pressKey(KeyEvent.KEYCODE_ENTER))
+        onView(withId(androidx.appcompat.R.id.search_src_text)).perform(typeText(city)).perform(pressKey(KeyEvent.KEYCODE_ENTER))
         onView(withId(com.google.android.material.R.id.snackbar_text))
             .check(matches(withText(NO_RESULT)))
     }

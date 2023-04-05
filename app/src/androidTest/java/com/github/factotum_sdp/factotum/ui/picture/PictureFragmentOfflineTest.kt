@@ -10,11 +10,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
-import com.github.factotum_sdp.factotum.utils.PictureUtils.Companion.TIME_WAIT_DONE_OR_CANCEL
-import com.github.factotum_sdp.factotum.utils.PictureUtils.Companion.TIME_WAIT_SHUTTER
-import com.github.factotum_sdp.factotum.utils.PictureUtils.Companion.TIME_WAIT_UPLOAD
-import com.github.factotum_sdp.factotum.utils.PictureUtils.Companion.emptyFirebaseStorage
-import com.github.factotum_sdp.factotum.utils.PictureUtils.Companion.emptyLocalFiles
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage

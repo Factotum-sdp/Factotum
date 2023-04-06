@@ -8,11 +8,13 @@ import android.view.ViewGroup
 import android.widget.SearchView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.ContactsList
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -41,6 +43,11 @@ class DirectoryFragment : Fragment() {
     @SuppressLint("NotifyDataSetChanged") //We are updating the entire list at launch so we are not worried about wasted performance
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val createContactButton = view.findViewById<FloatingActionButton>(R.id.add_contact_button)
+        createContactButton.setOnClickListener{
+            it.findNavController().navigate(R.id.action_directoryFragment_to_contactCreationFragment)
+        }
 
         // Load contacts from local storage
         ContactsList.loadContactsLocally(requireContext())

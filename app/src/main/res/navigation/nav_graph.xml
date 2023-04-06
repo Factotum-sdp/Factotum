@@ -52,6 +52,9 @@
         <action
             android:id="@+id/action_directoryFragment_to_contactDetailsFragment2"
             app:destination="@id/contactDetailsFragment2" />
+        <action
+            android:id="@+id/action_directoryFragment_to_contactCreationFragment"
+            app:destination="@id/contactCreationFragment" />
     </fragment>
     <fragment
         android:id="@+id/mapsFragment"
@@ -82,6 +85,14 @@
         <action
             android:id="@+id/action_contactDetailsFragment2_to_directoryFragment"
             app:destination="@id/directoryFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/contactCreationFragment"
+        android:name="com.github.factotum_sdp.factotum.ui.directory.ContactCreation"
+        android:label="contact_creation">
+        <action
+            android:id="@+id/action_contactCreation_to_directoryFragment"
+            app:destination="@id/directoryFragment"/>
     </fragment>
     <fragment
         android:id="@+id/displayFragment"

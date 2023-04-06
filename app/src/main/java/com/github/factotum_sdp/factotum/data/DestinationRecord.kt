@@ -1,5 +1,6 @@
 package com.github.factotum_sdp.factotum.data
 
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -37,7 +38,7 @@ data class DestinationRecord(
         fun timeStampFormat(timeStamp: Date?): String {
             val result =
                 timeStamp?.let {
-                    SimpleDateFormat.getTimeInstance().format(it)
+                    SimpleDateFormat.getTimeInstance(DateFormat.DEFAULT, Locale.ENGLISH).format(it)
                 } ?: "_"
             return result
         }

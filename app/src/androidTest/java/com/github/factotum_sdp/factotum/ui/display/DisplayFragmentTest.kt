@@ -209,6 +209,23 @@ class DisplayFragmentTest {
     }
 
     @Test
+    fun displayFragment_displayNoPhotosIfEmpty() {
+        scenario.onFragment { fragment ->
+            val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
+            assert(recyclerView.adapter?.itemCount == 0)
+        }
+
+        onView(withId(R.id.refreshButton)).perform(click())
+
+        Thread.sleep(WAIT_TIME_REFRESH)
+
+        scenario.onFragment { fragment ->
+            val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
+            assert(recyclerView.adapter?.itemCount == 0)
+        }
+    }
+
+    @Test
     fun displayFragment_sharingPhotoWorks() {
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)

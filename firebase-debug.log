@@ -176,3 +176,5 @@ Dev App Server is now running.
 
 Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
  
+[debug] [2023-04-06T08:50:22.137Z] 10:50:22.136 [NamespaceSystem-akka.actor.default-dispatcher-6] INFO com.firebase.core.namespace.NamespaceActor - sdp-firebase-bootcamp-c795d-default-rtdb successfully activated FBKV (SurveyIdle(0)) wait: 82ms, init: 0ms
+ {"metadata":{"emulator":{"name":"database"},"message":"10:50:22.136 [NamespaceSystem-akka.actor.default-dispatcher-6] INFO com.firebase.core.namespace.NamespaceActor - sdp-firebase-bootcamp-c795d-default-rtdb successfully activated FBKV (SurveyIdle(0)) wait: 82ms, init: 0ms\n"}}

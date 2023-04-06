@@ -122,6 +122,93 @@ class DisplayFragmentTest {
     }
 
     @Test
+    fun displayFragment_displayOneBadFormatPhotosWorks() {
+        runBlocking {
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3)
+        }
+
+        Thread.sleep(WAIT_TIME_INIT)
+
+        onView(withId(R.id.refreshButton)).perform(click())
+
+        Thread.sleep(WAIT_TIME_REFRESH)
+
+        scenario.onFragment { fragment ->
+            val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
+            assert(recyclerView.adapter?.itemCount == 1)
+        }
+    }
+
+
+    @Test
+    fun displayFragment_displayMixingFormatPhotosWorks() {
+        runBlocking {
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
+        }
+
+        runBlocking {
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3)
+        }
+
+        Thread.sleep(WAIT_TIME_INIT)
+
+        onView(withId(R.id.refreshButton)).perform(click())
+
+        Thread.sleep(WAIT_TIME_REFRESH)
+
+        scenario.onFragment { fragment ->
+            val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
+            assert(recyclerView.adapter?.itemCount == 2)
+        }
+
+        //Empty storage
+        emptyStorageEmulator(Firebase.storage.reference)
+
+
+        runBlocking {
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH4, TEST_IMAGE_PATH4)
+        }
+
+        runBlocking {
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2)
+        }
+
+        Thread.sleep(WAIT_TIME_INIT)
+
+        onView(withId(R.id.refreshButton)).perform(click())
+
+        Thread.sleep(WAIT_TIME_REFRESH)
+
+        scenario.onFragment { fragment ->
+            val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
+            assert(recyclerView.adapter?.itemCount == 2)
+        }
+    }
+
+
+    @Test
+    fun displayFragment_displayTwoBadFormatPhotosWorks() {
+        runBlocking {
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3)
+        }
+
+        runBlocking {
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH4, TEST_IMAGE_PATH4)
+        }
+
+        Thread.sleep(WAIT_TIME_INIT)
+
+        onView(withId(R.id.refreshButton)).perform(click())
+
+        Thread.sleep(WAIT_TIME_REFRESH)
+
+        scenario.onFragment { fragment ->
+            val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
+            assert(recyclerView.adapter?.itemCount == 2)
+        }
+    }
+
+    @Test
     fun displayFragment_sharingPhotoWorks() {
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)

@@ -241,6 +241,7 @@ class RoadBookFragmentTest {
         swipeRightTheRecordAt(3) // edit one record displayed below which has another clientID
         onView(withId(R.id.autoCompleteClientID)).perform(clearText(), typeText(clientID)) // set for the same client that different record
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
+        Thread.sleep(2000)
         onView(withText("$clientID#2")).check(matches(isDisplayed())) // unique destID is computed
     }
 
@@ -286,6 +287,7 @@ class RoadBookFragmentTest {
         onView(withId(R.id.editTextTimestamp)).perform(click())
         onView(withText(timePickerCancelBLabel)).perform(click())
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
+        Thread.sleep(2000)
 
         onView(withText(startsWith("arrival : ${timestampUntilHourFormat(cal)}"))).check(doesNotExist())
     }
@@ -471,6 +473,7 @@ class RoadBookFragmentTest {
         onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
 
         // Navigation on Click disabled
+        Thread.sleep(2000)
         onView(withText(DestinationRecords.RECORDS[2].destID)).perform(click())
         onView(withId(R.id.fragment_drecord_details_directors_parent)).check(doesNotExist())
 
@@ -498,6 +501,7 @@ class RoadBookFragmentTest {
         onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
 
         // Navigation on Click disabled
+        Thread.sleep(2000)
         onView(withText(DestinationRecords.RECORDS[2].destID)).perform(click())
         onView(withId(R.id.fragment_drecord_details_directors_parent)).check(doesNotExist())
     }

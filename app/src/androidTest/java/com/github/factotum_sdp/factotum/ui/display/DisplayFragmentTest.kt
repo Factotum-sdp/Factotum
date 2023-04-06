@@ -16,10 +16,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.ui.display.utils.WAIT_TIME_INIT
-import com.github.factotum_sdp.factotum.ui.display.utils.WAIT_TIME_REFRESH
-import com.github.factotum_sdp.factotum.ui.display.utils.emptyStorageEmulator
-import com.github.factotum_sdp.factotum.ui.display.utils.uploadImageToStorageEmulator
+import com.github.factotum_sdp.factotum.ui.display.utils.*
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.runBlocking
@@ -71,8 +68,7 @@ class DisplayFragmentTest {
     @Test
     fun displayFragment_displayOnlyOnePhotoIfSame() {
         runBlocking {
-            val imagePath = "test_image1.jpg"
-            uploadImageToStorageEmulator(context, imagePath, "test_image1.jpg")
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
         }
 
         Thread.sleep(WAIT_TIME_INIT)
@@ -82,8 +78,7 @@ class DisplayFragmentTest {
         Thread.sleep(WAIT_TIME_REFRESH)
 
         runBlocking {
-            val imagePath = "test_image1.jpg"
-            uploadImageToStorageEmulator(context, imagePath, "test_image1.jpg")
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
         }
 
         Thread.sleep(WAIT_TIME_INIT)
@@ -99,10 +94,37 @@ class DisplayFragmentTest {
     }
 
     @Test
+    fun displayFragment_displayTwoDifferentPhotosWorks() {
+        runBlocking {
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
+        }
+
+        Thread.sleep(WAIT_TIME_INIT)
+
+        onView(withId(R.id.refreshButton)).perform(click())
+
+        Thread.sleep(WAIT_TIME_REFRESH)
+
+        runBlocking {
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2)
+        }
+
+        Thread.sleep(WAIT_TIME_INIT)
+
+        onView(withId(R.id.refreshButton)).perform(click())
+
+        Thread.sleep(WAIT_TIME_REFRESH)
+
+        scenario.onFragment { fragment ->
+            val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
+            assert(recyclerView.adapter?.itemCount == 2)
+        }
+    }
+
+    @Test
     fun displayFragment_sharingPhotoWorks() {
         runBlocking {
-            val imagePath = "test_image1.jpg"
-            uploadImageToStorageEmulator(context, imagePath, "test_image1.jpg")
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
         }
 
         Thread.sleep(WAIT_TIME_INIT)

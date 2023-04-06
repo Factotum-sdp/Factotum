@@ -30,7 +30,7 @@ class ContactsListOnlineTest {
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
-            database.useEmulator("10.0.2.2", 9000)
+            database.useEmulator("10.0.2.2", 9001)
             MainActivity.setDatabase(database)
 
             ContactsList.init(database)

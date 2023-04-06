@@ -26,7 +26,7 @@ class DisplayViewModelTest {
     @Before
     fun setUp() {
         // Initialize Firebase
-        Firebase.storage.useEmulator("10.0.2.2", 9199)
+        Firebase.storage.useEmulator("10.0.2.2", 9197)
         context = InstrumentationRegistry.getInstrumentation().context
     }
 

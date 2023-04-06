@@ -12,6 +12,10 @@ import kotlin.coroutines.resumeWithException
 
 const val WAIT_TIME_REFRESH = 1000L
 const val WAIT_TIME_INIT = 1000L
+const val TEST_IMAGE_PATH1 = "USER_25-03-2023_17:57:11.jpg"
+const val TEST_IMAGE_PATH2 = "USER_26-03-2023_17:57:11.jpg"
+const val TEST_IMAGE_PATH3 = "test_image3.jpg"
+const val TEST_IMAGE_PATH4 = "test_image4.jpg"
 
 suspend fun uploadImageToStorageEmulator(
     context: Context,

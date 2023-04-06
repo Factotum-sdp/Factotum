@@ -38,7 +38,7 @@ class DisplayFragmentTest {
     @Before
     fun setUp() {
         scenario = launchFragmentInContainer(themeResId = R.style.Theme_Factotum)
-        Firebase.storage.useEmulator("10.0.2.2", 9196)
+        Firebase.storage.useEmulator("10.0.2.2", 9197)
         context = InstrumentationRegistry.getInstrumentation().context
         Intents.init()
     }

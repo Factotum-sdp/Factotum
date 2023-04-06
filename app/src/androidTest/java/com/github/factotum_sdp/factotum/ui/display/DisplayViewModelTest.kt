@@ -10,7 +10,6 @@ import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.runBlocking
 import org.junit.*
 import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
 
 @RunWith(AndroidJUnit4::class)
 class DisplayViewModelTest {

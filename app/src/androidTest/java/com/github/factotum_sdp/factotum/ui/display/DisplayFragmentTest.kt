@@ -9,8 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.intent.Intents
-import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
+import androidx.test.espresso.intent.matcher.IntentMatchers.*
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -24,7 +25,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
 
 @RunWith(AndroidJUnit4::class)
 class DisplayFragmentTest {
@@ -47,13 +47,13 @@ class DisplayFragmentTest {
     }
 
     @Test
-    fun displayFragment_uiElementsDisplayed() {
+    fun displayFragmentUiElementsDisplayed() {
         onView(withId(R.id.recyclerView)).check(matches(isDisplayed()))
         onView(withId(R.id.refreshButton)).check(matches(isDisplayed()))
     }
 
     @Test
-    fun displayFragment_recyclerViewHasCorrectLayoutManager() {
+    fun displayFragmentRecyclerViewHasCorrectLayoutManager() {
         scenario.onFragment { fragment ->
             val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
             assert(recyclerView.layoutManager is LinearLayoutManager)
@@ -61,12 +61,12 @@ class DisplayFragmentTest {
     }
 
     @Test
-    fun displayFragment_refreshButtonClicked() {
+    fun displayFragmentRefreshButtonClicked() {
         onView(withId(R.id.refreshButton)).perform(click())
     }
 
     @Test
-    fun displayFragment_displayOnlyOnePhotoIfSame() {
+    fun displayFragmentDisplayOnlyOnePhotoIfSame() {
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
         }
@@ -94,7 +94,7 @@ class DisplayFragmentTest {
     }
 
     @Test
-    fun displayFragment_displayTwoDifferentPhotosWorks() {
+    fun displayFragmentDisplayTwoDifferentPhotosWorks() {
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
         }
@@ -122,7 +122,7 @@ class DisplayFragmentTest {
     }
 
     @Test
-    fun displayFragment_displayOneBadFormatPhotosWorks() {
+    fun displayFragmentDisplayOneBadFormatPhotosWorks() {
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3)
         }
@@ -141,7 +141,7 @@ class DisplayFragmentTest {
 
 
     @Test
-    fun displayFragment_displayMixingFormatPhotosWorks() {
+    fun displayFragmentDisplayMixingFormatPhotosWorks() {
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
         }
@@ -187,7 +187,7 @@ class DisplayFragmentTest {
 
 
     @Test
-    fun displayFragment_displayTwoBadFormatPhotosWorks() {
+    fun displayFragmentDisplayTwoBadFormatPhotosWorks() {
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3)
         }
@@ -209,7 +209,7 @@ class DisplayFragmentTest {
     }
 
     @Test
-    fun displayFragment_displayNoPhotosIfEmpty() {
+    fun displayFragmentDisplayNoPhotosIfEmpty() {
         scenario.onFragment { fragment ->
             val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
             assert(recyclerView.adapter?.itemCount == 0)
@@ -226,7 +226,29 @@ class DisplayFragmentTest {
     }
 
     @Test
-    fun displayFragment_sharingPhotoWorks() {
+    fun displayFragmentClickingOnPhotosFireCorrectIntents() {
+        runBlocking {
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
+        }
+
+        onView(withId(R.id.refreshButton)).perform(click())
+
+        Thread.sleep(WAIT_TIME_REFRESH)
+
+        onView(withId(R.id.recyclerView)).perform(
+            RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
+                0,
+                click()
+            )
+        )
+
+        Intents.intended(hasAction(Intent.ACTION_VIEW))
+        Intents.intended(hasType("image/*"))
+        Intents.intended(hasFlag(Intent.FLAG_GRANT_READ_URI_PERMISSION))
+    }
+
+    @Test
+    fun displayFragmentSharingPhotoWorks() {
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
         }

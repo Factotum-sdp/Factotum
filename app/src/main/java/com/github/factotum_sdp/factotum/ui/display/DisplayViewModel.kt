@@ -11,7 +11,6 @@ import kotlinx.coroutines.launch
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.Comparator
 
 // ViewModel for managing the display of images from Firebase Storage
 class DisplayViewModel : ViewModel() {

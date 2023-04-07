@@ -32,7 +32,7 @@ class ContactDetailsFragmentTest {
         @JvmStatic
         fun setUpDatabase() {
             val database = Firebase.database
-            database.useEmulator("10.0.2.2", 9002)
+            database.useEmulator("10.0.2.2", 9000)
             MainActivity.setDatabase(database)
 
             ContactsUtils.emptyFirebaseDatabase(database)

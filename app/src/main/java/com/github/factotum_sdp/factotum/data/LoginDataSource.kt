@@ -1,5 +1,6 @@
 package com.github.factotum_sdp.factotum.data
 
+import com.github.factotum_sdp.factotum.MainActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -10,8 +11,8 @@ import java.util.concurrent.CompletableFuture
  * Class that handles authentication w/ login credentials and retrieves user information.
  */
 class LoginDataSource {
-    private val auth = FirebaseAuth.getInstance()
-    private val dbRef = Firebase.database.reference
+    private val auth = MainActivity.getAuth()
+    private val dbRef = MainActivity.getDatabase().reference
 
     fun login(userEmail: String, password: String, profile: User): Result<LoggedInUser> {
         val authResultFuture = CompletableFuture<Result<LoggedInUser>>()
@@ -69,7 +70,7 @@ class LoginDataSource {
     }
 
     companion object {
-        private const val DISPATCH_DB_PATH: String = "profile-dispatch"
+        const val DISPATCH_DB_PATH: String = "profile-dispatch"
     }
 
     data class User(

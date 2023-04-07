@@ -8,8 +8,16 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matchers.not
+import org.junit.AfterClass
+import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,6 +29,36 @@ class LoginFragmentTest {
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
     )
+
+    companion object {
+        private var database: FirebaseDatabase = Firebase.database
+        private var auth: FirebaseAuth = Firebase.auth
+
+        @BeforeClass
+        @JvmStatic
+        fun setUpDatabase() {
+            database.useEmulator("10.0.2.2", 9000)
+            auth.useEmulator("10.0.2.2", 9099)
+
+            MainActivity.setDatabase(database)
+            MainActivity.setAuth(auth)
+
+            UsersPlaceHolder.init(database, auth)
+
+            runBlocking {
+                UsersPlaceHolder.populateDatabase()
+            }
+            runBlocking {
+                UsersPlaceHolder.addAuthUser()
+            }
+        }
+
+        @AfterClass
+        @JvmStatic
+        fun emptyDatabase() {
+            UsersPlaceHolder.emptyFirebaseDatabase(database)
+        }
+    }
 
     @Test
     fun loginFormInitialStateIsEmpty() {
@@ -48,11 +86,11 @@ class LoginFragmentTest {
     }
 
     fun correctUserEntryLeadsToRoadBook() {
-        onView(withId(R.id.email)).perform(typeText("jane.doe@gmail.com"))
+        onView(withId(R.id.email)).perform(typeText(UsersPlaceHolder.USER1.email))
         onView(withId(R.id.fragment_login_directors_parent)).perform(
             closeSoftKeyboard()
         )
-        onView(withId(R.id.password)).perform(typeText("123456"))
+        onView(withId(R.id.password)).perform(typeText(UsersPlaceHolder.USER1.password))
         onView(withId(R.id.fragment_login_directors_parent)).perform(
             closeSoftKeyboard()
         )
@@ -67,11 +105,11 @@ class LoginFragmentTest {
 
     @Test
     fun userNotInProfileDispatchUserNotFoundMessage() {
-        onView(withId(R.id.email)).perform(typeText("lee.harmon@gmail.com"))
+        onView(withId(R.id.email)).perform(typeText(UsersPlaceHolder.USER2.email))
         onView(withId(R.id.fragment_login_directors_parent)).perform(
             closeSoftKeyboard()
         )
-        onView(withId(R.id.password)).perform(typeText("123456"))
+        onView(withId(R.id.password)).perform(typeText(UsersPlaceHolder.USER2.password))
         onView(withId(R.id.fragment_login_directors_parent)).perform(
             closeSoftKeyboard()
         )

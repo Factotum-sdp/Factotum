@@ -1,15 +1,21 @@
 package com.github.factotum_sdp.factotum.ui.maps
 
+import android.app.SearchManager
 import android.content.Intent
+import android.database.Cursor
+import android.database.MatrixCursor
 import android.net.Uri
 import android.os.Bundle
+import android.provider.BaseColumns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.CursorAdapter
 import android.widget.ListView
 import androidx.appcompat.widget.SearchView
+import androidx.cursoradapter.widget.SimpleCursorAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -108,22 +114,49 @@ class RouteFragment : Fragment() {
     }
 
     private fun setListenerSearch(){
-        binding.searchBar.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        val from = arrayOf(SearchManager.SUGGEST_COLUMN_TEXT_1)
+        val to = intArrayOf(R.id.searchItemID)
+        val cursorAdapter = SimpleCursorAdapter(requireContext(), R.layout.suggestion_item_layout, null, from, to, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER)
+        binding.searchBar.suggestionsAdapter = cursorAdapter
 
+        binding.searchBar.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 if (query != null) {
                     val location = Location.createAndStore(query, requireContext())
+                    val result = Location.geocoderQuery(query, requireContext())
                     if (location != null) viewModel.setLocation(location)
                     val toShow = viewModel.location.value?.address?.toString() ?: NO_RESULT
                     Snackbar.make(requireView(), toShow, Snackbar.LENGTH_LONG).show()
+                    val cursor =
+                        MatrixCursor(arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1))
+                    result?.forEachIndexed { index, suggestion ->
+                            cursor.addRow(arrayOf(index, suggestion.getAddressLine(0).toString()))
+
+                    }
+
+                    cursorAdapter.changeCursor(cursor)
                 }
                 return true
             }
             override fun onQueryTextChange(newText: String?): Boolean {
-                if (newText != null){
-                    val results = Location.geocoderQuery(newText, requireContext())
+                return false
+            }
 
-                }
+        })
+
+        binding.searchBar.setOnSuggestionListener(object : SearchView.OnSuggestionListener {
+            override fun onSuggestionClick(position: Int): Boolean {
+                val cursor = binding.searchBar.suggestionsAdapter.getItem(position) as Cursor
+                val index = cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1)
+                if (index == -1) return true
+                val selection =
+                    cursor.getString(index)
+                binding.searchBar.setQuery(selection.toString(), false)
+
+                return true
+            }
+
+            override fun onSuggestionSelect(position: Int): Boolean {
                 return false
             }
         })

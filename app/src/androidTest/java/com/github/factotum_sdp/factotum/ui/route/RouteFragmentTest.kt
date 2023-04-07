@@ -133,6 +133,11 @@ class RouteFragmentTest {
         onView(withId(com.google.android.material.R.id.snackbar_text))
             .check(matches(withText(NO_RESULT)))
     }
+    
+    @Test
+    fun searchQueryDropsDown(){
+        TODO()
+    }
 
 
 }

@@ -87,7 +87,7 @@ class PictureFragment : Fragment() {
         val fileProvider = getString(R.string.file_provider)
         val storageDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
 
-        val dateFormat = SimpleDateFormat("dd-MM-yyyy_HH:mm:ss", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("dd-MM-yyyy_HH-mm-ss", Locale.getDefault())
         val currentDateAndTime = dateFormat.format(Date())
 
         photoName = "USER_${currentDateAndTime}.jpg"

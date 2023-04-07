@@ -57,7 +57,7 @@ class DisplayViewModel : ViewModel() {
 
     // Sort the list of images by date in descending order
     private fun sortByDate(ref1: StorageReference, ref2: StorageReference): Int {
-        val dateFormat = SimpleDateFormat("dd-MM-yyyy_HH:mm:ss", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("dd-MM-yyyy_HH-mm-ss", Locale.getDefault())
         val dateString1 = ref1.name.substringAfter("USER_").substringBeforeLast(".")
         val dateString2 = ref2.name.substringAfter("USER_").substringBeforeLast(".")
 

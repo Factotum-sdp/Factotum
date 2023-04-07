@@ -4,16 +4,12 @@ import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.github.factotum_sdp.factotum.ui.display.utils.WAIT_TIME_INIT
-import com.github.factotum_sdp.factotum.ui.display.utils.WAIT_TIME_REFRESH
-import com.github.factotum_sdp.factotum.ui.display.utils.emptyStorageEmulator
-import com.github.factotum_sdp.factotum.ui.display.utils.uploadImageToStorageEmulator
+import com.github.factotum_sdp.factotum.ui.display.utils.*
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.runBlocking
 import org.junit.*
 import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
 
 @RunWith(AndroidJUnit4::class)
 class DisplayViewModelTest {
@@ -47,8 +43,7 @@ class DisplayViewModelTest {
         Assert.assertTrue("PhotosReference should be empty.", displayViewModel.photoReferences.value?.isEmpty() ?: true)
 
         runBlocking {
-            val imagePath = "test_image1.jpg"
-            uploadImageToStorageEmulator(context, imagePath, "test_image1.jpg")
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
         }
 
         // Refresh the images
@@ -60,8 +55,7 @@ class DisplayViewModelTest {
         Assert.assertFalse("PhotosReference should not be empty.", displayViewModel.photoReferences.value?.isEmpty() ?: false)
 
         runBlocking {
-            val imagePath = "test_image2.jpg"
-            uploadImageToStorageEmulator(context, imagePath, "test_image2.jpg")
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2)
         }
 
         // Refresh the images
@@ -76,8 +70,7 @@ class DisplayViewModelTest {
     @Test
     fun testFetchPhotoShouldHaveOnePhotoRefAfterInit() {
         runBlocking {
-            val imagePath = "test_image1.jpg"
-            uploadImageToStorageEmulator(context, imagePath, "test_image1.jpg")
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
         }
 
         // Initialize the ViewModel

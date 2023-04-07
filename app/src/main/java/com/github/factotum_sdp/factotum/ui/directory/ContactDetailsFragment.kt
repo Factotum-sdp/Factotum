@@ -25,6 +25,7 @@ class ContactDetailsFragment : Fragment() {
             view.findNavController().navigate(R.id.action_contactDetailsFragment2_to_directoryFragment)} // go back to the list of contacts when the button is clicked
         setContactDetails(mainView, ContactsList.getItems()[arguments?.getInt("id")!!]) //links the contact details to the layout
 
+
         return mainView
     }
 

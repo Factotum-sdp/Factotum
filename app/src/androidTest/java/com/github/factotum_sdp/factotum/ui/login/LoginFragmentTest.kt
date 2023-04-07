@@ -10,6 +10,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.google.firebase.auth.FirebaseAuth
+import junit.framework.Assert.assertEquals
+import junit.framework.Assert.assertNotNull
 import org.hamcrest.Matchers.not
 import org.junit.Before
 import org.junit.Rule
@@ -63,6 +65,8 @@ class LoginFragmentTest {
         FirebaseAuth.AuthStateListener { firebaseAuth ->
             if (firebaseAuth.currentUser != null) {
                 onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
+                assertNotNull(firebaseAuth.currentUser)
+                assertEquals(firebaseAuth.currentUser!!.email, "jane.doe@gmail.com")
             }
         }
     }

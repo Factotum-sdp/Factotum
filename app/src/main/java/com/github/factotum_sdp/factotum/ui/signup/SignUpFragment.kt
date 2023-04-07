@@ -9,11 +9,16 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.data.SignUpDataSink
 import com.github.factotum_sdp.factotum.databinding.FragmentSignupBinding
+import com.google.android.material.snackbar.Snackbar
 
 class SignUpFragment : Fragment() {
 
@@ -38,15 +43,17 @@ class SignUpFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this)[SignUpViewModel::class.java]
+        viewModel =
+            ViewModelProvider(this, SignUpViewModelFactory())[SignUpViewModel::class.java]
 
         val usernameEditText = binding.username
         val emailEditText = binding.email
         val passwordEditText = binding.password
         val roleAutoCompleteTextView = binding.role
+        val loadingProgressBar = binding.loading
         val signUpButton = binding.signup
 
-        observe(signUpButton, usernameEditText, emailEditText, passwordEditText)
+        observeSignUpFormState(signUpButton, usernameEditText, emailEditText, passwordEditText)
 
         val afterTextChangedListener = createTextWatcher(
             viewModel,
@@ -64,12 +71,22 @@ class SignUpFragment : Fragment() {
             afterTextChangedListener
         )
 
+        signUpButton.setOnClickListener {
+            loadingProgressBar.visibility = View.VISIBLE
+            viewModel.signUp(
+                emailEditText.text.toString(),
+                passwordEditText.text.toString()
+            )
+        }
+
+        observeLoginResult(loadingProgressBar)
+
         adapter = ArrayAdapter(requireContext(), R.layout.user_role_item, roles)
 
         roleAutoCompleteTextView.setAdapter(adapter)
     }
 
-    private fun observe(
+    private fun observeSignUpFormState(
         signupButton: Button,
         usernameEditText: EditText,
         emailEditText: EditText,
@@ -89,6 +106,20 @@ class SignUpFragment : Fragment() {
                 }
                 signupFormState.passwordError?.let {
                     passwordEditText.error = getString(it)
+                }
+            })
+    }
+
+    private fun observeLoginResult(loadingProgressBar: View) {
+        viewModel.signUpResult.observe(viewLifecycleOwner,
+            Observer { loginResult ->
+                loginResult ?: return@Observer
+                loadingProgressBar.visibility = View.GONE
+                loginResult.error?.let {
+                    showSignUpFailed(it)
+                }
+                loginResult.success?.let {
+                    updateUiWithNewUser(it)
                 }
             })
     }
@@ -129,8 +160,34 @@ class SignUpFragment : Fragment() {
         roleAutoCompleteTextView.addTextChangedListener(afterTextChangedListener)
     }
 
+    private fun updateUiWithNewUser(displayName: String) {
+        val welcome = getString(R.string.welcome) + " " + displayName
+        Snackbar.make(requireView(), welcome, Snackbar.LENGTH_LONG).show()
+        findNavController().navigate(R.id.action_signUpFragment_to_loginFragment)
+    }
+
+    private fun showSignUpFailed(@StringRes errorString: Int) {
+        Snackbar.make(requireView(), errorString, Snackbar.LENGTH_LONG).show()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    /**
+     * ViewModel provider factory to instantiate SignUpViewModel.
+     * Required given SignUpViewModel has a non-empty constructor
+     */
+    class SignUpViewModelFactory : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(SignUpViewModel::class.java)) {
+                return SignUpViewModel(
+                    signUpDataSink = SignUpDataSink()
+                ) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
+        }
     }
 }

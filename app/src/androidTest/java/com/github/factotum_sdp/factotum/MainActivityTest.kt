@@ -3,6 +3,7 @@ package com.github.factotum_sdp.factotum
 import android.Manifest
 import android.provider.MediaStore
 import android.view.Gravity
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.*
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -14,13 +15,17 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.placeholder.ContactsList
+import com.github.factotum_sdp.factotum.ui.login.LoginFragmentTest
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matchers.allOf
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
@@ -82,12 +87,16 @@ class MainActivityTest {
     }
 
     private fun clickOnAMenuItemLeadsCorrectly(menuItemId: Int, fragment_parent_id: Int) {
+        navigateTo(menuItemId)
+        onView(withId(fragment_parent_id)).check(matches(isDisplayed()))
+        onView(withId(R.id.drawer_layout)).check(matches(DrawerMatchers.isClosed(Gravity.LEFT)))
+    }
+
+    private fun navigateTo(menuItemId: Int) {
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(menuItemId))
             .perform(click())
-        onView(withId(fragment_parent_id)).check(matches(isDisplayed()))
-        onView(withId(R.id.drawer_layout)).check(matches(DrawerMatchers.isClosed(Gravity.LEFT)))
     }
 
     @Test
@@ -155,6 +164,33 @@ class MainActivityTest {
             R.id.roadBookFragment,
             R.id.fragment_roadbook_directors_parent
         )
+    }
+
+    @Test
+    fun pressingBackOnAMenuFragmentLeadsToRBFragment() {
+        // First need to login to trigger the change of navGraph's start fragment
+        LoginFragmentTest.fillUserEntryAndGoToRBFragment()
+        Thread.sleep(3000)
+
+        navigateToAndPressBackLeadsToRB(R.id.directoryFragment)
+        navigateToAndPressBackLeadsToRB(R.id.displayFragment)
+        navigateToAndPressBackLeadsToRB(R.id.routeFragment)
+    }
+
+    private fun navigateToAndPressBackLeadsToRB(menuItemId: Int) {
+        navigateTo(menuItemId)
+        Espresso.pressBack()
+        onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun pressingBackOnRBFragmentLeadsOutOfTheApp() {
+        LoginFragmentTest.fillUserEntryAndGoToRBFragment()
+        Thread.sleep(3000)
+        Espresso.pressBackUnconditionally()
+        val uiDevice = UiDevice.getInstance(getInstrumentation())
+        assertFalse(uiDevice.currentPackageName == "com.github.factotum_sdp.factotum")
+        assertTrue(uiDevice.isScreenOn)
     }
 
 }

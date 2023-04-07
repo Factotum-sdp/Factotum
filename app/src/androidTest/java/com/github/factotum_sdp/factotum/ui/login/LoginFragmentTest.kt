@@ -50,16 +50,7 @@ class LoginFragmentTest {
     }
 
     fun correctUserEntryLeadsToRoadBook() {
-        onView(withId(R.id.username)).perform(typeText("jane.doe@gmail.com"))
-        onView(withId(R.id.fragment_login_directors_parent)).perform(
-            closeSoftKeyboard()
-        )
-        onView(withId(R.id.password)).perform(typeText("123456"))
-        onView(withId(R.id.fragment_login_directors_parent)).perform(
-            closeSoftKeyboard()
-        )
-        onView(withId(R.id.login)).perform(click())
-
+        fillUserEntryAndGoToRBFragment()
         FirebaseAuth.AuthStateListener { firebaseAuth ->
             if (firebaseAuth.currentUser != null) {
                 onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
@@ -77,5 +68,19 @@ class LoginFragmentTest {
     fun clickOnSignUpLeadsToSignUpFragment() {
         onView(withId(R.id.signup)).perform(click())
         onView(withId(R.id.fragment_signup_directors_parent)).check(matches(isDisplayed()))
+    }
+
+    companion object {
+        fun fillUserEntryAndGoToRBFragment() {
+            onView(withId(R.id.username)).perform(typeText("jane.doe@gmail.com"))
+            onView(withId(R.id.fragment_login_directors_parent)).perform(
+                closeSoftKeyboard()
+            )
+            onView(withId(R.id.password)).perform(typeText("123456"))
+            onView(withId(R.id.fragment_login_directors_parent)).perform(
+                closeSoftKeyboard()
+            )
+            onView(withId(R.id.login)).perform(click())
+        }
     }
 }

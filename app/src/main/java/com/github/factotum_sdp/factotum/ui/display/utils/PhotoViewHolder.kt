@@ -1,25 +1,36 @@
 package com.github.factotum_sdp.factotum.ui.display.utils
 
-import android.widget.Button
+import android.net.Uri
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.databinding.DisplayItemBinding
-import com.github.factotum_sdp.factotum.ui.display.GlideApp
 import com.google.firebase.storage.StorageReference
 
-
-// ViewHolder for displaying an individual photo item
-class PhotoViewHolder(private val binding: DisplayItemBinding, private val onShareClick: (StorageReference) -> Unit) : RecyclerView.ViewHolder(binding.root) {
-
-    private val shareButton: Button = binding.shareButton
+class PhotoViewHolder(private val binding: DisplayItemBinding,
+                      private val onShareClick: (StorageReference) -> Unit,
+                      private val onCardClick: (Uri) -> Unit)
+    : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(storageReference: StorageReference) {
-        // Load the image using Glide and display it in the ImageView
-        GlideApp.with(binding.displayItemView.context)
-            .load(storageReference)
-            .into(binding.displayItemView)
+        // Extract the date, hour, and minute from the photo name
+        val dateTime = extractNewName(storageReference.name)
+        // Set the text of the TextView to the photo date, hour, and minute
+        binding.displayItemView.text = dateTime
 
-        shareButton.setOnClickListener {
+        binding.shareButton.setOnClickListener {
             onShareClick(storageReference)
         }
+
+        binding.cardView.setOnClickListener {
+            storageReference.downloadUrl.addOnSuccessListener { uri ->
+                onCardClick(uri)
+            }
+        }
+    }
+
+    // Extract the date, hour, and minute from the photo name
+    private fun extractNewName(name : String) : String {
+        val regex = Regex("""\d{2}-\d{2}-\d{4}_\d{2}-\d{2}""")
+        val match = regex.find(name)
+        return match?.value?.replace("_", " | ")?.replace('-', ':') ?: "Unknown date and time"
     }
 }

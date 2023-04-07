@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.github.factotum_sdp.factotum.data.DestinationRecord
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.google.firebase.database.DatabaseReference
+import java.text.DateFormat
 import java.text.SimpleDateFormat.getDateInstance
 import java.util.*
 import kotlin.collections.ArrayList
@@ -30,8 +31,9 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
 
     init {
         val date = Calendar.getInstance().time
+        val dateRef = getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH).format(date)
         dbRef = _dbRef // ref path to register all back-ups from this RoadBook
-                .child(getDateInstance().format(date))
+                .child(dateRef)
                 //.child(getTimeInstance().format(date).plus(Random.nextInt().toString()))
                 // Let uncommented for testing purpose. Uncomment it for back-up uniqueness in the DB
         // Only for demo purpose :

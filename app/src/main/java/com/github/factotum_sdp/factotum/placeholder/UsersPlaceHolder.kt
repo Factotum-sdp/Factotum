@@ -53,23 +53,17 @@ object UsersPlaceHolder {
         deferred.await()
     }
 
-    suspend fun addAuthUser() {
+    suspend fun addAuthUser(user: User) {
         val deferred = CompletableDeferred<Unit>()
-        auth.createUserWithEmailAndPassword(USER1.email, password)
+
+        auth.createUserWithEmailAndPassword(user.email, password)
             .addOnSuccessListener {
                 deferred.complete(Unit)
             }
             .addOnFailureListener { exception ->
                 deferred.completeExceptionally(exception)
             }
-        deferred.await()
-        auth.createUserWithEmailAndPassword(USER2.email, password)
-            .addOnSuccessListener {
-                deferred.complete(Unit)
-            }
-            .addOnFailureListener { exception ->
-                deferred.completeExceptionally(exception)
-            }
+
         deferred.await()
     }
 

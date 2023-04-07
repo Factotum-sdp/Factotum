@@ -49,7 +49,10 @@ class LoginFragmentTest {
                 UsersPlaceHolder.populateDatabase()
             }
             runBlocking {
-                UsersPlaceHolder.addAuthUser()
+                UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER1)
+            }
+            runBlocking {
+                UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER2)
             }
         }
 

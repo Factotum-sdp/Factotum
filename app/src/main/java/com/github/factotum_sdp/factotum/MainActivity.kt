@@ -17,7 +17,6 @@ import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -26,8 +25,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
-    private lateinit var db: DatabaseReference
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val auth: FirebaseAuth = getAuth()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +36,7 @@ class MainActivity : AppCompatActivity() {
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
+
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
         val navController = navHostFragment.navController
@@ -56,6 +55,7 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
 
         // Bind user data displayed in the Navigation Header
         setUserHeader()
@@ -92,7 +92,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
 
     private fun listenLogoutButton() {
         binding.navView.menu.findItem(R.id.signoutButton).setOnMenuItemClickListener {

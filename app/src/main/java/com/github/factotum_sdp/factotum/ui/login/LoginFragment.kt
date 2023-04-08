@@ -173,7 +173,14 @@ class LoginFragment : Fragment() {
     private fun updateUiWithUser(model: LoggedInUserView) {
         val welcome = getString(R.string.welcome) + " " + model.displayName + "!"
         Snackbar.make(requireView(), welcome, Snackbar.LENGTH_LONG).show()
+        updateNGraphStartDestination()
+    }
+
+    private fun updateNGraphStartDestination() {
         findNavController().navigate(R.id.action_loginFragment_to_roadBookFragment2)
+        val navGraph = findNavController().navInflater.inflate(R.navigation.nav_graph)
+        navGraph.setStartDestination(R.id.roadBookFragment)
+        findNavController().graph = navGraph
     }
 
     private fun showSnackBar(@StringRes message: Int) {

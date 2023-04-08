@@ -31,12 +31,12 @@ class LoginFragmentTest {
     )
 
     companion object {
-        private var database: FirebaseDatabase = Firebase.database
-        private var auth: FirebaseAuth = Firebase.auth
 
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
+            val database: FirebaseDatabase = Firebase.database
+            val auth: FirebaseAuth = Firebase.auth
             database.useEmulator("10.0.2.2", 9000)
             auth.useEmulator("10.0.2.2", 9099)
 
@@ -59,7 +59,28 @@ class LoginFragmentTest {
         @AfterClass
         @JvmStatic
         fun emptyDatabase() {
+            val database: FirebaseDatabase = MainActivity.getDatabase()
             UsersPlaceHolder.emptyFirebaseDatabase(database)
+        }
+
+        @AfterClass
+        @JvmStatic
+        fun stopAuthEmulator() {
+            val auth = Firebase.auth
+            auth.signOut()
+            MainActivity.setAuth(auth)
+        }
+
+        fun fillUserEntryAndGoToRBFragment() {
+            onView(withId(R.id.email)).perform(typeText("jane.doe@gmail.com"))
+            onView(withId(R.id.fragment_login_directors_parent)).perform(
+                closeSoftKeyboard()
+            )
+            onView(withId(R.id.password)).perform(typeText("123456"))
+            onView(withId(R.id.fragment_login_directors_parent)).perform(
+                closeSoftKeyboard()
+            )
+            onView(withId(R.id.login)).perform(click())
         }
     }
 
@@ -89,16 +110,7 @@ class LoginFragmentTest {
     }
 
     fun correctUserEntryLeadsToRoadBook() {
-        onView(withId(R.id.email)).perform(typeText(UsersPlaceHolder.USER1.email))
-        onView(withId(R.id.fragment_login_directors_parent)).perform(
-            closeSoftKeyboard()
-        )
-        onView(withId(R.id.password)).perform(typeText(UsersPlaceHolder.USER1.password))
-        onView(withId(R.id.fragment_login_directors_parent)).perform(
-            closeSoftKeyboard()
-        )
-        onView(withId(R.id.login)).perform(click())
-
+        fillUserEntryAndGoToRBFragment()
         FirebaseAuth.AuthStateListener { firebaseAuth ->
             if (firebaseAuth.currentUser != null) {
                 onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))

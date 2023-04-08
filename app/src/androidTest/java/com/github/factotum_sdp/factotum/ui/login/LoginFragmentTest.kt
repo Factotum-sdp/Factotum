@@ -31,12 +31,12 @@ class LoginFragmentTest {
     )
 
     companion object {
-        private var database: FirebaseDatabase = Firebase.database
-        private var auth: FirebaseAuth = Firebase.auth
 
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
+            val database: FirebaseDatabase = Firebase.database
+            val auth: FirebaseAuth = Firebase.auth
             database.useEmulator("10.0.2.2", 9000)
             auth.useEmulator("10.0.2.2", 9099)
 
@@ -59,7 +59,16 @@ class LoginFragmentTest {
         @AfterClass
         @JvmStatic
         fun emptyDatabase() {
+            val database: FirebaseDatabase = MainActivity.getDatabase()
             UsersPlaceHolder.emptyFirebaseDatabase(database)
+        }
+
+        @AfterClass
+        @JvmStatic
+        fun stopAuthEmulator() {
+            val auth = Firebase.auth
+            auth.signOut()
+            MainActivity.setAuth(auth)
         }
 
         fun fillUserEntryAndGoToRBFragment() {

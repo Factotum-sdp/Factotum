@@ -25,6 +25,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matchers.allOf
+import org.junit.AfterClass
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.BeforeClass
@@ -67,6 +68,14 @@ class MainActivityTest {
             runBlocking {
                 UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER3)
             }
+        }
+
+        @AfterClass
+        @JvmStatic
+        fun stopAuthEmulator() {
+            val auth = Firebase.auth
+            auth.signOut()
+            MainActivity.setAuth(auth)
         }
     }
 

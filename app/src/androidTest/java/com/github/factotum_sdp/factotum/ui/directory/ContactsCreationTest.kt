@@ -53,6 +53,7 @@ class ContactsCreationTest {
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         onView(withId(R.id.add_contact_button)).perform(click())
         onView((withId(R.id.contact_image_creation))).check(matches(isDisplayed()))
+        onView((withId(R.id.contactCreationAddress))).check(matches(isDisplayed()))
         onView(withId(R.id.roles_spinner)).check(matches(isDisplayed()))
         val fields = ContactsList.Contact::class.java.declaredFields
         var nbFields = 0
@@ -62,6 +63,9 @@ class ContactsCreationTest {
         }
         val nbEditText = device.findObjects(clazz(EditText::class.java.name)).size
         // image already present
+        // searchView already present
         assertEquals(nbFields-2, nbEditText)
     }
+
+
 }

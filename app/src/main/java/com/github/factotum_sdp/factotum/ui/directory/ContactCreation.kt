@@ -5,6 +5,7 @@ import android.database.Cursor
 import android.database.MatrixCursor
 import android.os.Bundle
 import android.provider.BaseColumns
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -84,17 +85,15 @@ class ContactCreation : Fragment() {
                         MatrixCursor(arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1))
                     result?.forEachIndexed { index, suggestion ->
                         cursor.addRow(arrayOf(index, suggestion.getAddressLine(0).toString()))
-
                     }
-
                     cursorAdapter.changeCursor(cursor)
                 }
                 return true
             }
             override fun onQueryTextChange(newText: String?): Boolean {
+                cursorAdapter.changeCursor(null)
                 return false
             }
-
         })
 
         binding.contactCreationAddress.setOnSuggestionListener(object : SearchView.OnSuggestionListener {
@@ -105,10 +104,8 @@ class ContactCreation : Fragment() {
                 val selection =
                     cursor.getString(index)
                 binding.contactCreationAddress.setQuery(selection.toString(), false)
-
                 return true
             }
-
             override fun onSuggestionSelect(position: Int): Boolean {
                 return false
             }

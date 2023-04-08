@@ -63,7 +63,7 @@ class LoginFragmentTest {
         }
 
         fun fillUserEntryAndGoToRBFragment() {
-            onView(withId(R.id.username)).perform(typeText("jane.doe@gmail.com"))
+            onView(withId(R.id.email)).perform(typeText("jane.doe@gmail.com"))
             onView(withId(R.id.fragment_login_directors_parent)).perform(
                 closeSoftKeyboard()
             )

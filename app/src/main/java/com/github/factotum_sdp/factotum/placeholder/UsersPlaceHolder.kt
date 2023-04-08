@@ -29,11 +29,19 @@ object UsersPlaceHolder {
         Role.CLIENT,
         password
     )
+    val USER3 = User(
+        "Jane Doe",
+        "jane.doe@gmail.com",
+        Role.CLIENT,
+        password
+    )
+
 
     fun init(dataSource: FirebaseDatabase, auth: FirebaseAuth) {
         this.dataSource = dataSource
         this.auth = auth
         users.add(USER1)
+        users.add(USER3)
     }
 
     /**

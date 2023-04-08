@@ -12,6 +12,7 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <item name="cardViewStrokeColor">@color/cardview_stroke_color_light_mode</item>
     </style>
 
     <style name="Theme.Factotum.NoActionBar">

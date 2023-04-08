@@ -1,14 +1,80 @@
 package com.github.factotum_sdp.factotum.placeholder
 
+import com.github.factotum_sdp.factotum.data.LoginDataSource
+import com.github.factotum_sdp.factotum.data.Role
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import kotlinx.coroutines.CompletableDeferred
+
 /**
  * Temporary PlaceHolder object for fake users data
  * For testing purpose of User data displayed in the Nav menu header
  */
 object UsersPlaceHolder {
-    val USER1 = User("Valentino Rossi", "valentino.rossi@epfl.ch")
+
+    private val users = mutableListOf<User>()
+    private lateinit var dataSource: FirebaseDatabase
+    private lateinit var auth: FirebaseAuth
+
+    private const val password = "123456"
+    val USER1 = User(
+        "Valentino Rossi",
+        "valentino.rossi@epfl.ch",
+        Role.CLIENT,
+        password
+    )
+    val USER2 = User(
+        "Marc Marquez",
+        "marc.marquez@epfl.ch",
+        Role.CLIENT,
+        password
+    )
+
+    fun init(dataSource: FirebaseDatabase, auth: FirebaseAuth) {
+        this.dataSource = dataSource
+        this.auth = auth
+        users.add(USER1)
+    }
+
+    /**
+     * Populates the database with users.
+     */
+    suspend fun populateDatabase() {
+        val deferred = CompletableDeferred<Unit>()
+
+        dataSource.getReference(LoginDataSource.DISPATCH_DB_PATH).setValue(users)
+            .addOnSuccessListener {
+                deferred.complete(Unit)
+            }
+            .addOnFailureListener { exception ->
+                deferred.completeExceptionally(exception)
+            }
+
+        deferred.await()
+    }
+
+    suspend fun addAuthUser(user: User) {
+        val deferred = CompletableDeferred<Unit>()
+
+        auth.createUserWithEmailAndPassword(user.email, password)
+            .addOnSuccessListener {
+                deferred.complete(Unit)
+            }
+            .addOnFailureListener { exception ->
+                deferred.completeExceptionally(exception)
+            }
+
+        deferred.await()
+    }
+
+    fun emptyFirebaseDatabase(database: FirebaseDatabase) {
+        database.reference.child(LoginDataSource.DISPATCH_DB_PATH).removeValue()
+    }
 
     data class User(
-        val name: String,
+        val username: String,
         val email: String,
+        val role: Role,
+        val password: String
     )
 }

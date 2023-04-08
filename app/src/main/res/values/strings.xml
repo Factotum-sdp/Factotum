@@ -64,13 +64,15 @@
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="no_role_selected">Please select a role</string>
     <string name="login_failed">"Login failed"</string>
+    <string name="user_not_found">"User not found"</string>
+    <string name="retrieve_profiles_failed">Error retrieving profiles</string>
+    <string name="retrieve_profiles_success">Profiles retrieved successfully</string>
     <string name="web_client_id">"539052463718–6gefd2fnlvbb1h9aiq09kil6sip37i0u.apps.googleusercontent.com"</string>
     <string name="forgot_my_password_text">Forgot my password</string>
     <string name="password_text">Password</string>
     <string name="register_via_another_account_text">Register via another account</string>
     <string name="i_don_t_have_an_account_text">I don\'t have an account</string>
     <string name="create_one_text">Create one</string>
-    <string name="login_text">Login</string>
     <string name="welcome_back_text">Welcome Back</string>
     <string name="e_mail_address_text">E-mail address</string>
     <string name="sign_up_text">Sign Up</string>

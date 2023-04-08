@@ -16,6 +16,7 @@ import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -24,7 +25,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val auth: FirebaseAuth = getAuth()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,7 +79,7 @@ class MainActivity : AppCompatActivity() {
         // Instantiate the current user
         val userFact =
             UserViewModel.UserViewModelFactory(
-                UsersPlaceHolder.USER1.name,
+                UsersPlaceHolder.USER1.username,
                 UsersPlaceHolder.USER1.email
             )
         val user = ViewModelProvider(this, userFact)[UserViewModel::class.java]
@@ -103,12 +104,22 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private var database: FirebaseDatabase = Firebase.database
+        private var auth: FirebaseAuth = Firebase.auth
+
         fun getDatabase(): FirebaseDatabase {
             return database
         }
 
+        fun getAuth(): FirebaseAuth {
+            return auth
+        }
+
         fun setDatabase(database: FirebaseDatabase) {
             this.database = database
+        }
+
+        fun setAuth(auth: FirebaseAuth) {
+            this.auth = auth
         }
     }
 

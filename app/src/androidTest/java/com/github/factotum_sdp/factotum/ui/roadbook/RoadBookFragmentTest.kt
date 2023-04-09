@@ -49,12 +49,13 @@ class RoadBookFragmentTest {
         const val SWIPE_R_SHARED_KEY = "SwipeRightButton"
         const val DRAG_N_DROP_SHARED_KEY = "DragNDropButton"
         const val TOUCH_CLICK_SHARED_KEY = "TouchClickButton"
+        const val WORST_REFRESH_TIME = 2000L
 
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
             val database = Firebase.database
-            database.useEmulator("10.0.2.2", 9000)
+            //database.useEmulator("10.0.2.2", 9000)
             MainActivity.setDatabase(database)
         }
     }
@@ -241,7 +242,7 @@ class RoadBookFragmentTest {
         swipeRightTheRecordAt(3) // edit one record displayed below which has another clientID
         onView(withId(R.id.autoCompleteClientID)).perform(clearText(), typeText(clientID)) // set for the same client that different record
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
-        Thread.sleep(2000)
+        Thread.sleep(WORST_REFRESH_TIME)
         onView(withText("$clientID#2")).check(matches(isDisplayed())) // unique destID is computed
     }
 
@@ -287,7 +288,7 @@ class RoadBookFragmentTest {
         onView(withId(R.id.editTextTimestamp)).perform(click())
         onView(withText(timePickerCancelBLabel)).perform(click())
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
-        Thread.sleep(2000)
+        Thread.sleep(WORST_REFRESH_TIME)
 
         onView(withText(startsWith("arrival : ${timestampUntilHourFormat(cal)}"))).check(doesNotExist())
     }
@@ -317,6 +318,7 @@ class RoadBookFragmentTest {
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
 
         // Check edited record is corretly displayed :
+        Thread.sleep(WORST_REFRESH_TIME)
         onView(withText("New#1")).check(matches(isDisplayed()))
 
         eraseFirstRecTimestamp() // For having no ambiguity btw Timestamp on screen
@@ -473,7 +475,7 @@ class RoadBookFragmentTest {
         onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
 
         // Navigation on Click disabled
-        Thread.sleep(2000)
+        Thread.sleep(WORST_REFRESH_TIME)
         onView(withText(DestinationRecords.RECORDS[2].destID)).perform(click())
         onView(withId(R.id.fragment_drecord_details_directors_parent)).check(doesNotExist())
 
@@ -501,7 +503,7 @@ class RoadBookFragmentTest {
         onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
 
         // Navigation on Click disabled
-        Thread.sleep(2000)
+        Thread.sleep(WORST_REFRESH_TIME)
         onView(withText(DestinationRecords.RECORDS[2].destID)).perform(click())
         onView(withId(R.id.fragment_drecord_details_directors_parent)).check(doesNotExist())
     }

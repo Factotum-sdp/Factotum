@@ -57,4 +57,12 @@ class SignUpViewModel(private val signUpDataSink: SignUpDataSink) : BaseAuthView
     private fun isUserNameValid(username: String): Boolean {
         return username.isNotBlank()
     }
+
+    /**
+     * Sign up result : success (new user name) or error message.
+     */
+    data class SignUpResult(
+        override val success: String? = null,
+        override val error: Int? = null
+    ): BaseAuthResult<String>(success, error)
 }

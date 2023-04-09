@@ -70,7 +70,7 @@ class SignUpFragment : BaseAuthFragment() {
             afterTextChangedListener
         )
 
-        authButtonOnClick(signUpButton, loadingProgressBar, emailEditText, passwordEditText)
+        listenToAuthButton(signUpButton, loadingProgressBar, emailEditText, passwordEditText)
 
         observeAuthResult(loadingProgressBar)
 

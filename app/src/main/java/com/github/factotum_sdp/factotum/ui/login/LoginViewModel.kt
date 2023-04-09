@@ -22,6 +22,9 @@ class LoginViewModel(private val loginRepository: LoginRepository) : BaseAuthVie
     override val _authResult = MutableLiveData<BaseAuthResult<*>>()
     override val authResult: LiveData<BaseAuthResult<*>> = _authResult
 
+    private val _retrieveProfilesResult = MutableLiveData<RetrieveProfilesResult>()
+    val retrieveProfilesResult: LiveData<RetrieveProfilesResult> = _retrieveProfilesResult
+
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 
     /**
@@ -35,11 +38,36 @@ class LoginViewModel(private val loginRepository: LoginRepository) : BaseAuthVie
                     LoginResult(
                         success = LoggedInUserView(
                             displayName = result.data.displayName,
-                            email = result.data.email
+                            email = result.data.email,
+                            role = result.data.role
                         )
                     )
             } else {
-                _authResult.value = LoginResult(error = R.string.login_failed)
+                _authResult.value = LoginResult(
+                    error = if ((result as Result.Error).exception.message == "User not found") {
+                        R.string.user_not_found
+                    } else {
+                        R.string.login_failed
+                    }
+                )
+            }
+        }
+    }
+
+    fun retrieveProfiles() {
+        // launch in a separate asynchronous job
+        viewModelScope.launch {
+            val result = withContext(dispatcher) { loginRepository.retrieveProfiles() }
+            if (result is Result.Success) {
+                _retrieveProfilesResult.value =
+                    RetrieveProfilesResult(
+                        success = R.string.retrieve_profiles_success
+                    )
+            } else {
+                _retrieveProfilesResult.value =
+                    RetrieveProfilesResult(
+                        error = R.string.retrieve_profiles_failed
+                    )
             }
         }
     }
@@ -53,4 +81,21 @@ class LoginViewModel(private val loginRepository: LoginRepository) : BaseAuthVie
             _loginForm.value = LoginFormState(isDataValid = true)
         }
     }
+
+    /**
+     * Profile retrieval result : success or error message.
+     */
+    data class RetrieveProfilesResult(
+        val success: Int? = null,
+        val error: Int? = null
+    )
+
+    /**
+     * Authentication result : success (user details) or error message.
+     */
+    data class LoginResult(
+        override val success: LoggedInUserView? = null,
+        override val error: Int? = null
+    ) : BaseAuthResult<LoggedInUserView>(success, error)
+
 }

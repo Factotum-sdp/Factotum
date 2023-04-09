@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val auth: FirebaseAuth = getAuth()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity() {
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
+
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
         val navController = navHostFragment.navController
@@ -54,6 +55,7 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
 
         // Bind user data displayed in the Navigation Header
         setUserHeader()
@@ -77,7 +79,7 @@ class MainActivity : AppCompatActivity() {
         // Instantiate the current user
         val userFact =
             UserViewModel.UserViewModelFactory(
-                UsersPlaceHolder.USER1.name,
+                UsersPlaceHolder.USER1.username,
                 UsersPlaceHolder.USER1.email
             )
         val user = ViewModelProvider(this, userFact)[UserViewModel::class.java]
@@ -90,7 +92,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
 
     private fun listenLogoutButton() {
         binding.navView.menu.findItem(R.id.signoutButton).setOnMenuItemClickListener {

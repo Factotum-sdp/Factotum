@@ -27,7 +27,7 @@ abstract class BaseAuthFragment : Fragment() {
             })
     }
 
-    internal fun authButtonOnClick(
+    internal fun listenToAuthButton(
         authButton: Button,
         loadingProgressBar: ProgressBar,
         emailEditText: EditText,

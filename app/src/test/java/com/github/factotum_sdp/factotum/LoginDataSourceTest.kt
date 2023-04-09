@@ -1,6 +1,6 @@
 package com.github.factotum_sdp.factotum
 
-import com.github.factotum_sdp.factotum.data.LoggedInUser
+import com.github.factotum_sdp.factotum.data.User
 import com.github.factotum_sdp.factotum.data.LoginDataSource
 import com.github.factotum_sdp.factotum.data.Result
 import com.github.factotum_sdp.factotum.data.Role
@@ -25,12 +25,12 @@ class LoginDataSourceTest {
     private val userRole = Role.BOSS
     private val validPassword = "123456"
     private val invalidPassword = "123456789"
-    private val profile = LoginDataSource.User(userName, userEmail, userRole)
+    private val profile = User(userName, userEmail, userRole)
 
     @Test
     fun `login with correct credentials returns a LoggedInUser`() {
         // given
-        val expectedUser = LoggedInUser(userName, userEmail, userRole)
+        val expectedUser = User(userName, userEmail, userRole)
 
         loginDataSource = mock(LoginDataSource::class.java)
         `when`(loginDataSource.login(userName, validPassword, profile)).thenReturn(
@@ -63,9 +63,9 @@ class LoginDataSourceTest {
     fun `retrieve profiles returns a list of users`() {
         // given
         val users = listOf(
-            LoginDataSource.User(userName, userEmail, userRole),
-            LoginDataSource.User("William Taylor", "william.taylor@gmail.com", Role.COURIER),
-            LoginDataSource.User("Helen Bates", "helen.bates@gmail.com", Role.COURIER)
+            User(userName, userEmail, userRole),
+            User("William Taylor", "william.taylor@gmail.com", Role.COURIER),
+            User("Helen Bates", "helen.bates@gmail.com", Role.COURIER)
         )
 
         loginDataSource = mock(LoginDataSource::class.java)

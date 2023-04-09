@@ -1,10 +1,10 @@
 package com.github.factotum_sdp.factotum.ui.login
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.UserViewModel
+import com.github.factotum_sdp.factotum.data.User
+import com.github.factotum_sdp.factotum.data.LoginDataSource
 import com.github.factotum_sdp.factotum.data.LoginRepository
 import com.github.factotum_sdp.factotum.data.Result
 import com.github.factotum_sdp.factotum.ui.auth.BaseAuthState
@@ -13,8 +13,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel() {
+class LoginViewModel(private val userViewModel: UserViewModel) : ViewModel() {
 
+    private var loginRepository: LoginRepository = LoginRepository(LoginDataSource())
     private val _loginForm = MutableLiveData<LoginFormState>()
     val loginFormState: LiveData<LoginFormState> = _loginForm
 
@@ -31,14 +32,9 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
         viewModelScope.launch {
             val result = withContext(dispatcher) { loginRepository.login(userEmail, password) }
             if (result is Result.Success) {
+                userViewModel.setLoggedInUser(result.data)
                 _loginResult.value =
-                    LoginResult(
-                        success = LoggedInUserView(
-                            displayName = result.data.displayName,
-                            email = result.data.email,
-                            role = result.data.role
-                        )
-                    )
+                    LoginResult(success = result.data)
             } else {
                 _loginResult.value = LoginResult(
                     error = if ((result as Result.Error).exception.message == "User not found") {
@@ -91,8 +87,18 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
      * Authentication result : success (user details) or error message.
      */
     data class LoginResult(
-        val success: LoggedInUserView? = null,
+        val success: User? = null,
         val error: Int? = null
     )
+
+    // Factory needed to assign a value at construction time to the class attribute
+    class LoginViewModelFactory(private val userViewModel: UserViewModel)
+        : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return modelClass
+                .getConstructor(UserViewModel::class.java)
+                .newInstance(userViewModel)
+        }
+    }
 
 }

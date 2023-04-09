@@ -1,9 +1,6 @@
 package com.github.factotum_sdp.factotum.data
 
 import com.github.factotum_sdp.factotum.MainActivity
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import java.io.IOException
 import java.util.concurrent.CompletableFuture
 
@@ -14,15 +11,13 @@ class LoginDataSource {
     private val auth = MainActivity.getAuth()
     private val dbRef = MainActivity.getDatabase().reference
 
-    fun login(userEmail: String, password: String, profile: User): Result<LoggedInUser> {
-        val authResultFuture = CompletableFuture<Result<LoggedInUser>>()
+    fun login(userEmail: String, password: String, profile: User): Result<User> {
+        val authResultFuture = CompletableFuture<Result<User>>()
 
         auth.signInWithEmailAndPassword(userEmail, password)
             .addOnCompleteListener { authTask ->
                 if (authTask.isSuccessful) {
-                    val loggedInUser =
-                        LoggedInUser(profile.displayName, profile.email, profile.role)
-                    authResultFuture.complete(Result.Success(loggedInUser))
+                    authResultFuture.complete(Result.Success(profile))
                 } else {
                     authResultFuture.complete(
                         Result.Error(
@@ -72,10 +67,4 @@ class LoginDataSource {
     companion object {
         const val DISPATCH_DB_PATH: String = "profile-dispatch"
     }
-
-    data class User(
-        val displayName: String,
-        val email: String,
-        val role: Role
-    )
 }

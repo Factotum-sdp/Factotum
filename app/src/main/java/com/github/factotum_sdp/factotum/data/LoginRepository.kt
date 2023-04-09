@@ -6,12 +6,12 @@ import java.io.IOException
  * Class that requests authentication and user information from the remote data source and
  * maintains an in-memory cache of login status and user credentials information.
  */
-class LoginRepository(val dataSource: LoginDataSource) {
+class LoginRepository(private val dataSource: LoginDataSource) {
 
     // in-memory cache of the loggedInUser object
-    private var user: LoggedInUser? = null
+    private var user: User? = null
 
-    private var profiles: List<LoginDataSource.User>? = null
+    private var profiles: List<User>? = null
 
     init {
         // If user credentials will be cached in local storage, it is recommended it be encrypted
@@ -20,7 +20,7 @@ class LoginRepository(val dataSource: LoginDataSource) {
         profiles = null
     }
 
-    fun login(userEmail: String, password: String): Result<LoggedInUser> {
+    fun login(userEmail: String, password: String): Result<User> {
         val profile = profiles?.find { it.email == userEmail }
             ?: return Result.Error(IOException("User not found"))
 
@@ -33,7 +33,7 @@ class LoginRepository(val dataSource: LoginDataSource) {
         return result
     }
 
-    fun retrieveProfiles(): Result<List<LoginDataSource.User>> {
+    fun retrieveProfiles(): Result<List<User>> {
         val result = dataSource.retrieveProfiles()
 
         if (result is Result.Success) {
@@ -43,13 +43,13 @@ class LoginRepository(val dataSource: LoginDataSource) {
         return result
     }
 
-    private fun setLoggedInUser(loggedInUser: LoggedInUser) {
+    private fun setLoggedInUser(loggedInUser: User) {
         this.user = loggedInUser
         // If user credentials will be cached in local storage, it is recommended it be encrypted
         // @see https://developer.android.com/training/articles/keystore
     }
 
-    private fun setProfiles(profiles: List<LoginDataSource.User>) {
+    private fun setProfiles(profiles: List<User>) {
         this.profiles = profiles
     }
 }

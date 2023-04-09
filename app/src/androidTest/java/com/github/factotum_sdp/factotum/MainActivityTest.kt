@@ -217,4 +217,13 @@ class MainActivityTest {
         assertTrue(uiDevice.isScreenOn)
     }
 
+    @Test
+    fun navHeaderDisplaysUserData() {
+        LoginFragmentTest.fillUserEntryAndGoToRBFragment()
+        Thread.sleep(3000)
+
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
+        onView(withText("jane.doe@gmail.com")).check(matches(isDisplayed()))
+        onView(withText("Jane Doe (CLIENT)")).check(matches(isDisplayed()))
+    }
 }

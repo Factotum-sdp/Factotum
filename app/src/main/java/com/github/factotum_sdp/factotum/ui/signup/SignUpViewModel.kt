@@ -4,32 +4,37 @@ import androidx.lifecycle.*
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.Result
 import com.github.factotum_sdp.factotum.data.SignUpDataSink
+import com.github.factotum_sdp.factotum.ui.auth.BaseAuthResult
 import com.github.factotum_sdp.factotum.ui.auth.BaseAuthState
+import com.github.factotum_sdp.factotum.ui.auth.BaseAuthViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class SignUpViewModel(private val signUpDataSink: SignUpDataSink) : ViewModel() {
+class SignUpViewModel(private val signUpDataSink: SignUpDataSink) : BaseAuthViewModel() {
 
     private val _signupForm = MutableLiveData<SignUpFormState>()
     val signupFormState: LiveData<SignUpFormState> = _signupForm
 
-    private val _signUpResult = MutableLiveData<SignUpResult>()
-    val signUpResult: LiveData<SignUpResult> = _signUpResult
+    override val _authResult = MutableLiveData<BaseAuthResult<*>>()
+    override val authResult: LiveData<BaseAuthResult<*>> = _authResult
 
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 
-    fun signUp(email: String, password: String) {
+    /**
+     * Called when the sign up button is clicked.
+     */
+    override fun auth(email: String, password: String) {
         viewModelScope.launch {
             val result = withContext(dispatcher) { signUpDataSink.signUp(email, password) }
             if (result is Result.Success) {
-                _signUpResult.value =
+                _authResult.value =
                     SignUpResult(
                         success = result.data
                     )
             } else {
-                _signUpResult.value = SignUpResult(error = R.string.signup_failed)
+                _authResult.value = SignUpResult(error = R.string.signup_failed)
             }
         }
     }

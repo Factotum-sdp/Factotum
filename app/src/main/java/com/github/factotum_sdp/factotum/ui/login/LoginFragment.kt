@@ -8,19 +8,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import androidx.annotation.StringRes
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.databinding.FragmentLoginBinding
+import com.github.factotum_sdp.factotum.ui.auth.BaseAuthFragment
 import com.google.android.material.snackbar.Snackbar
 
 
-class LoginFragment : Fragment() {
+class LoginFragment : BaseAuthFragment() {
 
-    private lateinit var loginViewModel: LoginViewModel
+    override lateinit var viewModel: LoginViewModel
     private var _binding: FragmentLoginBinding? = null
 
     // This property is only valid between onCreateView and
@@ -39,7 +38,7 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        loginViewModel =
+        viewModel =
             ViewModelProvider(this, LoginViewModelFactory())[LoginViewModel::class.java]
 
         val usernameEditText = binding.username
@@ -50,21 +49,14 @@ class LoginFragment : Fragment() {
 
         observeLoginFormState(loginButton, usernameEditText, passwordEditText)
 
-        observeLoginResult(loadingProgressBar)
+        observeAuthResult(loadingProgressBar)
 
         val afterTextChangedListener =
-            createTextWatcher(loginViewModel, usernameEditText, passwordEditText)
+            createTextWatcher(viewModel, usernameEditText, passwordEditText)
 
         addListeners(usernameEditText, passwordEditText, afterTextChangedListener)
 
-        loginButton.setOnClickListener {
-            loadingProgressBar.visibility = View.VISIBLE
-            loginViewModel.login(
-                usernameEditText.text.toString(),
-                passwordEditText.text.toString()
-            )
-
-        }
+        authButtonOnClick(loginButton, loadingProgressBar, usernameEditText, passwordEditText)
 
         signupButton.setOnClickListener {
             findNavController().navigate(R.id.action_loginFragment_to_signUpFragment)
@@ -95,7 +87,7 @@ class LoginFragment : Fragment() {
         usernameEditText: EditText,
         passwordEditText: EditText
     ) {
-        loginViewModel.loginFormState.observe(viewLifecycleOwner,
+        viewModel.loginFormState.observe(viewLifecycleOwner,
             Observer { loginFormState ->
                 if (loginFormState == null) {
                     return@Observer
@@ -110,20 +102,6 @@ class LoginFragment : Fragment() {
             })
     }
 
-    private fun observeLoginResult(loadingProgressBar: View) {
-        loginViewModel.loginResult.observe(viewLifecycleOwner,
-            Observer { loginResult ->
-                loginResult ?: return@Observer
-                loadingProgressBar.visibility = View.GONE
-                loginResult.error?.let {
-                    showLoginFailed(it)
-                }
-                loginResult.success?.let {
-                    updateUiWithUser(it)
-                }
-            })
-    }
-
     private fun addListeners(
         usernameEditText: EditText,
         passwordEditText: EditText,
@@ -133,14 +111,10 @@ class LoginFragment : Fragment() {
         passwordEditText.addTextChangedListener(afterTextChangedListener)
     }
 
-    private fun updateUiWithUser(model: LoggedInUserView) {
-        val welcome = getString(R.string.welcome) + " " + model.email
+    override fun updateUi(model: Any) {
+        val welcome = getString(R.string.welcome) + " " + (model as LoggedInUserView).email
         Snackbar.make(requireView(), welcome, Snackbar.LENGTH_LONG).show()
         findNavController().navigate(R.id.action_loginFragment_to_roadBookFragment2)
-    }
-
-    private fun showLoginFailed(@StringRes errorString: Int) {
-        Snackbar.make(requireView(), errorString, Snackbar.LENGTH_LONG).show()
     }
 
     override fun onDestroyView() {

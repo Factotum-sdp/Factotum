@@ -76,7 +76,7 @@
     <fragment
         android:id="@+id/signUpFragment"
         android:name="com.github.factotum_sdp.factotum.ui.signup.SignUpFragment"
-        android:label="fragment_signup"
+        android:label="Sign Up"
         tools:layout="@layout/fragment_signup" >
         <action
             android:id="@+id/action_signUpFragment_to_loginFragment"

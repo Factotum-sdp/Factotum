@@ -9,7 +9,7 @@ import com.github.factotum_sdp.factotum.data.User
  * ViewModel class for the App User
  * Observed in MainActivity
  */
-class UserViewModel() : ViewModel() {
+class UserViewModel : ViewModel() {
 
     private val _loggedInUser: MutableLiveData<User> = MutableLiveData()
     val loggedInUser: LiveData<User> = _loggedInUser

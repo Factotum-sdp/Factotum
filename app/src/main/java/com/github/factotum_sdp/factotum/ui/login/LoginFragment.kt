@@ -28,7 +28,6 @@ class LoginFragment : Fragment() {
     private var _binding: FragmentLoginBinding? = null
 
     private val userViewModel: UserViewModel by activityViewModels()
-    private var isProfileRetrieved = false
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -59,7 +58,7 @@ class LoginFragment : Fragment() {
         val profileRetrieveErrorText = binding.profileRetrivalError
 
         // Retrieve profiles of all users in the database
-        loginViewModel.retrieveProfiles()
+        loginViewModel.retrieveUsersList()
 
         // Observe the result of retrieving profiles and show it in a snackbar.
         observeRetrieveProfilesResult(profileRetrieveErrorText)
@@ -105,13 +104,10 @@ class LoginFragment : Fragment() {
     }
 
     private fun observeRetrieveProfilesResult(profileRetrieveErrorText: TextView) {
-        loginViewModel.retrieveProfilesResult.observe(viewLifecycleOwner) { profileRetrievalResult ->
-            profileRetrievalResult ?: return@observe
-            profileRetrievalResult.error?.let {
+        loginViewModel.retrieveUsersResult.observe(viewLifecycleOwner) { usersResult ->
+            usersResult ?: return@observe
+            usersResult.error?.let {
                 profileRetrieveErrorText.visibility = View.VISIBLE
-            }
-            profileRetrievalResult.success?.let {
-                isProfileRetrieved = true
             }
         }
     }
@@ -126,7 +122,7 @@ class LoginFragment : Fragment() {
                 if (loginFormState == null) {
                     return@Observer
                 }
-                loginButton.isEnabled = loginFormState.isDataValid && isProfileRetrieved
+                loginButton.isEnabled = loginFormState.isDataValid
                 loginFormState.emailError?.let {
                     usernameEditText.error = getString(it)
                 }

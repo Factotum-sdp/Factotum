@@ -22,8 +22,8 @@ class LoginViewModel(private val userViewModel: UserViewModel) : ViewModel() {
     private val _loginResult = MutableLiveData<LoginResult>()
     val loginResult: LiveData<LoginResult> = _loginResult
 
-    private val _retrieveProfilesResult = MutableLiveData<RetrieveProfilesResult>()
-    val retrieveProfilesResult: LiveData<RetrieveProfilesResult> = _retrieveProfilesResult
+    private val _retrieveUsersResult = MutableLiveData<RetrieveUsersResult>()
+    val retrieveUsersResult: LiveData<RetrieveUsersResult> = _retrieveUsersResult
 
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 
@@ -47,19 +47,19 @@ class LoginViewModel(private val userViewModel: UserViewModel) : ViewModel() {
         }
     }
 
-    fun retrieveProfiles() {
+    fun retrieveUsersList() {
         // launch in a separate asynchronous job
         viewModelScope.launch {
-            val result = withContext(dispatcher) { loginRepository.retrieveProfiles() }
+            val result = withContext(dispatcher) { loginRepository.retrieveUsersList() }
             if (result is Result.Success) {
-                _retrieveProfilesResult.value =
-                    RetrieveProfilesResult(
-                        success = R.string.retrieve_profiles_success
+                _retrieveUsersResult.value =
+                    RetrieveUsersResult(
+                        success = R.string.retrieve_users_success
                     )
             } else {
-                _retrieveProfilesResult.value =
-                    RetrieveProfilesResult(
-                        error = R.string.retrieve_profiles_failed
+                _retrieveUsersResult.value =
+                    RetrieveUsersResult(
+                        error = R.string.retrieve_users_failed
                     )
             }
         }
@@ -78,7 +78,7 @@ class LoginViewModel(private val userViewModel: UserViewModel) : ViewModel() {
     /**
      * Profile retrieval result : success or error message.
      */
-    data class RetrieveProfilesResult(
+    data class RetrieveUsersResult(
         val success: Int? = null,
         val error: Int? = null
     )

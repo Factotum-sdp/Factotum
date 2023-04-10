@@ -71,12 +71,12 @@ class LoginFragmentTest {
             MainActivity.setAuth(auth)
         }
 
-        fun fillUserEntryAndGoToRBFragment() {
-            onView(withId(R.id.email)).perform(typeText("jane.doe@gmail.com"))
+        fun fillUserEntryAndGoToRBFragment(email: String, password: String) {
+            onView(withId(R.id.email)).perform(typeText(email))
             onView(withId(R.id.fragment_login_directors_parent)).perform(
                 closeSoftKeyboard()
             )
-            onView(withId(R.id.password)).perform(typeText("123456"))
+            onView(withId(R.id.password)).perform(typeText(password))
             onView(withId(R.id.fragment_login_directors_parent)).perform(
                 closeSoftKeyboard()
             )
@@ -110,7 +110,7 @@ class LoginFragmentTest {
     }
 
     fun correctUserEntryLeadsToRoadBook() {
-        fillUserEntryAndGoToRBFragment()
+        fillUserEntryAndGoToRBFragment("jane.doe@gmail.com", "123456")
         FirebaseAuth.AuthStateListener { firebaseAuth ->
             if (firebaseAuth.currentUser != null) {
                 onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))

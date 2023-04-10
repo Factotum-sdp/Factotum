@@ -11,13 +11,13 @@ class LoginDataSource {
     private val auth = MainActivity.getAuth()
     private val dbRef = MainActivity.getDatabase().reference
 
-    fun login(userEmail: String, password: String, profile: User): Result<User> {
+    fun login(userEmail: String, password: String, user: User): Result<User> {
         val authResultFuture = CompletableFuture<Result<User>>()
 
         auth.signInWithEmailAndPassword(userEmail, password)
             .addOnCompleteListener { authTask ->
                 if (authTask.isSuccessful) {
-                    authResultFuture.complete(Result.Success(profile))
+                    authResultFuture.complete(Result.Success(user))
                 } else {
                     authResultFuture.complete(
                         Result.Error(
@@ -33,9 +33,9 @@ class LoginDataSource {
         return authResultFuture.get()
     }
 
-    fun retrieveProfiles(): Result<MutableList<User>> {
+    fun retrieveUsersList(): Result<MutableList<User>> {
         val profilesResultFuture = CompletableFuture<Result<MutableList<User>>>()
-        var profiles: MutableList<User>
+        var usersList: MutableList<User>
         dbRef.child(DISPATCH_DB_PATH).get().addOnSuccessListener {
             if (!it.exists()) {
                 profilesResultFuture.complete(
@@ -44,8 +44,8 @@ class LoginDataSource {
                 return@addOnSuccessListener
             }
             val profileList = it.value as List<*>
-            profiles = profilesToUsers(profileList)
-            profilesResultFuture.complete(Result.Success(profiles))
+            usersList = profilesToUsers(profileList)
+            profilesResultFuture.complete(Result.Success(usersList))
         }.addOnFailureListener {
             profilesResultFuture.complete(
                 Result.Error(IOException("Error retrieving profiles", it))

@@ -11,17 +11,17 @@ class LoginRepository(private val dataSource: LoginDataSource) {
     // in-memory cache of the loggedInUser object
     private var user: User? = null
 
-    private var profiles: List<User>? = null
+    private var usersList: List<User>? = null
 
     init {
         // If user credentials will be cached in local storage, it is recommended it be encrypted
         // @see https://developer.android.com/training/articles/keystore
         user = null
-        profiles = null
+        usersList = null
     }
 
     fun login(userEmail: String, password: String): Result<User> {
-        val profile = profiles?.find { it.email == userEmail }
+        val profile = usersList?.find { it.email == userEmail }
             ?: return Result.Error(IOException("User not found"))
 
         val result = dataSource.login(userEmail, password, profile)
@@ -33,11 +33,11 @@ class LoginRepository(private val dataSource: LoginDataSource) {
         return result
     }
 
-    fun retrieveProfiles(): Result<List<User>> {
-        val result = dataSource.retrieveProfiles()
+    fun retrieveUsersList(): Result<List<User>> {
+        val result = dataSource.retrieveUsersList()
 
         if (result is Result.Success) {
-            setProfiles(result.data)
+            setUsersList(result.data)
         }
 
         return result
@@ -49,7 +49,7 @@ class LoginRepository(private val dataSource: LoginDataSource) {
         // @see https://developer.android.com/training/articles/keystore
     }
 
-    private fun setProfiles(profiles: List<User>) {
-        this.profiles = profiles
+    private fun setUsersList(usersList: List<User>) {
+        this.usersList = usersList
     }
 }

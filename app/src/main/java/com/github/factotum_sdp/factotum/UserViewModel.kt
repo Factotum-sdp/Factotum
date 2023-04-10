@@ -1,28 +1,20 @@
 package com.github.factotum_sdp.factotum
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import com.github.factotum_sdp.factotum.data.User
 
 /**
  * ViewModel class for the App User
  * Observed in MainActivity
  */
-class UserViewModel(userValue: String, nameValue: String) : ViewModel() {
-    val email: MutableLiveData<String> = MutableLiveData()
-    val name: MutableLiveData<String> = MutableLiveData()
-    init {
-        email.value = userValue
-        name.value = nameValue
-    }
+class UserViewModel : ViewModel() {
 
-    // Factory needed to assign values at construction time to the class attributes
-    class UserViewModelFactory(private val nameValue: String, private val emailValue: String)
-        : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return modelClass
-                        .getConstructor(String::class.java, String::class.java)
-                        .newInstance(nameValue, emailValue)
-        }
+    private val _loggedInUser: MutableLiveData<User> = MutableLiveData()
+    val loggedInUser: LiveData<User> = _loggedInUser
+
+    fun setLoggedInUser(loggedInUser: User) {
+        _loggedInUser.postValue(loggedInUser)
     }
 }

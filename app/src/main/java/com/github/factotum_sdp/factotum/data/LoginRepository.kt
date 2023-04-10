@@ -6,22 +6,22 @@ import java.io.IOException
  * Class that requests authentication and user information from the remote data source and
  * maintains an in-memory cache of login status and user credentials information.
  */
-class LoginRepository(val dataSource: LoginDataSource) {
+class LoginRepository(private val dataSource: LoginDataSource) {
 
     // in-memory cache of the loggedInUser object
-    private var user: LoggedInUser? = null
+    private var user: User? = null
 
-    private var profiles: List<LoginDataSource.User>? = null
+    private var usersList: List<User>? = null
 
     init {
         // If user credentials will be cached in local storage, it is recommended it be encrypted
         // @see https://developer.android.com/training/articles/keystore
         user = null
-        profiles = null
+        usersList = null
     }
 
-    fun login(userEmail: String, password: String): Result<LoggedInUser> {
-        val profile = profiles?.find { it.email == userEmail }
+    fun login(userEmail: String, password: String): Result<User> {
+        val profile = usersList?.find { it.email == userEmail }
             ?: return Result.Error(IOException("User not found"))
 
         val result = dataSource.login(userEmail, password, profile)
@@ -33,23 +33,23 @@ class LoginRepository(val dataSource: LoginDataSource) {
         return result
     }
 
-    fun retrieveProfiles(): Result<List<LoginDataSource.User>> {
-        val result = dataSource.retrieveProfiles()
+    fun retrieveUsersList(): Result<List<User>> {
+        val result = dataSource.retrieveUsersList()
 
         if (result is Result.Success) {
-            setProfiles(result.data)
+            setUsersList(result.data)
         }
 
         return result
     }
 
-    private fun setLoggedInUser(loggedInUser: LoggedInUser) {
+    private fun setLoggedInUser(loggedInUser: User) {
         this.user = loggedInUser
         // If user credentials will be cached in local storage, it is recommended it be encrypted
         // @see https://developer.android.com/training/articles/keystore
     }
 
-    private fun setProfiles(profiles: List<LoginDataSource.User>) {
-        this.profiles = profiles
+    private fun setUsersList(usersList: List<User>) {
+        this.usersList = usersList
     }
 }

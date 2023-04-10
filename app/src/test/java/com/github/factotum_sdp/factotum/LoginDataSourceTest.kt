@@ -70,9 +70,9 @@ class LoginDataSourceTest {
 
         loginDataSource = mock(LoginDataSource::class.java)
 
-        doReturn(Result.Success(users)).`when`(loginDataSource).retrieveProfiles()
+        doReturn(Result.Success(users)).`when`(loginDataSource).retrieveUsersList()
         // when
-        val result = loginDataSource.retrieveProfiles()
+        val result = loginDataSource.retrieveUsersList()
 
         // then
         assertThat(
@@ -88,8 +88,8 @@ class LoginDataSourceTest {
         loginDataSource = mock(LoginDataSource::class.java)
 
         // when
-        doReturn(Result.Error(exception)).`when`(loginDataSource).retrieveProfiles()
-        val result = loginDataSource.retrieveProfiles()
+        doReturn(Result.Error(exception)).`when`(loginDataSource).retrieveUsersList()
+        val result = loginDataSource.retrieveUsersList()
 
         // then
         assertThat(

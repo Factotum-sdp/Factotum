@@ -14,4 +14,9 @@
         <!-- Customize your theme here. -->
         <item name="cardViewStrokeColor">@color/cardview_stroke_color_dark_mode</item>
     </style>
+
+    <style name="MyDialogAnimation">
+        <item name="android:windowEnterAnimation">@android:anim/slide_in_left</item>
+        <item name="android:windowExitAnimation">@android:anim/slide_out_right</item>
+    </style>
 </resources>

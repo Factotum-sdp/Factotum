@@ -85,10 +85,13 @@ abstract class RoadBookTHCallback() :
     }
 
     private fun editOnSwipeRight(viewHolder: ViewHolder) {
-        DRecordAlertDialogBuilder(getHost().requireContext(), getHost(),
-            getRbViewModel(), getRecyclerView())
+        val dial =
+            DRecordAlertDialogBuilder(getHost().requireContext(), getHost(),
+                                        getRbViewModel(), getRecyclerView())
             .forExistingRecordEdition(viewHolder)
-            .show()
+            .create()
+        dial.window?.attributes?.windowAnimations = R.style.MyDialogAnimation
+        dial.show()
     }
     private fun deleteOnSwipeLeft(viewHolder: ViewHolder) {
         val position = viewHolder.absoluteAdapterPosition
@@ -104,6 +107,8 @@ abstract class RoadBookTHCallback() :
         builder.setNegativeButton(getHost().getString(R.string.delete_cancel_button_label)) { _, _ ->
             getRecyclerView().adapter!!.notifyItemChanged(position)
         }
-        builder.show()
+        val dial = builder.create()
+        dial.window?.attributes?.windowAnimations = R.style.MyDialogAnimation
+        dial.show()
     }
 }

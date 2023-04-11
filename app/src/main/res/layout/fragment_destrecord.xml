@@ -4,23 +4,21 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="4dp"
-    app:cardBackgroundColor="@color/white"
     app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
     android:id="@+id/fragment_destrecord_directors_parent">
 
-
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="@drawable/cardview_clickable_background">
 
         <TextView
             android:id="@+id/dest_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/text_margin"
-            android:textAppearance="?attr/textAppearanceListItem"
-            android:textColor="#FF003549" />
+            android:layout_margin="@dimen/text_margin" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -31,25 +29,19 @@
                 android:id="@+id/timestamp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/text_margin"
-                android:textAppearance="?attr/textAppearanceListItem"
-                android:textColor="#FF003549" />
+                android:layout_margin="@dimen/text_margin" />
 
             <TextView
                 android:id="@+id/waiting_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/text_margin"
-                android:textAppearance="?attr/textAppearanceListItem"
-                android:textColor="#FF003549" />
+                android:layout_margin="@dimen/text_margin" />
 
             <TextView
                 android:id="@+id/rate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/text_margin"
-                android:textAppearance="?attr/textAppearanceListItem"
-                android:textColor="#FF003549" />
+                android:layout_margin="@dimen/text_margin" />
         </LinearLayout>
 
         <TextView
@@ -57,8 +49,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/text_margin"
-            android:textAppearance="?attr/textAppearanceListItem"
-            android:textStyle="italic"
-            android:textColor="#FF003549"/>
+            android:textStyle="italic" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

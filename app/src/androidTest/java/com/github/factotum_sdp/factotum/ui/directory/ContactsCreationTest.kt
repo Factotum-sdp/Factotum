@@ -1,5 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.directory
 
+import android.util.Log
 import android.view.KeyEvent
 import android.widget.EditText
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
@@ -95,7 +96,7 @@ class ContactsCreationTest {
         device.findObject(textContains(city)).click()
         val lausanneResult = Location.geocoderQuery(city, getApplicationContext())
         val address = device.findObject(textContains(city)).text
-        assertEquals(lausanneResult!![0].getAddressLine(0), address)
+        assertEquals(lausanneResult!![0].getAddressLine(0).toString(), address)
     }
 
 }

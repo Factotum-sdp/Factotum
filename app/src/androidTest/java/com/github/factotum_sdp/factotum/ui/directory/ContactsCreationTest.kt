@@ -94,6 +94,7 @@ class ContactsCreationTest {
         )
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         device.findObject(textContains(city)).click()
+        Thread.sleep(1000)
         val lausanneResult = Location.geocoderQuery(city, getApplicationContext())
         val address = device.findObject(textContains(city)).text
         assertEquals(lausanneResult!![0].getAddressLine(0).toString(), address)

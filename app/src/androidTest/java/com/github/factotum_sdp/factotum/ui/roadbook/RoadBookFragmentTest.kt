@@ -365,10 +365,9 @@ class RoadBookFragmentTest {
                 val curr = it.childFragmentManager.primaryNavigationFragment as RoadBookFragment
                 val recyclerView = curr.view!!.findViewById<RecyclerView>(R.id.list)
                 recyclerView.adapter?.notifyItemMoved(2,3)
-                curr.getRBViewModelForTest().swapRecords(2,2)
+                curr.getRBViewModelForTest().moveRecord(2,2)
                 recyclerView.adapter?.notifyItemMoved(3,4)
-                curr.getRBViewModelForTest().swapRecords(3,3)
-                curr.getRBViewModelForTest().pushSwapsResult()
+                curr.getRBViewModelForTest().moveRecord(3,3)
             }
         }
 

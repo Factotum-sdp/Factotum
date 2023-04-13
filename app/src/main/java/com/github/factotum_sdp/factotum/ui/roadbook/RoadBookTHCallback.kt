@@ -44,31 +44,14 @@ abstract class RoadBookTHCallback() :
         viewHolder: ViewHolder,
         target: ViewHolder
     ): Boolean {
-        try {
+        try { // Drag & Drop by swapping the DRecords of the RoadBookViewModel
             val fromPosition = viewHolder.absoluteAdapterPosition
             val toPosition = target.absoluteAdapterPosition
-
-            // Only the front-end is updated when drag-travelling for a smoother UX
+            getRbViewModel().moveRecord(fromPosition, toPosition)
             recyclerView.adapter?.notifyItemMoved(fromPosition, toPosition)
-
-            // Back-end swap job not published here, @see pushSwapsResult() call
-            if (toPosition < fromPosition) {
-                getRbViewModel().swapRecords(toPosition, fromPosition - 1)
-            } else {
-                getRbViewModel().swapRecords(fromPosition, toPosition - 1)
-            }
             return true
         } catch (e: java.lang.Exception) {
             return false
-        }
-    }
-
-    // Hacky move to update the ViewModel only when the Drag&Drop has ended
-    override fun onSelectedChanged(viewHolder: ViewHolder?, actionState: Int) {
-        super.onSelectedChanged(viewHolder, actionState)
-        if (actionState == ACTION_STATE_IDLE) {
-            // Push only if the STATE_IDLE arrives after a Drag and Drop move
-            getRbViewModel().pushSwapsResult()
         }
     }
 
@@ -85,7 +68,7 @@ abstract class RoadBookTHCallback() :
     }
 
     private fun editOnSwipeRight(viewHolder: ViewHolder) {
-        val dial =
+        val dial = // Launch & Delegate the event to a custom AlertDialog
             DRecordAlertDialogBuilder(getHost().requireContext(), getHost(),
                                         getRbViewModel(), getRecyclerView())
             .forExistingRecordEdition(viewHolder)
@@ -93,6 +76,7 @@ abstract class RoadBookTHCallback() :
         dial.window?.attributes?.windowAnimations = R.style.MyDialogAnimation
         dial.show()
     }
+
     private fun deleteOnSwipeLeft(viewHolder: ViewHolder) {
         val position = viewHolder.absoluteAdapterPosition
         val builder = AlertDialog.Builder(getHost().requireContext())
@@ -103,6 +87,7 @@ abstract class RoadBookTHCallback() :
             Snackbar
                 .make(getHost().requireView(), getHost().getString(R.string.snap_text_on_rec_delete), 700)
                 .setAction("Action", null).show()
+            getRecyclerView().adapter!!.notifyItemChanged(position)
         }
         builder.setNegativeButton(getHost().getString(R.string.delete_cancel_button_label)) { _, _ ->
             getRecyclerView().adapter!!.notifyItemChanged(position)

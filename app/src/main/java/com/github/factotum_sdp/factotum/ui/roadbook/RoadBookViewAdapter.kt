@@ -4,8 +4,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.recyclerview.widget.AsyncListDiffer
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.DestinationRecord.Action
@@ -19,19 +17,7 @@ import java.util.*
 class RoadBookViewAdapter(private val onClickListenerFromDestId: (String) -> View.OnClickListener?) :
     RecyclerView.Adapter<RoadBookViewAdapter.RecordViewHolder>() {
 
-    // Call back needed to instantiate the async list attribute
-    private val differCallback = object : DiffUtil.ItemCallback<DestinationRecord>(){
-        override fun areItemsTheSame(oldItem: DestinationRecord,
-                                     newItem: DestinationRecord): Boolean {
-            return  oldItem == newItem
-        }
-
-        override fun areContentsTheSame(oldItem: DestinationRecord,
-                                        newItem: DestinationRecord): Boolean {
-            return oldItem == newItem
-        }
-    }
-    private val asyncList = AsyncListDiffer(this, differCallback)
+    private var displayedDRecords: List<DestinationRecord> = arrayListOf()
 
     // Inflate a new view hierarchy according to fragment_destrecord.xml design
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecordViewHolder {
@@ -46,12 +32,12 @@ class RoadBookViewAdapter(private val onClickListenerFromDestId: (String) -> Vie
      * Updates the async list displayed by this RoadBookViewAdapter
      */
     fun submitList(ls: List<DestinationRecord>) {
-        asyncList.submitList(ls)
+        displayedDRecords = ls
     }
 
     // Bind each displayed Record to the corresponding current async list slot
     override fun onBindViewHolder(holder: RecordViewHolder, position: Int) {
-        val item = asyncList.currentList[position]
+        val item = displayedDRecords[position]
         val itemView = holder.itemView
         val context = holder.itemView.context
 
@@ -90,7 +76,7 @@ class RoadBookViewAdapter(private val onClickListenerFromDestId: (String) -> Vie
         return "$label : ${DestinationRecord.actionsFormat(actions)}"
     }
 
-    override fun getItemCount(): Int = asyncList.currentList.size
+    override fun getItemCount(): Int = displayedDRecords.size
 
     /**
      * ViewHolder of a (destination) record

@@ -138,8 +138,7 @@ class DRecordAlertDialogBuilder(context: Context?,
             } catch(e: java.lang.Exception) {
                 setSnackBar(host.getString(R.string.edit_rejected_snap_label), 1400)
             }
-            if (!recHasChanged)
-                rbRecyclerView.adapter!!.notifyItemChanged(position)
+            rbRecyclerView.adapter!!.notifyItemChanged(position)
         })
         return this
     }

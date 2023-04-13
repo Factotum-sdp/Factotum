@@ -14,14 +14,15 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.uiautomator.By.clazz
-import androidx.test.uiautomator.By.textContains
+import androidx.test.uiautomator.By.*
 import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.Until
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.localisation.Location
 import com.github.factotum_sdp.factotum.placeholder.ContactsList
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -93,11 +94,11 @@ class ContactsCreationTest {
             ViewActions.pressKey(KeyEvent.KEYCODE_ENTER)
         )
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        device.findObject(textContains(city)).click()
-        Thread.sleep(1000)
-        val lausanneResult = Location.geocoderQuery(city, getApplicationContext())
-        val address = device.findObject(textContains(city)).text
-        assertEquals(lausanneResult!![0].getAddressLine(0).toString(), address)
+        val lausanneResult = Location.geocoderQuery(city, getApplicationContext())!![0].getAddressLine(0)
+        val address = device.findObject(text(city))
+        device.findObject(text(lausanneResult)).click()
+        val addressChanged = address.wait(Until.textMatches(lausanneResult), 5000)
+        assertTrue(addressChanged)
     }
 
 }

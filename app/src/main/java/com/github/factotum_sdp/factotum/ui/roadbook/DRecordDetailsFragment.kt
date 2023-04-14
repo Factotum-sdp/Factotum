@@ -39,8 +39,8 @@ class DRecordDetailsFragment: Fragment() {
         val adapter = DetailsFragmentsAdapter(this)
         adapter.addFragment(DRecordInfoFragment(rec))
         adapter.addFragment(RouteFragment())
-        adapter.addFragment(PictureFragment())
         adapter.addFragment(DirectoryFragment()) // To be replaced with ContactDetailsFragment()
+        adapter.addFragment(PictureFragment())
         viewPager.adapter = adapter
 
         return view
@@ -55,13 +55,13 @@ class DRecordDetailsFragment: Fragment() {
             tab.setIcon(tabFrag.iconID)
         }.attach()
     }
-
     enum class TabFragment(val iconID: Int) {
         INFO(R.drawable.baseline_info_24),
         MAPS(R.drawable.baseline_map_24),
-        PICTURE(R.drawable.ic_menu_camera),
-        CONTACT(R.drawable.contact_image)
+        CONTACT(R.drawable.contact_image),
+        PICTURE(R.drawable.ic_menu_camera)
     }
+
 
     class DetailsFragmentsAdapter(fragment: Fragment): FragmentStateAdapter(fragment) {
         private val fragments: MutableList<Fragment> = mutableListOf()

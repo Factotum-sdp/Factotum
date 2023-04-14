@@ -5,6 +5,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.matcher.ViewMatchers.*
@@ -49,12 +50,16 @@ class DRecordDetailsFragmentTest {
         edit.apply()
     }
 
-    @Test
-    fun displayedDetailsFragMatchTheClickedRecord() {
+    private fun toFragment() {
         Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
         onView(withText(R.string.rb_label_touch_click)).perform(click())
         val destID = DestinationRecords.RECORDS[2].destID
         onView(withText(destID)).perform(click())
+    }
+
+    @Test
+    fun displayedDetailsFragMatchTheClickedRecord() {
+        toFragment()
         onView(withId(R.id.fragment_drecord_details_directors_parent)).check(matches(isDisplayed()))
         onView(withText(DestinationRecords.RECORDS[2].destID)).check(matches(isDisplayed()))
     }
@@ -86,5 +91,44 @@ class DRecordDetailsFragmentTest {
         onView(withId(R.id.fragment_drecord_details_directors_parent)).check(matches(isDisplayed()))
         onView(withText(destID)).check(matches(isDisplayed()))
         onView(withText(notes)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun swipeLeftOneTimeDisplaysMaps() {
+        toFragment()
+        onView(withId(R.id.fragment_route_directors_parent)).check(doesNotExist())
+        onView(withId(R.id.viewPager)).perform(swipeLeft())
+        onView(withId(R.id.fragment_route_directors_parent)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun swipeLeftTwoTimesDisplaysPicture() {
+        toFragment()
+        onView(withId(R.id.fragment_picture_directors_parent)).check(doesNotExist())
+        onView(withId(R.id.viewPager)).perform(swipeLeft())
+        onView(withId(R.id.viewPager)).perform(swipeLeft())
+        onView(withId(R.id.fragment_picture_directors_parent)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun swipeLeftThreeTimesDisplaysPicture() {
+        toFragment()
+        onView(withId(R.id.fragment_directory_directors_parent)).check(doesNotExist())
+        onView(withId(R.id.viewPager)).perform(swipeLeft())
+        onView(withId(R.id.viewPager)).perform(swipeLeft())
+        onView(withId(R.id.viewPager)).perform(swipeLeft())
+        onView(withId(R.id.fragment_directory_directors_parent)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun swipeRightAfterSwipeLeftDisplaysInfo() {
+        toFragment()
+        onView(withId(R.id.viewPager)).perform(click())
+        onView(withId(R.id.fragment_drecord_info_directors_parent)).check(matches(isDisplayed()))
+        onView(withId(R.id.viewPager)).perform(swipeLeft())
+        Thread.sleep(2000)
+        onView(withId(R.id.fragment_drecord_info_directors_parent)).check(doesNotExist())
+        onView(withId(R.id.viewPager)).perform(swipeRight())
+        onView(withId(R.id.fragment_drecord_info_directors_parent)).check(matches(isDisplayed()))
     }
 }

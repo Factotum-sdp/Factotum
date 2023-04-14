@@ -55,7 +55,6 @@ abstract class RoadBookTHCallback() :
         }
     }
 
-    @SuppressLint("NotifyDataSetChanged") // Don't update the front-end, want to keep the hole
     override fun onSwiped(viewHolder: ViewHolder, direction: Int) {
         when(direction) {
             RIGHT -> { // Record Edition
@@ -77,6 +76,7 @@ abstract class RoadBookTHCallback() :
         dial.show()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun deleteOnSwipeLeft(viewHolder: ViewHolder) {
         val position = viewHolder.absoluteAdapterPosition
         val builder = AlertDialog.Builder(getHost().requireContext())
@@ -87,7 +87,7 @@ abstract class RoadBookTHCallback() :
             Snackbar
                 .make(getHost().requireView(), getHost().getString(R.string.snap_text_on_rec_delete), 700)
                 .setAction("Action", null).show()
-            getRecyclerView().adapter!!.notifyItemChanged(position)
+            getRecyclerView().adapter!!.notifyDataSetChanged()
         }
         builder.setNegativeButton(getHost().getString(R.string.delete_cancel_button_label)) { _, _ ->
             getRecyclerView().adapter!!.notifyItemChanged(position)

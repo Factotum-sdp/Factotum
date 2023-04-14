@@ -1,44 +1,79 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.EditText
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.DestinationRecord
+import androidx.appcompat.widget.Toolbar
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
+import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment
+import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
+import com.github.factotum_sdp.factotum.ui.picture.PictureFragment
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 
 class DRecordDetailsFragment: Fragment() {
 
     private val rbViewModel: RoadBookViewModel by activityViewModels()
+    private lateinit var rec: DestinationRecord
+    private lateinit var viewPager: ViewPager2
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_drecord_details, container, false)
-        val arg = arguments?.getString(RoadBookFragment.DEST_ID_NAV_ARG_KEY) ?: "UNKNOWN"
+
+        val destID = arguments?.getString(RoadBookFragment.DEST_ID_NAV_ARG_KEY) ?: "UNKNOWN"
         rbViewModel.recordsListState.value?.let {
-            val rec = it.first { d -> d.destID == arg }
-            setEditTexts(rec, view)
+            rec = it.first { d -> d.destID == destID }
         }
+
+        val toolbar = requireActivity().findViewById<Toolbar>(R.id.toolbar)
+        toolbar.setTitle("Dest. Record : $destID")
+
+        viewPager = view.findViewById(R.id.viewPager)
+        val adapter = DetailsFragmentsAdapter(this)
+        adapter.addFragment(DRecordInfoFragment(rec))
+        adapter.addFragment(RouteFragment())
+        adapter.addFragment(PictureFragment())
+        adapter.addFragment(DirectoryFragment()) // To be replaced with ContactDetailsFragment()
+        viewPager.adapter = adapter
 
         return view
     }
 
-    private fun setEditTexts(rec: DestinationRecord, view: View) {
-        setEditText(rec.destID, R.id.editTextDestID, view)
-        setEditText(rec.clientID, R.id.editTextClientID, view)
-        setEditText(DestinationRecord.timeStampFormat(rec.timeStamp), R.id.editTextTimestamp, view)
-        setEditText(rec.waitingTime.toString(), R.id.editTextWaitingTime, view)
-        setEditText(rec.rate.toString(), R.id.editTextRate, view)
-        setEditText(DestinationRecord.actionsFormat(rec.actions), R.id.editTextActions, view)
-        setEditText(rec.notes, R.id.editTextNotes, view)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val tabLayout: TabLayout = view.findViewById(R.id.tabLayout)
+        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+            val tabFrag = TabFragment.values()[position]
+            tab.setIcon(tabFrag.iconID)
+        }.attach()
     }
-    private fun setEditText(format: String, id: Int, view: View) {
-        val editText = view.findViewById<EditText>(id)
-        editText.setText(format)
+
+    enum class TabFragment(val iconID: Int) {
+        INFO(R.drawable.baseline_info_24),
+        MAPS(R.drawable.baseline_map_24),
+        PICTURE(R.drawable.ic_menu_camera),
+        CONTACT(R.drawable.contact_image)
+    }
+
+    class DetailsFragmentsAdapter(fragment: Fragment): FragmentStateAdapter(fragment) {
+        private val fragments: MutableList<Fragment> = mutableListOf()
+
+        fun addFragment(fragment: Fragment) {
+            fragments.add(fragment)
+        }
+        override fun getItemCount(): Int {
+            return fragments.size
+        }
+        override fun createFragment(position: Int): Fragment {
+            return fragments[position]
+        }
     }
 }

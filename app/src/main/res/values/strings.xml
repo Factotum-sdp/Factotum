@@ -116,4 +116,12 @@
     <string name="phone_number">Phone number</string>
     <string name="create_contact">Create contact</string>
     <string name="notes">Notes</string>
+    <string name="drecord_notes_mi_title">DRecord notes</string>
+    <string name="textvlabel_destination_id">Destination ID</string>
+    <string name="textvlabel_client_id">Client ID</string>
+    <string name="textvlabel_timestamp">Timestamp</string>
+    <string name="textvlabel_waiting_time">Waiting Time</string>
+    <string name="textvlabel_rate">Rate</string>
+    <string name="textvlabel_actions">Actions</string>
+    <string name="textvlabel_notes">Notes</string>
 </resources>

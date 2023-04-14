@@ -300,7 +300,7 @@ class RoadBookFragmentTest {
 
         // Edit all fields :
         onView(withId(R.id.autoCompleteClientID))
-            .perform(click(), clearText(),  typeText("New "), closeSoftKeyboard())
+            .perform(click(), clearText(),  typeText("NewEvery "), closeSoftKeyboard())
 
         val cal: Calendar = Calendar.getInstance()
         onView(withId(R.id.editTextTimestamp)).perform(click())
@@ -319,7 +319,7 @@ class RoadBookFragmentTest {
 
         // Check edited record is corretly displayed :
         Thread.sleep(WORST_REFRESH_TIME)
-        onView(withText("New#1")).check(matches(isDisplayed()))
+        onView(withText("NewEvery#1")).check(matches(isDisplayed()))
 
         eraseFirstRecTimestamp() // For having no ambiguity btw Timestamp on screen
         onView(withText(startsWith("arrival : ${timestampUntilHourFormat(cal)}"))).check(matches(isDisplayed()))
@@ -481,6 +481,7 @@ class RoadBookFragmentTest {
         // Navigate outside and come back
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
+        onView(withId(R.id.routeFragment))
         onView(withId(R.id.routeFragment))
             .perform(click())
         onView(withId(R.id.fragment_route_directors_parent))

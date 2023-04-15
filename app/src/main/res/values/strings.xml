@@ -58,7 +58,7 @@
     <string name="prompt_password">••••••</string>
     <string name="action_sign_in">Access</string>
     <string name="action_sign_in_short">Sign in</string>
-    <string name="welcome">"Welcome!"</string>
+    <string name="welcome">"Welcome"</string>
     <string name="invalid_username">Not a valid username</string>
     <string name="invalid_email">Not a valid email</string>
     <string name="invalid_password">Password must be >5 characters</string>
@@ -85,6 +85,7 @@
     <string name="full_name_text">Full Name</string>
     <string name="create_account_text">Create Account</string>
     <string name="select_role_text">Select Role</string>
+    <string name="signup_failed">"Sign Up failed"</string>
 
     <string name="rb_label_swiper_edition">Swipe R. Editon</string>
     <string name="rb_label_dragdrop"><![CDATA[Drag & Drop]]></string>

@@ -9,15 +9,19 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.data.SignUpDataSink
 import com.github.factotum_sdp.factotum.databinding.FragmentSignupBinding
+import com.github.factotum_sdp.factotum.ui.auth.BaseAuthFragment
+import com.google.android.material.snackbar.Snackbar
 
-class SignUpFragment : Fragment() {
+class SignUpFragment : BaseAuthFragment() {
 
-    private lateinit var viewModel: SignUpViewModel
+    override lateinit var viewModel: SignUpViewModel
     private var _binding: FragmentSignupBinding? = null
 
     private val roles = listOf("BOSS", "COURIER", "CLIENT")
@@ -38,15 +42,17 @@ class SignUpFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this)[SignUpViewModel::class.java]
+        viewModel =
+            ViewModelProvider(this, SignUpViewModelFactory())[SignUpViewModel::class.java]
 
         val usernameEditText = binding.username
         val emailEditText = binding.email
         val passwordEditText = binding.password
         val roleAutoCompleteTextView = binding.role
+        val loadingProgressBar = binding.loading
         val signUpButton = binding.signup
 
-        observe(signUpButton, usernameEditText, emailEditText, passwordEditText)
+        observeSignUpFormState(signUpButton, usernameEditText, emailEditText, passwordEditText)
 
         val afterTextChangedListener = createTextWatcher(
             viewModel,
@@ -64,12 +70,16 @@ class SignUpFragment : Fragment() {
             afterTextChangedListener
         )
 
+        listenToAuthButton(signUpButton, loadingProgressBar, emailEditText, passwordEditText)
+
+        observeAuthResult(loadingProgressBar)
+
         adapter = ArrayAdapter(requireContext(), R.layout.user_role_item, roles)
 
         roleAutoCompleteTextView.setAdapter(adapter)
     }
 
-    private fun observe(
+    private fun observeSignUpFormState(
         signupButton: Button,
         usernameEditText: EditText,
         emailEditText: EditText,
@@ -129,8 +139,30 @@ class SignUpFragment : Fragment() {
         roleAutoCompleteTextView.addTextChangedListener(afterTextChangedListener)
     }
 
+    override fun updateUi(model: Any) {
+        val welcome = getString(R.string.welcome) + " " + (model as String)
+        Snackbar.make(requireView(), welcome, Snackbar.LENGTH_LONG).show()
+        findNavController().navigate(R.id.action_signUpFragment_to_loginFragment)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    /**
+     * ViewModel provider factory to instantiate SignUpViewModel.
+     * Required given SignUpViewModel has a non-empty constructor
+     */
+    class SignUpViewModelFactory : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(SignUpViewModel::class.java)) {
+                return SignUpViewModel(
+                    signUpDataSink = SignUpDataSink()
+                ) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
+        }
     }
 }

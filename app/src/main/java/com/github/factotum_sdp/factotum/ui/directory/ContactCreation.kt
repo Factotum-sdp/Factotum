@@ -53,7 +53,11 @@ class ContactCreation : Fragment() {
 
         initializeSpinner(view)
 
-        initializeAddressSearch()
+        val cursor = initializeAddressSearch()
+        setAddressSearchTextListener(cursor)
+        setAddressSearchSuggestions()
+
+
     }
 
     private fun initializeSpinner(view: View){
@@ -71,12 +75,7 @@ class ContactCreation : Fragment() {
         }
     }
 
-    private fun initializeAddressSearch(){
-        val from = arrayOf(SearchManager.SUGGEST_COLUMN_TEXT_1)
-        val to = intArrayOf(R.id.searchItemID)
-        val cursorAdapter = SimpleCursorAdapter(requireContext(), R.layout.suggestion_item_layout, null, from, to, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER)
-        binding.contactCreationAddress.suggestionsAdapter = cursorAdapter
-
+    private fun setAddressSearchTextListener(cursorAdapter: SimpleCursorAdapter) {
         binding.contactCreationAddress.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 if (query != null) {
@@ -95,7 +94,9 @@ class ContactCreation : Fragment() {
                 return false
             }
         })
+    }
 
+    private fun setAddressSearchSuggestions(){
         binding.contactCreationAddress.setOnSuggestionListener(object : SearchView.OnSuggestionListener {
             override fun onSuggestionClick(position: Int): Boolean {
                 val cursor = binding.contactCreationAddress.suggestionsAdapter.getItem(position) as Cursor
@@ -110,5 +111,20 @@ class ContactCreation : Fragment() {
                 return false
             }
         })
+    }
+
+    private fun initializeAddressSearch(): SimpleCursorAdapter {
+        val from = arrayOf(SearchManager.SUGGEST_COLUMN_TEXT_1)
+        val to = intArrayOf(R.id.searchItemID)
+        val cursorAdapter = SimpleCursorAdapter(
+            requireContext(),
+            R.layout.suggestion_item_layout,
+            null,
+            from,
+            to,
+            CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER
+        )
+        binding.contactCreationAddress.suggestionsAdapter = cursorAdapter
+        return cursorAdapter
     }
 }

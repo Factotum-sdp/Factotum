@@ -7,6 +7,7 @@ import com.github.factotum_sdp.factotum.data.SignUpDataSink
 import com.github.factotum_sdp.factotum.ui.auth.BaseAuthResult
 import com.github.factotum_sdp.factotum.ui.auth.BaseAuthState
 import com.github.factotum_sdp.factotum.ui.auth.BaseAuthViewModel
+import com.github.factotum_sdp.factotum.ui.login.LoginViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,6 +38,9 @@ class SignUpViewModel(private val signUpDataSink: SignUpDataSink) : BaseAuthView
                 _signupResult.value = SignUpResult(error = R.string.signup_failed)
             }
         }
+    }
+
+    fun updateUsersList() {
     }
 
     fun signUpDataChanged(username: String, email: String, password: String, role: String) {

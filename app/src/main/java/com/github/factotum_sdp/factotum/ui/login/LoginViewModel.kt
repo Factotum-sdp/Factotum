@@ -21,8 +21,8 @@ class LoginViewModel(private val userViewModel: UserViewModel) : BaseAuthViewMod
     private val _loginForm = MutableLiveData<LoginFormState>()
     val loginFormState: LiveData<LoginFormState> = _loginForm
 
-    override val _authResult = MutableLiveData<BaseAuthResult<*>>()
-    override val authResult: LiveData<BaseAuthResult<*>> = _authResult
+    private val _loginResult = MutableLiveData<BaseAuthResult<*>>()
+    override val authResult: LiveData<BaseAuthResult<*>> = _loginResult
 
     private val _retrieveUsersResult = MutableLiveData<RetrieveUsersResult>()
     val retrieveUsersResult: LiveData<RetrieveUsersResult> = _retrieveUsersResult
@@ -37,10 +37,10 @@ class LoginViewModel(private val userViewModel: UserViewModel) : BaseAuthViewMod
             val result = withContext(dispatcher) { loginRepository.login(email, password) }
             if (result is Result.Success) {
                 userViewModel.setLoggedInUser(result.data)
-                _authResult.value =
+                _loginResult.value =
                     LoginResult(success = result.data)
             } else {
-                _authResult.value = LoginResult(
+                _loginResult.value = LoginResult(
                     error = if ((result as Result.Error).exception.message == "User not found") {
                         R.string.user_not_found
                     } else {

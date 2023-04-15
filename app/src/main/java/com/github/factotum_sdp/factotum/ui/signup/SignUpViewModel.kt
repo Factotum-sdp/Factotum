@@ -17,8 +17,8 @@ class SignUpViewModel(private val signUpDataSink: SignUpDataSink) : BaseAuthView
     private val _signupForm = MutableLiveData<SignUpFormState>()
     val signupFormState: LiveData<SignUpFormState> = _signupForm
 
-    override val _authResult = MutableLiveData<BaseAuthResult<*>>()
-    override val authResult: LiveData<BaseAuthResult<*>> = _authResult
+    private val _signupResult = MutableLiveData<BaseAuthResult<*>>()
+    override val authResult: LiveData<BaseAuthResult<*>> = _signupResult
 
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 
@@ -29,12 +29,12 @@ class SignUpViewModel(private val signUpDataSink: SignUpDataSink) : BaseAuthView
         viewModelScope.launch {
             val result = withContext(dispatcher) { signUpDataSink.signUp(email, password) }
             if (result is Result.Success) {
-                _authResult.value =
+                _signupResult.value =
                     SignUpResult(
                         success = result.data
                     )
             } else {
-                _authResult.value = SignUpResult(error = R.string.signup_failed)
+                _signupResult.value = SignUpResult(error = R.string.signup_failed)
             }
         }
     }

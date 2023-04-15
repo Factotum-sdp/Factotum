@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 
 abstract class BaseAuthViewModel: ViewModel() {
 
-    abstract val _authResult : MutableLiveData<BaseAuthResult<*>>
     abstract val authResult: LiveData<BaseAuthResult<*>>
 
     abstract fun auth(email: String, password: String)

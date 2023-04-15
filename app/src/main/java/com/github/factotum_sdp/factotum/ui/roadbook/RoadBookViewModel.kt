@@ -26,7 +26,6 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
     val recordsListState: LiveData<List<DestinationRecord>> = _recordsList
 
     private var dbRef: DatabaseReference
-    private val swapedRecords: ArrayList<DestinationRecord> = arrayListOf()
     private val clientOccurences = HashMap<String, Int>()
 
     init {
@@ -78,31 +77,17 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
     }
 
     /**
-     * Swap between DestinationRecords at position : from and at position : to
-     * It is a one way swap, hence the from index must be lower or equal to the to index.
+     * Change a DRecord position in the recordsList of this RoadBookViewModel
      *
      * @param from Int
      * @param to Int
      */
-    fun swapRecords(from: Int, to: Int) {
-        assert(from <= to)
-        if(swapedRecords.isEmpty())
-            swapedRecords.addAll(_recordsList.value as Collection<DestinationRecord>)
-        Collections.swap(swapedRecords, from, to)
-    }
-
-    /**
-     * Update the Observable LiveData of this RoadBookViewModel
-     * To be called after a series of swapRecords() that comes to an end,
-     * in order to show the result to some possible observers.
-     */
-    fun pushSwapsResult() {
-        if(swapedRecords.isNotEmpty()) {
-            var ls = listOf<DestinationRecord>()
-            ls = ls.plus(swapedRecords)
-            _recordsList.postValue(ls)
-            swapedRecords.clear()
-        }
+    fun moveRecord(from: Int, to: Int) {
+        val ls = _recordsList.value!!.toMutableList()
+        val fromLocation = ls[from]
+        ls.removeAt(from)
+        ls.add(to, fromLocation)
+        _recordsList.postValue(ls)
     }
 
     /**

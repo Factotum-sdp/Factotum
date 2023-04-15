@@ -55,7 +55,7 @@ class RoadBookFragmentTest {
         @JvmStatic
         fun setUpDatabase() {
             val database = Firebase.database
-            //database.useEmulator("10.0.2.2", 9000)
+            database.useEmulator("10.0.2.2", 9000)
             MainActivity.setDatabase(database)
         }
     }
@@ -300,7 +300,7 @@ class RoadBookFragmentTest {
 
         // Edit all fields :
         onView(withId(R.id.autoCompleteClientID))
-            .perform(click(), clearText(),  typeText("New "), closeSoftKeyboard())
+            .perform(click(), clearText(),  typeText("NewEvery "), closeSoftKeyboard())
 
         val cal: Calendar = Calendar.getInstance()
         onView(withId(R.id.editTextTimestamp)).perform(click())
@@ -319,7 +319,7 @@ class RoadBookFragmentTest {
 
         // Check edited record is corretly displayed :
         Thread.sleep(WORST_REFRESH_TIME)
-        onView(withText("New#1")).check(matches(isDisplayed()))
+        onView(withText("NewEvery#1")).check(matches(isDisplayed()))
 
         eraseFirstRecTimestamp() // For having no ambiguity btw Timestamp on screen
         onView(withText(startsWith("arrival : ${timestampUntilHourFormat(cal)}"))).check(matches(isDisplayed()))
@@ -365,10 +365,9 @@ class RoadBookFragmentTest {
                 val curr = it.childFragmentManager.primaryNavigationFragment as RoadBookFragment
                 val recyclerView = curr.view!!.findViewById<RecyclerView>(R.id.list)
                 recyclerView.adapter?.notifyItemMoved(2,3)
-                curr.getRBViewModelForTest().swapRecords(2,2)
+                curr.getRBViewModelForTest().moveRecord(2,2)
                 recyclerView.adapter?.notifyItemMoved(3,4)
-                curr.getRBViewModelForTest().swapRecords(3,3)
-                curr.getRBViewModelForTest().pushSwapsResult()
+                curr.getRBViewModelForTest().moveRecord(3,3)
             }
         }
 

@@ -77,18 +77,12 @@ class MainActivity : AppCompatActivity() {
         val email = headerView.findViewById<TextView>(R.id.textView)
 
         // Instantiate the current user
-        val userFact =
-            UserViewModel.UserViewModelFactory(
-                UsersPlaceHolder.USER1.username,
-                UsersPlaceHolder.USER1.email
-            )
-        val user = ViewModelProvider(this, userFact)[UserViewModel::class.java]
+        val user = ViewModelProvider(this)[UserViewModel::class.java]
         binding.navView.findViewTreeLifecycleOwner()?.let { lco ->
-            user.name.observe(lco) {
-                userName.text = it
-            }
-            user.email.observe(lco) {
-                email.text = it
+            user.loggedInUser.observe(lco) {
+                val format = "${it.displayName} (${it.role})"
+                userName.text = format
+                email.text = it.email
             }
         }
     }

@@ -27,23 +27,28 @@ object TouchCustomMoves {
         Espresso.onView(ViewMatchers.withId(R.id.list)).perform(
             ViewActions.longClick(),
             RecyclerViewActions.actionOnItemAtPosition<RoadBookViewAdapter.RecordViewHolder>(
-                pos, GeneralSwipeAction(
-                    Swipe.SLOW,
-                    {
-                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
-                        val x = xy[0] + (it.width - 1) * startX
-                        val y = xy[1] + (it.height - 1) * startY
-                        floatArrayOf(x, y)
-                    },
-                    {
-                        val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
-                        val x = xy[0] + (it.width - 1) * endX
-                        val y = xy[1] + (it.height - 1) * endY
-                        floatArrayOf(x, y)
-                    },
-                    Press.PINPOINT
-                )
+                pos, swipeAction(startX, startY, endX, endY)
             )
+        )
+    }
+
+    private fun swipeAction(startX: Float, startY: Float,
+                    endX: Float, endY: Float): GeneralSwipeAction {
+        return GeneralSwipeAction(
+            Swipe.SLOW,
+            {
+                val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
+                val x = xy[0] + (it.width - 1) * startX
+                val y = xy[1] + (it.height - 1) * startY
+                floatArrayOf(x, y)
+            },
+            {
+                val xy = IntArray(2).also { ar -> it.getLocationOnScreen(ar) }
+                val x = xy[0] + (it.width - 1) * endX
+                val y = xy[1] + (it.height - 1) * endY
+                floatArrayOf(x, y)
+            },
+            Press.PINPOINT
         )
     }
 }

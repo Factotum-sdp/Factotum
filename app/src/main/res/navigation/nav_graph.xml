@@ -28,7 +28,7 @@
     <fragment
         android:id="@+id/roadBookFragment"
         android:name="com.github.factotum_sdp.factotum.ui.roadbook.RoadBookFragment"
-        android:label="RoadBook"
+        android:label="Roadbook"
         tools:layout="@layout/fragment_roadbook">
         <action
             android:id="@+id/action_roadBookFragment_to_DRecordDetailsFragment"

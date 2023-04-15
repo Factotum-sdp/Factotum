@@ -482,7 +482,6 @@ class RoadBookFragmentTest {
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.routeFragment))
-        onView(withId(R.id.routeFragment))
             .perform(click())
         onView(withId(R.id.fragment_route_directors_parent))
             .check(matches(isDisplayed()))

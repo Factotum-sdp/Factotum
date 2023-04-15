@@ -72,7 +72,7 @@ abstract class RoadBookTHCallback() :
                                         getRbViewModel(), getRecyclerView())
             .forExistingRecordEdition(viewHolder)
             .create()
-        dial.window?.attributes?.windowAnimations = R.style.MyDialogAnimation
+        dial.window?.attributes?.windowAnimations = R.style.DialogAnimLeftToRight
         dial.show()
     }
 
@@ -93,7 +93,7 @@ abstract class RoadBookTHCallback() :
             getRecyclerView().adapter!!.notifyItemChanged(position)
         }
         val dial = builder.create()
-        dial.window?.attributes?.windowAnimations = R.style.MyDialogAnimation
+        dial.window?.attributes?.windowAnimations = R.style.DialogAnimLeftToRight
         dial.show()
     }
 }

@@ -118,7 +118,7 @@ class RoadBookFragmentTest {
 
         swipeLeftTheRecordAt(2)
         onView(withText(R.string.delete_dialog_title))
-        onView(withText(R.string.delete_confirm_button_label)).perform(click())
+        onView(withText(R.string.swipeleft_confirm_button_label)).perform(click())
 
         // Record added previously is now deleted
         onView((withText(DestinationRecords.RECORDS[2].destID)))
@@ -134,7 +134,7 @@ class RoadBookFragmentTest {
 
         swipeLeftTheRecordAt(2)
         onView(withText(R.string.delete_dialog_title))
-        onView(withText(R.string.delete_cancel_button_label)).perform(click())
+        onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
 
         // Record added previously is now deleted
         onView((withText(DestinationRecords.RECORDS[2].destID)))

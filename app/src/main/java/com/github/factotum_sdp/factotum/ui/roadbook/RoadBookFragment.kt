@@ -1,5 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.*
@@ -34,6 +35,8 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private var isSREnabled = true
     private var isDDropEnabled = true
     private var isTClickEnabled = true
+    private var isShowArchivedEnabled = true
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -82,7 +85,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private fun setRoadBookEvents(rbViewModel: RoadBookViewModel, view: View) {
         // Add record on positive floating button click
         view.findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
-            DRecordAlertDialogBuilder(context, requireParentFragment(),
+            DRecordEditDialogBuilder(context, requireParentFragment(),
                                             rbViewModel, rbRecyclerView)
                 .forNewRecordEdition()
                 .show()
@@ -101,20 +104,25 @@ class RoadBookFragment : Fragment(), MenuProvider {
         val rbSL = menu.findItem(R.id.rbSwipeLDeletion)
         val rbSR = menu.findItem(R.id.rbSwipeREdition)
         val rbTC = menu.findItem(R.id.rbTouchClick)
+        val rbSA = menu.findItem(R.id.showArchived)
 
         // fetch saved States
         fetchRadioButtonState(DRAG_N_DROP_SHARED_KEY, rbDD)
         fetchRadioButtonState(SWIPE_L_SHARED_KEY, rbSL)
         fetchRadioButtonState(SWIPE_R_SHARED_KEY, rbSR)
         fetchRadioButtonState(TOUCH_CLICK_SHARED_KEY, rbTC)
+        fetchRadioButtonState(SHOW_ARCHIVED_KEY, rbSA)
 
         // init globals to saved preference state
         isDDropEnabled = rbDD.isChecked
         isSLEnabled = rbSL.isChecked
         isSREnabled = rbSR.isChecked
         isTClickEnabled = rbTC.isChecked
+        isShowArchivedEnabled = rbSA.isChecked
 
-        setRBonClickListeners(rbDD, rbSL, rbSR, rbTC)
+        showOrHideArchived(isShowArchivedEnabled)
+
+        setRBonClickListeners(rbDD, rbSL, rbSR, rbTC, rbSA)
 
         // Only at menu initialization
         val itemTouchHelper = ItemTouchHelper(newItemTHCallBack())
@@ -122,7 +130,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     }
 
     private fun setRBonClickListeners(rbDD: MenuItem, rbSL: MenuItem,
-                                      rbSR: MenuItem, rbTC: MenuItem) {
+                                      rbSR: MenuItem, rbTC: MenuItem, rbSA: MenuItem) {
         rbDD.setOnMenuItemClickListener {
             it.isChecked = !it.isChecked
             isDDropEnabled = !isDDropEnabled
@@ -143,6 +151,12 @@ class RoadBookFragment : Fragment(), MenuProvider {
             isTClickEnabled = !isTClickEnabled
             true
         }
+        rbSA.setOnMenuItemClickListener {
+            it.isChecked = !it.isChecked
+            isShowArchivedEnabled = !isShowArchivedEnabled
+            showOrHideArchived(isShowArchivedEnabled)
+            true
+        }
     }
 
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -156,7 +170,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private fun newItemTHCallBack(): Callback {
 
         // Overriding the getDragDirs and getSwipeDirs() to
-        // manage touch features proposed by RoadBookTHCallback()
+        // enable or disable touch features proposed by RoadBookTHCallback()
         val itemTHCallback = object : RoadBookTHCallback() {
             override fun getRbViewModel(): RoadBookViewModel {
                 return rbViewModel
@@ -199,6 +213,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         private const val SWIPE_L_SHARED_KEY = "SwipeLeftButton"
         private const val SWIPE_R_SHARED_KEY = "SwipeRightButton"
         private const val DRAG_N_DROP_SHARED_KEY = "DragNDropButton"
+        private const val SHOW_ARCHIVED_KEY = "ShowArchived"
         private const val TOUCH_CLICK_SHARED_KEY = "TouchClickButton"
         const val DEST_ID_NAV_ARG_KEY = "destID"
     }
@@ -213,6 +228,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         saveRadioButtonState(SWIPE_L_SHARED_KEY, R.id.rbSwipeLDeletion)
         saveRadioButtonState(DRAG_N_DROP_SHARED_KEY, R.id.rbDragDrop)
         saveRadioButtonState(TOUCH_CLICK_SHARED_KEY, R.id.rbTouchClick)
+        saveRadioButtonState(SHOW_ARCHIVED_KEY, R.id.showArchived)
         super.onDestroyView()
     }
 
@@ -229,5 +245,14 @@ class RoadBookFragment : Fragment(), MenuProvider {
             edit.putBoolean(sharedKey, radioButton.isChecked)
             edit.apply()
         }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun showOrHideArchived(isShowArchEnabled: Boolean) {
+        if (isShowArchEnabled)
+            rbViewModel.showArchivedRecords()
+        else
+            rbViewModel.hideArchivedRecords()
+        rbRecyclerView.adapter!!.notifyDataSetChanged()
     }
 }

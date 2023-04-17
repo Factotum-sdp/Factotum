@@ -21,9 +21,9 @@ import kotlin.collections.HashMap
  */
 class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
 
-    private val _recordsList: MutableLiveData<List<DestinationRecord>> =
-        MutableLiveData(emptyList())
-    val recordsListState: LiveData<List<DestinationRecord>> = _recordsList
+    private val _recordsList: MutableLiveData<DRecordList> =
+        MutableLiveData(DRecordList())
+    val recordsListState: LiveData<DRecordList> = _recordsList
 
     private var dbRef: DatabaseReference
     private val clientOccurences = HashMap<String, Int>()
@@ -55,7 +55,7 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         val destID = computeDestID(clientID)
         val rec = DestinationRecord(destID, clientID, timeStamp, waitingTime, rate, actions, notes)
         newList.add(rec)
-        _recordsList.postValue(newList)
+        _recordsList.setValue(currentDRecList().newDisplayedList(newList))
     }
 
     /**
@@ -64,9 +64,36 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
      */
     fun deleteRecordAt(pos: Int) {
         val newList = arrayListOf<DestinationRecord>()
-        newList.addAll(_recordsList.value as Collection<DestinationRecord>)
+        newList.addAll(currentDRecList() as Collection<DestinationRecord>)
         newList.removeAt(pos)
-        _recordsList.postValue(newList)
+        _recordsList.setValue(currentDRecList().newDisplayedList(newList))
+    }
+
+    fun archiveRecordAt(pos: Int) {
+        _recordsList.setValue(currentDRecList().archiveRecord(pos))
+    }
+
+    fun unarchiveRecordAt(pos: Int) {
+        _recordsList.setValue(currentDRecList().unarchiveRecord(pos))
+    }
+
+    fun showArchivedRecords() {
+        _recordsList.setValue(currentDRecList().withArchived())
+    }
+
+    fun hideArchivedRecords() {
+        _recordsList.setValue(currentDRecList().withoutArchived())
+    }
+
+    fun isRecordAtArchived(pos: Int): Boolean {
+        return currentDRecList().isArchived(pos)
+    }
+
+    fun isRecordAtTimeStamped(pos: Int): Boolean {
+        currentDRecList()[pos].timeStamp?.let {
+            return true
+        }
+        return false // if timeStamp is null
     }
 
     /**
@@ -83,11 +110,11 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
      * @param to Int
      */
     fun moveRecord(from: Int, to: Int) {
-        val ls = _recordsList.value!!.toMutableList()
+        val ls = currentDRecList().toMutableList()
         val fromLocation = ls[from]
         ls.removeAt(from)
         ls.add(to, fromLocation)
-        _recordsList.postValue(ls)
+        _recordsList.setValue(currentDRecList().newDisplayedList(ls))
     }
 
     /**
@@ -114,7 +141,7 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         ls.addAll(_recordsList.value as Collection<DestinationRecord>)
         ls[pos] = newRec
         if(currentRec != newRec) {
-            _recordsList.postValue(ls)
+            _recordsList.setValue(currentDRecList().newDisplayedList(ls))
             return true
         }
         // Prefer to be explicit with a boolean value, for the front-end to know it has to refresh, or act accordingly.
@@ -129,7 +156,11 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
             val destID = computeDestID(it.clientID)
             newList.add(DestinationRecord(destID, it.clientID, it.timeStamp, it.waitingTime, it.rate, it.actions, it.notes))
         }
-        _recordsList.postValue(newList)
+        _recordsList.setValue(currentDRecList().newDisplayedList(newList))
+    }
+
+    private fun currentDRecList(): DRecordList {
+        return _recordsList.value!!
     }
 
     private fun computeDestID(clientID: String): String {

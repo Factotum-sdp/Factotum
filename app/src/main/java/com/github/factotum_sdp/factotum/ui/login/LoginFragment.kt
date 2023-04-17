@@ -9,8 +9,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import androidx.annotation.StringRes
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -20,12 +18,13 @@ import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.data.Role
 import com.github.factotum_sdp.factotum.data.User
 import com.github.factotum_sdp.factotum.databinding.FragmentLoginBinding
+import com.github.factotum_sdp.factotum.ui.auth.BaseAuthFragment
 import com.google.android.material.snackbar.Snackbar
 
 
-class LoginFragment : Fragment() {
+class LoginFragment : BaseAuthFragment() {
 
-    private lateinit var loginViewModel: LoginViewModel
+    override lateinit var viewModel: LoginViewModel
     private var _binding: FragmentLoginBinding? = null
 
     private val userViewModel: UserViewModel by activityViewModels()
@@ -47,7 +46,7 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val logVMFact = LoginViewModel.LoginViewModelFactory(userViewModel)
-        loginViewModel =
+        viewModel =
             ViewModelProvider(this, logVMFact)[LoginViewModel::class.java]
 
         // Define the UI elements
@@ -59,25 +58,25 @@ class LoginFragment : Fragment() {
         val profileRetrieveErrorText = binding.profileRetrivalError
 
         // Retrieve profiles of all users in the database
-        loginViewModel.retrieveUsersList()
+        viewModel.retrieveUsersList()
 
         // Observe the result of retrieving profiles and show it in a snackbar.
         observeRetrieveProfilesResult(profileRetrieveErrorText)
 
-        // Observe the login form state and enable/disable the login button accordingly
-        observeLoginFormState(loginButton, emailEditText, passwordEditText)
-
         // Observe the login result and show it in a snackbar
-        observeLoginResult(loadingProgressBar)
+        observeAuthResult(loadingProgressBar)
 
         val afterTextChangedListener =
-            createTextWatcher(loginViewModel, emailEditText, passwordEditText)
+            createTextWatcher(viewModel, emailEditText, passwordEditText)
 
         // Add listeners to edit text fields
         addListeners(emailEditText, passwordEditText, afterTextChangedListener)
 
         // Add listener to login button
-        listenToLoginButton(loginButton, emailEditText, passwordEditText)
+        listenToAuthButton(loginButton, loadingProgressBar, emailEditText, passwordEditText)
+
+        // Observe the login form state and enable/disable the login button accordingly
+        observeLoginFormState(loginButton, emailEditText, passwordEditText)
 
         // Add listener to signup button
         signupButton.setOnClickListener {
@@ -105,7 +104,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun observeRetrieveProfilesResult(profileRetrieveErrorText: TextView) {
-        loginViewModel.retrieveUsersResult.observe(viewLifecycleOwner) { usersResult ->
+        viewModel.retrieveUsersResult.observe(viewLifecycleOwner) { usersResult ->
             usersResult ?: return@observe
             usersResult.error?.let {
                 profileRetrieveErrorText.visibility = View.VISIBLE
@@ -118,7 +117,7 @@ class LoginFragment : Fragment() {
         usernameEditText: EditText,
         passwordEditText: EditText
     ) {
-        loginViewModel.loginFormState.observe(viewLifecycleOwner,
+        viewModel.loginFormState.observe(viewLifecycleOwner,
             Observer { loginFormState ->
                 if (loginFormState == null) {
                     return@Observer
@@ -133,20 +132,6 @@ class LoginFragment : Fragment() {
             })
     }
 
-    private fun observeLoginResult(loadingProgressBar: View) {
-        loginViewModel.loginResult.observe(viewLifecycleOwner,
-            Observer { loginResult ->
-                loginResult ?: return@Observer
-                loadingProgressBar.visibility = View.GONE
-                loginResult.error?.let {
-                    showSnackBar(it)
-                }
-                loginResult.success?.let {
-                    updateUiWithUser(it)
-                }
-            })
-    }
-
     private fun addListeners(
         emailEditText: EditText,
         passwordEditText: EditText,
@@ -156,21 +141,8 @@ class LoginFragment : Fragment() {
         passwordEditText.addTextChangedListener(afterTextChangedListener)
     }
 
-    private fun listenToLoginButton(
-        loginButton: Button,
-        emailEditText: EditText,
-        passwordEditText: EditText
-    ) {
-        loginButton.setOnClickListener {
-            loginViewModel.login(
-                emailEditText.text.toString(),
-                passwordEditText.text.toString()
-            )
-        }
-    }
-
-    private fun updateUiWithUser(loggedInUser: User) {
-        val welcome = getString(R.string.welcome) + " " + loggedInUser.displayName + "!"
+    override fun updateUi(model: Any) {
+        val welcome = getString(R.string.welcome) + " " + (model as User).displayName + "!"
         Snackbar.make(requireView(), welcome, Snackbar.LENGTH_LONG).show()
         updateNGraphStartDestination()
     }
@@ -180,10 +152,6 @@ class LoginFragment : Fragment() {
         val navGraph = findNavController().navInflater.inflate(R.navigation.nav_graph)
         navGraph.setStartDestination(R.id.roadBookFragment)
         findNavController().graph = navGraph
-    }
-
-    private fun showSnackBar(@StringRes message: Int) {
-        Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
     }
 
     override fun onDestroyView() {

@@ -4,7 +4,9 @@ import android.Manifest
 import android.provider.MediaStore
 import android.view.Gravity
 import androidx.test.espresso.Espresso
-import androidx.test.espresso.Espresso.*
+import androidx.test.espresso.Espresso.pressBack
+import androidx.test.espresso.Espresso.pressBackUnconditionally
+import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
@@ -203,7 +205,7 @@ class MainActivityTest {
 
     private fun navigateToAndPressBackLeadsToRB(menuItemId: Int) {
         navigateTo(menuItemId)
-        Espresso.pressBack()
+        pressBack()
         onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
     }
 

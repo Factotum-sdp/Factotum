@@ -17,7 +17,7 @@
             android:title="@string/rb_label_touch_click" />
         <item
             android:id="@+id/showArchived"
-            android:title="@string/show_archived" />
+            android:title="@string/rb_label_show_archived" />
     </group>
 </menu>
 

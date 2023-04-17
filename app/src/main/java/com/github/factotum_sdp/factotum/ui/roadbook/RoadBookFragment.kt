@@ -35,7 +35,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private var isSREnabled = true
     private var isDDropEnabled = true
     private var isTClickEnabled = true
-    private var isShowArchivedEnabled = true
+    private var isShowArchivedEnabled = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

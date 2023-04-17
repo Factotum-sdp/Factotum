@@ -128,5 +128,5 @@
     <string name="textvlabel_rate">Rate</string>
     <string name="textvlabel_actions">Actions</string>
     <string name="textvlabel_notes">Notes</string>
-    <string name="show_archived">Show archived</string>
+    <string name="rb_label_show_archived">Show archived</string>
 </resources>

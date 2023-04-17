@@ -6,12 +6,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.github.factotum_sdp.factotum.data.Role
 import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.google.android.material.navigation.NavigationView
@@ -57,6 +60,9 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
 
+        // Set the OnNavigationItemSelectedListener for the NavigationView
+        navView.setNavigationItemSelectedListener(onNavigationItemSelectedListener)
+
         // Bind user data displayed in the Navigation Header
         setUserHeader()
 
@@ -83,8 +89,11 @@ class MainActivity : AppCompatActivity() {
                 val format = "${it.displayName} (${it.role})"
                 userName.text = format
                 email.text = it.email
+                updateMenuItems(it.role)
             }
         }
+
+
     }
 
     private fun listenLogoutButton() {
@@ -116,5 +125,71 @@ class MainActivity : AppCompatActivity() {
             this.auth = auth
         }
     }
+
+    private fun updateMenuItems(role : Role) {
+        val navMenu = binding.navView.menu
+
+        when (role) {
+            Role.BOSS -> {
+                navMenu.findItem(R.id.roadBookFragment).isVisible = true
+                navMenu.findItem(R.id.pictureFragment).isVisible = true
+                navMenu.findItem(R.id.directoryFragment).isVisible = true
+                navMenu.findItem(R.id.routeFragment).isVisible = true
+                navMenu.findItem(R.id.displayFragment).isVisible = true
+            }
+            Role.CLIENT -> {
+                navMenu.findItem(R.id.roadBookFragment).isVisible = true
+                navMenu.findItem(R.id.pictureFragment).isVisible = true
+                navMenu.findItem(R.id.directoryFragment).isVisible = true
+                navMenu.findItem(R.id.routeFragment).isVisible = true
+                navMenu.findItem(R.id.displayFragment).isVisible = true
+            }
+            Role.COURIER -> {
+                navMenu.findItem(R.id.roadBookFragment).isVisible = true
+                navMenu.findItem(R.id.pictureFragment).isVisible = true
+                navMenu.findItem(R.id.directoryFragment).isVisible = true
+                navMenu.findItem(R.id.routeFragment).isVisible = true
+                navMenu.findItem(R.id.displayFragment).isVisible = true
+            }
+            Role.UNKNOWN -> {
+                navMenu.findItem(R.id.roadBookFragment).isVisible = true
+                navMenu.findItem(R.id.pictureFragment).isVisible = true
+                navMenu.findItem(R.id.directoryFragment).isVisible = true
+                navMenu.findItem(R.id.routeFragment).isVisible = true
+                navMenu.findItem(R.id.displayFragment).isVisible = true
+            }
+        }
+    }
+
+    private val onNavigationItemSelectedListener =
+        NavigationView.OnNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.signoutButton -> {
+                    auth.signOut()
+                    finish()
+                    startActivity(intent)
+                    true
+                }
+
+                else -> {
+                    val navController = findNavController(R.id.nav_host_fragment_content_main)
+                    val handled = NavigationUI.onNavDestinationSelected(menuItem, navController)
+                    if (handled) {
+                        binding.drawerLayout.closeDrawers()
+                    }
+                    handled
+                }
+            }
+        }
+
+    private fun navigateToDisplayFragment() {
+        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        val navOptions = NavOptions.Builder()
+            .setLaunchSingleTop(true)
+            .setPopUpTo(navController.graph.startDestinationRoute, false)
+            .build()
+        navController.navigate(R.id.displayFragment, null, navOptions)
+    }
+
 
 }

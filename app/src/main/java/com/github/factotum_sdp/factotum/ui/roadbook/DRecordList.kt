@@ -12,7 +12,7 @@ private fun displayedRecords(allRecords: List<DestinationRecord>,
 }
 
 /**
- * List<DestinationRecord> Immutable Decorator class
+ *   Immutable Decorator for a List<DestinationRecord>
  *
  * - Allows archived records management through a private field containing all the archived items
  * - Allows choice at construction time for the main List, whether it contains or not the archived records.

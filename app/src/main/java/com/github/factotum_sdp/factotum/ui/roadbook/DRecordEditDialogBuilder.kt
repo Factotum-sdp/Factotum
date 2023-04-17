@@ -124,7 +124,7 @@ class DRecordEditDialogBuilder(context: Context?,
             var recHasChanged = false
             try {
                 recHasChanged =
-                    rbViewModel.editRecord(
+                    rbViewModel.editRecordAt(
                         position,
                         clientIDView.text.toString().trim(),
                         timestampFromString(timestampView.text.toString()),

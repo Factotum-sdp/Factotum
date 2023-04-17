@@ -121,7 +121,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
         isShowArchivedEnabled = rbSA.isChecked
 
         showOrHideArchived(isShowArchivedEnabled)
-
         setRBonClickListeners(rbDD, rbSL, rbSR, rbTC, rbSA)
 
         // Only at menu initialization

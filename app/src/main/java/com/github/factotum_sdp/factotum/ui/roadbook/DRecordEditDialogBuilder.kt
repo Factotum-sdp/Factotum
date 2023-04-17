@@ -113,16 +113,14 @@ class DRecordEditDialogBuilder(context: Context?,
     fun forExistingRecordEdition(viewHolder: ViewHolder): DRecordEditDialogBuilder {
         val position = viewHolder.absoluteAdapterPosition
         val rec = rbViewModel.recordsListState.value!![position]
-
         bindRecordDataToEditFields(rec)
 
         setViewModelUpdates({ _, _ ->
             // On negative button : Update the screen, no changes to back-end
             rbRecyclerView.adapter!!.notifyItemChanged(position)
         },{ _, _ ->
-            // On positive button : Try to edit the record
-            var recHasChanged = false
-            try {
+            val recHasChanged: Boolean
+            try { // On positive button : Try to edit the record
                 recHasChanged =
                     rbViewModel.editRecordAt(
                         position,

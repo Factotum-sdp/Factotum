@@ -530,7 +530,7 @@ class RoadBookFragmentTest {
 
     @Test
     fun archiveARecordAndCheckShowArchivedDisplayIt() {
-        // Archive first one because it's already timestamped
+        // Archive the first record
         onView((withText(DestinationRecords.RECORDS[0].destID)))
             .check(matches(isDisplayed()))
 
@@ -539,8 +539,8 @@ class RoadBookFragmentTest {
         onView((withText(DestinationRecords.RECORDS[0].destID)))
             .check(doesNotExist())
 
-        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
-        onView(withText(R.string.rb_label_show_archived)).perform(click())
+        // Enable showArchived
+        clickOnShowArchivedButton()
 
         onView((withText(DestinationRecords.RECORDS[0].destID)))
             .check(matches(isDisplayed()))
@@ -561,14 +561,14 @@ class RoadBookFragmentTest {
 
         onView((withText(DestinationRecords.RECORDS[0].destID)))
             .check(matches(isDisplayed()))
+
         swipeLeftTheRecordAt(0)
 
         onView(allOf(withId(R.id.archivedIcon), withEffectiveVisibility(Visibility.VISIBLE)))
             .check(matches(isDisplayed()))
 
         // Disable show archived and check they are no more displayed :
-        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
-        onView(withText(R.string.rb_label_show_archived)).perform(click())
+        clickOnShowArchivedButton()
         onView(allOf(withId(R.id.archivedIcon), withEffectiveVisibility(Visibility.VISIBLE)))
             .check(doesNotExist())
         onView((withText(DestinationRecords.RECORDS[0].destID)))

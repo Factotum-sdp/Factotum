@@ -20,19 +20,19 @@ object UsersPlaceHolder {
     val USER1 = User(
         "Valentino Rossi",
         "valentino.rossi@epfl.ch",
-        Role.CLIENT,
+        Role.BOSS,
         password
     )
     val USER2 = User(
         "Marc Marquez",
         "marc.marquez@epfl.ch",
-        Role.CLIENT,
+        Role.BOSS,
         password
     )
     val USER3 = User(
         "Jane Doe",
         "jane.doe@gmail.com",
-        Role.CLIENT,
+        Role.BOSS,
         password
     )
 

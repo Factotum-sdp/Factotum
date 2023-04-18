@@ -27,6 +27,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matchers.allOf
+import org.junit.After
 import org.junit.AfterClass
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -63,20 +64,13 @@ class MainActivityTest {
             }
 
             UsersPlaceHolder.init(database, auth)
-
             runBlocking {
                 UsersPlaceHolder.populateDatabase()
             }
             runBlocking {
                 UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER3)
-            }
-            runBlocking {
                 UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_BOSS)
-            }
-            runBlocking {
                 UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_COURIER)
-            }
-            runBlocking {
                 UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_CLIENT)
             }
         }
@@ -237,7 +231,8 @@ class MainActivityTest {
         onView(withText("Jane Doe (BOSS)")).check(matches(isDisplayed()))
     }
 
-    private fun drawerMenuIsCorrectlyDisplayedForBoss() {
+    @Test
+    fun drawerMenuIsCorrectlyDisplayedForBoss() {
         LoginFragmentTest.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
         Thread.sleep(LOGIN_REFRESH_TIME)
         //Check that the correct fragment is displayed

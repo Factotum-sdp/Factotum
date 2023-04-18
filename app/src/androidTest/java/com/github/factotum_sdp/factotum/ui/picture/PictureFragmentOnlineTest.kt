@@ -2,14 +2,18 @@ package com.github.factotum_sdp.factotum.ui.picture
 
 import android.Manifest
 import android.os.Environment
-import androidx.fragment.app.testing.FragmentScenario
-import androidx.fragment.app.testing.launchFragmentInContainer
-import androidx.lifecycle.Lifecycle
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.contrib.DrawerActions
+import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
+import com.github.factotum_sdp.factotum.MainActivity
+import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.ui.picture.*
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
@@ -24,7 +28,6 @@ import java.io.File
 class PictureFragmentOnlineTest {
 
     // Those tests need to run with a firebase storage emulator
-    private lateinit var scenario: FragmentScenario<PictureFragment>
     private lateinit var storage: FirebaseStorage
     private val externalDir = Environment.getExternalStorageDirectory()
     private val picturesDir = File(externalDir, "/Android/data/com.github.factotum_sdp.factotum/files/Pictures")
@@ -32,6 +35,11 @@ class PictureFragmentOnlineTest {
 
     @get:Rule
     val permissionsRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
+
+    @get:Rule
+    var testRule = ActivityScenarioRule(
+        MainActivity::class.java
+    )
 
     @Before
     fun setUp() {
@@ -43,10 +51,10 @@ class PictureFragmentOnlineTest {
         emptyLocalFiles(picturesDir)
 
         // Launch the fragment
-        scenario = launchFragmentInContainer(initialState = Lifecycle.State.INITIALIZED)
-
-        // Wait for the fragment to reach the resumed state
-        scenario.moveToState(Lifecycle.State.RESUMED)
+        onView(ViewMatchers.withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(ViewMatchers.withId(R.id.pictureFragment))
+            .perform(ViewActions.click())
 
         // Wait for the camera to open
         Thread.sleep(TIME_WAIT_SHUTTER)

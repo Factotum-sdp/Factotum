@@ -113,13 +113,6 @@ class MainActivity : AppCompatActivity() {
         val navMenu = binding.navView.menu
 
         when (role) {
-            Role.BOSS -> {
-                navMenu.findItem(R.id.roadBookFragment).isVisible = true
-                navMenu.findItem(R.id.pictureFragment).isVisible = true
-                navMenu.findItem(R.id.directoryFragment).isVisible = true
-                navMenu.findItem(R.id.routeFragment).isVisible = true
-                navMenu.findItem(R.id.displayFragment).isVisible = true
-            }
             Role.CLIENT -> {
                 navMenu.findItem(R.id.roadBookFragment).isVisible = false
                 navMenu.findItem(R.id.pictureFragment).isVisible = false
@@ -127,19 +120,13 @@ class MainActivity : AppCompatActivity() {
                 navMenu.findItem(R.id.routeFragment).isVisible = false
                 navMenu.findItem(R.id.displayFragment).isVisible = true
             }
-            Role.COURIER -> {
+
+            else -> {
                 navMenu.findItem(R.id.roadBookFragment).isVisible = true
                 navMenu.findItem(R.id.pictureFragment).isVisible = true
                 navMenu.findItem(R.id.directoryFragment).isVisible = true
                 navMenu.findItem(R.id.routeFragment).isVisible = true
                 navMenu.findItem(R.id.displayFragment).isVisible = true
-            }
-            Role.UNKNOWN -> {
-                navMenu.findItem(R.id.roadBookFragment).isVisible = false
-                navMenu.findItem(R.id.pictureFragment).isVisible = false
-                navMenu.findItem(R.id.directoryFragment).isVisible = false
-                navMenu.findItem(R.id.routeFragment).isVisible = false
-                navMenu.findItem(R.id.displayFragment).isVisible = false
             }
         }
     }
@@ -153,10 +140,10 @@ class MainActivity : AppCompatActivity() {
             .build()
 
         val destinationFragmentId = when (role) {
-            Role.BOSS -> R.id.roadBookFragment
             Role.CLIENT -> R.id.displayFragment
-            Role.COURIER -> R.id.roadBookFragment
-            Role.UNKNOWN -> R.id.roadBookFragment // Maybe create an error fragment here?
+            else -> {
+                R.id.roadBookFragment
+            }
         }
         navController.navigate(destinationFragmentId, null, navOptions)
     }

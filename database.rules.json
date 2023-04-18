@@ -1,10 +1,16 @@
 {
   "rules": {
     "Sheet-shift": {
+      ".read": true,
       ".write": "root.child('profile-dispatch').child(auth.token.email.replace('.', ',')).child('role').val() === 'BOSS'"
     },
     "profile-dispatch": {
-      ".read": true
+      ".read": true,
+      ".write": true
+    },
+    "contacts": {
+      ".read": true,
+      ".write": true
     }
   }
 }

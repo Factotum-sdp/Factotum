@@ -18,6 +18,7 @@ private const val CONTACTS_KEY = "contacts_key"
 /**
  * Class representing a list of contacts.
  */
+/**
 object ContactsList {
 
     /**
@@ -25,12 +26,7 @@ object ContactsList {
      */
     private val contacts = mutableListOf<Contact>()
     private val randomContacts = mutableListOf<Contact>()
-    private lateinit var dataSource: FirebaseDatabase
     val size get() = this.contacts.size
-
-    fun init(dataSource: FirebaseDatabase) {
-        this.dataSource = dataSource
-    }
 
 
     //fake data --> to be replaced with connection to database
@@ -128,18 +124,24 @@ object ContactsList {
     /**
      * Synchronizes the contacts list with Firebase Realtime Database.
      */
-    suspend fun syncContactsFromFirebase(context: Context) {
-        // Get a reference to the database node
-        val contactsRef = dataSource.getReference("contacts")
-
-        // Create a CompletableDeferred object to wait for the completion of the onDataChange method
+    suspend fun syncWithFirebase(context: Context, dataSource: FirebaseDatabase) {
+        // Create a CompletableDeferred to wait for the asynchronous operation to complete
         val deferred = CompletableDeferred<Unit>()
 
-        // Add a ValueEventListener for a single read from Firebase Realtime Database
-        contactsRef.addListenerForSingleValueEvent(createValueEventListener(deferred, context))
+        // Get a reference to the contacts node in the database
+        val contactsRef = dataSource.getReference("contacts")
 
-        // Wait for the completion of the onDataChange method
+        // Create a ValueEventListener to listen for changes in the database
+        val valueEventListener = createValueEventListener(deferred, context)
+
+        // Add the ValueEventListener to the contactsRef
+        contactsRef.addValueEventListener(valueEventListener)
+
+        // Wait for the asynchronous operation to complete
         deferred.await()
+
+        // Remove the ValueEventListener from the contactsRef
+        contactsRef.removeEventListener(valueEventListener)
     }
 
     private fun createValueEventListener(deferred: CompletableDeferred<Unit>, context: Context): ValueEventListener {
@@ -178,7 +180,7 @@ object ContactsList {
     /**
      * Populates the database with random contacts.
      */
-    suspend fun populateDatabase() {
+    suspend fun populateDatabase(dataSource: FirebaseDatabase) {
         val deferred = CompletableDeferred<Unit>()
 
         createRandomContacts()
@@ -211,4 +213,4 @@ object ContactsList {
     {
         constructor() : this("", "", "", 0, "", "", null)
     }
-}
+} **/

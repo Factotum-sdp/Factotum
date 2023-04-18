@@ -13,20 +13,20 @@ import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.placeholder.ContactsList
+import com.github.factotum_sdp.factotum.placeholder.Contact
 
-class ContactsRecyclerAdapter (private val originalContacts: List<ContactsList.Contact>) : RecyclerView.Adapter<ContactsRecyclerAdapter.ContactsViewHolder>(), Filterable {
+class ContactsRecyclerAdapter () : RecyclerView.Adapter<ContactsRecyclerAdapter.ContactsViewHolder>(), Filterable {
 
-    interface OnDataSetChangedListener {
-        fun onDataSetChanged(itemCount: Int)
+    private var originalContacts : List<Contact> = emptyList()
+    private var filteredContacts = ArrayList<Contact>()
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateContacts(contacts: List<Contact>) {
+        originalContacts = contacts
+        filteredContacts = ArrayList(contacts)
+        notifyDataSetChanged()
     }
 
-    private var filteredContacts = ArrayList<ContactsList.Contact>()
-    var onDataSetChangedListener: OnDataSetChangedListener? = null
-
-    init {
-        filteredContacts.addAll(originalContacts) // Use the originalContacts list here
-    }
     class ContactsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) { //this is the view holder for the recycler view
 
         val itemRole : TextView //these are the views that we want to display for each contact
@@ -65,7 +65,7 @@ class ContactsRecyclerAdapter (private val originalContacts: List<ContactsList.C
     override fun getFilter(): Filter {
         return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
-                val filteredList = ArrayList<ContactsList.Contact>()
+                val filteredList = ArrayList<Contact>()
                 if (constraint == null || constraint.isEmpty()) {
                     filteredList.addAll(originalContacts) // Use the originalContacts list here
                 } else {
@@ -86,10 +86,9 @@ class ContactsRecyclerAdapter (private val originalContacts: List<ContactsList.C
             override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
                 Log.d("filter", "Results : " + results?.values.toString())
                 filteredContacts.clear()
-                filteredContacts.addAll(results?.values as ArrayList<ContactsList.Contact>)
+                filteredContacts.addAll(results?.values as ArrayList<Contact>)
                 Log.d("filter", "Contacts : " + filteredContacts.joinToString { it.name })
                 notifyDataSetChanged()
-                onDataSetChangedListener?.onDataSetChanged(filteredContacts.size)
             }
         }
     }

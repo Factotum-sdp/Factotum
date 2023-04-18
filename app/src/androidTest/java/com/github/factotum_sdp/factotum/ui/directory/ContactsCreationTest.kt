@@ -14,7 +14,7 @@ import androidx.test.uiautomator.By.clazz
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.placeholder.ContactsList
+import com.github.factotum_sdp.factotum.placeholder.Contact
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -54,7 +54,7 @@ class ContactsCreationTest {
         onView(withId(R.id.add_contact_button)).perform(click())
         onView((withId(R.id.contact_image_creation))).check(matches(isDisplayed()))
         onView(withId(R.id.roles_spinner)).check(matches(isDisplayed()))
-        val fields = ContactsList.Contact::class.java.declaredFields
+        val fields = Contact::class.java.declaredFields
         var nbFields = 0
         for (param in fields){
             if (param.isSynthetic) continue

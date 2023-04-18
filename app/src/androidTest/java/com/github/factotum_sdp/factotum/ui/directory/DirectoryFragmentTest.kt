@@ -15,10 +15,8 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.placeholder.ContactsList
 import com.github.factotum_sdp.factotum.utils.ContactsUtils
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
+import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.setEmulatorGet
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -37,19 +35,17 @@ class DirectoryFragmentTest {
     )
 
     companion object {
+        private const val nbContacts = 10
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
-            val database = Firebase.database
-            database.useEmulator("10.0.2.2", 9000)
+            val database = setEmulatorGet()
             MainActivity.setDatabase(database)
 
-            ContactsUtils.emptyFirebaseDatabase(database)
-
-            ContactsList.init(database)
+            ContactsUtils.emptyFirebaseDatabase()
 
             runBlocking {
-                ContactsList.populateDatabase()
+                ContactsUtils.populateDatabase(nbContacts)
             }
         }
     }
@@ -87,7 +83,7 @@ class DirectoryFragmentTest {
     @Test
     fun allContactsCanBeClickedOn() {
         val device = UiDevice.getInstance(getInstrumentation())
-        for (i in 0 until ContactsList.size) {
+        for (i in 0 until nbContacts) {
             onView(withId(R.id.contacts_recycler_view))
                 .perform(
                     RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(

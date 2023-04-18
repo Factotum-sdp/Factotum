@@ -4,9 +4,8 @@ import android.Manifest
 import android.provider.MediaStore
 import android.view.Gravity
 import androidx.test.espresso.Espresso
-import androidx.test.espresso.Espresso.pressBack
-import androidx.test.espresso.Espresso.pressBackUnconditionally
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
@@ -19,11 +18,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
-import com.github.factotum_sdp.factotum.placeholder.ContactsList
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.ui.login.LoginFragmentTest
+import com.github.factotum_sdp.factotum.utils.ContactsUtils
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matchers.allOf
@@ -51,15 +49,14 @@ class MainActivityTest {
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
-            val database = Firebase.database
             val auth = Firebase.auth
-            database.useEmulator("10.0.2.2", 9000)
             auth.useEmulator("10.0.2.2", 9099)
-            MainActivity.setDatabase(database)
             MainActivity.setAuth(auth)
-            ContactsList.init(database)
+
+            val database = ContactsUtils.setEmulatorGet()
+
             runBlocking {
-                ContactsList.populateDatabase()
+                ContactsUtils.populateDatabase()
             }
 
             UsersPlaceHolder.init(database, auth)

@@ -8,9 +8,10 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.placeholder.ContactsList
+import com.github.factotum_sdp.factotum.placeholder.Contact
 
 class ContactDetailsFragment : Fragment() {
 
@@ -23,14 +24,18 @@ class ContactDetailsFragment : Fragment() {
         val button = mainView.findViewById<Button>(R.id.button) // connect the button to the layout
         button.setOnClickListener { view ->
             view.findNavController().navigate(R.id.action_contactDetailsFragment2_to_directoryFragment)} // go back to the list of contacts when the button is clicked
-        setContactDetails(mainView, ContactsList.getItems()[arguments?.getInt("id")!!]) //links the contact details to the layout
+        val contactsViewModel =
+            ViewModelProvider(requireActivity())[ContactsViewModel::class.java] // get the contacts view model
+        setContactDetails(mainView,
+            contactsViewModel.getContacts().value?.get(arguments?.getInt("id")!!)!!
+        ) //links the contact details to the layout
 
 
         return mainView
     }
 
     // links contact details to the layout
-    private fun setContactDetails(view: View, contact: ContactsList.Contact) {
+    private fun setContactDetails(view: View, contact: Contact) {
         val contactName = view.findViewById<TextView>(R.id.contact_name)
         val contactRole = view.findViewById<TextView>(R.id.contact_role)
         val contactImage = view.findViewById<ImageView>(R.id.contact_image)

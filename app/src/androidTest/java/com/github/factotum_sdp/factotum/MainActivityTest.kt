@@ -8,6 +8,7 @@ import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.Espresso.pressBackUnconditionally
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.DrawerMatchers
@@ -243,6 +244,21 @@ class MainActivityTest {
         onView(withText("Directory")).check(matches(isDisplayed()))
         onView(withText("Picture")).check(matches(isDisplayed()))
         onView(withText("Maps")).check(matches(isDisplayed()))
+        onView(withText("View Proof Pictures")).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun drawerMenuIsCorrectlyDisplayedForClient() {
+        LoginFragmentTest.fillUserEntryAndGoToRBFragment("client@gmail.com", "123456")
+        Thread.sleep(LOGIN_REFRESH_TIME)
+
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
+
+        // Check that the menu items are displayed
+        onView(withText("RoadBook")).check(doesNotExist())
+        onView(withText("Directory")).check(doesNotExist())
+        onView(withText("Picture")).check(doesNotExist())
+        onView(withText("Maps")).check(doesNotExist())
         onView(withText("View Proof Pictures")).check(matches(isDisplayed()))
     }
 

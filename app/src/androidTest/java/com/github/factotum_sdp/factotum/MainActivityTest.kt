@@ -213,7 +213,7 @@ class MainActivityTest {
     fun pressingBackOnRBFragmentLeadsOutOfTheApp() {
         LoginFragmentTest.fillUserEntryAndGoToRBFragment("jane.doe@gmail.com", "123456")
         Thread.sleep(LOGIN_REFRESH_TIME)
-        Espresso.pressBackUnconditionally()
+        pressBackUnconditionally()
         val uiDevice = UiDevice.getInstance(getInstrumentation())
         assertFalse(uiDevice.currentPackageName == "com.github.factotum_sdp.factotum")
         assertTrue(uiDevice.isScreenOn)
@@ -225,7 +225,7 @@ class MainActivityTest {
         Thread.sleep(LOGIN_REFRESH_TIME)
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("jane.doe@gmail.com")).check(matches(isDisplayed()))
-        onView(withText("Jane Doe (CLIENT)")).check(matches(isDisplayed()))
+        onView(withText("Jane Doe (BOSS)")).check(matches(isDisplayed()))
     }
 
     // Work when executing the scenario manually but emulators issues make it fails in the connectedCheck
@@ -236,7 +236,7 @@ class MainActivityTest {
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("jane.doe@gmail.com")).check(matches(isDisplayed()))
-        onView(withText("Jane Doe (CLIENT)")).check(matches(isDisplayed()))
+        onView(withText("Jane Doe (BOSS)")).check(matches(isDisplayed()))
 
         onView(withId(R.id.signoutButton)).perform(click())
         Thread.sleep(LOGIN_REFRESH_TIME)

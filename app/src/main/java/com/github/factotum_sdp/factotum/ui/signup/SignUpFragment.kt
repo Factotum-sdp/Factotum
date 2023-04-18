@@ -27,8 +27,6 @@ class SignUpFragment : BaseAuthFragment() {
     private val roles = listOf("BOSS", "COURIER", "CLIENT")
     private lateinit var adapter: ArrayAdapter<String>
 
-    private lateinit var newUser: User
-
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -98,11 +96,6 @@ class SignUpFragment : BaseAuthFragment() {
                     return@Observer
                 }
                 signupButton.isEnabled = signupFormState.isDataValid
-                newUser = User(
-                    usernameEditText.text.toString(),
-                    emailEditText.text.toString(),
-                    Role.UNKNOWN
-                )
                 signupFormState.usernameError?.let {
                     usernameEditText.error = getString(it)
                 }
@@ -154,6 +147,11 @@ class SignUpFragment : BaseAuthFragment() {
     override fun updateUi(model: Any) {
         val welcome = getString(R.string.welcome) + " " + (model as String)
         Snackbar.make(requireView(), welcome, Snackbar.LENGTH_LONG).show()
+        val newUser = User(
+            binding.username.text.toString(),
+            binding.email.text.toString(),
+            Role.valueOf(binding.role.text.toString())
+        )
         viewModel.updateUsersList(newUser)
         findNavController().navigate(R.id.action_signUpFragment_to_loginFragment)
     }

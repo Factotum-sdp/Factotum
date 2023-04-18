@@ -37,13 +37,13 @@ class LoginDataSource {
         val profilesResultFuture = CompletableFuture<Result<MutableList<User>>>()
         var usersList: MutableList<User>
         dbRef.child(DISPATCH_DB_PATH).get().addOnSuccessListener {
-            if (!it.exists()) {
+            if (!it.exists()){
                 profilesResultFuture.complete(
                     Result.Error(IOException("Error retrieving profiles"))
                 )
                 return@addOnSuccessListener
             }
-            val profileList = it.value as List<*>
+            val profileList = (it.value as Map<*, *>).values.toList()
             usersList = profilesToUsers(profileList)
             profilesResultFuture.complete(Result.Success(usersList))
         }.addOnFailureListener {
@@ -57,7 +57,7 @@ class LoginDataSource {
     private fun profilesToUsers(usersList: List<*>): MutableList<User> {
         return usersList.map { user ->
             val userMap = user as Map<*, *>
-            val displayName = userMap["displayName"] as String
+            val displayName = userMap["name"] as String
             val email = userMap["email"] as String
             val role = Role.valueOf(userMap["role"] as String)
             User(displayName, email, role)

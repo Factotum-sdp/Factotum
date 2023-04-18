@@ -8,8 +8,6 @@ import java.io.IOException
  */
 class LoginRepository(private val dataSource: LoginDataSource) {
 
-    private val dataSink = SignUpDataSink()
-
     // in-memory cache of the loggedInUser object
     private var user: User? = null
 
@@ -40,17 +38,6 @@ class LoginRepository(private val dataSource: LoginDataSource) {
 
         if (result is Result.Success) {
             setUsersList(result.data)
-        }
-
-        return result
-    }
-
-    fun updateUserList(user: User): Result<String> {
-        val temporaryList = usersList?.plus(user) ?: listOf(user)
-        val result = dataSink.updateUsersList(temporaryList)
-
-        if (result is Result.Success) {
-            usersList = temporaryList
         }
 
         return result

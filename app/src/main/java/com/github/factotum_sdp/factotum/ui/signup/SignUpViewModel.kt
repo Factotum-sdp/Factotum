@@ -50,7 +50,7 @@ class SignUpViewModel(
     fun updateUsersList(user: User) {
         // launch in a separate asynchronous job
         viewModelScope.launch {
-            val result = withContext(dispatcher) { loginRepository.updateUserList(user) }
+            val result = withContext(dispatcher) { signUpDataSink.updateUsersList(user) }
             if (result is Result.Success) {
                 _updateUsersResult.value =
                     UpdateUsersResult(

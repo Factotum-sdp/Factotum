@@ -30,10 +30,10 @@ class SignUpDataSink {
         return authResultFuture.get()
     }
 
-    fun updateUsersList(usersList: List<*>): Result<String> {
+    fun updateUsersList(user: User): Result<String> {
         val updateUsersResultFuture = CompletableFuture<Result<String>>()
 
-        dbRef.child(DISPATCH_DB_PATH).setValue(usersList)
+        dbRef.child(DISPATCH_DB_PATH).push().setValue(user)
             .addOnSuccessListener {
                 updateUsersResultFuture.complete(Result.Success("Success updating users"))
             }.addOnFailureListener {

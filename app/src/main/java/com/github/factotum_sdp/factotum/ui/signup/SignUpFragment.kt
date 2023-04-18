@@ -13,6 +13,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.*
 import com.github.factotum_sdp.factotum.databinding.FragmentSignupBinding
@@ -153,7 +154,9 @@ class SignUpFragment : BaseAuthFragment() {
             Role.valueOf(binding.role.text.toString())
         )
         viewModel.updateUsersList(newUser)
-        findNavController().navigate(R.id.action_signUpFragment_to_loginFragment)
+        MainActivity.getAuth().signOut()
+        MainActivity().finish()
+        startActivity(requireActivity().intent)
     }
 
     override fun onDestroyView() {

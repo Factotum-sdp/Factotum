@@ -4,15 +4,18 @@ import android.Manifest
 import android.provider.MediaStore
 import android.view.Gravity
 import androidx.test.espresso.Espresso
-import androidx.test.espresso.Espresso.pressBack
-import androidx.test.espresso.Espresso.pressBackUnconditionally
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.Espresso.pressBack
+import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.*
+import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.DrawerMatchers
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
+import androidx.test.espresso.matcher.RootMatchers
+import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -21,11 +24,15 @@ import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.placeholder.ContactsList
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
+import com.github.factotum_sdp.factotum.ui.directory.ContactsListOnlineTest
 import com.github.factotum_sdp.factotum.ui.login.LoginFragmentTest
+import com.github.factotum_sdp.factotum.utils.ContactsUtils
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.runBlocking
+import org.hamcrest.Matchers
 import org.hamcrest.Matchers.allOf
 import org.junit.AfterClass
 import org.junit.Assert.assertFalse
@@ -36,6 +43,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 const val LOGIN_REFRESH_TIME = 3000L
+
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest {
 
@@ -78,6 +86,14 @@ class MainActivityTest {
             val auth = Firebase.auth
             auth.signOut()
             MainActivity.setAuth(auth)
+        }
+
+        @AfterClass
+        @JvmStatic
+        fun emptyDatabase() {
+            val database = Firebase.database
+            ContactsUtils.emptyFirebaseDatabase(database)
+            UsersPlaceHolder.emptyFirebaseDatabase(database)
         }
     }
 
@@ -245,5 +261,45 @@ class MainActivityTest {
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("helen.bates@gmail.com")).check(matches(isDisplayed()))
         onView(withText("Helen Bates (COURIER)")).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun signUpFormWithAllFieldsAndClickAndLogin() {
+        onView(withId(R.id.signup)).perform(click())
+        onView(withId(R.id.username)).perform(typeText("Name"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.email)).perform(typeText("email@gmail.com"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.password)).perform(typeText("123456"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.role)).perform(click())
+        Espresso.onData(Matchers.anything()).inRoot(RootMatchers.isPlatformPopup()).atPosition(1)
+            .perform(click())
+        onView(withId(R.id.signup)).perform(click())
+        FirebaseAuth.AuthStateListener {
+            onView(withId(R.id.fragment_login_directors_parent)).check(
+                matches(
+                   isDisplayed()
+                )
+            )
+        }
+        LoginFragmentTest.fillUserEntryAndGoToRBFragment("email@gmail.com", "123456")
+
+        FirebaseAuth.AuthStateListener {firebaseAuth ->
+            if (firebaseAuth.currentUser != null) {
+                onView(withId(R.id.fragment_login_directors_parent)).check(
+                    matches(
+                        isDisplayed()
+                    )
+                )
+            }
+
+        }
     }
 }

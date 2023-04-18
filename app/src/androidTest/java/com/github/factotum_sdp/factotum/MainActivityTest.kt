@@ -70,6 +70,15 @@ class MainActivityTest {
             runBlocking {
                 UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER3)
             }
+            runBlocking {
+                UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_BOSS)
+            }
+            runBlocking {
+                UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_COURIER)
+            }
+            runBlocking {
+                UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_CLIENT)
+            }
         }
 
         @AfterClass
@@ -226,6 +235,22 @@ class MainActivityTest {
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("jane.doe@gmail.com")).check(matches(isDisplayed()))
         onView(withText("Jane Doe (BOSS)")).check(matches(isDisplayed()))
+    }
+
+    private fun drawerMenuIsCorrectlyDisplayedForBoss() {
+        LoginFragmentTest.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
+        Thread.sleep(LOGIN_REFRESH_TIME)
+        //Check that the correct fragment is displayed
+        onView(withId(R.id.roadBookFragment)).check(matches(isDisplayed()))
+
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
+
+        // Check that the menu items are displayed
+        onView(withText("RoadBook")).check(matches(isDisplayed()))
+        onView(withText("Directory")).check(matches(isDisplayed()))
+        onView(withText("Picture")).check(matches(isDisplayed()))
+        onView(withText("Maps")).check(matches(isDisplayed()))
+        onView(withText("View Proof Pictures")).check(matches(isDisplayed()))
     }
 
     // Work when executing the scenario manually but emulators issues make it fails in the connectedCheck

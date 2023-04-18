@@ -35,7 +35,24 @@ object UsersPlaceHolder {
         Role.BOSS,
         password
     )
-
+    val USER_BOSS = User(
+        "Boss",
+        "boss@gmail.com",
+        Role.BOSS,
+        password
+    )
+    val USER_COURIER = User(
+        "Courier",
+        "courier@gmail.com",
+        Role.COURIER,
+        password
+    )
+    val USER_CLIENT = User(
+        "Client",
+        "client@gmail.com",
+        Role.CLIENT,
+        password
+    )
 
     fun init(dataSource: FirebaseDatabase, auth: FirebaseAuth) {
         this.dataSource = dataSource

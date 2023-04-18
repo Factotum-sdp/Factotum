@@ -54,12 +54,12 @@ class LoginDataSource {
         return profilesResultFuture.get()
     }
 
-    private fun profilesToUsers(profileList: List<*>): MutableList<User> {
-        return profileList.map { profile ->
-            val profileMap = profile as Map<*, *>
-            val displayName = profileMap["username"] as String
-            val email = profileMap["email"] as String
-            val role = Role.valueOf(profileMap["role"] as String)
+    private fun profilesToUsers(usersList: List<*>): MutableList<User> {
+        return usersList.map { user ->
+            val userMap = user as Map<*, *>
+            val displayName = userMap["displayName"] as String
+            val email = userMap["email"] as String
+            val role = Role.valueOf(userMap["role"] as String)
             User(displayName, email, role)
         }.toMutableList()
     }

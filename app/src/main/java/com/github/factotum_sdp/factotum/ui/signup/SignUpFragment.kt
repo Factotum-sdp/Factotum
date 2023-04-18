@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.data.SignUpDataSink
+import com.github.factotum_sdp.factotum.data.*
 import com.github.factotum_sdp.factotum.databinding.FragmentSignupBinding
 import com.github.factotum_sdp.factotum.ui.auth.BaseAuthFragment
 import com.google.android.material.snackbar.Snackbar
@@ -26,6 +26,8 @@ class SignUpFragment : BaseAuthFragment() {
 
     private val roles = listOf("BOSS", "COURIER", "CLIENT")
     private lateinit var adapter: ArrayAdapter<String>
+
+    private lateinit var newUser: User
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -52,7 +54,12 @@ class SignUpFragment : BaseAuthFragment() {
         val loadingProgressBar = binding.loading
         val signUpButton = binding.signup
 
-        observeSignUpFormState(signUpButton, usernameEditText, emailEditText, passwordEditText)
+        observeSignUpFormState(
+            signUpButton,
+            usernameEditText,
+            emailEditText,
+            passwordEditText
+        )
 
         val afterTextChangedListener = createTextWatcher(
             viewModel,
@@ -91,6 +98,11 @@ class SignUpFragment : BaseAuthFragment() {
                     return@Observer
                 }
                 signupButton.isEnabled = signupFormState.isDataValid
+                newUser = User(
+                    usernameEditText.text.toString(),
+                    emailEditText.text.toString(),
+                    Role.UNKNOWN
+                )
                 signupFormState.usernameError?.let {
                     usernameEditText.error = getString(it)
                 }
@@ -142,6 +154,7 @@ class SignUpFragment : BaseAuthFragment() {
     override fun updateUi(model: Any) {
         val welcome = getString(R.string.welcome) + " " + (model as String)
         Snackbar.make(requireView(), welcome, Snackbar.LENGTH_LONG).show()
+        viewModel.updateUsersList(newUser)
         findNavController().navigate(R.id.action_signUpFragment_to_loginFragment)
     }
 
@@ -159,7 +172,8 @@ class SignUpFragment : BaseAuthFragment() {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(SignUpViewModel::class.java)) {
                 return SignUpViewModel(
-                    signUpDataSink = SignUpDataSink()
+                    signUpDataSink = SignUpDataSink(),
+                    loginRepository = LoginRepository(LoginDataSource())
                 ) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")

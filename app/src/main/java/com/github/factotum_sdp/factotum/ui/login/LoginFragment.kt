@@ -9,25 +9,25 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import androidx.annotation.StringRes
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.data.LoginDataSource
-import com.github.factotum_sdp.factotum.data.LoginRepository
+import com.github.factotum_sdp.factotum.UserViewModel
+import com.github.factotum_sdp.factotum.data.Role
+import com.github.factotum_sdp.factotum.data.User
 import com.github.factotum_sdp.factotum.databinding.FragmentLoginBinding
+import com.github.factotum_sdp.factotum.ui.auth.BaseAuthFragment
 import com.google.android.material.snackbar.Snackbar
 
 
-class LoginFragment : Fragment() {
+class LoginFragment : BaseAuthFragment() {
 
-    private lateinit var loginViewModel: LoginViewModel
+    override lateinit var viewModel: LoginViewModel
     private var _binding: FragmentLoginBinding? = null
 
-    private var isProfileRetrieved = false
+    private val userViewModel: UserViewModel by activityViewModels()
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -45,8 +45,9 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        loginViewModel =
-            ViewModelProvider(this, LoginViewModelFactory())[LoginViewModel::class.java]
+        val logVMFact = LoginViewModel.LoginViewModelFactory(userViewModel)
+        viewModel =
+            ViewModelProvider(this, logVMFact)[LoginViewModel::class.java]
 
         // Define the UI elements
         val emailEditText = binding.email
@@ -57,25 +58,25 @@ class LoginFragment : Fragment() {
         val profileRetrieveErrorText = binding.profileRetrivalError
 
         // Retrieve profiles of all users in the database
-        loginViewModel.retrieveProfiles()
+        viewModel.retrieveUsersList()
 
         // Observe the result of retrieving profiles and show it in a snackbar.
         observeRetrieveProfilesResult(profileRetrieveErrorText)
 
-        // Observe the login form state and enable/disable the login button accordingly
-        observeLoginFormState(loginButton, emailEditText, passwordEditText)
-
         // Observe the login result and show it in a snackbar
-        observeLoginResult(loadingProgressBar)
+        observeAuthResult(loadingProgressBar)
 
         val afterTextChangedListener =
-            createTextWatcher(loginViewModel, emailEditText, passwordEditText)
+            createTextWatcher(viewModel, emailEditText, passwordEditText)
 
         // Add listeners to edit text fields
         addListeners(emailEditText, passwordEditText, afterTextChangedListener)
 
         // Add listener to login button
-        listenToLoginButton(loginButton, emailEditText, passwordEditText)
+        listenToAuthButton(loginButton, loadingProgressBar, emailEditText, passwordEditText)
+
+        // Observe the login form state and enable/disable the login button accordingly
+        observeLoginFormState(loginButton, emailEditText, passwordEditText)
 
         // Add listener to signup button
         signupButton.setOnClickListener {
@@ -103,13 +104,10 @@ class LoginFragment : Fragment() {
     }
 
     private fun observeRetrieveProfilesResult(profileRetrieveErrorText: TextView) {
-        loginViewModel.retrieveProfilesResult.observe(viewLifecycleOwner) { profileRetrievalResult ->
-            profileRetrievalResult ?: return@observe
-            profileRetrievalResult.error?.let {
+        viewModel.retrieveUsersResult.observe(viewLifecycleOwner) { usersResult ->
+            usersResult ?: return@observe
+            usersResult.error?.let {
                 profileRetrieveErrorText.visibility = View.VISIBLE
-            }
-            profileRetrievalResult.success?.let {
-                isProfileRetrieved = true
             }
         }
     }
@@ -119,31 +117,17 @@ class LoginFragment : Fragment() {
         usernameEditText: EditText,
         passwordEditText: EditText
     ) {
-        loginViewModel.loginFormState.observe(viewLifecycleOwner,
+        viewModel.loginFormState.observe(viewLifecycleOwner,
             Observer { loginFormState ->
                 if (loginFormState == null) {
                     return@Observer
                 }
-                loginButton.isEnabled = loginFormState.isDataValid && isProfileRetrieved
+                loginButton.isEnabled = loginFormState.isDataValid
                 loginFormState.emailError?.let {
                     usernameEditText.error = getString(it)
                 }
                 loginFormState.passwordError?.let {
                     passwordEditText.error = getString(it)
-                }
-            })
-    }
-
-    private fun observeLoginResult(loadingProgressBar: View) {
-        loginViewModel.loginResult.observe(viewLifecycleOwner,
-            Observer { loginResult ->
-                loginResult ?: return@Observer
-                loadingProgressBar.visibility = View.GONE
-                loginResult.error?.let {
-                    showSnackBar(it)
-                }
-                loginResult.success?.let {
-                    updateUiWithUser(it)
                 }
             })
     }
@@ -157,21 +141,8 @@ class LoginFragment : Fragment() {
         passwordEditText.addTextChangedListener(afterTextChangedListener)
     }
 
-    private fun listenToLoginButton(
-        loginButton: Button,
-        emailEditText: EditText,
-        passwordEditText: EditText
-    ) {
-        loginButton.setOnClickListener {
-            loginViewModel.login(
-                emailEditText.text.toString(),
-                passwordEditText.text.toString()
-            )
-        }
-    }
-
-    private fun updateUiWithUser(model: LoggedInUserView) {
-        val welcome = getString(R.string.welcome) + " " + model.displayName + "!"
+    override fun updateUi(model: Any) {
+        val welcome = getString(R.string.welcome) + " " + (model as User).displayName + "!"
         Snackbar.make(requireView(), welcome, Snackbar.LENGTH_LONG).show()
         updateNGraphStartDestination()
     }
@@ -183,30 +154,9 @@ class LoginFragment : Fragment() {
         findNavController().graph = navGraph
     }
 
-    private fun showSnackBar(@StringRes message: Int) {
-        Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
-    /**
-     * ViewModel provider factory to instantiate LoginViewModel.
-     * Required given LoginViewModel has a non-empty constructor
-     */
-    class LoginViewModelFactory : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(LoginViewModel::class.java)) {
-                return LoginViewModel(
-                    loginRepository = LoginRepository(
-                        dataSource = LoginDataSource()
-                    )
-                ) as T
-            }
-            throw IllegalArgumentException("Unknown ViewModel class")
-        }
-    }
 }

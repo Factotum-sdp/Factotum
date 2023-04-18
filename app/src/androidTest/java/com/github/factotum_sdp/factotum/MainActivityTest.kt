@@ -4,7 +4,9 @@ import android.Manifest
 import android.provider.MediaStore
 import android.view.Gravity
 import androidx.test.espresso.Espresso
-import androidx.test.espresso.Espresso.*
+import androidx.test.espresso.Espresso.pressBack
+import androidx.test.espresso.Espresso.pressBackUnconditionally
+import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
@@ -33,7 +35,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-//Later when non-root fragment will exists : add test for navigateUp
+const val LOGIN_REFRESH_TIME = 3000L
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest {
 
@@ -193,8 +195,8 @@ class MainActivityTest {
     @Test
     fun pressingBackOnAMenuFragmentLeadsToRBFragment() {
         // First need to login to trigger the change of navGraph's start fragment
-        LoginFragmentTest.fillUserEntryAndGoToRBFragment()
-        Thread.sleep(3000)
+        LoginFragmentTest.fillUserEntryAndGoToRBFragment("jane.doe@gmail.com", "123456")
+        Thread.sleep(LOGIN_REFRESH_TIME)
 
         navigateToAndPressBackLeadsToRB(R.id.directoryFragment)
         navigateToAndPressBackLeadsToRB(R.id.displayFragment)
@@ -203,18 +205,45 @@ class MainActivityTest {
 
     private fun navigateToAndPressBackLeadsToRB(menuItemId: Int) {
         navigateTo(menuItemId)
-        Espresso.pressBack()
+        pressBack()
         onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
     }
 
     @Test
     fun pressingBackOnRBFragmentLeadsOutOfTheApp() {
-        LoginFragmentTest.fillUserEntryAndGoToRBFragment()
-        Thread.sleep(3000)
+        LoginFragmentTest.fillUserEntryAndGoToRBFragment("jane.doe@gmail.com", "123456")
+        Thread.sleep(LOGIN_REFRESH_TIME)
         Espresso.pressBackUnconditionally()
         val uiDevice = UiDevice.getInstance(getInstrumentation())
         assertFalse(uiDevice.currentPackageName == "com.github.factotum_sdp.factotum")
         assertTrue(uiDevice.isScreenOn)
     }
 
+    @Test
+    fun navHeaderDisplaysUserData() {
+        LoginFragmentTest.fillUserEntryAndGoToRBFragment("jane.doe@gmail.com", "123456")
+        Thread.sleep(LOGIN_REFRESH_TIME)
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
+        onView(withText("jane.doe@gmail.com")).check(matches(isDisplayed()))
+        onView(withText("Jane Doe (CLIENT)")).check(matches(isDisplayed()))
+    }
+
+    // Work when executing the scenario manually but emulators issues make it fails in the connectedCheck
+    // The second user Helen Bates can't be found.
+    private fun navHeaderStillDisplaysCorrectlyAfterLogout() {
+        LoginFragmentTest.fillUserEntryAndGoToRBFragment("jane.doe@gmail.com", "123456")
+        Thread.sleep(LOGIN_REFRESH_TIME)
+
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
+        onView(withText("jane.doe@gmail.com")).check(matches(isDisplayed()))
+        onView(withText("Jane Doe (CLIENT)")).check(matches(isDisplayed()))
+
+        onView(withId(R.id.signoutButton)).perform(click())
+        Thread.sleep(LOGIN_REFRESH_TIME)
+        LoginFragmentTest.fillUserEntryAndGoToRBFragment("helen.bates@gmail.com", "123456")
+        Thread.sleep(LOGIN_REFRESH_TIME)
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
+        onView(withText("helen.bates@gmail.com")).check(matches(isDisplayed()))
+        onView(withText("Helen Bates (COURIER)")).check(matches(isDisplayed()))
+    }
 }

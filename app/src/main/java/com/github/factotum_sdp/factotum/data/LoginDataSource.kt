@@ -1,9 +1,6 @@
 package com.github.factotum_sdp.factotum.data
 
 import com.github.factotum_sdp.factotum.MainActivity
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import java.io.IOException
 import java.util.concurrent.CompletableFuture
 
@@ -14,15 +11,13 @@ class LoginDataSource {
     private val auth = MainActivity.getAuth()
     private val dbRef = MainActivity.getDatabase().reference
 
-    fun login(userEmail: String, password: String, profile: User): Result<LoggedInUser> {
-        val authResultFuture = CompletableFuture<Result<LoggedInUser>>()
+    fun login(userEmail: String, password: String, user: User): Result<User> {
+        val authResultFuture = CompletableFuture<Result<User>>()
 
         auth.signInWithEmailAndPassword(userEmail, password)
             .addOnCompleteListener { authTask ->
                 if (authTask.isSuccessful) {
-                    val loggedInUser =
-                        LoggedInUser(profile.displayName, profile.email, profile.role)
-                    authResultFuture.complete(Result.Success(loggedInUser))
+                    authResultFuture.complete(Result.Success(user))
                 } else {
                     authResultFuture.complete(
                         Result.Error(
@@ -38,9 +33,9 @@ class LoginDataSource {
         return authResultFuture.get()
     }
 
-    fun retrieveProfiles(): Result<MutableList<User>> {
+    fun retrieveUsersList(): Result<MutableList<User>> {
         val profilesResultFuture = CompletableFuture<Result<MutableList<User>>>()
-        var profiles: MutableList<User>
+        var usersList: MutableList<User>
         dbRef.child(DISPATCH_DB_PATH).get().addOnSuccessListener {
             if (!it.exists()) {
                 profilesResultFuture.complete(
@@ -49,8 +44,8 @@ class LoginDataSource {
                 return@addOnSuccessListener
             }
             val profileList = it.value as List<*>
-            profiles = profilesToUsers(profileList)
-            profilesResultFuture.complete(Result.Success(profiles))
+            usersList = profilesToUsers(profileList)
+            profilesResultFuture.complete(Result.Success(usersList))
         }.addOnFailureListener {
             profilesResultFuture.complete(
                 Result.Error(IOException("Error retrieving profiles", it))
@@ -72,10 +67,4 @@ class LoginDataSource {
     companion object {
         const val DISPATCH_DB_PATH: String = "profile-dispatch"
     }
-
-    data class User(
-        val displayName: String,
-        val email: String,
-        val role: Role
-    )
 }

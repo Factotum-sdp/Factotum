@@ -15,11 +15,12 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import org.hamcrest.Matchers.anything
 import org.hamcrest.Matchers.not
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import org.junit.*
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
@@ -29,6 +30,18 @@ class SignUpFragmentTest {
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
     )
+
+    companion object {
+        private var auth: FirebaseAuth = Firebase.auth
+
+        @BeforeClass
+        @JvmStatic
+        fun setUpAuth() {
+            auth.useEmulator("10.0.2.2", 9099)
+
+            MainActivity.setAuth(auth)
+        }
+    }
 
     @Before
     fun setUp() {
@@ -132,9 +145,42 @@ class SignUpFragmentTest {
     }
 
     @Test
+    fun signUpFormWithAllFieldsAndClick() {
+        onView(withId(R.id.username)).perform(ViewActions.typeText("Jane Doe"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.email)).perform(ViewActions.typeText("jane.doe@gmail.com"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.password)).perform(ViewActions.typeText("123456"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.role)).perform(click())
+        onData(anything()).inRoot(RootMatchers.isPlatformPopup()).atPosition(1).perform(click())
+        onView(withId(R.id.signup)).perform(click())
+        FirebaseAuth.AuthStateListener { firebaseAuth ->
+            if (firebaseAuth.currentUser != null) {
+                onView(withId(R.id.fragment_login_directors_parent)).check(
+                    ViewAssertions.matches(
+                        ViewMatchers.isDisplayed()
+                    )
+                )
+            }
+        }
+
+    }
+
+    @Test
     fun clickOnSignUpLeadsToLoginFragment() {
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         device.pressBack()
-        onView(withId(R.id.fragment_login_directors_parent)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+        onView(withId(R.id.fragment_login_directors_parent)).check(
+            ViewAssertions.matches(
+                ViewMatchers.isDisplayed()
+            )
+        )
     }
 }

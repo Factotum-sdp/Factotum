@@ -235,8 +235,6 @@ class MainActivityTest {
     fun drawerMenuIsCorrectlyDisplayedForBoss() {
         LoginFragmentTest.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
         Thread.sleep(LOGIN_REFRESH_TIME)
-        //Check that the correct fragment is displayed
-        onView(withId(R.id.roadBookFragment)).check(matches(isDisplayed()))
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
 

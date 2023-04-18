@@ -61,14 +61,22 @@ abstract class RoadBookTHCallback() :
                 editOnSwipeRight(viewHolder)
             }
             LEFT -> { // Record Deletion
-                deleteOnSwipeLeft(viewHolder)
+                val pos = viewHolder.absoluteAdapterPosition
+                if (getRbViewModel().isRecordAtArchived(pos)) {
+                    unarchiveOnSwipeLeft(pos)
+                } else {
+                    if(getRbViewModel().isRecordAtTimeStamped(pos))
+                        archiveOnSwipeLeft(pos)
+                    else
+                        deleteOnSwipeLeft(pos)
+                }
             }
         }
     }
 
     private fun editOnSwipeRight(viewHolder: ViewHolder) {
         val dial = // Launch & Delegate the event to a custom AlertDialog
-            DRecordAlertDialogBuilder(getHost().requireContext(), getHost(),
+            DRecordEditDialogBuilder(getHost().requireContext(), getHost(),
                                         getRbViewModel(), getRecyclerView())
             .forExistingRecordEdition(viewHolder)
             .create()
@@ -76,24 +84,51 @@ abstract class RoadBookTHCallback() :
         dial.show()
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private fun deleteOnSwipeLeft(viewHolder: ViewHolder) {
-        val position = viewHolder.absoluteAdapterPosition
-        val builder = AlertDialog.Builder(getHost().requireContext())
-        builder.setTitle(getHost().getString(R.string.delete_dialog_title))
-        builder.setCancelable(false)
-        builder.setPositiveButton(getHost().getString(R.string.delete_confirm_button_label)) { _, _ ->
+    private fun deleteOnSwipeLeft(position: Int) {
+        swipeLeftDialogAndAction(position,
+            R.string.delete_dialog_title,
+            R.string.snap_text_on_rec_delete) {
             getRbViewModel().deleteRecordAt(position)
-            Snackbar
-                .make(getHost().requireView(), getHost().getString(R.string.snap_text_on_rec_delete), 700)
-                .setAction("Action", null).show()
-            getRecyclerView().adapter!!.notifyDataSetChanged()
         }
-        builder.setNegativeButton(getHost().getString(R.string.delete_cancel_button_label)) { _, _ ->
+    }
+
+    private fun unarchiveOnSwipeLeft(position: Int) {
+        swipeLeftDialogAndAction(position,
+            R.string.unarchive_dialog_title,
+            R.string.snap_text_on_rec_unarchive) {
+            getRbViewModel().unarchiveRecordAt(position)
+        }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun archiveOnSwipeLeft(position: Int) {
+        getRbViewModel().archiveRecordAt(position) // No confirmation dialog for the archive action
+        getRecyclerView().adapter!!.notifyDataSetChanged()
+        swipeLeftSnapMessage(R.string.snap_text_on_rec_archive)
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun swipeLeftDialogAndAction(position: Int, dialogTitleID: Int,
+                                         snapMessageID: Int, action: () -> Unit) {
+        val builder = AlertDialog.Builder(getHost().requireContext())
+        builder.setTitle(getHost().getString(dialogTitleID))
+        builder.setCancelable(false)
+        builder.setPositiveButton(getHost().getString(R.string.swipeleft_confirm_button_label)) { _, _ ->
+            action()
+            getRecyclerView().adapter!!.notifyDataSetChanged()
+            swipeLeftSnapMessage(snapMessageID)
+        }
+        builder.setNegativeButton(getHost().getString(R.string.swipeleft_cancel_button_label)) { _, _ ->
             getRecyclerView().adapter!!.notifyItemChanged(position)
         }
         val dial = builder.create()
         dial.window?.attributes?.windowAnimations = R.style.DialogAnimLeftToRight
         dial.show()
+    }
+
+    private fun swipeLeftSnapMessage(snapMessageID: Int) {
+        Snackbar
+            .make(getHost().requireView(), getHost().getString(snapMessageID), 700)
+            .setAction("Action", null).show()
     }
 }

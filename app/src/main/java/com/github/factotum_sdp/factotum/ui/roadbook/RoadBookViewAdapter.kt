@@ -3,6 +3,7 @@ package com.github.factotum_sdp.factotum.ui.roadbook
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
@@ -12,12 +13,12 @@ import java.util.*
 
 /**
  * Adapter for the RecyclerView which will display a dynamic list of DestinationRecord
- * Choice of the RecyclerView instead of a ListAdapter for later facilities with drageNdrop
+ * Choice of the RecyclerView instead of a ListAdapter for later facilities with drag & drop
  */
 class RoadBookViewAdapter(private val onClickListenerFromDestId: (String) -> View.OnClickListener?) :
     RecyclerView.Adapter<RoadBookViewAdapter.RecordViewHolder>() {
 
-    private var displayedDRecords: List<DestinationRecord> = arrayListOf()
+    private var displayedDRecords: DRecordList = DRecordList()
 
     // Inflate a new view hierarchy according to fragment_destrecord.xml design
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecordViewHolder {
@@ -31,7 +32,7 @@ class RoadBookViewAdapter(private val onClickListenerFromDestId: (String) -> Vie
     /**
      * Updates the async list displayed by this RoadBookViewAdapter
      */
-    fun submitList(ls: List<DestinationRecord>) {
+    fun submitList(ls: DRecordList) {
         displayedDRecords = ls
     }
 
@@ -51,6 +52,11 @@ class RoadBookViewAdapter(private val onClickListenerFromDestId: (String) -> Vie
             rateStringFormat(item.rate, context.getString(R.string.rate_text_view))
         holder.actions.text =
             actionsStringFormat(item.actions, context.getString(R.string.actions_text_view))
+        holder.archivedIcon.visibility =
+            if (displayedDRecords.isArchived(position))
+                View.VISIBLE
+            else
+                View.INVISIBLE
 
         // Note that transition has to be done through ID and not the position
         // as there is some asynchrony between displayed list and the RBViewModel's one
@@ -75,7 +81,6 @@ class RoadBookViewAdapter(private val onClickListenerFromDestId: (String) -> Vie
     private fun actionsStringFormat(actions: List<Action>, label: String): String {
         return "$label : ${DestinationRecord.actionsFormat(actions)}"
     }
-
     override fun getItemCount(): Int = displayedDRecords.size
 
     /**
@@ -87,5 +92,6 @@ class RoadBookViewAdapter(private val onClickListenerFromDestId: (String) -> Vie
         val waitingTime: TextView = itemView.findViewById(R.id.waiting_time)
         val rate: TextView = itemView.findViewById(R.id.rate)
         val actions: TextView = itemView.findViewById(R.id.dest_actions)
+        val archivedIcon: ImageView = itemView.findViewById(R.id.archivedIcon)
     }
 }

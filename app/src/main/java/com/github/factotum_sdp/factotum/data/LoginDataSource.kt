@@ -14,16 +14,14 @@ class LoginDataSource {
     fun login(userEmail: String, password: String, user: User): Result<User> {
         val authResultFuture = CompletableFuture<Result<User>>()
 
-        auth.signInWithEmailAndPassword(userEmail, password)
-            .addOnCompleteListener { authTask ->
+        auth.signInWithEmailAndPassword(userEmail, password).addOnCompleteListener { authTask ->
                 if (authTask.isSuccessful) {
                     authResultFuture.complete(Result.Success(user))
                 } else {
                     authResultFuture.complete(
                         Result.Error(
                             IOException(
-                                "Error logging in",
-                                authTask.exception
+                                "Error logging in", authTask.exception
                             )
                         )
                     )
@@ -37,7 +35,7 @@ class LoginDataSource {
         val profilesResultFuture = CompletableFuture<Result<MutableList<User>>>()
         var usersList: MutableList<User>
         dbRef.child(DISPATCH_DB_PATH).get().addOnSuccessListener {
-            if (!it.exists()){
+            if (!it.exists()) {
                 profilesResultFuture.complete(
                     Result.Error(IOException("Error retrieving profiles"))
                 )

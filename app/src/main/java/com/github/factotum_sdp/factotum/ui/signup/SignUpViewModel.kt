@@ -1,6 +1,8 @@
 package com.github.factotum_sdp.factotum.ui.signup
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.LoginRepository
 import com.github.factotum_sdp.factotum.data.Result

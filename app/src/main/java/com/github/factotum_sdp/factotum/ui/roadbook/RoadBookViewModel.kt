@@ -56,7 +56,7 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         val fromLocation = ls[from]
         ls.removeAt(from)
         ls.add(to, fromLocation)
-        _recordsList.setValue(currentDRecList().newDisplayedList(ls))
+        _recordsList.setValue(currentDRecList().replaceDisplayedList(ls))
     }
     
     /**
@@ -76,7 +76,7 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         val destID = computeDestID(clientID)
         val rec = DestinationRecord(destID, clientID, timeStamp, waitingTime, rate, actions, notes)
         newList.add(rec)
-        _recordsList.setValue(currentDRecList().newDisplayedList(newList))
+        _recordsList.setValue(currentDRecList().replaceDisplayedList(newList))
     }
 
     /**
@@ -88,7 +88,7 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         val newList = arrayListOf<DestinationRecord>()
         newList.addAll(currentDRecList() as Collection<DestinationRecord>)
         newList.removeAt(pos)
-        _recordsList.setValue(currentDRecList().newDisplayedList(newList))
+        _recordsList.setValue(currentDRecList().replaceDisplayedList(newList))
     }
 
     /**
@@ -116,7 +116,7 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         ls.addAll(_recordsList.value as Collection<DestinationRecord>)
         ls[pos] = newRec
         if(currentRec != newRec) {
-            _recordsList.setValue(currentDRecList().newDisplayedList(ls))
+            _recordsList.setValue(currentDRecList().replaceDisplayedList(ls))
             return true
         }
         // Prefer to be explicit with a boolean value, for the front-end to know it has to refresh, or act accordingly.
@@ -188,7 +188,7 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
             val destID = computeDestID(it.clientID)
             newList.add(DestinationRecord(destID, it.clientID, it.timeStamp, it.waitingTime, it.rate, it.actions, it.notes))
         }
-        _recordsList.setValue(currentDRecList().newDisplayedList(newList))
+        _recordsList.setValue(currentDRecList().replaceDisplayedList(newList))
     }
 
     private fun currentDRecList(): DRecordList {

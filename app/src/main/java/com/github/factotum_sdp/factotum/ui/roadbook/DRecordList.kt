@@ -3,6 +3,13 @@ package com.github.factotum_sdp.factotum.ui.roadbook
 import com.github.factotum_sdp.factotum.data.DestinationRecord
 
 
+
+/**
+ *   Immutable Decorator for a List<DestinationRecord>
+ *
+ * - Allows archived records management through a private field containing all the archived items
+ * - Allows choice at construction time for the main List, whether it contains or not the archived records.
+ */
 private fun displayedRecords(allRecords: List<DestinationRecord>,
                              archived: List<DestinationRecord>,
                              showArchived: Boolean): List<DestinationRecord> {
@@ -11,12 +18,6 @@ private fun displayedRecords(allRecords: List<DestinationRecord>,
     return allRecords.minus(archived.toSet())
 }
 
-/**
- *   Immutable Decorator for a List<DestinationRecord>
- *
- * - Allows archived records management through a private field containing all the archived items
- * - Allows choice at construction time for the main List, whether it contains or not the archived records.
- */
 class DRecordList(private val allRecords: List<DestinationRecord> = listOf(),
                   private val archived: List<DestinationRecord> = listOf(),
                   private val showArchived: Boolean = false)
@@ -41,7 +42,7 @@ class DRecordList(private val allRecords: List<DestinationRecord> = listOf(),
      * @param ls: List<DestinationRecord> The new list to replace the current (this) main List
      * @return a new DRecordList with the main List updated
      */
-    fun newDisplayedList(ls: List<DestinationRecord>): DRecordList {
+    fun replaceDisplayedList(ls: List<DestinationRecord>): DRecordList {
         val allRecs =
             if(showArchived)
                 ls

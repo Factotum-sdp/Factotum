@@ -37,7 +37,7 @@ class LoginDataSource {
         dbRef.child(DISPATCH_DB_PATH).get().addOnSuccessListener {
             if (!it.exists()) {
                 profilesResultFuture.complete(
-                    Result.Error(IOException("Error retrieving profiles"))
+                    Result.Error(IOException("Error retrieving users"))
                 )
                 return@addOnSuccessListener
             }
@@ -46,7 +46,7 @@ class LoginDataSource {
             profilesResultFuture.complete(Result.Success(usersList))
         }.addOnFailureListener {
             profilesResultFuture.complete(
-                Result.Error(IOException("Error retrieving profiles", it))
+                Result.Error(IOException("Error retrieving users", it))
             )
         }
         return profilesResultFuture.get()

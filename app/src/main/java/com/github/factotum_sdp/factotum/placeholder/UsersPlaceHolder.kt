@@ -47,10 +47,10 @@ object UsersPlaceHolder {
     /**
      * Populates the database with users.
      */
-    suspend fun populateDatabase() {
+    suspend fun addUserToDb(user: User) {
         val deferred = CompletableDeferred<Unit>()
 
-        dataSource.getReference(LoginDataSource.DISPATCH_DB_PATH).push().setValue(USER1)
+        dataSource.getReference(LoginDataSource.DISPATCH_DB_PATH).push().setValue(user)
             .addOnSuccessListener {
                 deferred.complete(Unit)
             }
@@ -59,18 +59,6 @@ object UsersPlaceHolder {
             }
 
         deferred.await()
-
-        val deferred2 = CompletableDeferred<Unit>()
-
-        dataSource.getReference(LoginDataSource.DISPATCH_DB_PATH).push().setValue(USER3)
-            .addOnSuccessListener {
-                deferred2.complete(Unit)
-            }
-            .addOnFailureListener { exception ->
-                deferred2.completeExceptionally(exception)
-            }
-
-        deferred2.await()
     }
 
     suspend fun addAuthUser(user: User) {

@@ -38,7 +38,7 @@ class SignUpDataSink {
                 updateUsersResultFuture.complete(Result.Success("Success updating users"))
             }.addOnFailureListener {
                 updateUsersResultFuture.complete(
-                    Result.Error(IOException("Error updating profiles", it))
+                    Result.Error(IOException("Error updating users", it))
                 )
             }
         return updateUsersResultFuture.get()

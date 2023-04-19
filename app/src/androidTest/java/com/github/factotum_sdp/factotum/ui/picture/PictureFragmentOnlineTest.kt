@@ -86,8 +86,8 @@ class PictureFragmentOnlineTest {
     fun testUploadFileCorrectly() {
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
-        val takePictureButton = device.findObject(UiSelector().description("Shutter"))
-        takePictureButton.click()
+        // Click on the shutter button
+        device.executeShellCommand("input keyevent 27")
 
         // Wait for the photo to be taken
         Thread.sleep(TIME_WAIT_DONE_OR_CANCEL)

@@ -77,14 +77,13 @@ class PictureFragmentOfflineTest {
     @Test
     fun testDoesNotDeleteFileIfUploadFails() {
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        val takePictureButton = device.findObject(UiSelector().description("Shutter"))
-        takePictureButton.click()
+        device.executeShellCommand("input keyevent 27")
 
         // Wait for the photo to be taken
         Thread.sleep(TIME_WAIT_DONE_OR_CANCEL)
+
         // Click the button to validate the photo
-        val validateButton = device.findObject(UiSelector().description("Done"))
-        validateButton.click()
+        device.executeShellCommand("input tap 540 2048")
 
         // Wait for the photo to be uploaded
         Thread.sleep(TIME_WAIT_UPLOAD)

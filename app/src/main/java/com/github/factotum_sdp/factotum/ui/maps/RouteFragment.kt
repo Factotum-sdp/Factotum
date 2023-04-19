@@ -42,10 +42,8 @@ class RouteFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         _binding = FragmentRoutesBinding.inflate(inflater, container, false)
         return binding.root
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -58,8 +56,6 @@ class RouteFragment : Fragment() {
         setListenerButtons()
 
         setListenerSearch()
-
-
     }
 
     private fun setListenerList(){
@@ -79,7 +75,6 @@ class RouteFragment : Fragment() {
             viewModel.setRunRoute(listRoute[position])
             binding.buttonRun.visibility = Button.VISIBLE
             binding.buttonNext.visibility = Button.VISIBLE
-
         }
     }
 

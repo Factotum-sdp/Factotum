@@ -10,7 +10,6 @@ import com.google.firebase.database.DatabaseReference
 import java.text.DateFormat
 import java.text.SimpleDateFormat.getDateInstance
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 /**
@@ -21,12 +20,11 @@ import kotlin.collections.HashMap
  */
 class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
 
-    private val _recordsList: MutableLiveData<List<DestinationRecord>> =
-        MutableLiveData(emptyList())
-    val recordsListState: LiveData<List<DestinationRecord>> = _recordsList
+    private val _recordsList: MutableLiveData<DRecordList> =
+        MutableLiveData(DRecordList())
+    val recordsListState: LiveData<DRecordList> = _recordsList
 
     private var dbRef: DatabaseReference
-    private val swapedRecords: ArrayList<DestinationRecord> = arrayListOf()
     private val clientOccurences = HashMap<String, Int>()
 
     init {
@@ -41,7 +39,29 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
     }
 
     /**
+     * Send the current recordsList data to the Database referenced at construction time
+     */
+    fun backUp() {
+        dbRef.setValue(_recordsList.value)
+    }
+
+    /**
+     * Change a DRecord position in the recordsList of this RoadBookViewModel
+     *
+     * @param from Int
+     * @param to Int
+     */
+    fun moveRecord(from: Int, to: Int) {
+        val ls = currentDRecList().toMutableList()
+        val fromLocation = ls[from]
+        ls.removeAt(from)
+        ls.add(to, fromLocation)
+        _recordsList.setValue(currentDRecList().replaceDisplayedList(ls))
+    }
+    
+    /**
      * Add a new DestinationRecord at the end of the recordsList
+     *
      * @param clientID The Customer unique identifier associated to this DestinationRecord
      * @param timeStamp The arrival time
      * @param waitingTime The waiting time in minutes
@@ -56,58 +76,25 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         val destID = computeDestID(clientID)
         val rec = DestinationRecord(destID, clientID, timeStamp, waitingTime, rate, actions, notes)
         newList.add(rec)
-        _recordsList.postValue(newList)
+        _recordsList.setValue(currentDRecList().replaceDisplayedList(newList))
     }
 
     /**
      * Delete the DestinationRecord at index "pos" in the recordsList
+     *
      * @param pos: Int Index of the target record to delete
      */
     fun deleteRecordAt(pos: Int) {
         val newList = arrayListOf<DestinationRecord>()
-        newList.addAll(_recordsList.value as Collection<DestinationRecord>)
+        newList.addAll(currentDRecList() as Collection<DestinationRecord>)
         newList.removeAt(pos)
-        _recordsList.postValue(newList)
+        _recordsList.setValue(currentDRecList().replaceDisplayedList(newList))
     }
 
     /**
-     * Send the current recordsList data to the Database referenced at construction time
-     */
-    fun backUp() {
-        dbRef.setValue(_recordsList.value)
-    }
-
-    /**
-     * Swap between DestinationRecords at position : from and at position : to
-     * It is a one way swap, hence the from index must be lower or equal to the to index.
+     * Edit the DestinationRecord at index "pos" in the recordsList attribute
+     * If the new DestRecord computed is the same at the old one, no value is set and false is returned
      *
-     * @param from Int
-     * @param to Int
-     */
-    fun swapRecords(from: Int, to: Int) {
-        assert(from <= to)
-        if(swapedRecords.isEmpty())
-            swapedRecords.addAll(_recordsList.value as Collection<DestinationRecord>)
-        Collections.swap(swapedRecords, from, to)
-    }
-
-    /**
-     * Update the Observable LiveData of this RoadBookViewModel
-     * To be called after a series of swapRecords() that comes to an end,
-     * in order to show the result to some possible observers.
-     */
-    fun pushSwapsResult() {
-        if(swapedRecords.isNotEmpty()) {
-            var ls = listOf<DestinationRecord>()
-            ls = ls.plus(swapedRecords)
-            _recordsList.postValue(ls)
-            swapedRecords.clear()
-        }
-    }
-
-    /**
-     * Edit the DestinationRecord at index pos in the recordsList attribute
-     * If the new DestRecord computed is the same at the old one no value is posted and false is returned
      * @param pos: Int position Index at which the current DestRecord will be override
      * @param clientID The Customer unique identifier associated to this DestinationRecord
      * @param timeStamp The arrival time
@@ -117,8 +104,8 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
      * @param notes The additional notes concerning a destination
      * @return true if according the args, there is a change and the _recordList is updated, false otherwise
      */
-    fun editRecord(pos: Int, clientID: String, timeStamp: Date?, waitingTime: Int,
-                   rate: Int, actions: List<DestinationRecord.Action>, notes: String): Boolean {
+    fun editRecordAt(pos: Int, clientID: String, timeStamp: Date?, waitingTime: Int,
+                     rate: Int, actions: List<DestinationRecord.Action>, notes: String): Boolean {
         val currentRec = _recordsList.value!![pos]
         var destID = currentRec.destID
         if(currentRec.clientID != clientID) {
@@ -129,13 +116,70 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         ls.addAll(_recordsList.value as Collection<DestinationRecord>)
         ls[pos] = newRec
         if(currentRec != newRec) {
-            _recordsList.postValue(ls)
+            _recordsList.setValue(currentDRecList().replaceDisplayedList(ls))
             return true
         }
         // Prefer to be explicit with a boolean value, for the front-end to know it has to refresh, or act accordingly.
         // ! Check the case where the destID is the same but
         return false
     }
+
+    /**
+     * Archive the DestinationRecord at index "pos" in the recordsList
+     *
+     * @param pos: Int Index of the target record to archive
+     */
+    fun archiveRecordAt(pos: Int) {
+        _recordsList.setValue(currentDRecList().archiveRecord(pos))
+    }
+
+    /**
+     * Unarchive the DestinationRecord at index "pos" in the recordsList
+     *
+     * @param pos: Int Index of the target record to unarchive
+     */
+    fun unarchiveRecordAt(pos: Int) {
+        _recordsList.setValue(currentDRecList().unarchiveRecord(pos))
+    }
+
+    /**
+     * Check if the DestinationRecord at index "pos" is archived
+     *
+     * @param pos: Int Index of the target record
+     * @return true if the record at "pos" is archived, false otherwise
+     */
+    fun isRecordAtArchived(pos: Int): Boolean {
+        return currentDRecList().isArchived(pos)
+    }
+
+    /**
+     * Check if the DestinationRecord at index "pos" is timestamped
+     *
+     * @param pos: Int Index of the target record
+     * @return true if the record at "pos" is timestamped, false otherwise
+     */
+    fun isRecordAtTimeStamped(pos: Int): Boolean {
+        currentDRecList()[pos].timeStamp?.let {
+            return true
+        }
+        return false // if timeStamp is null
+    }
+
+    /**
+     * Change the current recordsList state by "adding" the archived records
+     * (i.e all the records will be in the current _recordsList)
+     */
+    fun showArchivedRecords() {
+        _recordsList.setValue(currentDRecList().withArchived())
+    }
+
+    /**
+     * Change the current recordsList state by "removing" the archived records
+     */
+    fun hideArchivedRecords() {
+        _recordsList.setValue(currentDRecList().withoutArchived())
+    }
+
 
     //Needed to update the destIDOccurrences cache
     private fun addDemoRecords(ls: List<DestinationRecord>) {
@@ -144,7 +188,11 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
             val destID = computeDestID(it.clientID)
             newList.add(DestinationRecord(destID, it.clientID, it.timeStamp, it.waitingTime, it.rate, it.actions, it.notes))
         }
-        _recordsList.postValue(newList)
+        _recordsList.setValue(currentDRecList().replaceDisplayedList(newList))
+    }
+
+    private fun currentDRecList(): DRecordList {
+        return _recordsList.value!!
     }
 
     private fun computeDestID(clientID: String): String {

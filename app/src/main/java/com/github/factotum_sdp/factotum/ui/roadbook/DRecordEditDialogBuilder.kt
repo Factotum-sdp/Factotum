@@ -38,10 +38,10 @@ import java.util.*
  *
  * @constructor : Constructs the DRecordAlertDialogBuilder
  */
-class DRecordAlertDialogBuilder(context: Context?,
-                                private val host: Fragment,
-                                private val rbViewModel: RoadBookViewModel,
-                                private val rbRecyclerView: RecyclerView) :
+class DRecordEditDialogBuilder(context: Context?,
+                               private val host: Fragment,
+                               private val rbViewModel: RoadBookViewModel,
+                               private val rbRecyclerView: RecyclerView) :
     AlertDialog.Builder(ContextThemeWrapper(context, android.R.style.Theme_Holo_Dialog)) {
 
     private val clientIDView: AutoCompleteTextView
@@ -78,7 +78,7 @@ class DRecordAlertDialogBuilder(context: Context?,
      * On edit validation, the RoadBookViewModel of this class will be notified by a
      * RoadBookViewModel.addRecord() call
      */
-    fun forNewRecordEdition(): DRecordAlertDialogBuilder {
+    fun forNewRecordEdition(): DRecordEditDialogBuilder {
         setViewModelUpdates({ _, _ ->
             // On negative button do nothing
         }, { _, _ ->
@@ -110,21 +110,19 @@ class DRecordAlertDialogBuilder(context: Context?,
      *
      * @param viewHolder: ViewHolder The ViewHolder holding the starting DestinationRecord data
      */
-    fun forExistingRecordEdition(viewHolder: ViewHolder): DRecordAlertDialogBuilder {
+    fun forExistingRecordEdition(viewHolder: ViewHolder): DRecordEditDialogBuilder {
         val position = viewHolder.absoluteAdapterPosition
         val rec = rbViewModel.recordsListState.value!![position]
-
         bindRecordDataToEditFields(rec)
 
         setViewModelUpdates({ _, _ ->
             // On negative button : Update the screen, no changes to back-end
             rbRecyclerView.adapter!!.notifyItemChanged(position)
         },{ _, _ ->
-            // On positive button : Try to edit the record
-            var recHasChanged = false
-            try {
+            val recHasChanged: Boolean
+            try { // On positive button : Try to edit the record
                 recHasChanged =
-                    rbViewModel.editRecord(
+                    rbViewModel.editRecordAt(
                         position,
                         clientIDView.text.toString().trim(),
                         timestampFromString(timestampView.text.toString()),
@@ -138,8 +136,7 @@ class DRecordAlertDialogBuilder(context: Context?,
             } catch(e: java.lang.Exception) {
                 setSnackBar(host.getString(R.string.edit_rejected_snap_label), 1400)
             }
-            if (!recHasChanged)
-                rbRecyclerView.adapter!!.notifyItemChanged(position)
+            rbRecyclerView.adapter!!.notifyItemChanged(position)
         })
         return this
     }
@@ -198,7 +195,7 @@ class DRecordAlertDialogBuilder(context: Context?,
                     Calendar.getInstance().get(Calendar.MINUTE),
                     false)
                 tp.setButton(DialogInterface.BUTTON_NEUTRAL, ERASE_B_LABEL) { _, _ ->
-                    timestampView.setText("")
+                    timestampView.setText("") // Empty string converted to null for the timestamp ViewModel data
                 }
                 tp.show()
             }

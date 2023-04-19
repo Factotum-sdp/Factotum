@@ -44,66 +44,91 @@ abstract class RoadBookTHCallback() :
         viewHolder: ViewHolder,
         target: ViewHolder
     ): Boolean {
-        try {
+        try { // Drag & Drop by swapping the DRecords of the RoadBookViewModel
             val fromPosition = viewHolder.absoluteAdapterPosition
             val toPosition = target.absoluteAdapterPosition
-
-            // Only the front-end is updated when drag-travelling for a smoother UX
+            getRbViewModel().moveRecord(fromPosition, toPosition)
             recyclerView.adapter?.notifyItemMoved(fromPosition, toPosition)
-
-            // Back-end swap job not published here, @see pushSwapsResult() call
-            if (toPosition < fromPosition) {
-                getRbViewModel().swapRecords(toPosition, fromPosition - 1)
-            } else {
-                getRbViewModel().swapRecords(fromPosition, toPosition - 1)
-            }
             return true
         } catch (e: java.lang.Exception) {
             return false
         }
     }
 
-    // Hacky move to update the ViewModel only when the Drag&Drop has ended
-    override fun onSelectedChanged(viewHolder: ViewHolder?, actionState: Int) {
-        super.onSelectedChanged(viewHolder, actionState)
-        if (actionState == ACTION_STATE_IDLE) {
-            // Push only if the STATE_IDLE arrives after a Drag and Drop move
-            getRbViewModel().pushSwapsResult()
-        }
-    }
-
-    @SuppressLint("NotifyDataSetChanged") // Don't update the front-end, want to keep the hole
     override fun onSwiped(viewHolder: ViewHolder, direction: Int) {
         when(direction) {
             RIGHT -> { // Record Edition
                 editOnSwipeRight(viewHolder)
             }
             LEFT -> { // Record Deletion
-                deleteOnSwipeLeft(viewHolder)
+                val pos = viewHolder.absoluteAdapterPosition
+                if (getRbViewModel().isRecordAtArchived(pos)) {
+                    unarchiveOnSwipeLeft(pos)
+                } else {
+                    if(getRbViewModel().isRecordAtTimeStamped(pos))
+                        archiveOnSwipeLeft(pos)
+                    else
+                        deleteOnSwipeLeft(pos)
+                }
             }
         }
     }
 
     private fun editOnSwipeRight(viewHolder: ViewHolder) {
-        DRecordAlertDialogBuilder(getHost().requireContext(), getHost(),
-            getRbViewModel(), getRecyclerView())
+        val dial = // Launch & Delegate the event to a custom AlertDialog
+            DRecordEditDialogBuilder(getHost().requireContext(), getHost(),
+                                        getRbViewModel(), getRecyclerView())
             .forExistingRecordEdition(viewHolder)
-            .show()
+            .create()
+        dial.window?.attributes?.windowAnimations = R.style.DialogAnimLeftToRight
+        dial.show()
     }
-    private fun deleteOnSwipeLeft(viewHolder: ViewHolder) {
-        val position = viewHolder.absoluteAdapterPosition
-        val builder = AlertDialog.Builder(getHost().requireContext())
-        builder.setTitle(getHost().getString(R.string.delete_dialog_title))
-        builder.setCancelable(false)
-        builder.setPositiveButton(getHost().getString(R.string.delete_confirm_button_label)) { _, _ ->
+
+    private fun deleteOnSwipeLeft(position: Int) {
+        swipeLeftDialogAndAction(position,
+            R.string.delete_dialog_title,
+            R.string.snap_text_on_rec_delete) {
             getRbViewModel().deleteRecordAt(position)
-            Snackbar
-                .make(getHost().requireView(), getHost().getString(R.string.snap_text_on_rec_delete), 700)
-                .setAction("Action", null).show()
         }
-        builder.setNegativeButton(getHost().getString(R.string.delete_cancel_button_label)) { _, _ ->
+    }
+
+    private fun unarchiveOnSwipeLeft(position: Int) {
+        swipeLeftDialogAndAction(position,
+            R.string.unarchive_dialog_title,
+            R.string.snap_text_on_rec_unarchive) {
+            getRbViewModel().unarchiveRecordAt(position)
+        }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun archiveOnSwipeLeft(position: Int) {
+        getRbViewModel().archiveRecordAt(position) // No confirmation dialog for the archive action
+        getRecyclerView().adapter!!.notifyDataSetChanged()
+        swipeLeftSnapMessage(R.string.snap_text_on_rec_archive)
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun swipeLeftDialogAndAction(position: Int, dialogTitleID: Int,
+                                         snapMessageID: Int, action: () -> Unit) {
+        val builder = AlertDialog.Builder(getHost().requireContext())
+        builder.setTitle(getHost().getString(dialogTitleID))
+        builder.setCancelable(false)
+        builder.setPositiveButton(getHost().getString(R.string.swipeleft_confirm_button_label)) { _, _ ->
+            action()
+            getRecyclerView().adapter!!.notifyDataSetChanged()
+            swipeLeftSnapMessage(snapMessageID)
+        }
+        builder.setNegativeButton(getHost().getString(R.string.swipeleft_cancel_button_label)) { _, _ ->
             getRecyclerView().adapter!!.notifyItemChanged(position)
         }
-        builder.show()
+        val dial = builder.create()
+        dial.window?.attributes?.windowAnimations = R.style.DialogAnimLeftToRight
+        dial.show()
+    }
+
+    private fun swipeLeftSnapMessage(snapMessageID: Int) {
+        Snackbar
+            .make(getHost().requireView(), getHost().getString(snapMessageID), 700)
+            .setAction("Action", null).show()
     }
 }

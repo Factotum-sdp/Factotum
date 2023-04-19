@@ -22,14 +22,6 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/textView5"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="@string/login_text"
-            android:textSize="48sp" />
-
-        <TextView
             android:id="@+id/textView7"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -46,7 +38,7 @@
             android:text="@string/e_mail_address_text" />
 
         <EditText
-            android:id="@+id/username"
+            android:id="@+id/email"
             android:layout_width="337dp"
             android:layout_height="55dp"
             android:layout_marginBottom="16dp"
@@ -73,6 +65,14 @@
             android:inputType="textPassword"
             android:selectAllOnFocus="true"
             android:autofillHints="" />
+
+        <TextView
+            android:id="@+id/profile_retrival_error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/retrieve_users_failed"
+            android:textColor="#FF0000"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/pwdForgot"

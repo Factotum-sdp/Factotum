@@ -28,7 +28,7 @@
     <fragment
         android:id="@+id/roadBookFragment"
         android:name="com.github.factotum_sdp.factotum.ui.roadbook.RoadBookFragment"
-        android:label="RoadBook"
+        android:label="Roadbook"
         tools:layout="@layout/fragment_roadbook">
         <action
             android:id="@+id/action_roadBookFragment_to_DRecordDetailsFragment"
@@ -64,7 +64,7 @@
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.github.factotum_sdp.factotum.ui.login.LoginFragment"
-        android:label="fragment_login"
+        android:label="Login"
         tools:layout="@layout/fragment_login" >
         <action
             android:id="@+id/action_loginFragment_to_roadBookFragment2"
@@ -76,8 +76,12 @@
     <fragment
         android:id="@+id/signUpFragment"
         android:name="com.github.factotum_sdp.factotum.ui.signup.SignUpFragment"
-        android:label="fragment_signup"
-        tools:layout="@layout/fragment_signup" />
+        android:label="Sign Up"
+        tools:layout="@layout/fragment_signup" >
+        <action
+            android:id="@+id/action_signUpFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
     <fragment
         android:id="@+id/contactDetailsFragment2"
         android:name="com.github.factotum_sdp.factotum.ui.directory.ContactDetailsFragment"

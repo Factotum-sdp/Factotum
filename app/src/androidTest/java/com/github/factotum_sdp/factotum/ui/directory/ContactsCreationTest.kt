@@ -1,7 +1,5 @@
 package com.github.factotum_sdp.factotum.ui.directory
 
-import android.util.Log
-import android.view.KeyEvent
 import android.widget.EditText
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
@@ -21,8 +19,7 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.localisation.Location
 import com.github.factotum_sdp.factotum.placeholder.ContactsList
-import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertTrue
+import junit.framework.TestCase.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -78,24 +75,22 @@ class ContactsCreationTest {
     fun writeInAddressFieldMakesDropDown(){
         onView(withId(R.id.add_contact_button)).perform(click())
         val city = "Lausanne"
-        onView(withId(androidx.appcompat.R.id.search_src_text)).perform(ViewActions.typeText(city)).perform(
-            ViewActions.pressKey(KeyEvent.KEYCODE_ENTER)
-        )
+        onView(withId(androidx.appcompat.R.id.search_src_text)).perform(ViewActions.typeText(city.dropLast(2)))
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        val nbLausanne = device.findObjects(textContains(city)).size
-        assertEquals(2, nbLausanne)
+        val result = device.wait(Until.hasObject(textContains(city)), 5000)
+        assertTrue(result)
     }
 
     @Test
     fun selectSuggestionWritesAddress(){
         onView(withId(R.id.add_contact_button)).perform(click())
         val city = "Lausanne"
-        onView(withId(androidx.appcompat.R.id.search_src_text)).perform(ViewActions.typeText(city)).perform(
-            ViewActions.pressKey(KeyEvent.KEYCODE_ENTER)
-        )
+        onView(withId(androidx.appcompat.R.id.search_src_text)).perform(ViewActions.typeText(city))
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         val lausanneResult = Location.geocoderQuery(city, getApplicationContext())!![0].getAddressLine(0)
         val address = device.findObject(text(city))
+        val result = device.wait(Until.hasObject(text(lausanneResult)), 5000)
+        assertTrue(result)
         device.findObject(text(lausanneResult)).click()
         val addressChanged = address.wait(Until.textMatches(lausanneResult), 5000)
         assertTrue(addressChanged)

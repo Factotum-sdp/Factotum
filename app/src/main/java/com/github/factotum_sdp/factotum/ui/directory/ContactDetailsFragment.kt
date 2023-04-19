@@ -30,6 +30,12 @@ class ContactDetailsFragment : Fragment() {
             contactsViewModel.contacts.value?.get(arguments?.getInt("id")!!)!!
         ) //links the contact details to the layout
 
+        val deleteContactButton = mainView.findViewById<Button>(R.id.button_delete_contact)
+        deleteContactButton.setOnClickListener { view ->
+            contactsViewModel.deleteContact(contactsViewModel.contacts.value?.get(arguments?.getInt("id")!!)!!)
+            view.findNavController().navigate(R.id.action_contactDetailsFragment2_to_directoryFragment)
+        }
+
 
         return mainView
     }

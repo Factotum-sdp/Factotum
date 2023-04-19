@@ -125,4 +125,5 @@
     <string name="textvlabel_rate">Rate</string>
     <string name="textvlabel_actions">Actions</string>
     <string name="textvlabel_notes">Notes</string>
+    <string name="delete_contact_button">Delete Contact</string>
 </resources>

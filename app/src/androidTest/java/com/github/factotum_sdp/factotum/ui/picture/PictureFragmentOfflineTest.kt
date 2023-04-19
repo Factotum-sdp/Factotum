@@ -14,9 +14,11 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
+import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Before
@@ -46,18 +48,31 @@ class PictureFragmentOfflineTest {
         storage = Firebase.storage
         storage.useEmulator("10.0.2.2", 9198)
         emptyFirebaseStorage(storage)
-
-        // Empty Local Files
         emptyLocalFiles(picturesDir)
 
-        // Launch the fragment
+        // Open the drawer
         onView(ViewMatchers.withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
-        onView(ViewMatchers.withId(R.id.pictureFragment))
+        onView(ViewMatchers.withId(R.id.roadBookFragment))
             .perform(ViewActions.click())
+
+        // Click on one of the roadbook
+        val destID = DestinationRecords.RECORDS[2].destID
+        onView(ViewMatchers.withText(destID)).perform(ViewActions.click())
+
+        // Go to the picture fragment
+        onView(ViewMatchers.withId(R.id.viewPager)).perform(ViewActions.swipeLeft())
+        onView(ViewMatchers.withId(R.id.viewPager)).perform(ViewActions.swipeLeft())
+        onView(ViewMatchers.withId(R.id.viewPager)).perform(ViewActions.swipeLeft())
 
         // Wait for the camera to open
         Thread.sleep(TIME_WAIT_SHUTTER)
+    }
+
+    @After
+    fun tearDown() {
+        emptyFirebaseStorage(storage)
+        emptyLocalFiles(picturesDir)
     }
 
     @Test

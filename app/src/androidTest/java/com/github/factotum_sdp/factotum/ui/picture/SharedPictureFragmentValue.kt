@@ -19,6 +19,9 @@ fun emptyFirebaseStorage(storage: FirebaseStorage) {
 
 fun emptyLocalFiles(dir: File) {
     dir.listFiles()?.forEach { file ->
+        if (file.isDirectory) {
+            emptyLocalFiles(file) // Recursively delete files in the directory
+        }
         file.delete()
     }
 }

@@ -91,11 +91,11 @@ class PictureFragmentOfflineTest {
 
         storage.reference.listAll().addOnSuccessListener { listResult ->
             fail("Should not succeed")
-        }.addOnFailureListener{
-            //Check if there is a file in the local directory
-            picturesDir.listFiles()?.forEach { file ->
-                assertTrue(file.exists())
-            }
         }
+
+        //Check if there is a folder with a file in it
+        val directories = picturesDir.listFiles()?.filter { it.isDirectory } ?: emptyList()
+        assertTrue(directories.isNotEmpty())
+
     }
 }

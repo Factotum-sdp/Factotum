@@ -2,6 +2,7 @@ package com.github.factotum_sdp.factotum.ui.picture
 
 import android.Manifest
 import android.os.Environment
+import android.util.Log
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
@@ -53,7 +54,6 @@ class PictureFragmentOnlineTest {
     fun setUp() {
         storage = Firebase.storage
         storage.useEmulator("10.0.2.2", 9199)
-        runBlocking { emptyFirebaseStorage(storage.reference) }
         emptyLocalFiles(picturesDir)
 
         // Open the drawer
@@ -73,6 +73,12 @@ class PictureFragmentOnlineTest {
 
         // Wait for the camera to open
         Thread.sleep(TIME_WAIT_SHUTTER)
+    }
+
+    @After
+    fun tearDown() {
+        runBlocking { emptyFirebaseStorage(storage.reference) }
+        emptyLocalFiles(picturesDir)
     }
 
 
@@ -125,9 +131,13 @@ class PictureFragmentOnlineTest {
 
         // Check that the storage contains no files
         storage.reference.listAll().addOnSuccessListener { listResult ->
+            // Check that the folder in the storage is empty
             assertTrue(listResult.items.isEmpty())
-            //Check that the local picture directory is empty
-            assertTrue(picturesDir.listFiles()?.isEmpty() ?: false)
+
+            // Check that the local picture directory contains no files (folders are not counted
+            // but should be empty)
+            val directories = picturesDir.listFiles()?.filter { it.isDirectory } ?: emptyList()
+            assertTrue(directories.all { it.listFiles()?.isEmpty() == true})
         }.addOnFailureListener{ except ->
             fail(except.message)
         }

@@ -29,13 +29,11 @@ class ContactsRecyclerAdapter () : RecyclerView.Adapter<ContactsRecyclerAdapter.
 
     class ContactsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) { //this is the view holder for the recycler view
 
-        val itemRole : TextView //these are the views that we want to display for each contact
         val itemName : TextView
         val itemImage : ImageView
 
         init {
-            itemRole = itemView.findViewById(R.id.contact_role) //connect the views to the layout
-            itemName = itemView.findViewById(R.id.contact_name)
+            itemName = itemView.findViewById(R.id.contact_surname_and_name)
             itemImage = itemView.findViewById(R.id.contact_image)
 
             itemView.setOnClickListener {   //when a contact is clicked, go to the contact details fragment
@@ -52,9 +50,9 @@ class ContactsRecyclerAdapter () : RecyclerView.Adapter<ContactsRecyclerAdapter.
         return ContactsViewHolder(v)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ContactsViewHolder, i: Int) {
-        holder.itemRole.text = filteredContacts[i].role //set the text for each view
-        holder.itemName.text = filteredContacts[i].name
+        holder.itemName.text = filteredContacts[i].surname + " " + filteredContacts[i].name
         holder.itemImage.setImageResource(filteredContacts[i].profile_pic_id)
     }
 
@@ -69,9 +67,12 @@ class ContactsRecyclerAdapter () : RecyclerView.Adapter<ContactsRecyclerAdapter.
                 if (constraint == null || constraint.isEmpty()) {
                     filteredList.addAll(originalContacts) // Use the originalContacts list here
                 } else {
-                    val filterPattern = constraint.toString().lowercase().trim()
+                    // remove all whitespace from the constraint and the names such that names are matched even if they have different whitespace
+                    val filterPattern = constraint.toString().lowercase().replace("\\s".toRegex(), "")
                     for (item in originalContacts) { // Use the originalContacts list for filtering
-                        if (item.name.lowercase().contains(filterPattern)) {
+                        val nameSurname = (item.name + item.surname).lowercase().replace("\\s".toRegex(), "")
+                        val surnameName = (item.surname + item.name).lowercase().replace("\\s".toRegex(), "")
+                        if (nameSurname.contains(filterPattern) || surnameName.contains(filterPattern)) {
                             filteredList.add(item)
                         }
                     }

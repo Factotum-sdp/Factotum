@@ -11,6 +11,7 @@ import kotlinx.coroutines.CompletableDeferred
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.TypeSafeMatcher
+import java.util.UUID
 
 class ContactsUtils {
 
@@ -19,7 +20,8 @@ class ContactsUtils {
         private val randomContacts = mutableListOf<Contact>()
         private var emulatorSet : Boolean = false
         private var database : FirebaseDatabase = Firebase.database
-        private val randomNames = listOf("John Smith", "Jane Doe", "Bob Builder")
+        private val randomNames = listOf("John", "Jane", "Joe")
+        private var randomSurnames = listOf("Smith", "Jones", "Williams")
         private val roles = listOf("Boss", "Courier", "Client")
         private val randomAddresses = listOf("123 Fake Street", "456 Fake Street", "789 Fake Street")
         private val randomPhones = listOf("123456789", "987654321", "123987456")
@@ -37,8 +39,9 @@ class ContactsUtils {
 
         private fun createContact(position: Int): Contact {
             return Contact(
-                "$position",
-                roles[position % roles.size], randomNames[position % randomNames.size], image,
+                UUID.randomUUID().toString(),
+                roles[position % roles.size], randomNames[position % randomNames.size],
+                randomSurnames[position % randomSurnames.size], image,
                 randomAddresses[position % randomAddresses.size],
                 randomPhones[position % randomPhones.size],
                 randomDetails[position % randomDetails.size])
@@ -63,13 +66,15 @@ class ContactsUtils {
 
             createRandomContacts(count)
 
-            database.getReference("contacts").setValue(randomContacts)
-                .addOnSuccessListener {
-                    deferred.complete(Unit)
-                }
-                .addOnFailureListener { exception ->
-                    deferred.completeExceptionally(exception)
-                }
+            for (contact in randomContacts) {
+                database.getReference("contacts").child(contact.id).setValue(contact)
+                    .addOnSuccessListener {
+                        deferred.complete(Unit)
+                    }
+                    .addOnFailureListener { exception ->
+                        deferred.completeExceptionally(exception)
+                    }
+            }
 
             deferred.await()
         }

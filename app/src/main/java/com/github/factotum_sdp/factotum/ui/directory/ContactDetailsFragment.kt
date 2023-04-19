@@ -30,12 +30,18 @@ class ContactDetailsFragment : Fragment() {
             contactsViewModel.contacts.value?.get(arguments?.getInt("id")!!)!!
         ) //links the contact details to the layout
 
+        val updateContactButton = mainView.findViewById<Button>(R.id.button_modify_contact)
+        updateContactButton.setOnClickListener { view ->
+            val bundle = Bundle()
+            bundle.putInt("id", arguments?.getInt("id")!!)
+            view.findNavController().navigate(R.id.action_contactDetailsFragment2_to_contactCreationFragment, bundle)
+        }
+
         val deleteContactButton = mainView.findViewById<Button>(R.id.button_delete_contact)
         deleteContactButton.setOnClickListener { view ->
             contactsViewModel.deleteContact(contactsViewModel.contacts.value?.get(arguments?.getInt("id")!!)!!)
             view.findNavController().navigate(R.id.action_contactDetailsFragment2_to_directoryFragment)
         }
-
 
         return mainView
     }
@@ -43,6 +49,7 @@ class ContactDetailsFragment : Fragment() {
     // links contact details to the layout
     private fun setContactDetails(view: View, contact: Contact) {
         val contactName = view.findViewById<TextView>(R.id.contact_name)
+        val contactSurname = view.findViewById<TextView>(R.id.contact_surname)
         val contactRole = view.findViewById<TextView>(R.id.contact_role)
         val contactImage = view.findViewById<ImageView>(R.id.contact_image)
         val contactPhone = view.findViewById<TextView>(R.id.contact_phone)
@@ -50,6 +57,7 @@ class ContactDetailsFragment : Fragment() {
         val contactDetails = view.findViewById<TextView>(R.id.contact_details)
 
         contactName.text = contact.name
+        contactSurname.text = contact.surname
         contactRole.text = contact.role
         contactImage.setImageResource(contact.profile_pic_id)
         contactPhone.text = contact.phone

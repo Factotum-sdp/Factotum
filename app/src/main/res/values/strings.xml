@@ -40,8 +40,9 @@
     <string name="actions_text_view">actions</string>
 
     <string name="main_diary_activity">Main Diary Activity</string>
-    <string name="contact_name">John Doe</string>
-    <string name="contact_role">Example Role</string>
+    <string name="contact_name">John</string>
+    <string name="contact_surname">Doe</string>
+    <string name="contact_role">Boss</string>
     <string name="contact_image">Contact_image</string>
     <string name="contact_address">123 Example Street 1022 Lausanne</string>
     <string name="contact_phone">+4178*******</string>
@@ -126,4 +127,9 @@
     <string name="textvlabel_actions">Actions</string>
     <string name="textvlabel_notes">Notes</string>
     <string name="delete_contact_button">Delete Contact</string>
+    <string name="button_modify_contact">Modify contact</string>
+    <string name="form_button_update">Update Contact</string>
+    <string name="form_button_create">Create Contact</string>
+    <string name="contact_surname_and_name">Doe John</string>
+    <string name="search_contacts">Search contacts …</string>
 </resources>

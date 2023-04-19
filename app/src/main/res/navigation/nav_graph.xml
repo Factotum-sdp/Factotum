@@ -89,6 +89,9 @@
         <action
             android:id="@+id/action_contactDetailsFragment2_to_directoryFragment"
             app:destination="@id/directoryFragment" />
+        <action
+            android:id="@+id/action_contactDetailsFragment2_to_contactCreationFragment"
+            app:destination="@id/contactCreationFragment" />
     </fragment>
     <fragment
         android:id="@+id/contactCreationFragment"

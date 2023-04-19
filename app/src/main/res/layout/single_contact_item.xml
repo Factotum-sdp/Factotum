@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    tools:ignore="UseCompoundDrawables">
 
     <ImageView
         android:id="@+id/contact_image"
@@ -14,27 +15,13 @@
         android:layout_gravity="center_vertical"
         android:contentDescription="@string/contact_image" />
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/contact_surname_and_name"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:text="@string/contact_surname_and_name"
+        android:textSize="20sp"
+        android:layout_marginStart="10dp"/>
 
-        <TextView
-            android:id="@+id/contact_role"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="@string/contact_role"
-            android:textSize="20sp" />
-
-        <TextView
-            android:id="@+id/contact_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="@string/contact_name"
-            android:textSize="20sp"
-            android:layout_marginStart="10dp"/>
-
-    </LinearLayout>
 </LinearLayout>

@@ -27,8 +27,8 @@ class ContactsRepository(
         firebaseContactsRef.child(contact.id).setValue(contact)
     }
 
-    fun saveNewIDContact(role: String, name: String, image: Int, address: String, phone: String, details: String = "") {
-        val contact = Contact(UUID.randomUUID().toString(), role, name, image, address, phone, details)
+    fun saveNewIDContact(role: String, name: String, surname: String, image: Int, address: String, phone: String, details: String = "") {
+        val contact = Contact(UUID.randomUUID().toString(), role, name, surname, image, address, phone, details)
         saveContact(contact)
     }
 

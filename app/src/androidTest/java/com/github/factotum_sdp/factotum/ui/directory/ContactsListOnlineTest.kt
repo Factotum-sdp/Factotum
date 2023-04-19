@@ -1,5 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.directory
 
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.utils.ContactsUtils
@@ -12,6 +13,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runTest
 import org.junit.AfterClass
 import org.junit.BeforeClass
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.coroutines.resume
@@ -20,6 +22,11 @@ import kotlin.coroutines.suspendCoroutine
 
 @RunWith(AndroidJUnit4::class)
 class ContactsListOnlineTest {
+
+   @get:Rule
+   var testRule = ActivityScenarioRule(
+       MainActivity::class.java
+   )
 
     companion object {
         private lateinit var database: FirebaseDatabase
@@ -43,7 +50,7 @@ class ContactsListOnlineTest {
         ContactsUtils.populateDatabase()
 
         val ref = database.getReference("contacts")
-        val dataSnapshot = suspendCoroutine<DataSnapshot> { continuation ->
+        val dataSnapshot = suspendCoroutine { continuation ->
             ref.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     continuation.resume(dataSnapshot)
@@ -57,17 +64,5 @@ class ContactsListOnlineTest {
 
         assert(dataSnapshot.hasChildren())
     }
-
-    /**
-    @ExperimentalCoroutinesApi
-    @Test
-    fun testSyncContactsFromFirebase() = runTest {
-        // First, populate the database with contacts
-        ContactsUtils.populateDatabase(database)
-        // Then, synchronize the contacts list with Firebase
-        ContactsList.syncContactsFromFirebase(ApplicationProvider.getApplicationContext())
-        // Now, check if the local contacts list is not empty
-        assert(ContactsList.getItems().isNotEmpty())
-    } **/
 
 }

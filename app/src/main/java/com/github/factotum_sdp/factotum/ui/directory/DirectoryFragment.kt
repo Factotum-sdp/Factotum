@@ -44,9 +44,9 @@ class DirectoryFragment : Fragment() {
         viewModel = ViewModelProvider(requireActivity())[ContactsViewModel::class.java]
         viewModel.setDatabase(db)
         adapter = ContactsRecyclerAdapter()
-        adapter.updateContacts(viewModel.getContacts().value ?: emptyList())
+        adapter.updateContacts(viewModel.contacts.value ?: emptyList())
 
-        viewModel.getContacts().observe(viewLifecycleOwner) { contacts ->
+        viewModel.contacts.observe(viewLifecycleOwner) { contacts ->
             adapter.updateContacts(contacts)
         }
 
@@ -78,7 +78,4 @@ class DirectoryFragment : Fragment() {
         })
     }
 
-    override fun onPause() {
-        super.onPause()
-    }
 }

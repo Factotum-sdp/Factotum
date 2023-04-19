@@ -27,7 +27,7 @@ class ContactDetailsFragment : Fragment() {
         val contactsViewModel =
             ViewModelProvider(requireActivity())[ContactsViewModel::class.java] // get the contacts view model
         setContactDetails(mainView,
-            contactsViewModel.getContacts().value?.get(arguments?.getInt("id")!!)!!
+            contactsViewModel.contacts.value?.get(arguments?.getInt("id")!!)!!
         ) //links the contact details to the layout
 
 

@@ -2,57 +2,37 @@ package com.github.factotum_sdp.factotum.ui.directory
 
 import android.app.Application
 import android.content.Context
-import android.content.SharedPreferences
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asLiveData
 import com.github.factotum_sdp.factotum.placeholder.Contact
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 
 class ContactsViewModel(application: Application) : AndroidViewModel(application) {
-    private var database = FirebaseDatabase.getInstance()
-    private var databaseRef = database.reference.child("contacts")
-    private val contactsPreferences: SharedPreferences = application.getSharedPreferences("contacts", Context.MODE_PRIVATE)
+
+    private val sharedPreferences = application.getSharedPreferences("contacts", Context.MODE_PRIVATE)
+    private val repository = ContactsRepository(sharedPreferences)
 
     fun setDatabase(database: FirebaseDatabase) {
-        this.database = database
-        databaseRef = database.reference.child("contacts")
+        repository.setDatabase(database)
     }
 
-    fun getContacts(): LiveData<List<Contact>> {
-        val contacts: MutableLiveData<List<Contact>> = MutableLiveData()
-        val contactsJson = contactsPreferences.getString("contacts", null)
-        if (contactsJson != null) {
-            val contactList = Gson().fromJson<List<Contact>>(contactsJson, object : TypeToken<List<Contact>>() {}.type)
-            contacts.value = contactList
-        }
-        databaseRef.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val contactList = mutableListOf<Contact>()
-                for (contactSnapshot in snapshot.children) {
-                    val contact = contactSnapshot.getValue(Contact::class.java)
-                    contact?.let { contactList.add(it) }
-                }
-                contacts.value = contactList
-                saveContacts(contactList)
-            }
+    val contacts: LiveData<List<Contact>> = repository.getContacts().asLiveData()
 
-            override fun onCancelled(error: DatabaseError) {
-                // Handle error...
-            }
-        })
-        return contacts
+    fun saveContact(contact: Contact) {
+        repository.saveContact(contact)
     }
 
-    private fun saveContacts(contacts: List<Contact>) {
-        val contactsJson = Gson().toJson(contacts)
-        contactsPreferences.edit().putString("contacts", contactsJson).apply()
+    fun saveNewIDContact(role: String, name: String, image: Int, address: String, phone: String, details: String = "") {
+        repository.saveNewIDContact(role, name, image, address, phone, details)
     }
 
+    fun updateContact(contact: Contact) {
+        repository.updateContact(contact)
+    }
 
+    fun deleteContact(contact: Contact) {
+        repository.deleteContact(contact)
+    }
 }
+

@@ -6,14 +6,9 @@
     "firestore": {
       "port": 8080
     },
-    "database": [
-      {
-        "port": 9000
-      },
-      {
-        "port": 9001
-      }
-    ],
+    "database": {
+      "port": 9000
+    },
     "storage": {
       "port": 9199
     },

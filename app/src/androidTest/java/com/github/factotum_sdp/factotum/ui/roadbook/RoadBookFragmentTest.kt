@@ -22,8 +22,7 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeLeftTheRecordAt
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightTheRecordAt
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
+import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.setEmulatorGet
 import org.hamcrest.CoreMatchers.startsWith
 import org.junit.Before
 import org.junit.BeforeClass
@@ -54,8 +53,7 @@ class RoadBookFragmentTest {
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
-            val database = Firebase.database
-            database.useEmulator("10.0.2.2", 9000)
+            val database = setEmulatorGet()
             MainActivity.setDatabase(database)
         }
     }

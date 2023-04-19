@@ -18,6 +18,7 @@ import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
@@ -47,7 +48,6 @@ class PictureFragmentOfflineTest {
         // Initialize Firebase Storage
         storage = Firebase.storage
         storage.useEmulator("10.0.2.2", 9198)
-        emptyFirebaseStorage(storage)
         emptyLocalFiles(picturesDir)
 
         // Open the drawer
@@ -71,7 +71,6 @@ class PictureFragmentOfflineTest {
 
     @After
     fun tearDown() {
-        emptyFirebaseStorage(storage)
         emptyLocalFiles(picturesDir)
     }
 

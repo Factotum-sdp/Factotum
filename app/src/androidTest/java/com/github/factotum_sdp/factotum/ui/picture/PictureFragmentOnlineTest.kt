@@ -40,8 +40,6 @@ class PictureFragmentOnlineTest {
     private lateinit var storage: FirebaseStorage
     private val externalDir = Environment.getExternalStorageDirectory()
     private val picturesDir = File(externalDir, "/Android/data/com.github.factotum_sdp.factotum/files/Pictures")
-    private val drawerOpened = false
-
 
     @get:Rule
     val permissionsRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
@@ -55,7 +53,7 @@ class PictureFragmentOnlineTest {
     fun setUp() {
         storage = Firebase.storage
         storage.useEmulator("10.0.2.2", 9199)
-        emptyFirebaseStorage(storage)
+        runBlocking { emptyFirebaseStorage(storage.reference) }
         emptyLocalFiles(picturesDir)
 
         // Open the drawer

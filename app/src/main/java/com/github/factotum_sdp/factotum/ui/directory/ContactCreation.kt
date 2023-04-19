@@ -75,7 +75,6 @@ class ContactCreation : Fragment() {
     private fun setAddressSearchTextListener(cursorAdapter: SimpleCursorAdapter) {
         binding.contactCreationAddress.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-
                 return false
             }
             override fun onQueryTextChange(newText: String?): Boolean {

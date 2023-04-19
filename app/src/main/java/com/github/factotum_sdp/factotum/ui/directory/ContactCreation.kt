@@ -5,7 +5,6 @@ import android.database.Cursor
 import android.database.MatrixCursor
 import android.os.Bundle
 import android.provider.BaseColumns
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,12 +14,11 @@ import android.widget.Spinner
 import androidx.appcompat.widget.SearchView
 import androidx.cursoradapter.widget.SimpleCursorAdapter
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.localisation.Location
 import com.github.factotum_sdp.factotum.databinding.FragmentContactCreationBinding
-import com.github.factotum_sdp.factotum.databinding.FragmentRoutesBinding
-import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
-import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.launch
 
 /**
  * A simple ContactCreation fragment.
@@ -57,7 +55,6 @@ class ContactCreation : Fragment() {
         setAddressSearchTextListener(cursor)
         setAddressSearchSuggestions()
 
-
     }
 
     private fun initializeSpinner(view: View){
@@ -78,20 +75,22 @@ class ContactCreation : Fragment() {
     private fun setAddressSearchTextListener(cursorAdapter: SimpleCursorAdapter) {
         binding.contactCreationAddress.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                if (query != null) {
-                    val result = Location.geocoderQuery(query, requireContext())
-                    val cursor =
-                        MatrixCursor(arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1))
-                    result?.forEachIndexed { index, suggestion ->
-                        cursor.addRow(arrayOf(index, suggestion.getAddressLine(0).toString()))
-                    }
-                    cursorAdapter.changeCursor(cursor)
-                }
-                return true
+
+                return false
             }
             override fun onQueryTextChange(newText: String?): Boolean {
-                cursorAdapter.changeCursor(null)
-                return false
+                if (newText != null) {
+                    val cursor =
+                        MatrixCursor(arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1))
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        val result = Location.geocoderQuery(newText, requireContext())
+                        result?.forEachIndexed { index, suggestion ->
+                            cursor.addRow(arrayOf(index, suggestion.getAddressLine(0).toString()))
+                        }
+                        cursorAdapter.changeCursor(cursor)
+                    }
+                }
+                return true
             }
         })
     }

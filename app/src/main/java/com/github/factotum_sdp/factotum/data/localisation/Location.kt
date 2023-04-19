@@ -55,6 +55,13 @@ class Location(query: String, context : Context) {
             return location
         }
 
+        /**
+         * Blocking function that returns a list of addresses dependant on the query
+         *
+         * @param query : String. Address that we want to search
+         * @param context : Context. Context in which this function is called
+         * @return : List<Address>?. Null if no result
+         */
         fun geocoderQuery(query: String, context: Context): List<Address>?{
             // must handle differently depending on SDK.
             // getLocationFromName(String, int) deprecated in SDK 33

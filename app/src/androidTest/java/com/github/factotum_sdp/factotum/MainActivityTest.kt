@@ -8,6 +8,7 @@ import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.Espresso.pressBackUnconditionally
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.DrawerMatchers
@@ -27,6 +28,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matchers.allOf
+import org.junit.After
 import org.junit.AfterClass
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -63,12 +65,14 @@ class MainActivityTest {
             }
 
             UsersPlaceHolder.init(database, auth)
-
             runBlocking {
                 UsersPlaceHolder.populateDatabase()
             }
             runBlocking {
                 UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER3)
+                UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_BOSS)
+                UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_COURIER)
+                UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_CLIENT)
             }
         }
 
@@ -213,7 +217,7 @@ class MainActivityTest {
     fun pressingBackOnRBFragmentLeadsOutOfTheApp() {
         LoginFragmentTest.fillUserEntryAndGoToRBFragment("jane.doe@gmail.com", "123456")
         Thread.sleep(LOGIN_REFRESH_TIME)
-        Espresso.pressBackUnconditionally()
+        pressBackUnconditionally()
         val uiDevice = UiDevice.getInstance(getInstrumentation())
         assertFalse(uiDevice.currentPackageName == "com.github.factotum_sdp.factotum")
         assertTrue(uiDevice.isScreenOn)
@@ -225,7 +229,37 @@ class MainActivityTest {
         Thread.sleep(LOGIN_REFRESH_TIME)
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("jane.doe@gmail.com")).check(matches(isDisplayed()))
-        onView(withText("Jane Doe (CLIENT)")).check(matches(isDisplayed()))
+        onView(withText("Jane Doe (BOSS)")).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun drawerMenuIsCorrectlyDisplayedForBoss() {
+        LoginFragmentTest.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
+        Thread.sleep(LOGIN_REFRESH_TIME)
+
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
+
+        // Check that the menu items are displayed
+        onView(withText("RoadBook")).check(matches(isDisplayed()))
+        onView(withText("Directory")).check(matches(isDisplayed()))
+        onView(withText("Picture")).check(matches(isDisplayed()))
+        onView(withText("Maps")).check(matches(isDisplayed()))
+        onView(withText("View Proof Pictures")).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun drawerMenuIsCorrectlyDisplayedForClient() {
+        LoginFragmentTest.fillUserEntryAndGoToRBFragment("client@gmail.com", "123456")
+        Thread.sleep(LOGIN_REFRESH_TIME)
+
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
+
+        // Check that the menu items are displayed
+        onView(withText("RoadBook")).check(doesNotExist())
+        onView(withText("Directory")).check(doesNotExist())
+        onView(withText("Picture")).check(doesNotExist())
+        onView(withText("Maps")).check(doesNotExist())
+        onView(withText("View Proof Pictures")).check(matches(isDisplayed()))
     }
 
     // Work when executing the scenario manually but emulators issues make it fails in the connectedCheck
@@ -236,7 +270,7 @@ class MainActivityTest {
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("jane.doe@gmail.com")).check(matches(isDisplayed()))
-        onView(withText("Jane Doe (CLIENT)")).check(matches(isDisplayed()))
+        onView(withText("Jane Doe (BOSS)")).check(matches(isDisplayed()))
 
         onView(withId(R.id.signoutButton)).perform(click())
         Thread.sleep(LOGIN_REFRESH_TIME)

@@ -2,11 +2,7 @@ package com.github.factotum_sdp.factotum.ui.picture
 
 import android.Manifest
 import android.os.Environment
-import android.util.Log
-import androidx.test.core.app.ApplicationProvider
-import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.espresso.contrib.DrawerActions
@@ -22,8 +18,6 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.ui.picture.*
-import com.github.factotum_sdp.factotum.ui.roadbook.DRecordDetailsFragmentTest
-import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookFragmentTest
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
@@ -93,8 +87,9 @@ class PictureFragmentOnlineTest {
         Thread.sleep(TIME_WAIT_DONE_OR_CANCEL)
 
         // Click the button to validate the photo
-        val validateButton = device.findObject(UiSelector().description("Done"))
-        validateButton.click()
+        device.executeShellCommand("input keyevent 61")
+        device.executeShellCommand("input keyevent 61")
+        device.executeShellCommand("input keyevent 62")
 
         // Wait for the photo to be uploaded
         Thread.sleep(TIME_WAIT_UPLOAD)
@@ -123,8 +118,10 @@ class PictureFragmentOnlineTest {
         Thread.sleep(TIME_WAIT_DONE_OR_CANCEL)
 
         // Click the button to cancel the photo
-        val cancelButton = device.findObject(UiSelector().description("Cancel"))
-        cancelButton.click()
+        device.executeShellCommand("input keyevent 61")
+        device.executeShellCommand("input keyevent 61")
+        device.executeShellCommand("input keyevent 61")
+        device.executeShellCommand("input keyevent 62")
 
         // Wait for the photo to be uploaded
         Thread.sleep(TIME_WAIT_UPLOAD)

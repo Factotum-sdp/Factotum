@@ -11,14 +11,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
-import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
-import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
@@ -83,7 +81,9 @@ class PictureFragmentOfflineTest {
         Thread.sleep(TIME_WAIT_DONE_OR_CANCEL)
 
         // Click the button to validate the photo
-        device.executeShellCommand("input tap 540 2048")
+        device.executeShellCommand("input keyevent 61")
+        device.executeShellCommand("input keyevent 61")
+        device.executeShellCommand("input keyevent 62")
 
         // Wait for the photo to be uploaded
         Thread.sleep(TIME_WAIT_UPLOAD)

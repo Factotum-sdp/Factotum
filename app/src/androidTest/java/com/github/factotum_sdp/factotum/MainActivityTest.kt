@@ -46,9 +46,6 @@ class MainActivityTest {
         MainActivity::class.java
     )
 
-    @get:Rule
-    val permissionsRule: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
-
     companion object {
         @BeforeClass
         @JvmStatic
@@ -138,30 +135,6 @@ class MainActivityTest {
     }
 
     @Test
-    fun clickOnPictureMenuItemLeadsToCorrectFragmentAnd() {
-        Intents.init()
-        val device = UiDevice.getInstance(getInstrumentation())
-
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.pictureFragment))
-            .perform(click())
-        // Check that is open the camera
-
-        // Create an IntentMatcher to capture the intent that should open the camera app
-        val expectedIntent = allOf(hasAction(MediaStore.ACTION_IMAGE_CAPTURE))
-
-        Thread.sleep(5000)
-
-        // Click on the camera shutter button
-        device.executeShellCommand("input keyevent 27")
-
-        // Use Intents.intended() to check that the captured intent matches the expected intent
-        Intents.intended(expectedIntent)
-        Intents.release()
-    }
-
-    @Test
     fun clickOnMapsMenuItemLeadsToCorrectFragment() {
         clickOnAMenuItemLeadsCorrectly(
             R.id.routeFragment,
@@ -242,7 +215,6 @@ class MainActivityTest {
         // Check that the menu items are displayed
         onView(withText("RoadBook")).check(matches(isDisplayed()))
         onView(withText("Directory")).check(matches(isDisplayed()))
-        onView(withText("Picture")).check(matches(isDisplayed()))
         onView(withText("Maps")).check(matches(isDisplayed()))
         onView(withText("View Proof Pictures")).check(matches(isDisplayed()))
     }
@@ -257,7 +229,6 @@ class MainActivityTest {
         // Check that the menu items are displayed
         onView(withText("RoadBook")).check(doesNotExist())
         onView(withText("Directory")).check(doesNotExist())
-        onView(withText("Picture")).check(doesNotExist())
         onView(withText("Maps")).check(doesNotExist())
         onView(withText("View Proof Pictures")).check(matches(isDisplayed()))
     }

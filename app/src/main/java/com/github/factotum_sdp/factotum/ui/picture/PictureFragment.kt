@@ -15,13 +15,14 @@ import java.io.File
 import java.util.Date
 import java.util.Locale
 
-class PictureFragment : Fragment() {
+class PictureFragment(clientID : String): Fragment() {
 
     private lateinit var photoFile: File
     private lateinit var photoUri: Uri
     private lateinit var photoName: String
     private val storage: FirebaseStorage = FirebaseStorage.getInstance()
     private val storageRef: StorageReference = storage.reference
+    private val folderName: String = clientID.ifBlank { "default" }
 
     override fun onStart() {
         super.onStart()
@@ -32,11 +33,16 @@ class PictureFragment : Fragment() {
         val fileProvider = getString(R.string.file_provider)
         val storageDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
 
+        val tempFolder = File(storageDir, folderName)
+        if (!tempFolder.exists()) {
+            tempFolder.mkdir()
+        }
+
         val dateFormat = SimpleDateFormat("dd-MM-yyyy_HH-mm-ss", Locale.getDefault())
         val currentDateAndTime = dateFormat.format(Date())
 
         photoName = "USER_${currentDateAndTime}.jpg"
-        photoFile = File.createTempFile(photoName, ".jpg", storageDir)
+        photoFile = File(tempFolder, photoName) // Create the photo file in the temporary folder
         photoUri = FileProvider.getUriForFile(requireContext(), fileProvider, photoFile)
 
         // Launch the camera given the URI of the photo
@@ -48,7 +54,7 @@ class PictureFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.TakePicture()) { result ->
             if (result) {
                 // Upload photo to Firebase Storage
-                val photoRef = storageRef.child(photoName)
+                val photoRef = storageRef.child("$folderName/$photoName")
                 val uploadTask = photoRef.putFile(photoUri)
 
                 // Register observers to listen for when the upload is done or if it fails

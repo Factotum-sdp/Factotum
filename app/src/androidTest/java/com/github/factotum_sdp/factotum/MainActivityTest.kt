@@ -38,6 +38,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 const val LOGIN_REFRESH_TIME = 3000L
+const val DRAWER_REFRESH_TIME = 1000L
+
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest {
 
@@ -212,6 +214,8 @@ class MainActivityTest {
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
 
+        Thread.sleep(DRAWER_REFRESH_TIME)
+
         // Check that the menu items are displayed
         onView(withText("RoadBook")).check(matches(isDisplayed()))
         onView(withText("Directory")).check(matches(isDisplayed()))
@@ -225,6 +229,8 @@ class MainActivityTest {
         Thread.sleep(LOGIN_REFRESH_TIME)
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
+
+        Thread.sleep(DRAWER_REFRESH_TIME)
 
         // Check that the menu items are displayed
         onView(withText("RoadBook")).check(doesNotExist())

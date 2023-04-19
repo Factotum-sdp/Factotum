@@ -61,13 +61,6 @@ class LoginFragmentTest {
 
         @AfterClass
         @JvmStatic
-        fun emptyDatabase() {
-            val database: FirebaseDatabase = MainActivity.getDatabase()
-            UsersPlaceHolder.emptyFirebaseDatabase(database)
-        }
-
-        @AfterClass
-        @JvmStatic
         fun stopAuthEmulator() {
             val auth = Firebase.auth
             auth.signOut()

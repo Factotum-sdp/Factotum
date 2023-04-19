@@ -90,14 +90,6 @@ class MainActivityTest {
             auth.signOut()
             MainActivity.setAuth(auth)
         }
-
-        @AfterClass
-        @JvmStatic
-        fun emptyDatabase() {
-            val database = Firebase.database
-            ContactsUtils.emptyFirebaseDatabase(database)
-            UsersPlaceHolder.emptyFirebaseDatabase(database)
-        }
     }
 
     //========================================================================================

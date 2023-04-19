@@ -35,12 +35,6 @@ class ContactsListOnlineTest {
 
             ContactsList.init(database)
         }
-
-        @AfterClass
-        @JvmStatic
-        fun emptyDatabase() {
-            ContactsUtils.emptyFirebaseDatabase(database)
-        }
     }
 
     @ExperimentalCoroutinesApi

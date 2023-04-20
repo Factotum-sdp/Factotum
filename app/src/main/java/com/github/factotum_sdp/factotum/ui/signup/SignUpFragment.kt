@@ -13,8 +13,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.data.SignUpDataSink
+import com.github.factotum_sdp.factotum.data.*
 import com.github.factotum_sdp.factotum.databinding.FragmentSignupBinding
 import com.github.factotum_sdp.factotum.ui.auth.BaseAuthFragment
 import com.google.android.material.snackbar.Snackbar
@@ -52,7 +53,12 @@ class SignUpFragment : BaseAuthFragment() {
         val loadingProgressBar = binding.loading
         val signUpButton = binding.signup
 
-        observeSignUpFormState(signUpButton, usernameEditText, emailEditText, passwordEditText)
+        observeSignUpFormState(
+            signUpButton,
+            usernameEditText,
+            emailEditText,
+            passwordEditText
+        )
 
         val afterTextChangedListener = createTextWatcher(
             viewModel,
@@ -142,7 +148,15 @@ class SignUpFragment : BaseAuthFragment() {
     override fun updateUi(model: Any) {
         val welcome = getString(R.string.welcome) + " " + (model as String)
         Snackbar.make(requireView(), welcome, Snackbar.LENGTH_LONG).show()
-        findNavController().navigate(R.id.action_signUpFragment_to_loginFragment)
+        val newUser = User(
+            binding.username.text.toString(),
+            binding.email.text.toString(),
+            Role.valueOf(binding.role.text.toString())
+        )
+        viewModel.updateUsersList(newUser)
+        MainActivity.getAuth().signOut()
+        MainActivity().finish()
+        startActivity(requireActivity().intent)
     }
 
     override fun onDestroyView() {
@@ -159,7 +173,8 @@ class SignUpFragment : BaseAuthFragment() {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(SignUpViewModel::class.java)) {
                 return SignUpViewModel(
-                    signUpDataSink = SignUpDataSink()
+                    signUpDataSink = SignUpDataSink(),
+                    loginRepository = LoginRepository(LoginDataSource())
                 ) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")

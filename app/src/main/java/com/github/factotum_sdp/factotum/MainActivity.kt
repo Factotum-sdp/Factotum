@@ -9,11 +9,7 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.NavigationUI
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
+import androidx.navigation.ui.*
 import com.github.factotum_sdp.factotum.data.Role
 import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
 import com.google.android.material.navigation.NavigationView
@@ -85,7 +81,7 @@ class MainActivity : AppCompatActivity() {
         val user = ViewModelProvider(this)[UserViewModel::class.java]
         binding.navView.findViewTreeLifecycleOwner()?.let { lco ->
             user.loggedInUser.observe(lco) {
-                val format = "${it.displayName} (${it.role})"
+                val format = "${it.name} (${it.role})"
                 userName.text = format
                 email.text = it.email
 
@@ -107,7 +103,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Update the menu items according to the user roledisplayFragment
-    private fun updateMenuItems(role : Role) {
+    private fun updateMenuItems(role: Role) {
         val navMenu = binding.navView.menu
 
         when (role) {

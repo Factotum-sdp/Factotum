@@ -40,10 +40,6 @@
         android:label="Record details"
         tools:layout="@layout/fragment_drecord_details"/>
     <fragment
-        android:id="@+id/pictureFragment"
-        android:name="com.github.factotum_sdp.factotum.ui.picture.PictureFragment"
-        android:label="Picture"/>
-    <fragment
         android:id="@+id/directoryFragment"
         android:name="com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment"
         android:label="Directory"

@@ -2,7 +2,6 @@ package com.github.factotum_sdp.factotum
 
 import android.os.Bundle
 import android.widget.TextView
-import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
@@ -17,7 +16,6 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.github.factotum_sdp.factotum.data.Role
 import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
-import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -49,8 +47,8 @@ class MainActivity : AppCompatActivity() {
         // In order to keep out the NavigateUpButton which would mask the HamburgerButton
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.roadBookFragment, R.id.pictureFragment,
-                R.id.directoryFragment, R.id.loginFragment, R.id.routeFragment,
+                R.id.roadBookFragment, R.id.directoryFragment,
+                R.id.loginFragment, R.id.routeFragment,
                 R.id.displayFragment
             ), drawerLayout
         )
@@ -115,7 +113,6 @@ class MainActivity : AppCompatActivity() {
         when (role) {
             Role.CLIENT -> {
                 navMenu.findItem(R.id.roadBookFragment).isVisible = false
-                navMenu.findItem(R.id.pictureFragment).isVisible = false
                 navMenu.findItem(R.id.directoryFragment).isVisible = false
                 navMenu.findItem(R.id.routeFragment).isVisible = false
                 navMenu.findItem(R.id.displayFragment).isVisible = true
@@ -123,7 +120,6 @@ class MainActivity : AppCompatActivity() {
 
             else -> {
                 navMenu.findItem(R.id.roadBookFragment).isVisible = true
-                navMenu.findItem(R.id.pictureFragment).isVisible = true
                 navMenu.findItem(R.id.directoryFragment).isVisible = true
                 navMenu.findItem(R.id.routeFragment).isVisible = true
                 navMenu.findItem(R.id.displayFragment).isVisible = true

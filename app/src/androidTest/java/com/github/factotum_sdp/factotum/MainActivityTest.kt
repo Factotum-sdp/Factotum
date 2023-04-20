@@ -67,12 +67,6 @@ class MainActivityTest {
 
             UsersPlaceHolder.init(database, auth)
             runBlocking {
-                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER1)
-            }
-            runBlocking {
-                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER3)
-            }
-            runBlocking {
                 UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_BOSS)
             }
             runBlocking {
@@ -80,12 +74,6 @@ class MainActivityTest {
             }
             runBlocking {
                 UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_CLIENT)
-            }
-            runBlocking {
-                UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER1)
-            }
-            runBlocking {
-                UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER3)
             }
             runBlocking {
                 UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_BOSS)
@@ -197,7 +185,7 @@ class MainActivityTest {
     @Test
     fun pressingBackOnAMenuFragmentLeadsToRBFragment() {
         // First need to login to trigger the change of navGraph's start fragment
-        LoginFragmentTest.fillUserEntryAndGoToRBFragment("jane.doe@gmail.com", "123456")
+        LoginFragmentTest.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
         Thread.sleep(LOGIN_REFRESH_TIME)
 
         navigateToAndPressBackLeadsToRB(R.id.directoryFragment)
@@ -213,7 +201,7 @@ class MainActivityTest {
 
     @Test
     fun pressingBackOnRBFragmentLeadsOutOfTheApp() {
-        LoginFragmentTest.fillUserEntryAndGoToRBFragment("jane.doe@gmail.com", "123456")
+        LoginFragmentTest.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
         Thread.sleep(LOGIN_REFRESH_TIME)
         pressBackUnconditionally()
         val uiDevice = UiDevice.getInstance(getInstrumentation())
@@ -223,11 +211,11 @@ class MainActivityTest {
 
     @Test
     fun navHeaderDisplaysUserData() {
-        LoginFragmentTest.fillUserEntryAndGoToRBFragment("jane.doe@gmail.com", "123456")
+        LoginFragmentTest.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
         Thread.sleep(LOGIN_REFRESH_TIME)
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
-        onView(withText("jane.doe@gmail.com")).check(matches(isDisplayed()))
-        onView(withText("Jane Doe (BOSS)")).check(matches(isDisplayed()))
+        onView(withText("boss@gmail.com")).check(matches(isDisplayed()))
+        onView(withText("Boss (BOSS)")).check(matches(isDisplayed()))
     }
 
     @Test
@@ -265,12 +253,12 @@ class MainActivityTest {
     // Work when executing the scenario manually but emulators issues make it fails in the connectedCheck
     // The second user Helen Bates can't be found.
     private fun navHeaderStillDisplaysCorrectlyAfterLogout() {
-        LoginFragmentTest.fillUserEntryAndGoToRBFragment("jane.doe@gmail.com", "123456")
+        LoginFragmentTest.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
         Thread.sleep(LOGIN_REFRESH_TIME)
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
-        onView(withText("jane.doe@gmail.com")).check(matches(isDisplayed()))
-        onView(withText("Jane Doe (BOSS)")).check(matches(isDisplayed()))
+        onView(withText("boss@gmail.com")).check(matches(isDisplayed()))
+        onView(withText("Boss (BOSS)")).check(matches(isDisplayed()))
 
         onView(withId(R.id.signoutButton)).perform(click())
         Thread.sleep(LOGIN_REFRESH_TIME)

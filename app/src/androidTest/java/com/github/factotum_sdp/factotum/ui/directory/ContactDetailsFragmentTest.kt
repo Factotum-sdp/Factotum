@@ -1,6 +1,5 @@
 package com.github.factotum_sdp.factotum.ui.directory
 
-import android.Manifest
 import android.content.Intent
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
@@ -14,7 +13,6 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until.hasObject
@@ -23,6 +21,7 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.ContactsList
 import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
 import com.github.factotum_sdp.factotum.utils.ContactsUtils
+import com.github.factotum_sdp.factotum.utils.LocationUtils
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import junit.framework.TestCase.assertTrue
@@ -38,11 +37,6 @@ import org.junit.runner.RunWith
 class ContactDetailsFragmentTest {
     @get:Rule
     var activityRule = ActivityScenarioRule(MainActivity::class.java)
-
-    @get:Rule
-    val permission = GrantPermissionRule.grant(
-        Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.ACCESS_COARSE_LOCATION)
 
     companion object {
         @BeforeClass
@@ -118,6 +112,7 @@ class ContactDetailsFragmentTest {
     fun buttonRunOpensGoogleMaps(){
         Intents.init()
         onView(withId(R.id.run_button)).perform(click())
+        LocationUtils.maybeLocationPermission()
         Intents.intended(
             CoreMatchers.allOf(
                 IntentMatchers.hasAction(Intent.ACTION_VIEW),
@@ -130,6 +125,7 @@ class ContactDetailsFragmentTest {
     @Test
     fun buttonShowDestination(){
         onView(withId(R.id.show_all_button)).perform(click())
+        LocationUtils.maybeLocationPermission()
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         val markers = device.wait(hasObject(By.descContains("Destination")), 5000L)
         assertTrue(markers)

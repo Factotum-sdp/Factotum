@@ -81,6 +81,18 @@ class DirectoryFragmentTest {
     }
 
     @Test
+    fun addButtonExists(){
+        onView(withId(R.id.add_contact_button)).check(matches(isDisplayed()))
+
+    }
+
+    @Test
+    fun addButtonOpensContactCreation(){
+        onView(withId(R.id.add_contact_button)).perform(click())
+        onView(withId(R.id.contact_creation_fragment)).check(matches(isDisplayed()))
+    }
+
+    @Test
     fun allContactsCanBeClickedOn() {
         val device = UiDevice.getInstance(getInstrumentation())
         for (i in 0 until nbContacts) {
@@ -107,7 +119,7 @@ class DirectoryFragmentTest {
 
         // Check if the expected contact is visible in the RecyclerView
         onView(withId(R.id.contacts_recycler_view))
-            .perform(scrollToHolder(ContactsUtils.withHolderContactName("John")))
+            .perform(scrollToHolder(ContactsUtils.withHolderContactName("Smith John")))
     }
 
 }

@@ -11,7 +11,6 @@ import kotlinx.coroutines.CompletableDeferred
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.TypeSafeMatcher
-import java.util.UUID
 
 class ContactsUtils {
 
@@ -39,7 +38,7 @@ class ContactsUtils {
 
         private fun createContact(position: Int): Contact {
             return Contact(
-                UUID.randomUUID().toString(),
+                position.toString(),
                 roles[position % roles.size], randomNames[position % randomNames.size],
                 randomSurnames[position % randomSurnames.size], image,
                 randomAddresses[position % randomAddresses.size],

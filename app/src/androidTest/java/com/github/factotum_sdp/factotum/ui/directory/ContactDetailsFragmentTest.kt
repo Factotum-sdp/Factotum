@@ -31,17 +31,16 @@ class ContactDetailsFragmentTest {
 
             val database = ContactsUtils.setEmulatorGet()
             MainActivity.setDatabase(database)
-
-            ContactsUtils.emptyFirebaseDatabase()
-
-            runBlocking {
-                ContactsUtils.populateDatabase(5)
-            }
         }
     }
 
     @Before
     fun goToContactDetails() {
+        ContactsUtils.emptyFirebaseDatabase()
+
+        runBlocking {
+            ContactsUtils.populateDatabase(5)
+        }
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.directoryFragment))
@@ -57,8 +56,32 @@ class ContactDetailsFragmentTest {
     }
 
     @Test
+    fun modifyButtonIsDisplayed() {
+        onView(withId(R.id.button_modify_contact))
+            .check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun deleteButtonIsDisplayed() {
+        onView(withId(R.id.button_delete_contact))
+            .check(matches(isDisplayed()))
+    }
+
+    @Test
     fun buttonIsClickable() {
         onView(withId(R.id.button))
+            .perform(click())
+    }
+
+    @Test
+    fun modifyButtonIsClickable() {
+        onView(withId(R.id.button_modify_contact))
+            .perform(click())
+    }
+
+    @Test
+    fun deleteButtonIsClickable() {
+        onView(withId(R.id.button_delete_contact))
             .perform(click())
     }
 
@@ -92,6 +115,41 @@ class ContactDetailsFragmentTest {
             .perform(click())
         onView(withId(R.id.contacts_recycler_view))
             .check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun modifyButtonGoesToContactEdition() {
+        onView(withId(R.id.button_modify_contact))
+            .perform(click())
+        onView(withId(R.id.contact_creation_fragment))
+            .check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun deleteButtonReturnsToContacts() {
+        onView(withId(R.id.button_delete_contact))
+            .perform(click())
+        onView(withId(R.id.contacts_recycler_view))
+            .check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun deleteButtonDeletesContact() {
+        onView(withId(R.id.button_delete_contact))
+            .perform(click())
+        onView(withId(R.id.contacts_recycler_view))
+            .check(matches(isDisplayed()))
+        //check if size of recycler view is 4
+        onView(withId(R.id.contacts_recycler_view))
+            .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
+            .check { view, noViewFoundException ->
+                if (noViewFoundException != null) {
+                    throw noViewFoundException
+                }
+                val recyclerView = view as RecyclerView
+                val adapter = recyclerView.adapter
+                assert(adapter?.itemCount == 4)
+            }
     }
 
 }

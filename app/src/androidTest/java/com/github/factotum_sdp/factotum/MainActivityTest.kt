@@ -73,9 +73,27 @@ class MainActivityTest {
                 UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER3)
             }
             runBlocking {
+                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_BOSS)
+            }
+            runBlocking {
+                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_COURIER)
+            }
+            runBlocking {
+                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_CLIENT)
+            }
+            runBlocking {
+                UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER1)
+            }
+            runBlocking {
                 UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER3)
+            }
+            runBlocking {
                 UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_BOSS)
+            }
+            runBlocking {
                 UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_COURIER)
+            }
+            runBlocking {
                 UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_CLIENT)
             }
         }

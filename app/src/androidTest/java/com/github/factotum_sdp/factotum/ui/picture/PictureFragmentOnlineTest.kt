@@ -33,6 +33,7 @@ class PictureFragmentOnlineTest {
 
     // Those tests need to run with a firebase storage emulator
     private lateinit var storage: FirebaseStorage
+    private lateinit var device : UiDevice
     private val externalDir = Environment.getExternalStorageDirectory()
     private val picturesDir = File(externalDir, "/Android/data/com.github.factotum_sdp.factotum/files/Pictures")
 
@@ -49,6 +50,7 @@ class PictureFragmentOnlineTest {
         storage = Firebase.storage
         storage.useEmulator("10.0.2.2", 9199)
         emptyLocalFiles(picturesDir)
+        device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
         // Open the drawer
         onView(withId(R.id.drawer_layout))
@@ -67,6 +69,9 @@ class PictureFragmentOnlineTest {
 
         // Wait for the camera to open
         Thread.sleep(TIME_WAIT_SHUTTER)
+
+        // Take a photo
+        triggerShutter(device)
     }
 
     @After
@@ -78,18 +83,11 @@ class PictureFragmentOnlineTest {
 
     @Test
     fun testUploadFileCorrectly() {
-        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-
-        // Click on the shutter button
-        device.executeShellCommand("input keyevent 27")
-
         // Wait for the photo to be taken
         Thread.sleep(TIME_WAIT_DONE_OR_CANCEL)
 
         // Click the button to validate the photo
-        device.executeShellCommand("input keyevent 61")
-        device.executeShellCommand("input keyevent 61")
-        device.executeShellCommand("input keyevent 62")
+        triggerDone(device)
 
         // Wait for the photo to be uploaded
         Thread.sleep(TIME_WAIT_UPLOAD)
@@ -109,19 +107,11 @@ class PictureFragmentOnlineTest {
 
     @Test
     fun testCancelPhoto() {
-        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-
-        val takePictureButton = device.findObject(UiSelector().description("Shutter"))
-        takePictureButton.click()
-
         // Wait for the photo to be taken
         Thread.sleep(TIME_WAIT_DONE_OR_CANCEL)
 
         // Click the button to cancel the photo
-        device.executeShellCommand("input keyevent 61")
-        device.executeShellCommand("input keyevent 61")
-        device.executeShellCommand("input keyevent 61")
-        device.executeShellCommand("input keyevent 62")
+        triggerCancel(device)
 
         // Wait for the photo to be uploaded
         Thread.sleep(TIME_WAIT_UPLOAD)
@@ -139,4 +129,6 @@ class PictureFragmentOnlineTest {
             fail(except.message)
         }
     }
+
+
 }

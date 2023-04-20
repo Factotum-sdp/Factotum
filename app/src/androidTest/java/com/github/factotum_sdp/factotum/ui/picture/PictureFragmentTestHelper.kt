@@ -1,6 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.picture
 
-import com.google.firebase.storage.FirebaseStorage
+import androidx.test.uiautomator.UiDevice
 import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.tasks.await
 import java.io.File
@@ -31,4 +31,21 @@ fun emptyLocalFiles(dir: File) {
         }
         file.delete()
     }
+}
+
+fun triggerShutter(device : UiDevice) {
+    device.executeShellCommand("input keyevent 27")
+}
+
+fun triggerDone(device: UiDevice) {
+    device.executeShellCommand("input keyevent 61")
+    device.executeShellCommand("input keyevent 61")
+    device.executeShellCommand("input keyevent 62")
+}
+
+fun triggerCancel(device: UiDevice) {
+    device.executeShellCommand("input keyevent 61")
+    device.executeShellCommand("input keyevent 61")
+    device.executeShellCommand("input keyevent 61")
+    device.executeShellCommand("input keyevent 62")
 }

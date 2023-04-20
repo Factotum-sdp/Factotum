@@ -4,8 +4,12 @@ import android.Manifest
 import android.os.Environment
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -30,6 +34,7 @@ import java.io.File
 @RunWith(AndroidJUnit4::class)
 class PictureFragmentOfflineTest {
     private lateinit var storage: FirebaseStorage
+    private lateinit var device: UiDevice
     private val externalDir = Environment.getExternalStorageDirectory()
     private val picturesDir = File(externalDir, "/Android/data/com.github.factotum_sdp.factotum/files/Pictures")
 
@@ -46,22 +51,23 @@ class PictureFragmentOfflineTest {
         // Initialize Firebase Storage
         storage = Firebase.storage
         storage.useEmulator("10.0.2.2", 9198)
+        device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         emptyLocalFiles(picturesDir)
 
         // Open the drawer
-        onView(ViewMatchers.withId(R.id.drawer_layout))
+        onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
-        onView(ViewMatchers.withId(R.id.roadBookFragment))
-            .perform(ViewActions.click())
+        onView(withId(R.id.roadBookFragment))
+            .perform(click())
 
         // Click on one of the roadbook
         val destID = DestinationRecords.RECORDS[2].destID
-        onView(ViewMatchers.withText(destID)).perform(ViewActions.click())
+        onView(withText(destID)).perform(click())
 
         // Go to the picture fragment
-        onView(ViewMatchers.withId(R.id.viewPager)).perform(ViewActions.swipeLeft())
-        onView(ViewMatchers.withId(R.id.viewPager)).perform(ViewActions.swipeLeft())
-        onView(ViewMatchers.withId(R.id.viewPager)).perform(ViewActions.swipeLeft())
+        onView(withId(R.id.viewPager)).perform(swipeLeft())
+        onView(withId(R.id.viewPager)).perform(swipeLeft())
+        onView(withId(R.id.viewPager)).perform(swipeLeft())
 
         // Wait for the camera to open
         Thread.sleep(TIME_WAIT_SHUTTER)
@@ -74,16 +80,14 @@ class PictureFragmentOfflineTest {
 
     @Test
     fun testDoesNotDeleteFileIfUploadFails() {
-        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        device.executeShellCommand("input keyevent 27")
+        // Take a photo
+        triggerShutter(device)
 
         // Wait for the photo to be taken
         Thread.sleep(TIME_WAIT_DONE_OR_CANCEL)
 
         // Click the button to validate the photo
-        device.executeShellCommand("input keyevent 61")
-        device.executeShellCommand("input keyevent 61")
-        device.executeShellCommand("input keyevent 62")
+        triggerDone(device)
 
         // Wait for the photo to be uploaded
         Thread.sleep(TIME_WAIT_UPLOAD)

@@ -1,6 +1,16 @@
 package com.github.factotum_sdp.factotum.ui.picture
 
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.swipeLeft
+import androidx.test.espresso.contrib.DrawerActions.open
+import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.uiautomator.UiDevice
+import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.tasks.await
 import java.io.File
@@ -48,4 +58,21 @@ fun triggerCancel(device: UiDevice) {
     device.executeShellCommand("input keyevent 61")
     device.executeShellCommand("input keyevent 61")
     device.executeShellCommand("input keyevent 62")
+}
+
+fun goToPictureFragment() {
+    // Open the drawer
+    onView(withId(R.id.drawer_layout))
+        .perform(open())
+    onView(withId(R.id.roadBookFragment))
+        .perform(click())
+
+    // Click on one of the roadbook
+    val destID = DestinationRecords.RECORDS[2].destID
+    onView(withText(destID)).perform(click())
+
+    // Go to the picture fragment
+    onView(withId(R.id.viewPager)).perform(swipeLeft())
+    onView(withId(R.id.viewPager)).perform(swipeLeft())
+    onView(withId(R.id.viewPager)).perform(swipeLeft())
 }

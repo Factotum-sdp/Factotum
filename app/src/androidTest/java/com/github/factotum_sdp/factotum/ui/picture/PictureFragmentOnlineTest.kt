@@ -52,20 +52,7 @@ class PictureFragmentOnlineTest {
         emptyLocalFiles(picturesDir)
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
-        // Open the drawer
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.roadBookFragment))
-            .perform(ViewActions.click())
-
-        // Click on one of the roadbook
-        val destID = DestinationRecords.RECORDS[2].destID
-        onView(ViewMatchers.withText(destID)).perform(ViewActions.click())
-
-        // Go to the picture fragment
-        onView(withId(R.id.viewPager)).perform(swipeLeft())
-        onView(withId(R.id.viewPager)).perform(swipeLeft())
-        onView(withId(R.id.viewPager)).perform(swipeLeft())
+        goToPictureFragment()
 
         // Wait for the camera to open
         Thread.sleep(TIME_WAIT_SHUTTER)

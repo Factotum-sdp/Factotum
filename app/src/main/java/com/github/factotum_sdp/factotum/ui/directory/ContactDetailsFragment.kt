@@ -14,6 +14,7 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.Contact
 
 class ContactDetailsFragment : Fragment() {
+    private lateinit var currentContact: Contact
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,10 +29,9 @@ class ContactDetailsFragment : Fragment() {
         val contactsViewModel = //retrieve list of contacts
             ViewModelProvider(requireActivity())[ContactsViewModel::class.java]
 
-        setContactDetails(
-            view, //set contact details
-            contactsViewModel.contacts.value?.get(arguments?.getInt("id")!!) ?: Contact()
-        )
+        currentContact = contactsViewModel.contacts.value?.get(arguments?.getInt("id")!!) ?: Contact()
+
+        setContactDetails(view, currentContact) //set contact details
 
         initialiseAllButtons(view, contactsViewModel)
     }
@@ -73,13 +73,7 @@ class ContactDetailsFragment : Fragment() {
 
         val deleteContactButton = view.findViewById<Button>(R.id.button_delete_contact)
         deleteContactButton.setOnClickListener {
-            contactsViewModel.deleteContact(
-                contactsViewModel.contacts.value?.get(
-                    arguments?.getInt(
-                        "id"
-                    )!!
-                ) ?: Contact()
-            )
+            contactsViewModel.deleteContact(currentContact)
             it.findNavController()
                 .navigate(R.id.action_contactDetailsFragment2_to_directoryFragment)
         }

@@ -107,7 +107,7 @@ class DirectoryFragmentTest {
 
         // Check if the expected contact is visible in the RecyclerView
         onView(withId(R.id.contacts_recycler_view))
-            .perform(scrollToHolder(ContactsUtils.withHolderContactName("John Smith")))
+            .perform(scrollToHolder(ContactsUtils.withHolderContactName("John")))
     }
 
 }

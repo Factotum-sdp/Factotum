@@ -93,7 +93,7 @@ class ContactsUtils {
 
                 override fun matchesSafely(item: RecyclerView.ViewHolder): Boolean {
                     val holderName =
-                        item.itemView.findViewById<TextView>(R.id.contact_name).text.toString()
+                        item.itemView.findViewById<TextView>(R.id.contact_surname_and_name).text.toString()
                     if (holderName == name && isFirstMatch) {
                         isFirstMatch = false
                         return true

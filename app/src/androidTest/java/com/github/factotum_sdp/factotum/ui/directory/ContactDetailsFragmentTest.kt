@@ -66,6 +66,8 @@ class ContactDetailsFragmentTest {
     fun correctInfoIsDisplayed() {
         onView(withId(R.id.contact_name))
             .check(matches(withText(ContactsUtils.getContacts()[0].name)))
+        onView(withId(R.id.contact_surname))
+            .check(matches(withText(ContactsUtils.getContacts()[0].surname)))
         onView(withId(R.id.contact_phone))
             .check(matches(withText(ContactsUtils.getContacts()[0].phone)))
         onView(withId(R.id.contact_role))

@@ -62,6 +62,6 @@ class ContactsCreationTest {
         }
         val nbEditText = device.findObjects(clazz(EditText::class.java.name)).size
         // image already present
-        assertEquals(nbFields-2, nbEditText)
+        assertEquals(nbFields-1, nbEditText)
     }
 }

@@ -2,7 +2,6 @@ package com.github.factotum_sdp.factotum
 
 import android.os.Bundle
 import android.widget.TextView
-import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
@@ -17,7 +16,6 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.github.factotum_sdp.factotum.data.Role
 import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
-import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth

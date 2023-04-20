@@ -2,21 +2,12 @@ package com.github.factotum_sdp.factotum.ui.picture
 
 import android.Manifest
 import android.os.Environment
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions
-import androidx.test.espresso.action.ViewActions.swipeLeft
-import androidx.test.espresso.contrib.DrawerActions
-import androidx.test.espresso.matcher.ViewMatchers
-import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
-import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
-import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.ui.picture.*
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage

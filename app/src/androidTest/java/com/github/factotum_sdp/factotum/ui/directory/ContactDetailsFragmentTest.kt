@@ -129,7 +129,10 @@ class ContactDetailsFragmentTest {
     @Test
     fun buttonShowDestination(){
         onView(withId(R.id.show_all_button)).perform(click())
-        LocationUtils.hasLocationPopUp()
+        if(LocationUtils.hasLocationPopUp()){
+            val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+            device.findObject(UiSelector().textContains(LocationUtils.buttonTextAllow)).click()
+        }
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         val markers = device.wait(hasObject(By.descContains("Destination")), 5000L)
         assertTrue(markers)

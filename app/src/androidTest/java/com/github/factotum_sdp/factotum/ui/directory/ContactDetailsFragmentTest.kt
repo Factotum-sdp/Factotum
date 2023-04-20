@@ -1,21 +1,31 @@
 package com.github.factotum_sdp.factotum.ui.directory
 
+import android.content.Intent
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.RecyclerViewActions
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.uiautomator.By
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.Until.hasObject
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.ContactsList
+import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
 import com.github.factotum_sdp.factotum.utils.ContactsUtils
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.runBlocking
+import org.hamcrest.CoreMatchers
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -97,4 +107,24 @@ class ContactDetailsFragmentTest {
             .check(matches(isDisplayed()))
     }
 
+    @Test
+    fun buttonRunOpensGoogleMaps(){
+        Intents.init()
+        onView(withId(R.id.run_button)).perform(click())
+        Intents.intended(
+            CoreMatchers.allOf(
+                IntentMatchers.hasAction(Intent.ACTION_VIEW),
+                IntentMatchers.toPackage(RouteFragment.MAPS_PKG)
+            )
+        )
+        Intents.release()
+    }
+
+    @Test
+    fun buttonShowDestination(){
+        onView(withId(R.id.show_all_button)).perform(click())
+        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        val markers = device.wait(hasObject(By.descContains("Destination")), 5000)
+        assertTrue(markers)
+    }
 }

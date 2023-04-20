@@ -32,6 +32,10 @@
     <string name="del_button_text">Del</string>
     <string name="snap_text_on_rec_delete">Record deleted</string>
     <string name="temp_delete_action_button">temp_delete_action_button</string>
+    <string name="snap_text_on_rec_archive">Record archived</string>
+    <string name="unarchive_dialog_title">Unarchive the swiped record ?</string>
+    <string name="snap_text_on_rec_unarchive">Record unarchived</string>
+
     <string name="menu_maps">Maps</string>
     <string name="run">Run</string>
     <string name="rate_text_view">rate</string>
@@ -101,8 +105,8 @@
     <string name="hint_dialog_actions">Actions</string>
     <string name="hint_dialog_notes">Notes</string>
     <string name="rb_label_swipel_deletion">Swipe L. Deletion</string>
-    <string name="delete_confirm_button_label">Confirm</string>
-    <string name="delete_cancel_button_label">Cancel</string>
+    <string name="swipeleft_confirm_button_label">Confirm</string>
+    <string name="swipeleft_cancel_button_label">Cancel</string>
     <string name="delete_dialog_title">Delete the swiped record ?</string>
     <string name="edit_rejected_snap_label">Wrong format. Edition canceled</string>
     <string name="edit_confirmed_snap_label">Record edited</string>
@@ -126,6 +130,7 @@
     <string name="textvlabel_rate">Rate</string>
     <string name="textvlabel_actions">Actions</string>
     <string name="textvlabel_notes">Notes</string>
+    <string name="rb_label_show_archived">Show archived</string>
     <string name="delete_contact_button">Delete Contact</string>
     <string name="button_modify_contact">Modify contact</string>
     <string name="form_button_update">Update Contact</string>

@@ -112,14 +112,14 @@ class DRecordDetailsFragmentTest {
 
     // I think block in the CI due to the camera authorizations however it begins to be @Jules part,
     // and maybe a different Fragment will be here.
-    private fun swipeLeftThreeTimesDisplaysPicture() {
+    /*private fun swipeLeftThreeTimesDisplaysPicture() {
         toFragment()
         onView(withId(R.id.fragment_picture_directors_parent)).check(doesNotExist())
         onView(withId(R.id.viewPager)).perform(swipeLeft())
         onView(withId(R.id.viewPager)).perform(swipeLeft())
         onView(withId(R.id.viewPager)).perform(swipeLeft())
         onView(withId(R.id.fragment_picture_directors_parent)).check(matches(isDisplayed()))
-    }
+    }*/
 
     @Test
     fun swipeRightAfterSwipeLeftDisplaysInfo() {

@@ -40,7 +40,7 @@ class DRecordDetailsFragment: Fragment() {
         adapter.addFragment(DRecordInfoFragment(rec))
         adapter.addFragment(RouteFragment())
         adapter.addFragment(DirectoryFragment()) // To be replaced with ContactDetailsFragment()
-        adapter.addFragment(PictureFragment())
+        adapter.addFragment(PictureFragment(rec.clientID))
         viewPager.adapter = adapter
 
         return view

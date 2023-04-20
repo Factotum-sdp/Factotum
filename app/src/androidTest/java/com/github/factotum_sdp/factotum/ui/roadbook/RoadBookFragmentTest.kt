@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
 import androidx.test.espresso.action.*
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.PositionAssertions.isCompletelyAbove
@@ -23,6 +23,7 @@ import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeLeftTheRecordAt
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightTheRecordAt
 import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.setEmulatorGet
+import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.CoreMatchers.startsWith
 import org.junit.Before
 import org.junit.BeforeClass
@@ -43,11 +44,11 @@ class RoadBookFragmentTest {
     )
 
     companion object {
-
         const val SWIPE_L_SHARED_KEY = "SwipeLeftButton"
         const val SWIPE_R_SHARED_KEY = "SwipeRightButton"
         const val DRAG_N_DROP_SHARED_KEY = "DragNDropButton"
         const val TOUCH_CLICK_SHARED_KEY = "TouchClickButton"
+        const val SHOW_ARCHIVED_KEY = "ShowArchived"
         const val WORST_REFRESH_TIME = 2000L
 
         @BeforeClass
@@ -71,6 +72,7 @@ class RoadBookFragmentTest {
             setPrefs(SWIPE_R_SHARED_KEY, it, true)
             setPrefs(DRAG_N_DROP_SHARED_KEY, it, true)
             setPrefs(TOUCH_CLICK_SHARED_KEY, it, false)
+            setPrefs(SHOW_ARCHIVED_KEY, it, false)
         }
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
@@ -80,7 +82,7 @@ class RoadBookFragmentTest {
 
     @Test
     fun radioButtonsAreAccessible() {
-        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
         onView(withText(R.string.rb_label_dragdrop)).check(matches(isDisplayed()))
         onView(withText(R.string.rb_label_swiper_edition)).check(matches(isDisplayed()))
         onView(withText(R.string.rb_label_swipel_deletion)).check(matches(isDisplayed()))
@@ -116,7 +118,7 @@ class RoadBookFragmentTest {
 
         swipeLeftTheRecordAt(2)
         onView(withText(R.string.delete_dialog_title))
-        onView(withText(R.string.delete_confirm_button_label)).perform(click())
+        onView(withText(R.string.swipeleft_confirm_button_label)).perform(click())
 
         // Record added previously is now deleted
         onView((withText(DestinationRecords.RECORDS[2].destID)))
@@ -132,7 +134,7 @@ class RoadBookFragmentTest {
 
         swipeLeftTheRecordAt(2)
         onView(withText(R.string.delete_dialog_title))
-        onView(withText(R.string.delete_cancel_button_label)).perform(click())
+        onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
 
         // Record added previously is now deleted
         onView((withText(DestinationRecords.RECORDS[2].destID)))
@@ -379,7 +381,7 @@ class RoadBookFragmentTest {
 
     @Test
     fun rbSwipeLeftCorrectlyDisableDeletion() {
-        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
         onView(withText(R.string.rb_label_swipel_deletion)).perform(click())
         swipeLeftTheRecordAt(2)
         onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
@@ -387,7 +389,7 @@ class RoadBookFragmentTest {
 
     @Test
     fun rbSwipeRightCorrectlyDisableEdition() {
-        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
         onView(withText(R.string.rb_label_swiper_edition)).perform(click())
         swipeRightTheRecordAt(2)
         onView(withText(R.string.edit_dialog_update_b)).check(doesNotExist())
@@ -396,7 +398,7 @@ class RoadBookFragmentTest {
 
     @Test
     fun rbDragNDrop() { // Still can't test the drag & drop touch action
-        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
         onView(withText(R.string.rb_label_swiper_edition)).perform(click())
     }
 
@@ -407,9 +409,9 @@ class RoadBookFragmentTest {
         onView(withId(R.id.fragment_drecord_details_directors_parent)).check(doesNotExist())
 
         // Check two times to disable it during a Fragment's LifeCycle
-        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
         onView(withText(R.string.rb_label_touch_click)).perform(click())
-        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
         onView(withText(R.string.rb_label_touch_click)).perform(click())
 
         // Check it is still disabled
@@ -419,25 +421,25 @@ class RoadBookFragmentTest {
 
     @Test
     fun rbSLeftEnabledAgainWorks() {
-        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
         onView(withText(R.string.rb_label_swipel_deletion)).perform(click())
         swipeLeftTheRecordAt(2)
         onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
 
-        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
         onView(withText(R.string.rb_label_swipel_deletion)).perform(click())
         swipeLeftTheRecordAt(2)
         onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
     }
     @Test
     fun rbSwipeREnabledAgainWorks() {
-        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
         onView(withText(R.string.rb_label_swiper_edition)).perform(click())
         swipeRightTheRecordAt(2)
         onView(withText(R.string.edit_dialog_update_b)).check(doesNotExist())
         onView(withText(R.string.edit_dialog_cancel_b)).check(doesNotExist())
 
-        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
         onView(withText(R.string.rb_label_swiper_edition)).perform(click())
         swipeRightTheRecordAt(2)
         onView(withText(R.string.edit_dialog_update_b)).check(matches(isDisplayed()))
@@ -445,9 +447,9 @@ class RoadBookFragmentTest {
     }
     @Test
     fun rbDragNDropEnabledAgainWorks() { // Still can't test the drag & drop touch action
-        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
         onView(withText(R.string.rb_label_swiper_edition)).perform(click())
-        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
         onView(withText(R.string.rb_label_swiper_edition)).perform(click())
     }
 
@@ -457,7 +459,7 @@ class RoadBookFragmentTest {
         // Set some states :
         // Turn SwipeLeft disabled
         // Keep SwipeRight, DragNDrop enabled and Touch Navigation disabled
-        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
         onView(withText(R.string.rb_label_swipel_deletion)).perform(click())
 
         // Check features :
@@ -476,17 +478,7 @@ class RoadBookFragmentTest {
         onView(withText(DestinationRecords.RECORDS[2].destID)).perform(click())
         onView(withId(R.id.fragment_drecord_details_directors_parent)).check(doesNotExist())
 
-        // Navigate outside and come back
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.routeFragment))
-            .perform(click())
-        onView(withId(R.id.fragment_route_directors_parent))
-            .check(matches(isDisplayed()))
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.roadBookFragment))
-            .perform(click())
+        navigateOutsideAndComeBack()
 
         // Check features again :
         // Swipe Left disabled
@@ -511,10 +503,170 @@ class RoadBookFragmentTest {
 
     @Test
     fun clickingOnADestRecordLeadsToADRecordDetailsFragment() {
-        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
         onView(withText(R.string.rb_label_touch_click)).perform(click())
         onView(withText(DestinationRecords.RECORDS[2].destID)).perform(click())
         onView(withId(R.id.fragment_drecord_details_directors_parent)).check(matches(isDisplayed()))
+    }
+
+    // ============================================================================================
+    // ================================== RB Archiving Records ====================================
+    // By default archived records are not displayed, see @before setUp() routine
+    @Test
+    fun archiveARecordMakesItDisappear() {
+        // Archive first one because it's already timestamped
+        onView((withText(DestinationRecords.RECORDS[0].destID)))
+            .check(matches(isDisplayed()))
+
+        swipeLeftTheRecordAt(0)
+
+        // Check that the record is not here
+        onView((withText(DestinationRecords.RECORDS[0].destID)))
+            .check(doesNotExist())
+    }
+
+    @Test
+    fun archiveARecordAndCheckShowArchivedDisplayIt() {
+        // Archive the first record
+        onView((withText(DestinationRecords.RECORDS[0].destID)))
+            .check(matches(isDisplayed()))
+
+        swipeLeftTheRecordAt(0)
+
+        onView((withText(DestinationRecords.RECORDS[0].destID)))
+            .check(doesNotExist())
+
+        // Enable showArchived
+        clickOnShowArchivedButton()
+
+        onView((withText(DestinationRecords.RECORDS[0].destID)))
+            .check(matches(isDisplayed()))
+
+        // Check if the archived icon is visible on it.
+        onView(allOf(withId(R.id.archivedIcon), withEffectiveVisibility(Visibility.VISIBLE)))
+            .check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun archiveRecordWithShowArchivedChecked() {
+        // Enable showArchived
+        clickOnShowArchivedButton()
+
+        // Check no archived icon is displayed yet :
+        onView(allOf(withId(R.id.archivedIcon), withEffectiveVisibility(Visibility.VISIBLE)))
+            .check(doesNotExist())
+
+        onView((withText(DestinationRecords.RECORDS[0].destID)))
+            .check(matches(isDisplayed()))
+
+        swipeLeftTheRecordAt(0)
+
+        onView(allOf(withId(R.id.archivedIcon), withEffectiveVisibility(Visibility.VISIBLE)))
+            .check(matches(isDisplayed()))
+
+        // Disable show archived and check they are no more displayed :
+        clickOnShowArchivedButton()
+        onView(allOf(withId(R.id.archivedIcon), withEffectiveVisibility(Visibility.VISIBLE)))
+            .check(doesNotExist())
+        onView((withText(DestinationRecords.RECORDS[0].destID)))
+            .check(doesNotExist())
+    }
+
+    @Test
+    fun archiveANonTimestampedRecord() {
+        onView((withText(DestinationRecords.RECORDS[1].destID)))
+            .check(matches(isDisplayed()))
+        swipeLeftTheRecordAt(1)
+
+        // On non timestamped record swipe left should show deletion dialog
+        onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
+        onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
+        onView((withText(DestinationRecords.RECORDS[1].destID)))
+            .check(matches(isDisplayed()))
+
+        // Edit a timestamp :
+        swipeRightTheRecordAt(1)
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click())
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+        Thread.sleep(WORST_REFRESH_TIME)
+
+        swipeLeftTheRecordAt(1)
+        onView((withText(DestinationRecords.RECORDS[1].destID)))
+            .check(doesNotExist())
+    }
+
+    @Test
+    fun unarchiveARecord() {
+        // Enable showArchived
+        clickOnShowArchivedButton()
+
+        // Archive first
+        swipeLeftTheRecordAt(0)
+
+        // Check is well archived
+        onView((withText(DestinationRecords.RECORDS[0].destID)))
+            .check(matches(isDisplayed()))
+        onView(allOf(withId(R.id.archivedIcon), withEffectiveVisibility(Visibility.VISIBLE)))
+            .check(matches(isDisplayed()))
+
+        // Unarchive it
+        swipeLeftTheRecordAt(0)
+        onView(withText(R.string.unarchive_dialog_title)).check(matches(isDisplayed()))
+        onView(withText(R.string.swipeleft_confirm_button_label)).perform(click())
+
+        // Check the record has been unarchived
+        onView((withText(DestinationRecords.RECORDS[0].destID)))
+            .check(matches(isDisplayed()))
+        onView(allOf(withId(R.id.archivedIcon), withEffectiveVisibility(Visibility.VISIBLE)))
+            .check(doesNotExist())
+
+        // Disable showArchived
+        clickOnShowArchivedButton()
+
+        // Ensure the record is still displayed
+        onView((withText(DestinationRecords.RECORDS[0].destID)))
+            .check(matches(isDisplayed()))
+        onView(allOf(withId(R.id.archivedIcon), withEffectiveVisibility(Visibility.VISIBLE)))
+            .check(doesNotExist())
+    }
+
+    @Test
+    fun recordStayArchivedAfterNavigation() {
+        onView((withText(DestinationRecords.RECORDS[0].destID)))
+            .check(matches(isDisplayed()))
+
+        // Archive the record
+        swipeLeftTheRecordAt(0)
+
+        // Check that the record is not here
+        onView((withText(DestinationRecords.RECORDS[0].destID)))
+            .check(doesNotExist())
+
+        navigateOutsideAndComeBack()
+
+        // Check that the record is still not there
+        onView((withText(DestinationRecords.RECORDS[0].destID)))
+            .check(doesNotExist())
+    }
+
+    @Test
+    fun stayArchivedAfterNavigationWithShowArchived() {
+        // Enable showArchived
+        clickOnShowArchivedButton()
+
+        // Archive the record
+        swipeLeftTheRecordAt(0)
+
+        // Check that the record is archived through the archivedIcon
+        onView(allOf(withId(R.id.archivedIcon), withEffectiveVisibility(Visibility.VISIBLE)))
+            .check(matches(isDisplayed()))
+
+        navigateOutsideAndComeBack()
+
+        // Check that the record is still archived
+        onView(allOf(withId(R.id.archivedIcon), withEffectiveVisibility(Visibility.VISIBLE)))
+            .check(matches(isDisplayed()))
     }
 
 
@@ -526,6 +678,24 @@ class RoadBookFragmentTest {
     private val timePickerCancelBLabel = "Cancel"
     private val timePickerUpdateBLabel = "OK"
     private val timePickerEraseBLabel = "Erase"
+
+    private fun clickOnShowArchivedButton() {
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_show_archived)).perform(click())
+    }
+
+    private fun navigateOutsideAndComeBack() {
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.routeFragment))
+            .perform(click())
+        onView(withId(R.id.fragment_route_directors_parent))
+            .check(matches(isDisplayed()))
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.roadBookFragment))
+            .perform(click())
+    }
     private fun newRecord() {
         onView(withId(R.id.fab)).perform(click())
         onView(withId(R.id.autoCompleteClientID))

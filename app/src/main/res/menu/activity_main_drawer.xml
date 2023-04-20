@@ -13,10 +13,6 @@
             android:icon="@android:drawable/ic_menu_call"
             android:title="@string/menu_directory" />
         <item
-            android:id="@+id/pictureFragment"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="@string/menu_picture" />
-        <item
             android:id="@+id/routeFragment"
             android:icon="@android:drawable/ic_dialog_map"
             android:title="@string/menu_maps" />

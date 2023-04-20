@@ -6,6 +6,7 @@ import android.view.Gravity
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.pressBack
+import androidx.test.espresso.Espresso.pressBackUnconditionally
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -39,6 +40,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 const val LOGIN_REFRESH_TIME = 3000L
+const val DRAWER_REFRESH_TIME = 1000L
 
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest {
@@ -47,9 +49,6 @@ class MainActivityTest {
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
     )
-
-    @get:Rule
-    val permissionsRule: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
 
     companion object {
         @BeforeClass
@@ -143,30 +142,6 @@ class MainActivityTest {
     }
 
     @Test
-    fun clickOnPictureMenuItemLeadsToCorrectFragmentAnd() {
-        Intents.init()
-        val device = UiDevice.getInstance(getInstrumentation())
-
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.pictureFragment))
-            .perform(click())
-        // Check that is open the camera
-
-        // Create an IntentMatcher to capture the intent that should open the camera app
-        val expectedIntent = allOf(hasAction(MediaStore.ACTION_IMAGE_CAPTURE))
-
-        Thread.sleep(5000)
-
-        // Click on the camera shutter button
-        device.executeShellCommand("input keyevent 27")
-
-        // Use Intents.intended() to check that the captured intent matches the expected intent
-        Intents.intended(expectedIntent)
-        Intents.release()
-    }
-
-    @Test
     fun clickOnMapsMenuItemLeadsToCorrectFragment() {
         clickOnAMenuItemLeadsCorrectly(
             R.id.routeFragment,
@@ -244,10 +219,11 @@ class MainActivityTest {
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
 
+        Thread.sleep(DRAWER_REFRESH_TIME)
+
         // Check that the menu items are displayed
         onView(withText("RoadBook")).check(matches(isDisplayed()))
         onView(withText("Directory")).check(matches(isDisplayed()))
-        onView(withText("Picture")).check(matches(isDisplayed()))
         onView(withText("Maps")).check(matches(isDisplayed()))
         onView(withText("View Proof Pictures")).check(matches(isDisplayed()))
     }
@@ -259,10 +235,11 @@ class MainActivityTest {
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
 
+        Thread.sleep(DRAWER_REFRESH_TIME)
+
         // Check that the menu items are displayed
         onView(withText("RoadBook")).check(doesNotExist())
         onView(withText("Directory")).check(doesNotExist())
-        onView(withText("Picture")).check(doesNotExist())
         onView(withText("Maps")).check(doesNotExist())
         onView(withText("View Proof Pictures")).check(matches(isDisplayed()))
     }

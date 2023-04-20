@@ -43,8 +43,8 @@ class MainActivity : AppCompatActivity() {
         // In order to keep out the NavigateUpButton which would mask the HamburgerButton
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.roadBookFragment, R.id.pictureFragment,
-                R.id.directoryFragment, R.id.loginFragment, R.id.routeFragment,
+                R.id.roadBookFragment, R.id.directoryFragment,
+                R.id.loginFragment, R.id.routeFragment,
                 R.id.displayFragment
             ), drawerLayout
         )
@@ -109,7 +109,6 @@ class MainActivity : AppCompatActivity() {
         when (role) {
             Role.CLIENT -> {
                 navMenu.findItem(R.id.roadBookFragment).isVisible = false
-                navMenu.findItem(R.id.pictureFragment).isVisible = false
                 navMenu.findItem(R.id.directoryFragment).isVisible = false
                 navMenu.findItem(R.id.routeFragment).isVisible = false
                 navMenu.findItem(R.id.displayFragment).isVisible = true
@@ -117,7 +116,6 @@ class MainActivity : AppCompatActivity() {
 
             else -> {
                 navMenu.findItem(R.id.roadBookFragment).isVisible = true
-                navMenu.findItem(R.id.pictureFragment).isVisible = true
                 navMenu.findItem(R.id.directoryFragment).isVisible = true
                 navMenu.findItem(R.id.routeFragment).isVisible = true
                 navMenu.findItem(R.id.displayFragment).isVisible = true

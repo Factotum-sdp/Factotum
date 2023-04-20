@@ -78,7 +78,7 @@ class ContactCreation : Fragment() {
                 return false
             }
             override fun onQueryTextChange(newText: String?): Boolean {
-                if (newText != null) {
+                if (newText != null && newText.length > 2) {
                     val cursor =
                         MatrixCursor(arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1))
                     viewLifecycleOwner.lifecycleScope.launch {

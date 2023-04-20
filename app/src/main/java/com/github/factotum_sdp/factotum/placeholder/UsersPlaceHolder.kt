@@ -20,37 +20,58 @@ object UsersPlaceHolder {
     val USER1 = User(
         "Valentino Rossi",
         "valentino.rossi@epfl.ch",
-        Role.CLIENT,
+        Role.BOSS,
         password
     )
     val USER2 = User(
         "Marc Marquez",
         "marc.marquez@epfl.ch",
-        Role.CLIENT,
+        Role.BOSS,
         password
     )
     val USER3 = User(
         "Jane Doe",
         "jane.doe@gmail.com",
+        Role.BOSS,
+        password
+    )
+    val USER_BOSS = User(
+        "Boss",
+        "boss@gmail.com",
+        Role.BOSS,
+        password
+    )
+    val USER_COURIER = User(
+        "Courier",
+        "courier@gmail.com",
+        Role.COURIER,
+        password
+    )
+    val USER_CLIENT = User(
+        "Client",
+        "client@gmail.com",
         Role.CLIENT,
         password
     )
-
 
     fun init(dataSource: FirebaseDatabase, auth: FirebaseAuth) {
         this.dataSource = dataSource
         this.auth = auth
         users.add(USER1)
+        users.add(USER2)
         users.add(USER3)
+        users.add(USER_BOSS)
+        users.add(USER_COURIER)
+        users.add(USER_CLIENT)
     }
 
     /**
      * Populates the database with users.
      */
-    suspend fun populateDatabase() {
+    suspend fun addUserToDb(user: User) {
         val deferred = CompletableDeferred<Unit>()
 
-        dataSource.getReference(LoginDataSource.DISPATCH_DB_PATH).setValue(users)
+        dataSource.getReference(LoginDataSource.DISPATCH_DB_PATH).push().setValue(user)
             .addOnSuccessListener {
                 deferred.complete(Unit)
             }
@@ -80,7 +101,7 @@ object UsersPlaceHolder {
     }
 
     data class User(
-        val username: String,
+        val name: String,
         val email: String,
         val role: Role,
         val password: String

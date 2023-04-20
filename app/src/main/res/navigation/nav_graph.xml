@@ -40,11 +40,6 @@
         android:label="Record details"
         tools:layout="@layout/fragment_drecord_details"/>
     <fragment
-        android:id="@+id/pictureFragment"
-        android:name="com.github.factotum_sdp.factotum.ui.picture.PictureFragment"
-        android:label="Picture"
-        tools:layout="@layout/fragment_picture" />
-    <fragment
         android:id="@+id/directoryFragment"
         android:name="com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment"
         android:label="Directory"
@@ -89,6 +84,9 @@
         <action
             android:id="@+id/action_contactDetailsFragment2_to_directoryFragment"
             app:destination="@id/directoryFragment" />
+        <action
+            android:id="@+id/action_contactDetailsFragment2_to_MapsFragment"
+            app:destination="@id/MapsFragment" />
     </fragment>
     <fragment
         android:id="@+id/contactCreationFragment"

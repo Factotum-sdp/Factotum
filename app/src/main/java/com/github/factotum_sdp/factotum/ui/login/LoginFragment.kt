@@ -142,7 +142,7 @@ class LoginFragment : BaseAuthFragment() {
     }
 
     override fun updateUi(model: Any) {
-        val welcome = getString(R.string.welcome) + " " + (model as User).displayName + "!"
+        val welcome = getString(R.string.welcome) + " " + (model as User).name + "!"
         Snackbar.make(requireView(), welcome, Snackbar.LENGTH_LONG).show()
         updateNGraphStartDestination()
     }

@@ -3,6 +3,7 @@ package com.github.factotum_sdp.factotum
 import android.view.Gravity
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.pressBack
+import androidx.test.espresso.Espresso.pressBackUnconditionally
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -47,6 +48,7 @@ class MainActivityTest {
             MainActivity.setAuth(auth)
 
             val database = ContactsUtils.setEmulatorGet()
+            MainActivity.setDatabase(database)
 
             runBlocking {
                 ContactsUtils.populateDatabase()

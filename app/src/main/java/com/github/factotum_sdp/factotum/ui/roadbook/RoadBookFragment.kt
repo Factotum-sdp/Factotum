@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.widget.SwitchCompat
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -11,6 +12,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.ItemTouchHelper.*
+import com.github.factotum_sdp.factotum.LocationTrackingHandler
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -28,6 +30,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
             MainActivity.getDatabase().reference.child(ROADBOOK_DB_PATH)
         )
     }
+    private val locationTrackingHandler: LocationTrackingHandler
 
     // Checked OptionMenu States with default values
     // overridden by the device saved SharedPreference
@@ -37,6 +40,9 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private var isTClickEnabled = true
     private var isShowArchivedEnabled = false
 
+    init {
+        locationTrackingHandler = LocationTrackingHandler()
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -106,12 +112,13 @@ class RoadBookFragment : Fragment(), MenuProvider {
         val rbTC = menu.findItem(R.id.rbTouchClick)
         val rbSA = menu.findItem(R.id.showArchived)
 
+
         // fetch saved States
-        fetchRadioButtonState(DRAG_N_DROP_SHARED_KEY, rbDD)
-        fetchRadioButtonState(SWIPE_L_SHARED_KEY, rbSL)
-        fetchRadioButtonState(SWIPE_R_SHARED_KEY, rbSR)
-        fetchRadioButtonState(TOUCH_CLICK_SHARED_KEY, rbTC)
-        fetchRadioButtonState(SHOW_ARCHIVED_KEY, rbSA)
+        fetchMenuItemState(DRAG_N_DROP_SHARED_KEY, rbDD)
+        fetchMenuItemState(SWIPE_L_SHARED_KEY, rbSL)
+        fetchMenuItemState(SWIPE_R_SHARED_KEY, rbSR)
+        fetchMenuItemState(TOUCH_CLICK_SHARED_KEY, rbTC)
+        fetchMenuItemState(SHOW_ARCHIVED_KEY, rbSA)
 
         // init globals to saved preference state
         isDDropEnabled = rbDD.isChecked
@@ -120,16 +127,27 @@ class RoadBookFragment : Fragment(), MenuProvider {
         isTClickEnabled = rbTC.isChecked
         isShowArchivedEnabled = rbSA.isChecked
 
+
         showOrHideArchived(isShowArchivedEnabled)
         setRBonClickListeners(rbDD, rbSL, rbSR, rbTC, rbSA)
+
+        // Set live location switch
+        val locationMenu = menu.findItem(R.id.location_switch)
+        val locationSwitch = locationMenu.actionView!!.findViewById<SwitchCompat>(R.id.menu_item_switch)
+        locationSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+            if(isChecked)
+                locationTrackingHandler.startLocationService(requireContext(), requireActivity())
+            else if(lifecycle.currentState == Lifecycle.State.RESUMED)
+                locationTrackingHandler.stopLocationService(requireContext(), requireActivity())
+        }
 
         // Only at menu initialization
         val itemTouchHelper = ItemTouchHelper(newItemTHCallBack())
         itemTouchHelper.attachToRecyclerView(rbRecyclerView)
     }
 
-    private fun setRBonClickListeners(rbDD: MenuItem, rbSL: MenuItem,
-                                      rbSR: MenuItem, rbTC: MenuItem, rbSA: MenuItem) {
+    private fun setRBonClickListeners(rbDD: MenuItem, rbSL: MenuItem, rbSR: MenuItem,
+                                      rbTC: MenuItem, rbSA: MenuItem) {
         rbDD.setOnMenuItemClickListener {
             it.isChecked = !it.isChecked
             isDDropEnabled = !isDDropEnabled
@@ -228,13 +246,14 @@ class RoadBookFragment : Fragment(), MenuProvider {
         saveRadioButtonState(DRAG_N_DROP_SHARED_KEY, R.id.rbDragDrop)
         saveRadioButtonState(TOUCH_CLICK_SHARED_KEY, R.id.rbTouchClick)
         saveRadioButtonState(SHOW_ARCHIVED_KEY, R.id.showArchived)
+        locationTrackingHandler.stopLocationService(requireContext(), requireActivity())
         super.onDestroyView()
     }
 
-    private fun fetchRadioButtonState(sharedKey: String, radioButton: MenuItem) {
+    private fun fetchMenuItemState(sharedKey: String, menuItem: MenuItem) {
         val sp = requireActivity().getSharedPreferences(sharedKey ,Context.MODE_PRIVATE)
         val savedState = sp.getBoolean(sharedKey, true)
-        radioButton.setChecked(savedState)
+        menuItem.setChecked(savedState)
     }
     private fun saveRadioButtonState(sharedKey: String, radioButtonId: Int) {
         val sp = requireActivity().getSharedPreferences(sharedKey,Context.MODE_PRIVATE)

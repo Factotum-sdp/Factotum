@@ -19,6 +19,9 @@ import java.util.concurrent.CountDownLatch
  */
 class Location(query: String, context : Context) {
 
+    val address : Address?
+    val addressName : String?
+
     companion object {
         const val CACHE_FILE_NAME = "locations.txt"
         const val CACHE_FILE_SEPARATOR = "|"
@@ -54,9 +57,6 @@ class Location(query: String, context : Context) {
             return location
         }
     }
-
-    val address : Address?
-    val addressName : String?
 
     init {
         val geocoder = Geocoder(context)

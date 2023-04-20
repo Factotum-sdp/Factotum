@@ -51,13 +51,12 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_below="@id/basic_contact_info">
-        <EditText
+        <androidx.appcompat.widget.SearchView
             android:id="@+id/contactCreationAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/address"
-            android:autofillHints="postalAddress"
-            android:inputType="textPostalAddress" />
+            app:queryHint="Search address..."
+            app:iconifiedByDefault="false"/>
         <EditText
             android:id="@+id/contactCreationPhoneNumber"
             android:layout_width="match_parent"

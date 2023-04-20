@@ -62,27 +62,25 @@ class MapsFragmentTest {
 
     @Test
     fun a_permissionAskPopUp(){
-        if(LocationUtils.maybeLocationPermission()){
-            return
-        }
         onData(anything())
             .inAdapterView(withId(R.id.list_view_routes)).atPosition(0).perform(
                 click()
             )
         onView(withId(R.id.button_next)).perform(click())
-        assertTrue(device.findObject(UiSelector().textContains(buttonTextAllow)).exists())
+        if(LocationUtils.hasLocationPopUp()) {
+            assertTrue(device.findObject(UiSelector().textContains(buttonTextAllow)).exists())
+        }
     }
     @Test
     fun b_permissionAllowShowLocation(){
-        if(LocationUtils.maybeLocationPermission()){
-            return
+            onData(anything())
+                .inAdapterView(withId(R.id.list_view_routes)).atPosition(0).perform(
+                    click()
+                )
+            onView(withId(R.id.button_next)).perform(click())
+        if(LocationUtils.hasLocationPopUp()) {
+            device.findObject(UiSelector().textContains(buttonTextAllow)).click()
         }
-        onData(anything())
-            .inAdapterView(withId(R.id.list_view_routes)).atPosition(0).perform(
-                click()
-            )
-        onView(withId(R.id.button_next)).perform(click())
-        device.findObject(UiSelector().textContains(buttonTextAllow)).click()
         assertTrue(checkLocationEnabled(testRule))
     }
     @Test

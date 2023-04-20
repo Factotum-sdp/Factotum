@@ -8,18 +8,14 @@ import java.util.*
 
 class LocationUtils {
     companion object {
-        fun maybeLocationPermission() : Boolean {
-            val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-            val buttonTextAllow = when (Locale.getDefault().language) {
-                Locale.FRENCH.language -> "Uniquement cette fois-ci"
-                else -> "Only this time"
-            }
-            val hasPopup = device.wait(Until.hasObject(By.textContains(buttonTextAllow)), 1000)
-            if (hasPopup) {
-                device.findObject(By.textContains(buttonTextAllow)).click()
-                return true
-            }
-        return false
+        val buttonTextAllow = when (Locale.getDefault().language) {
+            Locale.FRENCH.language -> "Uniquement cette fois-ci"
+            else -> "Only this time"
         }
+        fun hasLocationPopUp(): Boolean {
+            val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+            return device.wait(Until.hasObject(By.textContains(buttonTextAllow)), 1000)
+        }
+
     }
 }

@@ -15,6 +15,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.UiSelector
 import androidx.test.uiautomator.Until.hasObject
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
@@ -112,7 +113,10 @@ class ContactDetailsFragmentTest {
     fun buttonRunOpensGoogleMaps(){
         Intents.init()
         onView(withId(R.id.run_button)).perform(click())
-        LocationUtils.maybeLocationPermission()
+        if(LocationUtils.hasLocationPopUp()){
+            val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+            device.findObject(UiSelector().textContains(LocationUtils.buttonTextAllow)).click()
+        }
         Intents.intended(
             CoreMatchers.allOf(
                 IntentMatchers.hasAction(Intent.ACTION_VIEW),
@@ -125,7 +129,7 @@ class ContactDetailsFragmentTest {
     @Test
     fun buttonShowDestination(){
         onView(withId(R.id.show_all_button)).perform(click())
-        LocationUtils.maybeLocationPermission()
+        LocationUtils.hasLocationPopUp()
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         val markers = device.wait(hasObject(By.descContains("Destination")), 5000L)
         assertTrue(markers)

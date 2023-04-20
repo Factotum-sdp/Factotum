@@ -17,6 +17,7 @@ import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.ui.login.LoginFragmentTest
 import com.github.factotum_sdp.factotum.utils.ContactsUtils
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.setEmulatorGet
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.runBlocking
@@ -47,7 +48,7 @@ class MainActivityTest {
             auth.useEmulator("10.0.2.2", 9099)
             MainActivity.setAuth(auth)
 
-            val database = ContactsUtils.setEmulatorGet()
+            val database = setEmulatorGet()
             MainActivity.setDatabase(database)
 
             runBlocking {

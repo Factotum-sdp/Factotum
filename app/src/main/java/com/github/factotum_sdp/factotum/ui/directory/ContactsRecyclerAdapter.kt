@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.Contact
 
-class ContactsRecyclerAdapter () : RecyclerView.Adapter<ContactsRecyclerAdapter.ContactsViewHolder>(), Filterable {
+class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.ContactsViewHolder>(), Filterable {
 
     private var originalContacts : List<Contact> = emptyList()
     private var filteredContacts = ArrayList<Contact>()
@@ -60,6 +60,10 @@ class ContactsRecyclerAdapter () : RecyclerView.Adapter<ContactsRecyclerAdapter.
         return filteredContacts.size
     }
 
+    private fun cleanString(string: String): String {
+        return string.lowercase().replace("\\s".toRegex(), "")
+    }
+
     override fun getFilter(): Filter {
         return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
@@ -68,10 +72,10 @@ class ContactsRecyclerAdapter () : RecyclerView.Adapter<ContactsRecyclerAdapter.
                     filteredList.addAll(originalContacts) // Use the originalContacts list here
                 } else {
                     // remove all whitespace from the constraint and the names such that names are matched even if they have different whitespace
-                    val filterPattern = constraint.toString().lowercase().replace("\\s".toRegex(), "")
+                    val filterPattern = cleanString(constraint.toString())
                     for (item in originalContacts) { // Use the originalContacts list for filtering
-                        val nameSurname = (item.name + item.surname).lowercase().replace("\\s".toRegex(), "")
-                        val surnameName = (item.surname + item.name).lowercase().replace("\\s".toRegex(), "")
+                        val nameSurname = cleanString(item.name + item.surname)
+                        val surnameName = cleanString(item.surname + item.name)
                         if (nameSurname.contains(filterPattern) || surnameName.contains(filterPattern)) {
                             filteredList.add(item)
                         }

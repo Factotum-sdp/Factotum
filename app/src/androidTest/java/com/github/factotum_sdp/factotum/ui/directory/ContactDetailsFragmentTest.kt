@@ -12,6 +12,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.utils.ContactsUtils
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.setEmulatorGet
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.BeforeClass
@@ -29,7 +30,7 @@ class ContactDetailsFragmentTest {
         @JvmStatic
         fun setUpDatabase() {
 
-            val database = ContactsUtils.setEmulatorGet()
+            val database = setEmulatorGet()
             MainActivity.setDatabase(database)
         }
     }

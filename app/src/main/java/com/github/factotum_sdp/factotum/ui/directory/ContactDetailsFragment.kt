@@ -19,31 +19,21 @@ class ContactDetailsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        val mainView = inflater.inflate(R.layout.contact_with_details, container, false)
-        val button = mainView.findViewById<Button>(R.id.button) // connect the button to the layout
-        button.setOnClickListener { view ->
-            view.findNavController().navigate(R.id.action_contactDetailsFragment2_to_directoryFragment)} // go back to the list of contacts when the button is clicked
-        val contactsViewModel =
-            ViewModelProvider(requireActivity())[ContactsViewModel::class.java] // get the contacts view model
-        setContactDetails(mainView,
-            contactsViewModel.contacts.value?.get(arguments?.getInt("id")!!)!!
-        ) //links the contact details to the layout
+        return inflater.inflate(R.layout.contact_with_details, container, false)
+    }
 
-        val updateContactButton = mainView.findViewById<Button>(R.id.button_modify_contact)
-        updateContactButton.setOnClickListener { view ->
-            val bundle = Bundle()
-            bundle.putInt("id", arguments?.getInt("id")!!)
-            view.findNavController().navigate(R.id.action_contactDetailsFragment2_to_contactCreationFragment, bundle)
-        }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        val deleteContactButton = mainView.findViewById<Button>(R.id.button_delete_contact)
-        deleteContactButton.setOnClickListener { view ->
-            contactsViewModel.deleteContact(contactsViewModel.contacts.value?.get(arguments?.getInt("id")!!)!!)
-            view.findNavController().navigate(R.id.action_contactDetailsFragment2_to_directoryFragment)
-        }
+        val contactsViewModel = //retrieve list of contacts
+            ViewModelProvider(requireActivity())[ContactsViewModel::class.java]
 
-        return mainView
+        setContactDetails(
+            view, //set contact details
+            contactsViewModel.contacts.value?.get(arguments?.getInt("id")!!) ?: Contact()
+        )
+
+        initialiseAllButtons(view, contactsViewModel)
     }
 
     // links contact details to the layout
@@ -63,5 +53,36 @@ class ContactDetailsFragment : Fragment() {
         contactPhone.text = contact.phone
         contactAddress.text = contact.address
         contactDetails.text = contact.details
+    }
+
+    private fun initialiseAllButtons(view: View, contactsViewModel: ContactsViewModel) {
+
+        val returnToContactsButton = view.findViewById<Button>(R.id.button) // connect the button to the layout
+        returnToContactsButton.setOnClickListener {
+            it.findNavController()
+                .navigate(R.id.action_contactDetailsFragment2_to_directoryFragment)
+        } // go back to the list of contacts when the button is clicked
+
+        val updateContactButton = view.findViewById<Button>(R.id.button_modify_contact)
+        updateContactButton.setOnClickListener {
+            val bundle = Bundle()
+            bundle.putInt("id", arguments?.getInt("id")!!)
+            it.findNavController()
+                .navigate(R.id.action_contactDetailsFragment2_to_contactCreationFragment, bundle)
+        }
+
+        val deleteContactButton = view.findViewById<Button>(R.id.button_delete_contact)
+        deleteContactButton.setOnClickListener {
+            contactsViewModel.deleteContact(
+                contactsViewModel.contacts.value?.get(
+                    arguments?.getInt(
+                        "id"
+                    )!!
+                ) ?: Contact()
+            )
+            it.findNavController()
+                .navigate(R.id.action_contactDetailsFragment2_to_directoryFragment)
+        }
+
     }
 }

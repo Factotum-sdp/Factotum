@@ -20,6 +20,7 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.Contact
 import com.github.factotum_sdp.factotum.utils.ContactsUtils
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.setEmulatorGet
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -40,7 +41,7 @@ class ContactsCreationTest {
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
-            val database = ContactsUtils.setEmulatorGet()
+            val database = setEmulatorGet()
             MainActivity.setDatabase(database)
         }
     }

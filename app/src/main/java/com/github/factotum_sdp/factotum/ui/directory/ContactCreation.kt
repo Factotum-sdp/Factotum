@@ -43,60 +43,23 @@ class ContactCreation : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        spinner = view.findViewById(R.id.roles_spinner)
-        // Initializes the spinner for the roles
-        ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_spinner_item,
-            roles
-        ).also { adapter ->
-            // Specify the layout to use when the list of choices appears
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            // Apply the adapter to the spinner
-            spinner.adapter = adapter
-        }
+        retrievePossibleArguments()
 
+        initaliseRolesSpinner(view)
+
+        setContactFields(view, currentContact)
+
+        initialiseApproveFormButton(view)
+
+
+    }
+
+    private fun retrievePossibleArguments() {
         viewModel = ViewModelProvider(requireActivity())[ContactsViewModel::class.java]
         viewModel.setDatabase(MainActivity.getDatabase())
 
         if (arguments?.getInt("id") != null) {
             currentContact = viewModel.contacts.value?.get(arguments?.getInt("id")!!)
-        }
-
-        setContactFields(view, currentContact)
-
-        val approveFormButton = view.findViewById<Button>(R.id.create_contact)
-
-        if (isUpdate) {
-            approveFormButton.text = getString(R.string.form_button_update)
-            approveFormButton.setOnClickListener {
-                viewModel.updateContact(
-                    Contact(
-                        currentContact!!.id,
-                        spinner.selectedItem.toString(),
-                        name.text.toString(),
-                        surname.text.toString(),
-                        R.drawable.contact_image,
-                        address.text.toString(),
-                        phoneNumber.text.toString(),
-                        details.text.toString()
-                    )
-                )
-                it.findNavController().navigate(R.id.action_contactCreation_to_directoryFragment)
-            }
-        } else {
-            approveFormButton.text = getString(R.string.form_button_create)
-            approveFormButton.setOnClickListener {
-                viewModel.saveNewIDContact(
-                    spinner.selectedItem.toString(),
-                    name.text.toString(),
-                    surname.text.toString(),
-                    R.drawable.contact_image,
-                    address.text.toString(),
-                    phoneNumber.text.toString(),
-                    details.text.toString())
-                it.findNavController().navigate(R.id.action_contactCreation_to_directoryFragment)
-            }
         }
     }
 
@@ -114,6 +77,57 @@ class ContactCreation : Fragment() {
             address.setText(contact.address)
             phoneNumber.setText(contact.phone)
             details.setText(contact.details)
+        }
+    }
+
+    private fun initaliseRolesSpinner(view : View) {
+        spinner = view.findViewById(R.id.roles_spinner)
+        // Initializes the spinner for the roles
+        ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            roles
+        ).also { adapter ->
+            // Specify the layout to use when the list of choices appears
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            // Apply the adapter to the spinner
+            spinner.adapter = adapter
+        }
+    }
+
+    private fun initialiseApproveFormButton(view : View) {
+        val approveFormButton = view.findViewById<Button>(R.id.create_contact)
+
+        if (isUpdate) {
+            approveFormButton.text = getString(R.string.form_button_update)
+            approveFormButton.setOnClickListener {
+                viewModel.updateContact(
+                    Contact(
+                        id = currentContact!!.id,
+                        role = spinner.selectedItem.toString(),
+                        name = name.text.toString(),
+                        surname = surname.text.toString(),
+                        profile_pic_id = R.drawable.contact_image,
+                        address = address.text.toString(),
+                        phone = phoneNumber.text.toString(),
+                        details = details.text.toString()
+                    )
+                )
+                it.findNavController().navigate(R.id.action_contactCreation_to_directoryFragment)
+            }
+        } else {
+            approveFormButton.text = getString(R.string.form_button_create)
+            approveFormButton.setOnClickListener {
+                viewModel.saveNewIDContact(
+                    role = spinner.selectedItem.toString(),
+                    name = name.text.toString(),
+                    surname = surname.text.toString(),
+                    image = R.drawable.contact_image,
+                    address = address.text.toString(),
+                    phone = phoneNumber.text.toString(),
+                    details = details.text.toString())
+                it.findNavController().navigate(R.id.action_contactCreation_to_directoryFragment)
+            }
         }
     }
 }

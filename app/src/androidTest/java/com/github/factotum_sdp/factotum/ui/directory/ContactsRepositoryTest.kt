@@ -6,6 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.Contact
 import com.github.factotum_sdp.factotum.utils.ContactsUtils
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.setEmulatorGet
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
 import org.junit.After
@@ -28,7 +29,7 @@ class ContactsRepositoryTest {
         context = ApplicationProvider.getApplicationContext()
         val sharedPreferences = context.getSharedPreferences("contacts_test", Context.MODE_PRIVATE)
         repository = ContactsRepository(sharedPreferences)
-        repository.setDatabase(ContactsUtils.setEmulatorGet())
+        repository.setDatabase(setEmulatorGet())
         ContactsUtils.emptyFirebaseDatabase()
     }
 
@@ -39,7 +40,7 @@ class ContactsRepositoryTest {
     }
 
     @Test
-    fun testSaveContactToSharedPreferences() = runBlocking {
+    fun savesContactToSharedPreferences() = runBlocking {
         // Save a contact to the cache
         val contact = Contact("1", "Manager", "John", "Doe", R.drawable.contact_image, "123 Main St", "555-555-1234")
         repository.saveContactToSharedPreferences(contact)
@@ -52,7 +53,7 @@ class ContactsRepositoryTest {
 
 
     @Test
-    fun testSaveContactOnline() = runBlocking {
+    fun savesContactOnline() = runBlocking {
         val contact = Contact("1", "Manager", "John", "Doe", R.drawable.contact_image, "123 Main St", "555-555-1234")
         val latch = CountDownLatch(1)
 

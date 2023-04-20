@@ -4,9 +4,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.Contact
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import kotlinx.coroutines.CompletableDeferred
 import org.hamcrest.Description
 import org.hamcrest.Matcher
@@ -17,8 +15,6 @@ class ContactsUtils {
     companion object {
         //fake data --> to be replaced with connection to database
         private val randomContacts = mutableListOf<Contact>()
-        private var emulatorSet : Boolean = false
-        private var database : FirebaseDatabase = Firebase.database
         private val randomNames = listOf("John", "Jane", "Joe")
         private var randomSurnames = listOf("Smith", "Jones", "Williams")
         private val roles = listOf("Boss", "Courier", "Client")
@@ -27,14 +23,6 @@ class ContactsUtils {
         private val randomDetails = listOf("I am a boss", "I am a courier", "I am a client")
 
         private const val image = R.drawable.contact_image
-
-        fun setEmulatorGet() : FirebaseDatabase {
-            if (!emulatorSet) {
-                database.useEmulator("10.0.2.2", 9000)
-                emulatorSet = true
-            }
-            return database
-        }
 
         private fun createContact(position: Int): Contact {
             return Contact(
@@ -66,7 +54,7 @@ class ContactsUtils {
             createRandomContacts(count)
 
             for (contact in randomContacts) {
-                database.getReference("contacts").child(contact.id).setValue(contact)
+                getDatabase().getReference("contacts").child(contact.id).setValue(contact)
                     .addOnSuccessListener {
                         deferred.complete(Unit)
                     }
@@ -79,7 +67,7 @@ class ContactsUtils {
         }
 
         fun emptyFirebaseDatabase() {
-            database.reference.child("contacts").removeValue()
+            getDatabase().reference.child("contacts").removeValue()
         }
 
         fun withHolderContactName(name: String): Matcher<RecyclerView.ViewHolder> {

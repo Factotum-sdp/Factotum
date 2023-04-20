@@ -16,7 +16,7 @@ import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.utils.ContactsUtils
-import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.setEmulatorGet
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.setEmulatorGet
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -36,6 +36,7 @@ class DirectoryFragmentTest {
 
     companion object {
         private const val nbContacts = 10
+
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
@@ -81,13 +82,13 @@ class DirectoryFragmentTest {
     }
 
     @Test
-    fun addButtonExists(){
+    fun addButtonExists() {
         onView(withId(R.id.add_contact_button)).check(matches(isDisplayed()))
 
     }
 
     @Test
-    fun addButtonOpensContactCreation(){
+    fun addButtonOpensContactCreation() {
         onView(withId(R.id.add_contact_button)).perform(click())
         onView(withId(R.id.contact_creation_fragment)).check(matches(isDisplayed()))
     }

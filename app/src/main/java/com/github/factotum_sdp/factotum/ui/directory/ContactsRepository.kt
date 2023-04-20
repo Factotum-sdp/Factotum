@@ -49,11 +49,6 @@ class ContactsRepository(
         }
     }
 
-    fun updateContact(contact: Contact) {
-        saveContactToSharedPreferences(contact)
-        firebaseContactsRef.child(contact.id).setValue(contact)
-    }
-
     fun deleteContact(contact: Contact) {
         sharedPreferences.edit().remove(contact.id).apply()
         firebaseContactsRef.child(contact.id).removeValue()
@@ -68,7 +63,7 @@ class ContactsRepository(
                         val contact = contactSnapshot.getValue(Contact::class.java)
                         contact?.let {
                             contactsList.add(it)
-                            sharedPreferences.edit().putString(contact.id, Gson().toJson(contact)).apply()
+                            saveContactToSharedPreferences(it)
                         }
                     }
                     trySend(contactsList).isSuccess

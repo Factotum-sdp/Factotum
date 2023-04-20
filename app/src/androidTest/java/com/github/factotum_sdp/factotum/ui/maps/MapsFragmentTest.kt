@@ -20,6 +20,7 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.utils.LocationUtils
 import com.google.android.gms.maps.SupportMapFragment
 import junit.framework.TestCase.assertTrue
 import org.hamcrest.CoreMatchers.allOf
@@ -61,6 +62,9 @@ class MapsFragmentTest {
 
     @Test
     fun a_permissionAskPopUp(){
+        if(LocationUtils.maybeLocationPermission()){
+            return
+        }
         onData(anything())
             .inAdapterView(withId(R.id.list_view_routes)).atPosition(0).perform(
                 click()
@@ -70,6 +74,9 @@ class MapsFragmentTest {
     }
     @Test
     fun b_permissionAllowShowLocation(){
+        if(LocationUtils.maybeLocationPermission()){
+            return
+        }
         onData(anything())
             .inAdapterView(withId(R.id.list_view_routes)).atPosition(0).perform(
                 click()

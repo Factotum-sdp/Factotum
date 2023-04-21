@@ -1,9 +1,11 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -15,7 +17,9 @@ import androidx.recyclerview.widget.ItemTouchHelper.*
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.LocationClient
+import com.github.factotum_sdp.factotum.hasLocationPermission
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import java.lang.ref.ReferenceQueue
 import java.util.*
 
 

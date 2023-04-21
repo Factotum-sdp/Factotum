@@ -63,6 +63,11 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
     override fun onPause() {
         rbViewModel.backUp()
+        saveRadioButtonState(SWIPE_R_SHARED_KEY, R.id.rbSwipeREdition)
+        saveRadioButtonState(SWIPE_L_SHARED_KEY, R.id.rbSwipeLDeletion)
+        saveRadioButtonState(DRAG_N_DROP_SHARED_KEY, R.id.rbDragDrop)
+        saveRadioButtonState(TOUCH_CLICK_SHARED_KEY, R.id.rbTouchClick)
+        saveRadioButtonState(SHOW_ARCHIVED_KEY, R.id.showArchived)
         super.onPause()
     }
 

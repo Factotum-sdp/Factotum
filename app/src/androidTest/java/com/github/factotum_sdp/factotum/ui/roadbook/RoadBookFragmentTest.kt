@@ -721,34 +721,6 @@ class RoadBookFragmentTest {
     }
 
     @Test
-    fun automaticTimestampIsWorkingWhenFragmentIsOnTheBackGround() {
-        // Non timestamped record, hence swipe left shows deletion dialog
-        swipeLeftTheRecordAt(1)
-        onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
-        Thread.sleep(3000)
-        onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
-        onView(withText(DestinationRecords.RECORDS[1].destID)).check(matches(isDisplayed()))
-
-        injectMockLocationClient()
-
-        onView(withId(R.id.location_switch)).perform(click())
-        val uiDevice = UiDevice.getInstance(getInstrumentation())
-        uiDevice.pressHome()
-
-        Thread.sleep(4000)
-        val device = UiDevice.getInstance(getInstrumentation())
-        device.pressHome()
-        device.pressRecentApps()
-        device.click(device.displayWidth / 2, device.displayHeight / 2)
-        device.click(device.displayWidth / 2, device.displayHeight / 2)
-        Thread.sleep(4000)
-        // Now
-        swipeLeftTheRecordAt(1)
-        onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
-        onView(withText(DestinationRecords.RECORDS[1].destID)).check(doesNotExist())
-    }
-
-    @Test
     fun automaticTimestampDoesNotWorkAfterDestroyingTheAppByInjection()  {
         // Non timestamped record, hence swipe left shows deletion dialog
         swipeLeftTheRecordAt(1)

@@ -10,7 +10,7 @@ import android.os.IBinder
 import androidx.activity.ComponentActivity
 import com.github.factotum_sdp.factotum.data.LocationClient
 
-class LocationTrackingHandler() {
+class LocationTrackingHandler {
 
     private lateinit var locationService: LocationService
     private var onLocationUpdate: ((location: Location) -> Unit)? = null

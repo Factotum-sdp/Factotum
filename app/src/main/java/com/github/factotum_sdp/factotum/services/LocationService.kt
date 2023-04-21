@@ -29,7 +29,7 @@ private const val CHANNEL_ID = "location_service"
 private const val CHANNEL_NAME = "My Location Service"
 private const val SERVICE_ID = 101
 private const val UPDATE_INTERVAL = 1000L
-class LocationService(): Service() {
+class LocationService: Service() {
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var onLocationUpdateEvent: ((location: Location) -> Unit)? = null

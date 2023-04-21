@@ -38,7 +38,11 @@ class LoginViewModel(private val userViewModel: UserViewModel) : BaseAuthViewMod
                     LoginResult(success = result.data)
             } else {
                 _loginResult.value = LoginResult(
-                    User("Carl", "carl.schutz@epfl.ch", Role.BOSS)
+                    error = if ((result as Result.Error).exception.message == "User not found") {
+                        R.string.user_not_found
+                    } else {
+                        R.string.login_failed
+                    }
                 )
             }
         }

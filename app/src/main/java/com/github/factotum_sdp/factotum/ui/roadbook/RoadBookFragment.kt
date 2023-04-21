@@ -63,10 +63,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         rbRecyclerView.adapter = adapter
 
         locationTrackingHandler.setOnLocationUpdate {
-            val lat = it.latitude.toString().takeLast(3)
-            val long = it.longitude.toString().takeLast(3)
             val cal = Calendar.getInstance()
-            println("Location from roadbookFrag: ($lat, $long)")
             rbViewModel.timestampNextDestinationRecord(cal.time)
         }
 
@@ -194,7 +191,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
                 locationTrackingHandler.startLocationService(requireContext(), requireActivity())
             else if(lifecycle.currentState == Lifecycle.State.RESUMED && this.isVisible) {
                 locationTrackingHandler.stopLocationService(requireContext(), requireActivity())
-                println("out from RB")
             }
         }
     }

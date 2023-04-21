@@ -22,12 +22,29 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.runBlocking
 import org.junit.After
+import org.junit.AfterClass
 import org.junit.Before
+import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class DisplayFragmentTest {
+
+    companion object {
+        @JvmStatic
+        @BeforeClass
+        fun setUpClass() {
+            Firebase.storage.useEmulator("10.0.2.2", 9199)
+            Intents.init()
+        }
+
+        @JvmStatic
+        @AfterClass
+        fun tearDownClass() {
+            Intents.release()
+        }
+    }
 
     private lateinit var scenario: FragmentScenario<DisplayFragment>
     private lateinit var context: Context
@@ -35,17 +52,13 @@ class DisplayFragmentTest {
     @Before
     fun setUp() {
         scenario = launchFragmentInContainer(themeResId = R.style.Theme_Factotum)
-        Firebase.storage.useEmulator("10.0.2.2", 9199)
         context = InstrumentationRegistry.getInstrumentation().context
-        Intents.init()
     }
 
     @After
     fun tearDown() {
         emptyStorageEmulator(Firebase.storage.reference)
-        Intents.release()
     }
-
     @Test
     fun displayFragmentUiElementsDisplayed() {
         onView(withId(R.id.recyclerView)).check(matches(isDisplayed()))

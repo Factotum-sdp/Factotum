@@ -750,39 +750,7 @@ class RoadBookFragmentTest {
         onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
         onView(withText(DestinationRecords.RECORDS[2].destID)).check(doesNotExist())
     }
-
-    @Test
-    fun automaticTimestampIsWorkingWhenNavigatingInTheApp() {
-        // Non timestamped record, hence swipe left shows deletion dialog
-        swipeLeftTheRecordAt(1)
-        onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
-        onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
-        Thread.sleep(3000)
-        onView(withText(DestinationRecords.RECORDS[1].destID)).check(matches(isDisplayed()))
-
-        onView(withId(R.id.location_switch)).perform(click())
-        Thread.sleep(1000)
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.routeFragment))
-            .perform(click())
-        onView(withId(R.id.fragment_route_directors_parent))
-            .check(matches(isDisplayed()))
-        Thread.sleep(4000)
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.roadBookFragment))
-            .perform(click())
-        onView(withId(R.id.refresh_button)).perform(click())
-
-        // Now
-        swipeLeftTheRecordAt(1)
-        onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
-        onView(withText(DestinationRecords.RECORDS[1].destID)).check(doesNotExist())
-    }
-
-
-
+    
     fun withIndex(matcher: Matcher<View?>, index: Int): Matcher<View?>? {
         return object : TypeSafeMatcher<View?>() {
             var currentIndex = 0

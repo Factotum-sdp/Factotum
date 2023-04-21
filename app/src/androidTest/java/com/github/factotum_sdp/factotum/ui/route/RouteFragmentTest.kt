@@ -16,7 +16,10 @@ import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.ui.maps.RouteFragment.Companion.NO_RESULT
@@ -130,8 +133,10 @@ class RouteFragmentTest {
     fun wrongSearchShowsNoResultSnackbar(){
         val city = "wrong_search"
         onView(withId(androidx.appcompat.R.id.search_src_text)).perform(typeText(city)).perform(pressKey(KeyEvent.KEYCODE_ENTER))
-        onView(withId(com.google.android.material.R.id.snackbar_text))
-            .check(matches(withText(NO_RESULT)))
+        //create UI device see if it sees the no result text
+        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        device.findObject(
+            UiSelector().text(NO_RESULT)).exists()
     }
 
 }

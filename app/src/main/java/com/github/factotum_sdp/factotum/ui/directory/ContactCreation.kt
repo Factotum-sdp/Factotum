@@ -37,19 +37,17 @@ class ContactCreation : Fragment() {
     private val isUpdate: Boolean
         get() = currentContact != null
     private lateinit var viewModel : ContactsViewModel
-    val ROLES = listOf("Boss", "Courier", "Client")
     private var _binding: FragmentContactCreationBinding? = null
-
-
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
     private lateinit var name: EditText
     private lateinit var surname: EditText
-    private lateinit var address: EditText
     private lateinit var phoneNumber: EditText
     private lateinit var details: EditText
 
@@ -91,7 +89,6 @@ class ContactCreation : Fragment() {
     private fun setContactFields(view: View, contact: Contact?) {
         name = view.findViewById(R.id.editTextName)
         surname = view.findViewById(R.id.editTextSurname)
-        address = view.findViewById(R.id.contactCreationAddress)
         phoneNumber = view.findViewById(R.id.contactCreationPhoneNumber)
         details = view.findViewById(R.id.contactCreationNotes)
 
@@ -99,7 +96,7 @@ class ContactCreation : Fragment() {
             spinner.setSelection(roles.indexOf(contact.role))
             name.setText(contact.name)
             surname.setText(contact.surname)
-            address.setText(contact.address)
+            binding.contactCreationAddress.setQuery(contact.address, false)
             phoneNumber.setText(contact.phone)
             details.setText(contact.details)
         }
@@ -188,7 +185,7 @@ class ContactCreation : Fragment() {
                         name = name.text.toString(),
                         surname = surname.text.toString(),
                         profile_pic_id = R.drawable.contact_image,
-                        address = address.text.toString(),
+                        address = binding.contactCreationAddress.query.toString(),
                         phone = phoneNumber.text.toString(),
                         details = details.text.toString()
                     )
@@ -203,7 +200,7 @@ class ContactCreation : Fragment() {
                     name = name.text.toString(),
                     surname = surname.text.toString(),
                     image = R.drawable.contact_image,
-                    address = address.text.toString(),
+                    address = binding.contactCreationAddress.query.toString(),
                     phone = phoneNumber.text.toString(),
                     details = details.text.toString())
                 it.findNavController().navigate(R.id.action_contactCreation_to_directoryFragment)

@@ -49,7 +49,9 @@ import java.util.concurrent.CompletableFuture
 class RoadBookFragmentTest {
 
     @get:Rule
-    val permissionsRule = GrantPermissionRule.grant(Manifest.permission.FOREGROUND_SERVICE)
+    val permissionsRule = GrantPermissionRule.grant(Manifest.permission.FOREGROUND_SERVICE,
+                                                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                                                    Manifest.permission.ACCESS_FINE_LOCATION)
 
     @get:Rule
     var testRule = ActivityScenarioRule(
@@ -690,6 +692,7 @@ class RoadBookFragmentTest {
         // Non timestamped record, hence swipe left shows deletion dialog
         swipeLeftTheRecordAt(1)
         onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
+        Thread.sleep(3000)
         onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
         onView(withText(DestinationRecords.RECORDS[1].destID)).check(matches(isDisplayed()))
 
@@ -710,6 +713,7 @@ class RoadBookFragmentTest {
         // Non timestamped record, hence swipe left shows deletion dialog
         swipeLeftTheRecordAt(1)
         onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
+        Thread.sleep(3000)
         onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
         onView(withText(DestinationRecords.RECORDS[1].destID)).check(matches(isDisplayed()))
 
@@ -765,9 +769,11 @@ class RoadBookFragmentTest {
         swipeLeftTheRecordAt(1)
         onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
         onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
+        Thread.sleep(3000)
         onView(withText(DestinationRecords.RECORDS[1].destID)).check(matches(isDisplayed()))
 
         onView(withId(R.id.location_switch)).perform(click())
+        Thread.sleep(1000)
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.routeFragment))
@@ -779,6 +785,7 @@ class RoadBookFragmentTest {
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))
             .perform(click())
+
 
         // Now
         swipeLeftTheRecordAt(1)

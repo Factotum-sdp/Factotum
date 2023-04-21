@@ -105,7 +105,7 @@ class LocationService: Service() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel(channelId: String, channelName: String,
                                           service: NotificationManager): String{
-        val chan = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_NONE)
+        val chan = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH)
         chan.lightColor = Color.BLUE
         chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
         service.createNotificationChannel(chan)

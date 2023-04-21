@@ -89,4 +89,11 @@ class LocationTest {
         val cacheSizeAfter = cacheFile.length()
         assertEquals(cacheSizeBefore, cacheSizeAfter)
     }
+
+    @Test
+    fun rightQueryReturnsMultiplesResults(){
+        val query = "rue de Genève"
+        val result = Location.geocoderQuery(query, getApplicationContext())
+        assertTrue(result!!.size > 1)
+    }
 }

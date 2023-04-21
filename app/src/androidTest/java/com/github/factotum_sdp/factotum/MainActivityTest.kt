@@ -2,6 +2,8 @@ package com.github.factotum_sdp.factotum
 
 import android.view.Gravity
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.Espresso
+import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.Espresso.pressBackUnconditionally
 import androidx.test.espresso.action.ViewActions.*
@@ -9,6 +11,9 @@ import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.DrawerMatchers
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
+import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -18,9 +23,12 @@ import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.ui.login.LoginFragmentTest
 import com.github.factotum_sdp.factotum.utils.ContactsUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.setEmulatorGet
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.runBlocking
+import org.hamcrest.Matchers
+import org.hamcrest.Matchers.allOf
 import org.junit.AfterClass
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -57,12 +65,21 @@ class MainActivityTest {
 
             UsersPlaceHolder.init(database, auth)
             runBlocking {
-                UsersPlaceHolder.populateDatabase()
+                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_BOSS)
             }
             runBlocking {
-                UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER3)
+                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_COURIER)
+            }
+            runBlocking {
+                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_CLIENT)
+            }
+            runBlocking {
                 UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_BOSS)
+            }
+            runBlocking {
                 UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_COURIER)
+            }
+            runBlocking {
                 UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_CLIENT)
             }
         }
@@ -166,7 +183,7 @@ class MainActivityTest {
     @Test
     fun pressingBackOnAMenuFragmentLeadsToRBFragment() {
         // First need to login to trigger the change of navGraph's start fragment
-        LoginFragmentTest.fillUserEntryAndGoToRBFragment("jane.doe@gmail.com", "123456")
+        LoginFragmentTest.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
         Thread.sleep(LOGIN_REFRESH_TIME)
 
         navigateToAndPressBackLeadsToRB(R.id.directoryFragment)
@@ -182,7 +199,7 @@ class MainActivityTest {
 
     @Test
     fun pressingBackOnRBFragmentLeadsOutOfTheApp() {
-        LoginFragmentTest.fillUserEntryAndGoToRBFragment("jane.doe@gmail.com", "123456")
+        LoginFragmentTest.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
         Thread.sleep(LOGIN_REFRESH_TIME)
         pressBackUnconditionally()
         val uiDevice = UiDevice.getInstance(getInstrumentation())
@@ -192,11 +209,11 @@ class MainActivityTest {
 
     @Test
     fun navHeaderDisplaysUserData() {
-        LoginFragmentTest.fillUserEntryAndGoToRBFragment("jane.doe@gmail.com", "123456")
+        LoginFragmentTest.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
         Thread.sleep(LOGIN_REFRESH_TIME)
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
-        onView(withText("jane.doe@gmail.com")).check(matches(isDisplayed()))
-        onView(withText("Jane Doe (BOSS)")).check(matches(isDisplayed()))
+        onView(withText("boss@gmail.com")).check(matches(isDisplayed()))
+        onView(withText("Boss (BOSS)")).check(matches(isDisplayed()))
     }
 
     @Test
@@ -234,12 +251,12 @@ class MainActivityTest {
     // Work when executing the scenario manually but emulators issues make it fails in the connectedCheck
     // The second user Helen Bates can't be found.
     private fun navHeaderStillDisplaysCorrectlyAfterLogout() {
-        LoginFragmentTest.fillUserEntryAndGoToRBFragment("jane.doe@gmail.com", "123456")
+        LoginFragmentTest.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
         Thread.sleep(LOGIN_REFRESH_TIME)
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
-        onView(withText("jane.doe@gmail.com")).check(matches(isDisplayed()))
-        onView(withText("Jane Doe (BOSS)")).check(matches(isDisplayed()))
+        onView(withText("boss@gmail.com")).check(matches(isDisplayed()))
+        onView(withText("Boss (BOSS)")).check(matches(isDisplayed()))
 
         onView(withId(R.id.signoutButton)).perform(click())
         Thread.sleep(LOGIN_REFRESH_TIME)
@@ -248,5 +265,45 @@ class MainActivityTest {
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("helen.bates@gmail.com")).check(matches(isDisplayed()))
         onView(withText("Helen Bates (COURIER)")).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun signUpFormWithAllFieldsAndClickAndLogin() {
+        onView(withId(R.id.signup)).perform(click())
+        onView(withId(R.id.username)).perform(typeText("Name"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.email)).perform(typeText("email@gmail.com"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.password)).perform(typeText("123456"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.role)).perform(click())
+        Espresso.onData(Matchers.anything()).inRoot(RootMatchers.isPlatformPopup()).atPosition(1)
+            .perform(click())
+        onView(withId(R.id.signup)).perform(click())
+        FirebaseAuth.AuthStateListener {
+            onView(withId(R.id.fragment_login_directors_parent)).check(
+                matches(
+                    isDisplayed()
+                )
+            )
+        }
+        LoginFragmentTest.fillUserEntryAndGoToRBFragment("email@gmail.com", "123456")
+
+        FirebaseAuth.AuthStateListener { firebaseAuth ->
+            if (firebaseAuth.currentUser != null) {
+                onView(withId(R.id.fragment_login_directors_parent)).check(
+                    matches(
+                        isDisplayed()
+                    )
+                )
+            }
+
+        }
     }
 }

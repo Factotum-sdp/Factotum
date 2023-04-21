@@ -134,5 +134,4 @@ class RouteFragmentTest {
             .check(matches(withText(NO_RESULT)))
     }
 
-
 }

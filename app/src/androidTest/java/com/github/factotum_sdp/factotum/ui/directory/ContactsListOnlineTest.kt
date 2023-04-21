@@ -37,11 +37,7 @@ class ContactsListOnlineTest {
             MainActivity.setDatabase(database)
         }
 
-        @AfterClass
-        @JvmStatic
-        fun emptyDatabase() {
-            ContactsUtils.emptyFirebaseDatabase()
-        }
+        //TODO: MAYBE EMPTY DATABASE
     }
 
     @ExperimentalCoroutinesApi

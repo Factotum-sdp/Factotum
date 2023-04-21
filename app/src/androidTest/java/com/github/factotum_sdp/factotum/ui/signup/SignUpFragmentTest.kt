@@ -161,16 +161,13 @@ class SignUpFragmentTest {
         onView(withId(R.id.role)).perform(click())
         onData(anything()).inRoot(RootMatchers.isPlatformPopup()).atPosition(1).perform(click())
         onView(withId(R.id.signup)).perform(click())
-        FirebaseAuth.AuthStateListener { firebaseAuth ->
-            if (firebaseAuth.currentUser != null) {
-                onView(withId(R.id.fragment_login_directors_parent)).check(
-                    ViewAssertions.matches(
-                        ViewMatchers.isDisplayed()
-                    )
+        FirebaseAuth.AuthStateListener {
+            onView(withId(R.id.fragment_login_directors_parent)).check(
+                ViewAssertions.matches(
+                    ViewMatchers.isDisplayed()
                 )
-            }
+            )
         }
-
     }
 
     @Test

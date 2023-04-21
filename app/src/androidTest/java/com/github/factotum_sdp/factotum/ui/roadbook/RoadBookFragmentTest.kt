@@ -48,9 +48,6 @@ import java.util.concurrent.CompletableFuture
 class RoadBookFragmentTest {
 
     @get:Rule
-    val permissionsRule = GrantPermissionRule.grant(Manifest.permission.POST_NOTIFICATIONS)
-
-    @get:Rule
     val coarseLocationrule = GrantPermissionRule.grant(Manifest.permission.ACCESS_COARSE_LOCATION)
 
     @get:Rule

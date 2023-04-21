@@ -273,7 +273,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
     }
 
     override fun onDestroy() {
-        println("Stop from onDestroy")
         locationTrackingHandler.stopLocationService(requireContext(), requireActivity())
         super.onDestroy()
     }

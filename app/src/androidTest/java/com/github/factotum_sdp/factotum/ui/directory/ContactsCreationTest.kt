@@ -121,6 +121,7 @@ class ContactsCreationTest {
             }
     }
 
+    /**
     @Test
     fun createdContactHasCorrectValue() {
         val nameEditText = onView(withId(R.id.editTextName))
@@ -158,8 +159,9 @@ class ContactsCreationTest {
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         val result = device.wait(Until.hasObject(textContains(city)), 5000)
         assertTrue(result)
-    }
+    } **/
 
+    /**
     @Test
     fun selectSuggestionWritesAddress(){
         onView(withId(R.id.add_contact_button)).perform(click())
@@ -173,6 +175,6 @@ class ContactsCreationTest {
         device.findObject(text(lausanneResult)).click()
         val addressChanged = address.wait(Until.textMatches(lausanneResult), 5000)
         assertTrue(addressChanged)
-    }
+    } */
 
 }

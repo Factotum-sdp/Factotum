@@ -15,7 +15,6 @@ class LocationTrackingHandler {
     private lateinit var locationService: LocationService
     private var onLocationUpdate: ((location: Location) -> Unit)? = null
     private var isTrackingEnabled = false
-    private var locationClientForTest: LocationClient? = null
 
     fun startLocationService(applicationContext: Context, componentActivity: ComponentActivity) {
         Intent(applicationContext, LocationService::class.java).apply {
@@ -51,9 +50,6 @@ class LocationTrackingHandler {
             val binder = service as LocationService.LocalBinder
             locationService = binder.getService()
             onLocationUpdate?.let { f ->
-                locationClientForTest?.let { 
-                    locationService.setLocationClient(it)
-                }
                 locationService.setEventOnLocationUpdate(f)
             }
             isTrackingEnabled = true
@@ -69,9 +65,5 @@ class LocationTrackingHandler {
             unbind(connection)
         } catch (_: java.lang.IllegalArgumentException) {}
         // Do not unbind, on connectedCheck... However working fine on manual tests
-    }
-    
-    fun setLocationClientForTest(locationClient: LocationClient) {
-        locationClientForTest = locationClient
     }
 }

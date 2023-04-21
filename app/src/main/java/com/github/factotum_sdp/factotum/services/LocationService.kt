@@ -134,11 +134,4 @@ class LocationService: Service() {
         const val ACTION_START = "ACTION_START"
         const val ACTION_STOP = "ACTION_STOP"
     }
-
-    /**
-     * Only for testing purpose, and to be called before
-     */
-    fun setLocationClient(locationClient: LocationClient) {
-        this.locationClient = locationClient
-    }
 }

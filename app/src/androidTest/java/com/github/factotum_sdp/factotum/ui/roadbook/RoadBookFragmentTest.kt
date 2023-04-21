@@ -690,6 +690,27 @@ class RoadBookFragmentTest {
     // ================================Automatic Timestamp ========================================
 
     @Test
+    fun automaticTimestampIsWorkingWhenFragmentIsVisible() {
+        // Non timestamped record, hence swipe left shows deletion dialog
+        swipeLeftTheRecordAt(1)
+        onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
+        onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
+        Thread.sleep(3000)
+        onView(withText(DestinationRecords.RECORDS[1].destID)).check(matches(isDisplayed()))
+
+        // Enable foreground location job
+        onView(withId(R.id.location_switch)).perform(click())
+
+        // Time to have an automatic timestamp for at least one record
+        Thread.sleep(4000)
+
+        // Now swipe left archive it as it is timestamped
+        swipeLeftTheRecordAt(1)
+        onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
+        onView(withText(DestinationRecords.RECORDS[1].destID)).check(doesNotExist())
+    }
+
+    @Test
     fun automaticTimestampDoesNotWorkAfterDestroyingTheApp()  {
         // Non timestamped record, hence swipe left shows deletion dialog
         onView(withText(DestinationRecords.RECORDS[1].destID)).check(matches(isDisplayed()))
@@ -703,6 +724,64 @@ class RoadBookFragmentTest {
             .check(matches(isDisplayed()))
         onView(withId(R.id.refresh_button)).perform(click())
     }
+
+    @Test
+    fun automaticTimestampIsWorkingWhenFragmentIsOnTheBackGround() {
+        // Non timestamped record, hence swipe left shows deletion dialog
+        swipeLeftTheRecordAt(2)
+        onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
+        Thread.sleep(3000)
+        onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
+        onView(withText(DestinationRecords.RECORDS[2].destID)).check(matches(isDisplayed()))
+
+        onView(withId(R.id.location_switch)).perform(click())
+        val uiDevice = UiDevice.getInstance(getInstrumentation())
+        uiDevice.pressHome()
+
+        Thread.sleep(4000)
+        val device = UiDevice.getInstance(getInstrumentation())
+        device.pressHome()
+        device.pressRecentApps()
+        device.click(device.displayWidth / 2, device.displayHeight / 2)
+        device.click(device.displayWidth / 2, device.displayHeight / 2)
+        Thread.sleep(4000)
+        // Now
+        swipeLeftTheRecordAt(2)
+        onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
+        onView(withText(DestinationRecords.RECORDS[2].destID)).check(doesNotExist())
+    }
+
+    @Test
+    fun automaticTimestampIsWorkingWhenNavigatingInTheApp() {
+        // Non timestamped record, hence swipe left shows deletion dialog
+        swipeLeftTheRecordAt(1)
+        onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
+        onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
+        Thread.sleep(3000)
+        onView(withText(DestinationRecords.RECORDS[1].destID)).check(matches(isDisplayed()))
+
+        onView(withId(R.id.location_switch)).perform(click())
+        Thread.sleep(1000)
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.routeFragment))
+            .perform(click())
+        onView(withId(R.id.fragment_route_directors_parent))
+            .check(matches(isDisplayed()))
+        Thread.sleep(4000)
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.roadBookFragment))
+            .perform(click())
+        onView(withId(R.id.refresh_button)).perform(click())
+
+        // Now
+        swipeLeftTheRecordAt(1)
+        onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
+        onView(withText(DestinationRecords.RECORDS[1].destID)).check(doesNotExist())
+    }
+
+
 
     fun withIndex(matcher: Matcher<View?>, index: Int): Matcher<View?>? {
         return object : TypeSafeMatcher<View?>() {

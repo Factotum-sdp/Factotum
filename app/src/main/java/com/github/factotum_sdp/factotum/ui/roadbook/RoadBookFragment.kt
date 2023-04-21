@@ -300,8 +300,4 @@ class RoadBookFragment : Fragment(), MenuProvider {
             rbViewModel.hideArchivedRecords()
         rbRecyclerView.adapter!!.notifyDataSetChanged()
     }
-
-    fun setLocationClientForTest(locationClient: LocationClient) {
-        locationTrackingHandler.setLocationClientForTest(locationClient)
-    }
 }

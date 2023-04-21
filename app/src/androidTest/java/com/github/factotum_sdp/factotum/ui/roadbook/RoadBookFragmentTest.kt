@@ -53,6 +53,9 @@ class RoadBookFragmentTest {
     @get:Rule
     val fineLocationRule = GrantPermissionRule.grant(Manifest.permission.ACCESS_FINE_LOCATION)
 
+    @get:Rule
+    val foreGroundService = GrantPermissionRule.grant(Manifest.permission.FOREGROUND_SERVICE)
+
 
     @get:Rule
     var testRule = ActivityScenarioRule(

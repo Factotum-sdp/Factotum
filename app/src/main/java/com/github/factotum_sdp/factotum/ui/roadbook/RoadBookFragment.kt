@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.data.LocationClient
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.*
 
@@ -299,5 +300,9 @@ class RoadBookFragment : Fragment(), MenuProvider {
         else
             rbViewModel.hideArchivedRecords()
         rbRecyclerView.adapter!!.notifyDataSetChanged()
+    }
+
+    fun setLocationClientForTest(locationClient: LocationClient) {
+        locationTrackingHandler.setLocationClientForTest(locationClient)
     }
 }

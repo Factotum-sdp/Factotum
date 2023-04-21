@@ -29,12 +29,12 @@ private const val CHANNEL_ID = "location_service"
 private const val CHANNEL_NAME = "My Location Service"
 private const val SERVICE_ID = 101
 private const val UPDATE_INTERVAL = 1000L
-class LocationService: Service() {
+class LocationService(): Service() {
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private lateinit var locationClient: LocationClient
     private var onLocationUpdateEvent: ((location: Location) -> Unit)? = null
     private val binder = LocalBinder()
+    private lateinit var locationClient: LocationClient
 
     override fun onBind(p0: Intent?): IBinder? {
         return binder
@@ -43,9 +43,9 @@ class LocationService: Service() {
     override fun onCreate() {
         super.onCreate()
         locationClient = FusedLocationClient(
-            applicationContext,
-            LocationServices.getFusedLocationProviderClient(applicationContext)
-        )
+                applicationContext,
+                LocationServices.getFusedLocationProviderClient(applicationContext)
+            )
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -90,7 +90,7 @@ class LocationService: Service() {
             .setSmallIcon(R.drawable.location)
             .setOngoing(true)
 
-        locationClient
+        locationClient!!
             .getLocationUpdates(interval)
             .catch { e -> e.printStackTrace() }
             .onEach { location ->
@@ -133,5 +133,12 @@ class LocationService: Service() {
     companion object {
         const val ACTION_START = "ACTION_START"
         const val ACTION_STOP = "ACTION_STOP"
+    }
+
+    /**
+     * Only for testing purpose, and to be called before
+     */
+    fun setLocationClient(locationClient: LocationClient) {
+        this.locationClient = locationClient
     }
 }

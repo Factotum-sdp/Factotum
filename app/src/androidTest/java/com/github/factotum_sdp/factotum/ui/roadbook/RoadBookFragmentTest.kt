@@ -687,14 +687,26 @@ class RoadBookFragmentTest {
 
     // ============================================================================================
     // ================================Automatic Timestamp ========================================
+
+    private fun injectMockLocationClient() {
+        testRule.scenario.onActivity {
+            val fragment = it.supportFragmentManager.fragments.first() as NavHostFragment
+            fragment.let {
+                val curr = it.childFragmentManager.primaryNavigationFragment as RoadBookFragment
+                curr.setLocationClientForTest(MockLocationClient())
+            }
+        }
+    }
     @Test
-    fun automaticTimestampIsWorkingWhenFragmentIsVisible() {
+    fun automaticTimestampIsWorkingWhenFragmentIsVisibleByInjection() {
         // Non timestamped record, hence swipe left shows deletion dialog
         swipeLeftTheRecordAt(1)
         onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
         Thread.sleep(3000)
         onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
         onView(withText(DestinationRecords.RECORDS[1].destID)).check(matches(isDisplayed()))
+
+        injectMockLocationClient()
 
         // Enable foreground location job
         onView(withId(R.id.location_switch)).perform(click())
@@ -717,6 +729,8 @@ class RoadBookFragmentTest {
         onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
         onView(withText(DestinationRecords.RECORDS[1].destID)).check(matches(isDisplayed()))
 
+        injectMockLocationClient()
+
         onView(withId(R.id.location_switch)).perform(click())
         val uiDevice = UiDevice.getInstance(getInstrumentation())
         uiDevice.pressHome()
@@ -735,12 +749,14 @@ class RoadBookFragmentTest {
     }
 
     @Test
-    fun automaticTimestampDoesNotWorkAfterDestroyingTheApp()  {
+    fun automaticTimestampDoesNotWorkAfterDestroyingTheAppByInjection()  {
         // Non timestamped record, hence swipe left shows deletion dialog
         swipeLeftTheRecordAt(1)
         onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
         onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
         onView(withText(DestinationRecords.RECORDS[1].destID)).check(matches(isDisplayed()))
+
+        injectMockLocationClient()
 
         // Enable foreground location job
         onView(withId(R.id.location_switch)).perform(click())
@@ -764,13 +780,15 @@ class RoadBookFragmentTest {
     }
 
     @Test
-    fun automaticTimestampIsWorkingWhenNavigatingInTheApp() {
+    fun automaticTimestampIsWorkingWhenNavigatingInTheAppByInjection() {
         // Non timestamped record, hence swipe left shows deletion dialog
         swipeLeftTheRecordAt(1)
         onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
         onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
         Thread.sleep(3000)
         onView(withText(DestinationRecords.RECORDS[1].destID)).check(matches(isDisplayed()))
+
+        injectMockLocationClient()
 
         onView(withId(R.id.location_switch)).perform(click())
         Thread.sleep(1000)

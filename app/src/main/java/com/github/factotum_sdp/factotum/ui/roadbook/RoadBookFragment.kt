@@ -16,6 +16,7 @@ import com.github.factotum_sdp.factotum.LocationTrackingHandler
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import java.util.*
 
 
 /**
@@ -30,7 +31,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
             MainActivity.getDatabase().reference.child(ROADBOOK_DB_PATH)
         )
     }
-    private val locationTrackingHandler: LocationTrackingHandler
+    private val locationTrackingHandler: LocationTrackingHandler = LocationTrackingHandler()
 
     // Checked OptionMenu States with default values
     // overridden by the device saved SharedPreference
@@ -40,9 +41,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private var isTClickEnabled = true
     private var isShowArchivedEnabled = false
 
-    init {
-        locationTrackingHandler = LocationTrackingHandler()
-    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -63,6 +61,14 @@ class RoadBookFragment : Fragment(), MenuProvider {
         rbRecyclerView = view.findViewById(R.id.list)
         rbRecyclerView.layoutManager = LinearLayoutManager(context)
         rbRecyclerView.adapter = adapter
+
+        locationTrackingHandler.setOnLocationUpdate {
+            val lat = it.latitude.toString().takeLast(3)
+            val long = it.longitude.toString().takeLast(3)
+            val cal = Calendar.getInstance()
+            println("Location from roadbookFrag: ($lat, $long)")
+            rbViewModel.timestampNextDestinationRecord(cal.time)
+        }
 
         return view
     }
@@ -102,6 +108,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
+
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
         menuInflater.inflate(R.menu.main, menu)
         fragMenu = menu
@@ -111,7 +118,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
         val rbSR = menu.findItem(R.id.rbSwipeREdition)
         val rbTC = menu.findItem(R.id.rbTouchClick)
         val rbSA = menu.findItem(R.id.showArchived)
-
 
         // fetch saved States
         fetchMenuItemState(DRAG_N_DROP_SHARED_KEY, rbDD)
@@ -130,16 +136,8 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
         showOrHideArchived(isShowArchivedEnabled)
         setRBonClickListeners(rbDD, rbSL, rbSR, rbTC, rbSA)
-
-        // Set live location switch
-        val locationMenu = menu.findItem(R.id.location_switch)
-        val locationSwitch = locationMenu.actionView!!.findViewById<SwitchCompat>(R.id.menu_item_switch)
-        locationSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
-            if(isChecked)
-                locationTrackingHandler.startLocationService(requireContext(), requireActivity())
-            else if(lifecycle.currentState == Lifecycle.State.RESUMED)
-                locationTrackingHandler.stopLocationService(requireContext(), requireActivity())
-        }
+        setLiveLocationSwitch(fragMenu)
+        setRefreshButtonListener(fragMenu)
 
         // Only at menu initialization
         val itemTouchHelper = ItemTouchHelper(newItemTHCallBack())
@@ -183,6 +181,31 @@ class RoadBookFragment : Fragment(), MenuProvider {
             return false
         }
         return true
+    }
+
+    private fun setLiveLocationSwitch(menu: Menu) {
+        val locationMenu = menu.findItem(R.id.location_switch)
+        val locationSwitch = locationMenu.actionView!!.findViewById<SwitchCompat>(R.id.menu_item_switch)
+        locationSwitch?.let {// Load current state to set the switch item
+            it.isChecked = locationTrackingHandler.isTrackingEnabled()
+        }
+        locationSwitch!!.setOnCheckedChangeListener { _, isChecked ->
+            if(isChecked)
+                locationTrackingHandler.startLocationService(requireContext(), requireActivity())
+            else if(lifecycle.currentState == Lifecycle.State.RESUMED && this.isVisible) {
+                locationTrackingHandler.stopLocationService(requireContext(), requireActivity())
+                println("out from RB")
+            }
+        }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun setRefreshButtonListener(menu: Menu) {
+        val refreshButton = menu.findItem(R.id.refresh_button)
+        refreshButton.setOnMenuItemClickListener {
+            rbRecyclerView.adapter?.notifyDataSetChanged()
+            true
+        }
     }
     private fun newItemTHCallBack(): Callback {
 
@@ -246,8 +269,13 @@ class RoadBookFragment : Fragment(), MenuProvider {
         saveRadioButtonState(DRAG_N_DROP_SHARED_KEY, R.id.rbDragDrop)
         saveRadioButtonState(TOUCH_CLICK_SHARED_KEY, R.id.rbTouchClick)
         saveRadioButtonState(SHOW_ARCHIVED_KEY, R.id.showArchived)
-        locationTrackingHandler.stopLocationService(requireContext(), requireActivity())
         super.onDestroyView()
+    }
+
+    override fun onDestroy() {
+        println("Stop from onDestroy")
+        locationTrackingHandler.stopLocationService(requireContext(), requireActivity())
+        super.onDestroy()
     }
 
     private fun fetchMenuItemState(sharedKey: String, menuItem: MenuItem) {

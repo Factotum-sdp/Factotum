@@ -20,6 +20,11 @@
             android:id="@+id/showArchived"
             android:title="@string/rb_label_show_archived" />
         <item
+            android:id="@+id/refresh_button"
+            android:icon="@drawable/refresh"
+            app:showAsAction="always"
+            android:title="RefreshButton" />
+        <item
             android:id="@+id/location_switch"
             android:title="Switch"
             app:actionLayout="@layout/switch_item"

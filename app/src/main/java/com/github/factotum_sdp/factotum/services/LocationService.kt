@@ -25,13 +25,16 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
+private const val CHANNEL_ID = "location_service"
+private const val CHANNEL_NAME = "My Location Service"
+private const val SERVICE_ID = 101
+private const val UPDATE_INTERVAL = 1000L
 class LocationService: Service() {
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private lateinit var locationClient: LocationClient
     private var onLocationUpdateEvent: ((location: Location) -> Unit)? = null
     private val binder = LocalBinder()
-    private var count: Int = 0
 
     override fun onBind(p0: Intent?): IBinder? {
         return binder
@@ -59,11 +62,11 @@ class LocationService: Service() {
     }
 
     private fun start() {
-        startForegroundJob(1000L)  { service, notification ->
+        startForegroundJob(UPDATE_INTERVAL)  { service, notification ->
             val updatedNotification = notification.setContentText(
-                "Location service for Factotum is working"
-            ).setChannelId("my_service")
-            service.notify(101, updatedNotification.build())
+                getString(R.string.loc_service_notification_message)
+            ).setChannelId(CHANNEL_ID)
+            service.notify(SERVICE_ID, updatedNotification.build())
         }
     }
 
@@ -73,7 +76,7 @@ class LocationService: Service() {
         val service = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val channelId =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                createNotificationChannel("my_service", "My Background Service", service)
+                createNotificationChannel(CHANNEL_ID, CHANNEL_NAME, service)
             } else {
                 // If earlier version channel ID is not used
                 // https://developer.android.com/reference/android/support/v4/app/NotificationCompat.Builder.html#NotificationCompat.Builder(android.content.Context)
@@ -81,7 +84,7 @@ class LocationService: Service() {
             }
 
         val notification = NotificationCompat.Builder(this, channelId)
-            .setContentTitle("Tracking location...")
+            .setContentTitle(getString(R.string.loc_service_notification_title))
             .setContentText("Location: null")
             .setCategory(Notification.CATEGORY_SERVICE)
             .setSmallIcon(R.drawable.location)
@@ -96,7 +99,7 @@ class LocationService: Service() {
             }
             .launchIn(serviceScope)
 
-        startForeground(101, notification.build())
+        startForeground(SERVICE_ID, notification.build())
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

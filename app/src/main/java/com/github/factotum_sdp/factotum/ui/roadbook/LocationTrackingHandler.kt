@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum
+package com.github.factotum_sdp.factotum.ui.roadbook
 
 import android.content.Context
 import android.content.Intent

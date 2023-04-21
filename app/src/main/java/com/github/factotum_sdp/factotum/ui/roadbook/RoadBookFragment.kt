@@ -12,7 +12,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.ItemTouchHelper.*
-import com.github.factotum_sdp.factotum.LocationTrackingHandler
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.google.android.material.floatingactionbutton.FloatingActionButton

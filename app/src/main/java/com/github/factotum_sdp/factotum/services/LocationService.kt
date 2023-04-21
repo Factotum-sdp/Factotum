@@ -61,7 +61,7 @@ class LocationService: Service() {
     private fun start() {
         startForegroundJob(1000L)  { service, notification ->
             val updatedNotification = notification.setContentText(
-                "Location service for Factotum is working ${count++}"
+                "Location service for Factotum is working"
             ).setChannelId("my_service")
             service.notify(101, updatedNotification.build())
         }

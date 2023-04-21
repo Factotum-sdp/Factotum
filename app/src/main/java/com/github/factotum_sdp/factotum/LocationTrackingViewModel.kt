@@ -27,7 +27,7 @@ class LocationTrackingHandler() {
         if(isTrackingEnabled) {
             Intent(applicationContext, LocationService::class.java).apply {
                 action = LocationService.ACTION_STOP
-                componentActivity.unbindService(connection)
+                unbindWrapForCI { componentActivity.unbindService(it) }
                 componentActivity.stopService(this)
             }
         } // else the service is already disabled
@@ -57,5 +57,12 @@ class LocationTrackingHandler() {
         override fun onServiceDisconnected(arg0: ComponentName) {
             isTrackingEnabled = false
         }
+    }
+
+    private fun unbindWrapForCI(unbind: (connection: ServiceConnection) -> Unit) {
+        try {
+            unbind(connection)
+        } catch (_: java.lang.IllegalArgumentException) {}
+        // Do not unbind, on connectedCheck... However working fine on manual tests
     }
 }

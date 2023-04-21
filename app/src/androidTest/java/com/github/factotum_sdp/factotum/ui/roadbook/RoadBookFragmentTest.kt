@@ -1,6 +1,8 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
+import android.Manifest
 import android.content.Context
+import android.view.View
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider
@@ -18,6 +20,9 @@ import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import androidx.test.rule.GrantPermissionRule
+import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
@@ -27,6 +32,9 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.CoreMatchers.startsWith
+import org.hamcrest.Description
+import org.hamcrest.Matcher
+import org.hamcrest.TypeSafeMatcher
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -39,6 +47,9 @@ import java.util.concurrent.CompletableFuture
 
 @RunWith(AndroidJUnit4::class)
 class RoadBookFragmentTest {
+
+    @get:Rule
+    val permissionsRule = GrantPermissionRule.grant(Manifest.permission.FOREGROUND_SERVICE)
 
     @get:Rule
     var testRule = ActivityScenarioRule(
@@ -672,6 +683,124 @@ class RoadBookFragmentTest {
             .check(matches(isDisplayed()))
     }
 
+    // ============================================================================================
+    // ================================Automatic Timestamp ========================================
+    @Test
+    fun automaticTimestampIsWorkingWhenFragmentIsVisible() {
+        // Non timestamped record, hence swipe left shows deletion dialog
+        swipeLeftTheRecordAt(1)
+        onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
+        onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
+        onView(withText(DestinationRecords.RECORDS[1].destID)).check(matches(isDisplayed()))
+
+        // Enable foreground location job
+        onView(withId(R.id.location_switch)).perform(click())
+
+        // Time to have an automatic timestamp for at least one record
+        Thread.sleep(4000)
+
+        // Now swipe left archive it as it is timestamped
+        swipeLeftTheRecordAt(1)
+        onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
+        onView(withText(DestinationRecords.RECORDS[1].destID)).check(doesNotExist())
+    }
+
+    @Test
+    fun automaticTimestampIsWorkingWhenFragmentIsOnTheBackGround() {
+        // Non timestamped record, hence swipe left shows deletion dialog
+        swipeLeftTheRecordAt(1)
+        onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
+        onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
+        onView(withText(DestinationRecords.RECORDS[1].destID)).check(matches(isDisplayed()))
+
+        onView(withId(R.id.location_switch)).perform(click())
+        val uiDevice = UiDevice.getInstance(getInstrumentation())
+        uiDevice.pressHome()
+
+        Thread.sleep(4000)
+        val device = UiDevice.getInstance(getInstrumentation())
+        device.pressHome()
+        device.pressRecentApps()
+        device.click(device.displayWidth / 2, device.displayHeight / 2)
+        device.click(device.displayWidth / 2, device.displayHeight / 2)
+        Thread.sleep(4000)
+        // Now
+        swipeLeftTheRecordAt(1)
+        onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
+        onView(withText(DestinationRecords.RECORDS[1].destID)).check(doesNotExist())
+    }
+
+    @Test
+    fun automaticTimestampDoesNotWorkAfterDestroyingTheApp()  {
+        // Non timestamped record, hence swipe left shows deletion dialog
+        swipeLeftTheRecordAt(1)
+        onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
+        onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
+        onView(withText(DestinationRecords.RECORDS[1].destID)).check(matches(isDisplayed()))
+
+        // Enable foreground location job
+        onView(withId(R.id.location_switch)).perform(click())
+
+        onView(withId(R.id.location_switch)).perform(click())
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.signoutButton))
+            .perform(click())
+        Thread.sleep(4000)
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.roadBookFragment))
+            .perform(click())
+
+        // Still not timestamped
+        swipeLeftTheRecordAt(1)
+        onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
+        onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
+        onView(withText(DestinationRecords.RECORDS[1].destID)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun automaticTimestampIsWorkingWhenNavigatingInTheApp() {
+        // Non timestamped record, hence swipe left shows deletion dialog
+        swipeLeftTheRecordAt(1)
+        onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
+        onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
+        onView(withText(DestinationRecords.RECORDS[1].destID)).check(matches(isDisplayed()))
+
+        onView(withId(R.id.location_switch)).perform(click())
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.routeFragment))
+            .perform(click())
+        onView(withId(R.id.fragment_route_directors_parent))
+            .check(matches(isDisplayed()))
+        Thread.sleep(4000)
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.roadBookFragment))
+            .perform(click())
+
+        // Now
+        swipeLeftTheRecordAt(1)
+        onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
+        onView(withText(DestinationRecords.RECORDS[1].destID)).check(doesNotExist())
+    }
+
+
+    fun withIndex(matcher: Matcher<View?>, index: Int): Matcher<View?>? {
+        return object : TypeSafeMatcher<View?>() {
+            var currentIndex = 0
+            override fun describeTo(description: Description) {
+                description.appendText("with index: ")
+                description.appendValue(index)
+                matcher.describeTo(description)
+            }
+
+            override fun matchesSafely(view: View?): Boolean {
+                return matcher.matches(view) && currentIndex++ == index
+            }
+        }
+    }
 
 
     // ============================================================================================

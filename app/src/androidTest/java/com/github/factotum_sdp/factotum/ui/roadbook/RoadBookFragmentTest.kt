@@ -1,7 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
 import android.Manifest
-import android.content.Context
 import android.view.View
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.RecyclerView
@@ -20,14 +19,13 @@ import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.GrantPermissionRule
-import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeLeftTheRecordAt
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightTheRecordAt
+import com.github.factotum_sdp.factotum.utils.PreferencesSetting.setAllPrefs
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import org.hamcrest.CoreMatchers.*
@@ -56,41 +54,19 @@ class RoadBookFragmentTest {
     @get:Rule
     val foreGroundService = GrantPermissionRule.grant(Manifest.permission.FOREGROUND_SERVICE)
 
-
-
     @get:Rule
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
     )
 
     companion object {
-        const val SWIPE_L_SHARED_KEY = "SwipeLeftButton"
-        const val SWIPE_R_SHARED_KEY = "SwipeRightButton"
-        const val DRAG_N_DROP_SHARED_KEY = "DragNDropButton"
-        const val TOUCH_CLICK_SHARED_KEY = "TouchClickButton"
-        const val SHOW_ARCHIVED_KEY = "ShowArchived"
         const val WORST_REFRESH_TIME = 2000L
-
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
             val database = Firebase.database
             database.useEmulator("10.0.2.2", 9000)
             MainActivity.setDatabase(database)
-        }
-        fun setPrefs(sharedKey: String, activity: MainActivity, value: Boolean) {
-            val sp = activity.getSharedPreferences(sharedKey, Context.MODE_PRIVATE)
-            val edit = sp.edit()
-            edit.putBoolean(sharedKey, value)
-            edit.apply()
-        }
-
-        fun setAllPrefs(activity: MainActivity) {
-            setPrefs(SWIPE_L_SHARED_KEY, activity, true)
-            setPrefs(SWIPE_R_SHARED_KEY, activity, true)
-            setPrefs(DRAG_N_DROP_SHARED_KEY, activity, true)
-            setPrefs(TOUCH_CLICK_SHARED_KEY, activity, false)
-            setPrefs(SHOW_ARCHIVED_KEY, activity, false)
         }
     }
 
@@ -741,22 +717,6 @@ class RoadBookFragmentTest {
         onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
         onView(withText(DestinationRecords.RECORDS[1].destID)).check(doesNotExist())
     }
-
-    fun withIndex(matcher: Matcher<View?>, index: Int): Matcher<View?>? {
-        return object : TypeSafeMatcher<View?>() {
-            var currentIndex = 0
-            override fun describeTo(description: Description) {
-                description.appendText("with index: ")
-                description.appendValue(index)
-                matcher.describeTo(description)
-            }
-
-            override fun matchesSafely(view: View?): Boolean {
-                return matcher.matches(view) && currentIndex++ == index
-            }
-        }
-    }
-
 
     // ============================================================================================
     // ===================================== Helpers ==============================================

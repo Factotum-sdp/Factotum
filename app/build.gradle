@@ -50,6 +50,8 @@ android {
     buildFeatures {
         viewBinding true
     }
+
+    useLibrary 'android.test.mock'
 }
 
 dependencies {

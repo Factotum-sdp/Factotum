@@ -9,7 +9,7 @@ import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.ui.picture.*
-import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookFragmentTest
+import com.github.factotum_sdp.factotum.utils.PreferencesSetting
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
@@ -45,7 +45,7 @@ class PictureFragmentOnlineTest {
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
         testRule.scenario.onActivity {
-            RoadBookFragmentTest.setPrefs(RoadBookFragmentTest.TOUCH_CLICK_SHARED_KEY, it, true)
+            PreferencesSetting.setPrefs(PreferencesSetting.TOUCH_CLICK_SHARED_KEY, it, true)
         }
 
         goToPictureFragment()

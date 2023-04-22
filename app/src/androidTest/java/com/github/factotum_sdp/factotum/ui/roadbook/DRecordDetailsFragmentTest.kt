@@ -1,6 +1,5 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
-import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
@@ -15,6 +14,7 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightTheRecordAt
+import com.github.factotum_sdp.factotum.utils.PreferencesSetting
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -32,22 +32,12 @@ class DRecordDetailsFragmentTest {
     @Before
     fun toRoadBookFragment() {
         testRule.scenario.onActivity {
-            setPrefs(RoadBookFragmentTest.SWIPE_L_SHARED_KEY, it, true)
-            setPrefs(RoadBookFragmentTest.SWIPE_R_SHARED_KEY, it, true)
-            setPrefs(RoadBookFragmentTest.DRAG_N_DROP_SHARED_KEY, it, true)
-            setPrefs(RoadBookFragmentTest.TOUCH_CLICK_SHARED_KEY, it, false)
+            PreferencesSetting.setAllPrefs(it)
         }
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))
             .perform(click())
-    }
-
-    private fun setPrefs(sharedKey: String, activity: MainActivity, value: Boolean) {
-        val sp = activity.getSharedPreferences(sharedKey, Context.MODE_PRIVATE)
-        val edit = sp.edit()
-        edit.putBoolean(sharedKey, value)
-        edit.apply()
     }
 
     private fun toFragment() {

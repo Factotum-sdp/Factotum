@@ -37,7 +37,7 @@ class DRecordDetailsFragmentTest {
         @JvmStatic
         fun setUpDatabase() {
             val database = Firebase.database
-            database.useEmulator("10.0.2.2", 9000)
+            //database.useEmulator("10.0.2.2", 9000)
             MainActivity.setDatabase(database)
         }
     }

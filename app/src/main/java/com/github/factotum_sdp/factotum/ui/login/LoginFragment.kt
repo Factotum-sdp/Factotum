@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
+import com.github.factotum_sdp.factotum.data.Role
 import com.github.factotum_sdp.factotum.data.User
 import com.github.factotum_sdp.factotum.databinding.FragmentLoginBinding
 import com.github.factotum_sdp.factotum.ui.auth.BaseAuthFragment

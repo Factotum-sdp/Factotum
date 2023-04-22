@@ -90,7 +90,7 @@ class LocationService: Service() {
             .setSmallIcon(R.drawable.location)
             .setOngoing(true)
 
-        locationClient!!
+        locationClient
             .getLocationUpdates(interval)
             .catch { e -> e.printStackTrace() }
             .onEach { location ->

@@ -57,6 +57,7 @@ class RoadBookFragmentTest {
     val foreGroundService = GrantPermissionRule.grant(Manifest.permission.FOREGROUND_SERVICE)
 
 
+
     @get:Rule
     var testRule = ActivityScenarioRule(
         MainActivity::class.java

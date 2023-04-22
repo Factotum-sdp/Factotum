@@ -15,7 +15,10 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightTheRecordAt
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import org.junit.Before
+import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,6 +31,16 @@ class DRecordDetailsFragmentTest {
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
     )
+
+    companion object {
+        @BeforeClass
+        @JvmStatic
+        fun setUpDatabase() {
+            val database = Firebase.database
+            database.useEmulator("10.0.2.2", 9000)
+            MainActivity.setDatabase(database)
+        }
+    }
 
     @Before
     fun toRoadBookFragment() {

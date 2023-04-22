@@ -81,6 +81,7 @@ class RoadBookFragmentTest {
             .perform(click())
     }
 
+
     @Test
     fun radioButtonsAreAccessible() {
         Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
@@ -575,25 +576,26 @@ class RoadBookFragmentTest {
 
     @Test
     fun archiveANonTimestampedRecord() {
-        onView((withText(DestinationRecords.RECORDS[1].destID)))
+        onView((withText(DestinationRecords.RECORDS[3].destID)))
             .check(matches(isDisplayed()))
-        swipeLeftTheRecordAt(1)
+        swipeLeftTheRecordAt(3)
 
         // On non timestamped record swipe left should show deletion dialog
         onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
+        Thread.sleep(3000)
         onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
-        onView((withText(DestinationRecords.RECORDS[1].destID)))
+        onView((withText(DestinationRecords.RECORDS[3].destID)))
             .check(matches(isDisplayed()))
 
         // Edit a timestamp :
-        swipeRightTheRecordAt(1)
+        swipeRightTheRecordAt(3)
         onView(withId(R.id.editTextTimestamp)).perform(click())
         onView(withText(timePickerUpdateBLabel)).perform(click())
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
         Thread.sleep(WORST_REFRESH_TIME)
 
-        swipeLeftTheRecordAt(1)
-        onView((withText(DestinationRecords.RECORDS[1].destID)))
+        swipeLeftTheRecordAt(3)
+        onView((withText(DestinationRecords.RECORDS[3].destID)))
             .check(doesNotExist())
     }
 

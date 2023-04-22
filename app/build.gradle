@@ -35,6 +35,7 @@ android {
     }
 
     testOptions {
+        animationsDisabled = true
         unitTests.all {
             useJUnitPlatform()
         }
@@ -50,8 +51,6 @@ android {
     buildFeatures {
         viewBinding true
     }
-
-    useLibrary 'android.test.mock'
 }
 
 dependencies {

@@ -37,8 +37,7 @@ class DRecordDetailsFragmentTest {
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
-            val database = setEmulatorGet()
-            MainActivity.setDatabase(database)
+            setEmulatorGet()
         }
     }
 

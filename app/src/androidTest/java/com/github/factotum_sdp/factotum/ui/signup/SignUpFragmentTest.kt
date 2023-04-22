@@ -15,6 +15,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.setEmulatorGet
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -37,6 +38,7 @@ class SignUpFragmentTest {
         @BeforeClass
         @JvmStatic
         fun setUpAuth() {
+            setEmulatorGet()
             auth.useEmulator("10.0.2.2", 9099)
 
             MainActivity.setAuth(auth)

@@ -60,20 +60,13 @@ class ContactsUpdateTest {
 
     @Test
     fun hasAllTheFields(){
-        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        onView((withId(R.id.contact_image_creation)))
-            .check(matches(isDisplayed()))
-        onView(withId(R.id.roles_spinner))
-            .check(matches(isDisplayed()))
-        val fields = Contact::class.java.declaredFields
-        var nbFields = 0
-        for (param in fields){
-            if (param.isSynthetic) continue
-            nbFields++
-        }
-        val nbEditText = device.findObjects(By.clazz(EditText::class.java.name)).size
-        // image already present
-        assertEquals(nbFields - 3, nbEditText)
+        onView((withId(R.id.contact_image_creation))).check(matches(isDisplayed()))
+        onView((withId(R.id.contactCreationAddress))).check(matches(isDisplayed()))
+        onView(withId(R.id.roles_spinner)).check(matches(isDisplayed()))
+        onView(withId(R.id.editTextName)).check(matches(isDisplayed()))
+        onView(withId(R.id.editTextSurname)).check(matches(isDisplayed()))
+        onView(withId(R.id.contactCreationPhoneNumber)).check(matches(isDisplayed()))
+        onView(withId(R.id.contactCreationNotes)).check(matches(isDisplayed()))
     }
 
     @Test

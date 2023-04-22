@@ -8,15 +8,13 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.MainActivity
+import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
-import org.junit.After
+import org.junit.*
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
 
@@ -35,6 +33,14 @@ class PictureFragmentOfflineTest {
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
     )
+
+    companion object {
+        @BeforeClass
+        @JvmStatic
+        fun setUpDatabase() {
+            GeneralUtils.setEmulatorGet()
+        }
+    }
 
     @Before
     fun setUp() {

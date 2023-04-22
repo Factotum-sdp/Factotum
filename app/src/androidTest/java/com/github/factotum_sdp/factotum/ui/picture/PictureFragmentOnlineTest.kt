@@ -9,6 +9,7 @@ import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.ui.picture.*
+import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
@@ -35,6 +36,14 @@ class PictureFragmentOnlineTest {
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
     )
+
+    companion object {
+        @BeforeClass
+        @JvmStatic
+        fun setUpDatabase() {
+            GeneralUtils.setEmulatorGet()
+        }
+    }
 
     @Before
     fun setUp() {

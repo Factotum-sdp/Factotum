@@ -57,8 +57,7 @@ class RoadBookFragmentTest {
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
-            val database = setEmulatorGet()
-            MainActivity.setDatabase(database)
+            setEmulatorGet()
         }
     }
     private fun setPrefs(sharedKey: String, activity: MainActivity, value: Boolean) {

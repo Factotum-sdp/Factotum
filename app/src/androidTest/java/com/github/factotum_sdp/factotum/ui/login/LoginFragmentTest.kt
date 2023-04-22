@@ -40,7 +40,6 @@ class LoginFragmentTest {
 
             auth.useEmulator("10.0.2.2", 9099)
 
-            MainActivity.setDatabase(database)
             MainActivity.setAuth(auth)
 
             UsersPlaceHolder.init(database, auth)

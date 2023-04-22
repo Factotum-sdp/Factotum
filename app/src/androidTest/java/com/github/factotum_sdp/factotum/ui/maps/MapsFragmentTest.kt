@@ -20,16 +20,14 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.LocationUtils
 import com.google.android.gms.maps.SupportMapFragment
 import junit.framework.TestCase.assertTrue
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.Matchers.anything
+import org.junit.*
 import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.FixMethodOrder
-import org.junit.Rule
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 import java.util.*
@@ -47,6 +45,15 @@ class MapsFragmentTest {
         Locale.FRENCH.language -> "Uniquement cette fois-ci"
         else -> "Only this time"
     }
+
+    companion object {
+        @BeforeClass
+        @JvmStatic
+        fun setUpDatabase() {
+            GeneralUtils.setEmulatorGet()
+        }
+    }
+
     @get:Rule
     var testRule = ActivityScenarioRule(
         MainActivity::class.java

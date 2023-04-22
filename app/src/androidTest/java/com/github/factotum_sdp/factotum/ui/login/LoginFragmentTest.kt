@@ -9,7 +9,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
-import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.setEmulatorGet
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getAuth
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
@@ -35,14 +37,10 @@ class LoginFragmentTest {
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
-            val database: FirebaseDatabase = setEmulatorGet()
-            val auth: FirebaseAuth = Firebase.auth
+            initFirebase()
 
-            auth.useEmulator("10.0.2.2", 9099)
-
-            MainActivity.setAuth(auth)
-
-            UsersPlaceHolder.init(database, auth)
+            MainActivity.setAuth(getAuth())
+            UsersPlaceHolder.init(getDatabase(), getAuth())
 
             runBlocking {
                 UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER1)

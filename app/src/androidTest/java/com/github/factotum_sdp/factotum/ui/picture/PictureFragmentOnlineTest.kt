@@ -10,6 +10,7 @@ import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.ui.picture.*
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
@@ -41,7 +42,7 @@ class PictureFragmentOnlineTest {
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
-            GeneralUtils.setEmulatorGet()
+            initFirebase()
         }
     }
 

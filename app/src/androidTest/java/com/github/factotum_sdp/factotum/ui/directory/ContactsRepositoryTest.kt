@@ -6,13 +6,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.Contact
 import com.github.factotum_sdp.factotum.utils.ContactsUtils
-import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.setEmulatorGet
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
-import org.junit.After
-import org.junit.Assert
-import org.junit.Before
-import org.junit.Test
+import org.junit.*
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -24,12 +22,20 @@ class ContactsRepositoryTest {
     private lateinit var context: Context
     private lateinit var repository: ContactsRepository
 
+    companion object {
+        @BeforeClass
+        @JvmStatic
+        fun setUpFirebase() {
+            initFirebase()
+        }
+    }
+
     @Before
     fun setUp() {
         context = ApplicationProvider.getApplicationContext()
         val sharedPreferences = context.getSharedPreferences("contacts_test", Context.MODE_PRIVATE)
         repository = ContactsRepository(sharedPreferences)
-        repository.setDatabase(setEmulatorGet())
+        repository.setDatabase(getDatabase())
         ContactsUtils.emptyFirebaseDatabase()
     }
 

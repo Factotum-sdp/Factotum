@@ -19,7 +19,7 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.Contact
 import com.github.factotum_sdp.factotum.utils.ContactsUtils
-import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.setEmulatorGet
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -35,9 +35,8 @@ class ContactsUpdateTest {
         private const val nbContacts = 5
         @BeforeClass
         @JvmStatic
-        fun setUpDatabase() {
-            val database = setEmulatorGet()
-            MainActivity.setDatabase(database)
+        fun setUpFirebase() {
+            initFirebase()
         }
     }
 

@@ -18,8 +18,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.ui.display.utils.*
-import com.github.factotum_sdp.factotum.utils.GeneralUtils
-import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.setEmulatorGet
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.runBlocking
@@ -37,8 +36,7 @@ class DisplayFragmentTest {
         @JvmStatic
         @BeforeClass
         fun setUpClass() {
-            setEmulatorGet()
-            Firebase.storage.useEmulator("10.0.2.2", 9199)
+            initFirebase()
             Intents.init()
         }
 

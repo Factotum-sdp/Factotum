@@ -21,6 +21,7 @@ import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.LocationUtils
 import com.google.android.gms.maps.SupportMapFragment
 import junit.framework.TestCase.assertTrue
@@ -50,7 +51,7 @@ class MapsFragmentTest {
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
-            GeneralUtils.setEmulatorGet()
+            initFirebase()
         }
     }
 

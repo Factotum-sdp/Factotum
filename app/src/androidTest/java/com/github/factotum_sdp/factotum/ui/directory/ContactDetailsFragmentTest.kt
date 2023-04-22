@@ -22,10 +22,8 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
 import com.github.factotum_sdp.factotum.utils.ContactsUtils
 import com.github.factotum_sdp.factotum.utils.LocationUtils
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import junit.framework.TestCase.assertTrue
-import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.setEmulatorGet
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers
 import org.junit.Before
@@ -42,10 +40,8 @@ class ContactDetailsFragmentTest {
     companion object {
         @BeforeClass
         @JvmStatic
-        fun setUpDatabase() {
-
-            val database = setEmulatorGet()
-            MainActivity.setDatabase(database)
+        fun setUp() {
+            initFirebase()
         }
     }
 

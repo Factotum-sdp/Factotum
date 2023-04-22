@@ -19,8 +19,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.ui.maps.RouteFragment.Companion.NO_RESULT
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import org.hamcrest.Matchers.*
 import org.junit.Before
 import org.junit.BeforeClass
@@ -37,7 +37,7 @@ class RouteFragmentTest {
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
-            GeneralUtils.setEmulatorGet()
+            initFirebase()
         }
     }
 

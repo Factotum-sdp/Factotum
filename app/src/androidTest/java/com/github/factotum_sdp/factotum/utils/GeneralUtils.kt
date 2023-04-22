@@ -12,7 +12,7 @@ class GeneralUtils {
         fun setEmulatorGet(): FirebaseDatabase {
             if (!emulatorSet) {
                 database = Firebase.database
-                //database.useEmulator("10.0.2.2", 9000)
+                database.useEmulator("10.0.2.2", 9000)
                 emulatorSet = true
             }
             return database

@@ -3,10 +3,10 @@ package com.github.factotum_sdp.factotum.ui.directory
 import android.widget.EditText
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
+import androidx.test.espresso.Espresso.closeSoftKeyboard
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.replaceText
+import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.RecyclerViewActions
@@ -16,6 +16,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.uiautomator.By
 import androidx.test.uiautomator.By.*
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
@@ -121,7 +122,7 @@ class ContactsCreationTest {
             }
     }
 
-    /**
+
     @Test
     fun createdContactHasCorrectValue() {
         val nameEditText = onView(withId(R.id.editTextName))
@@ -130,8 +131,10 @@ class ContactsCreationTest {
         val surnameEditText = onView(withId(R.id.editTextSurname))
         surnameEditText.perform(replaceText("Doe"))
 
-        val addressEditText = onView(withId(R.id.contactCreationAddress))
-        addressEditText.perform(replaceText("123 Main St"))
+        onView(withId(androidx.appcompat.R.id.search_src_text)).perform(
+            typeText("123 Main St")
+        )
+        closeSoftKeyboard()
 
         val phoneEditText = onView(withId(R.id.contactCreationPhoneNumber))
         phoneEditText.perform(replaceText("555-555-1234"))
@@ -153,18 +156,16 @@ class ContactsCreationTest {
 
     @Test
     fun writeInAddressFieldMakesDropDown(){
-        onView(withId(R.id.add_contact_button)).perform(click())
         val city = "Lausanne"
         onView(withId(androidx.appcompat.R.id.search_src_text)).perform(ViewActions.typeText(city.dropLast(2)))
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         val result = device.wait(Until.hasObject(textContains(city)), 5000)
         assertTrue(result)
-    } **/
+    }
 
-    /**
+
     @Test
     fun selectSuggestionWritesAddress(){
-        onView(withId(R.id.add_contact_button)).perform(click())
         val city = "Lausanne"
         onView(withId(androidx.appcompat.R.id.search_src_text)).perform(ViewActions.typeText(city))
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
@@ -175,6 +176,6 @@ class ContactsCreationTest {
         device.findObject(text(lausanneResult)).click()
         val addressChanged = address.wait(Until.textMatches(lausanneResult), 5000)
         assertTrue(addressChanged)
-    } */
+    }
 
 }

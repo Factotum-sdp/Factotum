@@ -272,14 +272,13 @@ class RoadBookFragmentTest {
             .check(matches(isDisplayed()))
     }
 
-    /**
     @Test
     fun eraseOnTimePickerResetTimestamp() {
         val cal: Calendar = Calendar.getInstance()
         onView(withText(startsWith("arrival : ${timestampUntilHourFormat(cal)}"))).check(matches(isDisplayed()))
         eraseFirstRecTimestamp()
         onView(withText(startsWith("arrival : ${timestampUntilHourFormat(cal)}"))).check(doesNotExist())
-    } **/
+    }
 
     @Test
     fun cancelOnTimePickerWorks() {

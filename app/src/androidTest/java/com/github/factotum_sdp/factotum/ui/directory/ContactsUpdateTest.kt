@@ -2,8 +2,11 @@ package com.github.factotum_sdp.factotum.ui.directory
 
 import android.widget.EditText
 import androidx.recyclerview.widget.RecyclerView
+import androidx.test.espresso.Espresso.closeSoftKeyboard
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.action.ViewActions.clearText
+import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.RecyclerViewActions
@@ -107,7 +110,7 @@ class ContactsUpdateTest {
             }
     }
 
-    /**
+
     @Test
     fun fieldsContainContactValues() {
         val nameEditText = onView(withId(R.id.editTextName))
@@ -116,8 +119,9 @@ class ContactsUpdateTest {
         val surnameEditText = onView(withId(R.id.editTextSurname))
         surnameEditText.check(matches(withText(ContactsUtils.getContacts()[0].surname)))
 
-        val addressEditText = onView(withId(R.id.contactCreationAddress))
-        addressEditText.check(matches(withText(ContactsUtils.getContacts()[0].address)))
+        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        val addressEditText = device.findObject(By.text(ContactsUtils.getContacts()[0].address))
+        assert(addressEditText != null)
 
         val phoneEditText = onView(withId(R.id.contactCreationPhoneNumber))
         phoneEditText.check(matches(withText(ContactsUtils.getContacts()[0].phone)))
@@ -127,9 +131,8 @@ class ContactsUpdateTest {
 
         val roleSpinner = onView(withId(R.id.roles_spinner))
         roleSpinner.check(matches(withSpinnerText(ContactsUtils.getContacts()[0].role)))
-    } **/
+    }
 
-    /**
     @Test
     fun updatedContactHasCorrectValue() {
         val nameEditText = onView(withId(R.id.editTextName))
@@ -138,8 +141,10 @@ class ContactsUpdateTest {
         val surnameEditText = onView(withId(R.id.editTextSurname))
         surnameEditText.perform(ViewActions.replaceText("Doe"))
 
-        val addressEditText = onView(withId(R.id.contactCreationAddress))
-        addressEditText.perform(ViewActions.replaceText("123 Main St"))
+        onView(withId(androidx.appcompat.R.id.search_src_text)).perform(
+            clearText(),
+            typeText("123 Main St"))
+        closeSoftKeyboard()
 
         val phoneEditText = onView(withId(R.id.contactCreationPhoneNumber))
         phoneEditText.perform(ViewActions.replaceText("555-555-1234"))
@@ -164,5 +169,5 @@ class ContactsUpdateTest {
             .check(matches(withText("555-555-1234")))
         onView(withId(R.id.contact_details))
             .check(matches(withText("This is a test note.")))
-    } **/
+    }
 }

@@ -80,7 +80,7 @@ class MainActivityTest {
         @AfterClass
         @JvmStatic
         fun stopAuthEmulator() {
-            val auth = Firebase.auth
+            val auth = getAuth()
             auth.signOut()
             MainActivity.setAuth(auth)
         }

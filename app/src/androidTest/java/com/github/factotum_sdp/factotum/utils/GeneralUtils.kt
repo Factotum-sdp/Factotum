@@ -18,17 +18,15 @@ class GeneralUtils {
         private lateinit var storage : FirebaseStorage
 
         fun initFirebase() {
-            if (!firebaseSet) {
-                database = Firebase.database
-                auth = Firebase.auth
-                storage = Firebase.storage
-                database.useEmulator("10.0.2.2", 9000)
-                auth.useEmulator("10.0.2.2", 9099)
-                storage.useEmulator("10.0.2.2", 9199)
-                MainActivity.setDatabase(database)
-                MainActivity.setAuth(auth)
-                firebaseSet = true
-            }
+            database = Firebase.database
+            auth = Firebase.auth
+            storage = Firebase.storage
+            database.useEmulator("10.0.2.2", 9000)
+            auth.useEmulator("10.0.2.2", 9099)
+            storage.useEmulator("10.0.2.2", 9199)
+            firebaseSet = true
+            MainActivity.setDatabase(database)
+            MainActivity.setAuth(auth)
         }
         fun getDatabase(): FirebaseDatabase {
             return database

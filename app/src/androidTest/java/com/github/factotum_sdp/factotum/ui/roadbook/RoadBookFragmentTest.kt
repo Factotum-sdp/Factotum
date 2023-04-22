@@ -78,22 +78,26 @@ class RoadBookFragmentTest {
             database.useEmulator("10.0.2.2", 9000)
             MainActivity.setDatabase(database)
         }
-    }
-    private fun setPrefs(sharedKey: String, activity: MainActivity, value: Boolean) {
-        val sp = activity.getSharedPreferences(sharedKey, Context.MODE_PRIVATE)
-        val edit = sp.edit()
-        edit.putBoolean(sharedKey, value)
-        edit.apply()
+        fun setPrefs(sharedKey: String, activity: MainActivity, value: Boolean) {
+            val sp = activity.getSharedPreferences(sharedKey, Context.MODE_PRIVATE)
+            val edit = sp.edit()
+            edit.putBoolean(sharedKey, value)
+            edit.apply()
+        }
+
+        fun setAllPrefs(activity: MainActivity) {
+            setPrefs(SWIPE_L_SHARED_KEY, activity, true)
+            setPrefs(SWIPE_R_SHARED_KEY, activity, true)
+            setPrefs(DRAG_N_DROP_SHARED_KEY, activity, true)
+            setPrefs(TOUCH_CLICK_SHARED_KEY, activity, false)
+            setPrefs(SHOW_ARCHIVED_KEY, activity, false)
+        }
     }
 
     @Before
     fun toRoadBookFragment() {
         testRule.scenario.onActivity {
-            setPrefs(SWIPE_L_SHARED_KEY, it, true)
-            setPrefs(SWIPE_R_SHARED_KEY, it, true)
-            setPrefs(DRAG_N_DROP_SHARED_KEY, it, true)
-            setPrefs(TOUCH_CLICK_SHARED_KEY, it, false)
-            setPrefs(SHOW_ARCHIVED_KEY, it, false)
+            setAllPrefs(activity = it)
         }
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())

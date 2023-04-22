@@ -3,10 +3,7 @@ package com.github.factotum_sdp.factotum.ui.login
 import androidx.lifecycle.*
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
-import com.github.factotum_sdp.factotum.data.LoginDataSource
-import com.github.factotum_sdp.factotum.data.LoginRepository
-import com.github.factotum_sdp.factotum.data.Result
-import com.github.factotum_sdp.factotum.data.User
+import com.github.factotum_sdp.factotum.data.*
 import com.github.factotum_sdp.factotum.ui.auth.BaseAuthResult
 import com.github.factotum_sdp.factotum.ui.auth.BaseAuthState
 import com.github.factotum_sdp.factotum.ui.auth.BaseAuthViewModel

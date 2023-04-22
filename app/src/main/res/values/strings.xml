@@ -132,4 +132,6 @@
     <string name="textvlabel_actions">Actions</string>
     <string name="textvlabel_notes">Notes</string>
     <string name="rb_label_show_archived">Show archived</string>
+    <string name="loc_service_notification_message">Location service for Factotum is working</string>
+    <string name="loc_service_notification_title">Tracking location</string>
 </resources>

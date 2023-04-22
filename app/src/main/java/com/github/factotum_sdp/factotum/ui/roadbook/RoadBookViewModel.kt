@@ -10,6 +10,7 @@ import com.google.firebase.database.DatabaseReference
 import java.text.DateFormat
 import java.text.SimpleDateFormat.getDateInstance
 import java.util.*
+import kotlin.NoSuchElementException
 import kotlin.collections.HashMap
 
 /**
@@ -43,6 +44,26 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
      */
     fun backUp() {
         dbRef.setValue(_recordsList.value)
+    }
+
+    fun timestampNextDestinationRecord(timeStamp: Date) {
+        try {
+            val record = currentDRecList().getNextDestinationRecord()
+            val newRec = DestinationRecord(
+                record.destID,
+                record.clientID,
+                timeStamp,
+                record.waitingTime,
+                record.rate,
+                record.actions,
+                record.notes
+            )
+            val ls = arrayListOf<DestinationRecord>()
+            ls.addAll(_recordsList.value as Collection<DestinationRecord>)
+            ls[currentDRecList().getNextDestinationIndex()] = newRec
+
+            _recordsList.postValue(currentDRecList().replaceDisplayedList(ls))
+        } catch (_: NoSuchElementException) {}
     }
 
     /**
@@ -106,7 +127,7 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
      */
     fun editRecordAt(pos: Int, clientID: String, timeStamp: Date?, waitingTime: Int,
                      rate: Int, actions: List<DestinationRecord.Action>, notes: String): Boolean {
-        val currentRec = _recordsList.value!![pos]
+        val currentRec = currentDRecList()[pos]
         var destID = currentRec.destID
         if(currentRec.clientID != clientID) {
             destID = computeDestID(clientID)

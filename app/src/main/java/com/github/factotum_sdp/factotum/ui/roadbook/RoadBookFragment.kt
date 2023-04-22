@@ -1,9 +1,12 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.*
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.SwitchCompat
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -13,7 +16,11 @@ import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.data.LocationClient
+import com.github.factotum_sdp.factotum.hasLocationPermission
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import java.lang.ref.ReferenceQueue
+import java.util.*
 
 
 /**
@@ -28,6 +35,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
             MainActivity.getDatabase().reference.child(ROADBOOK_DB_PATH)
         )
     }
+    private val locationTrackingHandler: LocationTrackingHandler = LocationTrackingHandler()
 
     // Checked OptionMenu States with default values
     // overridden by the device saved SharedPreference
@@ -57,6 +65,11 @@ class RoadBookFragment : Fragment(), MenuProvider {
         rbRecyclerView = view.findViewById(R.id.list)
         rbRecyclerView.layoutManager = LinearLayoutManager(context)
         rbRecyclerView.adapter = adapter
+
+        locationTrackingHandler.setOnLocationUpdate {
+            val cal = Calendar.getInstance()
+            rbViewModel.timestampNextDestinationRecord(cal.time)
+        }
 
         return view
     }
@@ -96,6 +109,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
+
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
         menuInflater.inflate(R.menu.main, menu)
         fragMenu = menu
@@ -107,11 +121,11 @@ class RoadBookFragment : Fragment(), MenuProvider {
         val rbSA = menu.findItem(R.id.showArchived)
 
         // fetch saved States
-        fetchRadioButtonState(DRAG_N_DROP_SHARED_KEY, rbDD)
-        fetchRadioButtonState(SWIPE_L_SHARED_KEY, rbSL)
-        fetchRadioButtonState(SWIPE_R_SHARED_KEY, rbSR)
-        fetchRadioButtonState(TOUCH_CLICK_SHARED_KEY, rbTC)
-        fetchRadioButtonState(SHOW_ARCHIVED_KEY, rbSA)
+        fetchMenuItemState(DRAG_N_DROP_SHARED_KEY, rbDD)
+        fetchMenuItemState(SWIPE_L_SHARED_KEY, rbSL)
+        fetchMenuItemState(SWIPE_R_SHARED_KEY, rbSR)
+        fetchMenuItemState(TOUCH_CLICK_SHARED_KEY, rbTC)
+        fetchMenuItemState(SHOW_ARCHIVED_KEY, rbSA)
 
         // init globals to saved preference state
         isDDropEnabled = rbDD.isChecked
@@ -120,16 +134,19 @@ class RoadBookFragment : Fragment(), MenuProvider {
         isTClickEnabled = rbTC.isChecked
         isShowArchivedEnabled = rbSA.isChecked
 
+
         showOrHideArchived(isShowArchivedEnabled)
         setRBonClickListeners(rbDD, rbSL, rbSR, rbTC, rbSA)
+        setLiveLocationSwitch(fragMenu)
+        setRefreshButtonListener(fragMenu)
 
         // Only at menu initialization
         val itemTouchHelper = ItemTouchHelper(newItemTHCallBack())
         itemTouchHelper.attachToRecyclerView(rbRecyclerView)
     }
 
-    private fun setRBonClickListeners(rbDD: MenuItem, rbSL: MenuItem,
-                                      rbSR: MenuItem, rbTC: MenuItem, rbSA: MenuItem) {
+    private fun setRBonClickListeners(rbDD: MenuItem, rbSL: MenuItem, rbSR: MenuItem,
+                                      rbTC: MenuItem, rbSA: MenuItem) {
         rbDD.setOnMenuItemClickListener {
             it.isChecked = !it.isChecked
             isDDropEnabled = !isDDropEnabled
@@ -165,6 +182,30 @@ class RoadBookFragment : Fragment(), MenuProvider {
             return false
         }
         return true
+    }
+
+    private fun setLiveLocationSwitch(menu: Menu) {
+        val locationMenu = menu.findItem(R.id.location_switch)
+        val locationSwitch = locationMenu.actionView!!.findViewById<SwitchCompat>(R.id.menu_item_switch)
+        locationSwitch?.let {// Load current state to set the switch item
+            it.isChecked = locationTrackingHandler.isTrackingEnabled()
+        }
+        locationSwitch!!.setOnCheckedChangeListener { _, isChecked ->
+            if(isChecked)
+                locationTrackingHandler.startLocationService(requireContext(), requireActivity())
+            else if(lifecycle.currentState == Lifecycle.State.RESUMED && this.isVisible) {
+                locationTrackingHandler.stopLocationService(requireContext(), requireActivity())
+            }
+        }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun setRefreshButtonListener(menu: Menu) {
+        val refreshButton = menu.findItem(R.id.refresh_button)
+        refreshButton.setOnMenuItemClickListener {
+            rbRecyclerView.adapter?.notifyDataSetChanged()
+            true
+        }
     }
     private fun newItemTHCallBack(): Callback {
 
@@ -231,10 +272,15 @@ class RoadBookFragment : Fragment(), MenuProvider {
         super.onDestroyView()
     }
 
-    private fun fetchRadioButtonState(sharedKey: String, radioButton: MenuItem) {
+    override fun onDestroy() {
+        locationTrackingHandler.stopLocationService(requireContext(), requireActivity())
+        super.onDestroy()
+    }
+
+    private fun fetchMenuItemState(sharedKey: String, menuItem: MenuItem) {
         val sp = requireActivity().getSharedPreferences(sharedKey ,Context.MODE_PRIVATE)
         val savedState = sp.getBoolean(sharedKey, true)
-        radioButton.setChecked(savedState)
+        menuItem.setChecked(savedState)
     }
     private fun saveRadioButtonState(sharedKey: String, radioButtonId: Int) {
         val sp = requireActivity().getSharedPreferences(sharedKey,Context.MODE_PRIVATE)

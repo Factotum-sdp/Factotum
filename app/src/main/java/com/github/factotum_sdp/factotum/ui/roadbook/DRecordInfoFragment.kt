@@ -24,7 +24,7 @@ class DRecordInfoFragment(private val record: DestinationRecord): Fragment() {
     private fun setEditTexts(rec: DestinationRecord, view: View) {
         setEditText(rec.destID, R.id.editTextDestID, view)
         setEditText(rec.clientID, R.id.editTextClientID, view)
-        setEditText(DestinationRecord.timeStampFormat(rec.timeStamp), R.id.editTextTimestamp, view)
+        setEditText(DestinationRecord.timeStampFormat(rec.timeStamp), R.id.editTextTimestampDRecord, view)
         setEditText(rec.waitingTime.toString(), R.id.editTextWaitingTime, view)
         setEditText(rec.rate.toString(), R.id.editTextRate, view)
         setEditText(DestinationRecord.actionsFormat(rec.actions), R.id.editTextActions, view)

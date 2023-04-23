@@ -18,12 +18,13 @@ class GeneralUtils {
         private val storage : FirebaseStorage = Firebase.storage
 
         fun initFirebase() {
-            if (!firebaseSet) {
+            //if (!firebaseSet) {
+            database.setPersistenceEnabled(true)
                 database.useEmulator("10.0.2.2", 9000)
                 auth.useEmulator("10.0.2.2", 9099)
                 storage.useEmulator("10.0.2.2", 9199)
                 firebaseSet = true
-            }
+            //}
             MainActivity.setDatabase(database)
             MainActivity.setAuth(auth)
         }

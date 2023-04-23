@@ -35,6 +35,14 @@ class DRecordList(private val allRecords: List<DestinationRecord> = listOf(),
         return archivedSet.contains(this[index])
     }
 
+    fun getNextDestinationIndex(): Int {
+        return this.indexOfFirst { dRec -> dRec.timeStamp == null }
+    }
+
+    fun getNextDestinationRecord(): DestinationRecord {
+        return this.first { dRec -> dRec.timeStamp == null }
+    }
+
     /**
      * Update the current main List (this) in an immutable way,
      * keeping all the others current settings.

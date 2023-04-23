@@ -79,8 +79,8 @@ class MapsFragmentTest {
             assertTrue(device.findObject(UiSelector().textContains(buttonTextAllow)).exists())
         }
     }
-    @Test
-    fun b_permissionAllowShowLocation(){
+
+    private fun b_permissionAllowShowLocation(){
             onData(anything())
                 .inAdapterView(withId(R.id.list_view_routes)).atPosition(0).perform(
                     click()

@@ -1,18 +1,17 @@
 package com.github.factotum_sdp.factotum.ui.maps
 
 import android.Manifest
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
 import com.github.factotum_sdp.factotum.data.localisation.Route
 import com.github.factotum_sdp.factotum.databinding.FragmentMapsBinding
+import com.github.factotum_sdp.factotum.hasLocationPermission
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
@@ -38,7 +37,7 @@ class MapsFragment : Fragment() {
         ActivityResultContracts.RequestPermission()
     ){ isGranted ->
         if (isGranted){
-            checkAndActivateLocation()
+            requireContext().hasLocationPermission()
         }
     }
 
@@ -74,7 +73,7 @@ class MapsFragment : Fragment() {
     }
 
     private fun initMapLocation(googleMap: GoogleMap){
-        if (!checkAndActivateLocation()){
+        if (!requireContext().hasLocationPermission()){
             requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
         googleMap.uiSettings.isMyLocationButtonEnabled = true
@@ -112,21 +111,6 @@ class MapsFragment : Fragment() {
             ?: CameraUpdateFactory.newLatLngZoom(EPFL_LOC, 8f)
 
         googleMap.moveCamera(cuf)
-    }
-
-    private fun checkAndActivateLocation() :Boolean{
-        if (ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            mMap.isMyLocationEnabled = true
-            return true
-        }
-        return false
     }
 
     override fun onDestroyView() {

@@ -7,6 +7,8 @@
     <uses-feature android:name="android.hardware.camera" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+
 
     <queries>
         <!-- Camera -->
@@ -43,7 +45,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <service android:name=".services.LocationService" android:foregroundServiceType="location" />
          <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.github.factotum_sdp.factotum.file-provider"

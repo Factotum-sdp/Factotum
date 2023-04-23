@@ -13,15 +13,12 @@ import com.google.firebase.storage.ktx.storage
 class GeneralUtils {
     companion object {
         private var firebaseSet: Boolean = false
-        private lateinit var database: FirebaseDatabase
-        private lateinit var auth: FirebaseAuth
-        private lateinit var storage : FirebaseStorage
+        private val database: FirebaseDatabase = Firebase.database
+        private val auth: FirebaseAuth = Firebase.auth
+        private val storage : FirebaseStorage = Firebase.storage
 
         fun initFirebase() {
             if (!firebaseSet) {
-                database = Firebase.database
-                auth = Firebase.auth
-                storage = Firebase.storage
                 database.useEmulator("10.0.2.2", 9000)
                 auth.useEmulator("10.0.2.2", 9099)
                 storage.useEmulator("10.0.2.2", 9199)

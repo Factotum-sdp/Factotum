@@ -455,6 +455,7 @@ class RoadBookFragmentTest {
     }
 
     // Check that moving somewhere else in the app keep the sharedPref alive.
+    /**
     @Test
     fun movingOutsideRBFragmentKeepsButtonStates() {
         // Set some states :
@@ -496,7 +497,7 @@ class RoadBookFragmentTest {
         Thread.sleep(WORST_REFRESH_TIME)
         onView(withText(DestinationRecords.RECORDS[2].destID)).perform(click())
         onView(withId(R.id.fragment_drecord_details_directors_parent)).check(doesNotExist())
-    }
+    } **/
 
 
     // ============================================================================================

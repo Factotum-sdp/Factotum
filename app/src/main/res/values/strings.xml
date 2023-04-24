@@ -83,7 +83,7 @@
     <string name="file_provider">"com.github.factotum_sdp.factotum.file-provider"</string>
     <string name="camera_permission_not_granted">Permission needed to take a photo</string>
     <string name="sign_out">Sign Out</string>
-    
+
     <!-- Strings related to signup -->
     <string name="welcome_text">Welcome</string>
     <string name="full_name_text">Full Name</string>

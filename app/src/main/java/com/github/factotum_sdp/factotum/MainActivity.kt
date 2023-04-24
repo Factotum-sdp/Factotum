@@ -1,10 +1,18 @@
 package com.github.factotum_sdp.factotum
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
+import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
@@ -12,6 +20,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.*
 import com.github.factotum_sdp.factotum.data.Role
 import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
+import com.github.factotum_sdp.factotum.ui.user.ProfilePictureSelectorFragment
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -19,11 +28,20 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private val auth: FirebaseAuth = getAuth()
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ){ isGranted ->
+        if (isGranted){
+            launchProfilePictureSelectorFragment()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,11 +92,30 @@ class MainActivity : AppCompatActivity() {
         val headerView = binding.navView.inflateHeaderView(R.layout.nav_header_main)
 
         // Fetch Header Views
+        val image = headerView.findViewById<ImageView>(R.id.imageView)
         val userName = headerView.findViewById<TextView>(R.id.userName)
         val email = headerView.findViewById<TextView>(R.id.textView)
 
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Choose an option")
+        val options = arrayOf("Upload image", "Show image")
+        builder.setItems(options) { _, which ->
+            when (which) {
+                0 -> {
+                    requestPermissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
+                }
+                1 -> {
+
+                }
+            }
+        }
+
+        image.setOnClickListener {
+            builder.create().show()
+        }
+
         // Instantiate the current user
-        val user = ViewModelProvider(this)[UserViewModel::class.java]
+        val user by viewModels<UserViewModel>()
         binding.navView.findViewTreeLifecycleOwner()?.let { lco ->
             user.loggedInUser.observe(lco) {
                 val format = "${it.name} (${it.role})"
@@ -91,6 +128,15 @@ class MainActivity : AppCompatActivity() {
                 navigateToFragment(it.role)
             }
         }
+    }
+
+    private fun launchProfilePictureSelectorFragment() {
+        val fragment = ProfilePictureSelectorFragment()
+        val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.nav_host_fragment_content_main, fragment)
+        transaction.addToBackStack(null)
+        transaction.commit()
+        binding.drawerLayout.closeDrawers()
     }
 
     private fun listenLogoutButton() {

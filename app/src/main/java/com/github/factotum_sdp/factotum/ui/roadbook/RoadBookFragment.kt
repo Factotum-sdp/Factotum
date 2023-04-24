@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.UserViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.*
 
@@ -31,6 +32,8 @@ class RoadBookFragment : Fragment(), MenuProvider {
         )
     }
     private val locationTrackingHandler: LocationTrackingHandler = LocationTrackingHandler()
+    private val userView: UserViewModel by activityViewModels()
+
 
     // Checked OptionMenu States with default values
     // overridden by the device saved SharedPreference
@@ -66,10 +69,13 @@ class RoadBookFragment : Fragment(), MenuProvider {
             rbViewModel.timestampNextDestinationRecord(cal.time)
         }
 
+        rbViewModel.setLoggedUser(userView.loggedInUser.value!!)
+
         return view
     }
 
     override fun onPause() {
+        rbViewModel.logDeliveries()
         rbViewModel.backUp()
         saveRadioButtonState(SWIPE_R_SHARED_KEY, R.id.rbSwipeREdition)
         saveRadioButtonState(SWIPE_L_SHARED_KEY, R.id.rbSwipeLDeletion)
@@ -256,6 +262,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
     companion object {
         private const val ROADBOOK_DB_PATH: String = "Sheet-shift"
+        const val DELIVERY_LOG_DB_PATH: String = "Delivery-Log"
         private const val SWIPE_L_SHARED_KEY = "SwipeLeftButton"
         private const val SWIPE_R_SHARED_KEY = "SwipeRightButton"
         private const val DRAG_N_DROP_SHARED_KEY = "DragNDropButton"

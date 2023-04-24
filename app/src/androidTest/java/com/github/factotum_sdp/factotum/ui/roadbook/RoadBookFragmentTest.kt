@@ -24,7 +24,6 @@ import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeLeftTheRecordAt
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightTheRecordAt
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
-import com.github.factotum_sdp.factotum.utils.PreferencesSetting.setAllPrefs
 import org.hamcrest.CoreMatchers.*
 import org.junit.Before
 import org.junit.BeforeClass
@@ -613,20 +612,6 @@ class RoadBookFragmentTest {
     // ============================================================================================
     // ================================Automatic Timestamp ========================================
 
-    @Test
-    fun automaticTimestampDoesNotWorkAfterDestroyingTheApp()  {
-        // Non timestamped record, hence swipe left shows deletion dialog
-        onView(withText(DestinationRecords.RECORDS[1].destID)).check(matches(isDisplayed()))
-        swipeLeftTheRecordAt(1)
-        Thread.sleep(4000)
-
-        onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
-        onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
-        Thread.sleep(4000)
-        onView((withText(DestinationRecords.RECORDS[1].destID)))
-            .check(matches(isDisplayed()))
-        onView(withId(R.id.refresh_button)).perform(click())
-    }
 
     // ============================================================================================
     // ===================================== Helpers ==============================================

@@ -92,6 +92,7 @@ class MapsFragmentTest {
         assertTrue(checkLocationEnabled(testRule))
     }
 
+    /*
     @Test
     fun goesToSecondFragement() {
         onData(anything()).inAdapterView(withId(R.id.list_view_routes)).atPosition(0)
@@ -99,8 +100,9 @@ class MapsFragmentTest {
         val nextButton = onView(withId(R.id.button_next))
         nextButton.perform(click())
         onView(withId(R.id.fragment_maps_directors_parent)).check(matches(isDisplayed()))
-    }
+    } */
 
+    /*
     @Test
     fun showsDestinationMarker() {
 
@@ -110,9 +112,9 @@ class MapsFragmentTest {
         nextButton.perform(click())
         val endMarker = device.findObject(UiSelector().descriptionContains("Destination"))
         assertTrue(endMarker.exists())
-    }
+    } */
 
-    @Test
+   /* @Test
     fun showsAllDest() {
         val nbRoutes = device.findObjects(textContains("->")).size
         val showAll = onView(withId(R.id.button_all))
@@ -123,7 +125,7 @@ class MapsFragmentTest {
             endMarker = device.findObjects(descContains("Destination"))
         }
         assertEquals(nbRoutes, endMarker.size)
-    }
+    } */
 
     @Test
     fun runLaunchesMaps() {

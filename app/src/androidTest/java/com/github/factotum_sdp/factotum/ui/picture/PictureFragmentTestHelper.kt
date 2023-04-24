@@ -9,6 +9,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
+import com.github.factotum_sdp.factotum.utils.PreferencesSetting
 import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.tasks.await
 import java.io.File
@@ -64,6 +65,8 @@ fun goToPictureFragment() {
         .perform(open())
     onView(withId(R.id.roadBookFragment))
         .perform(click())
+
+    PreferencesSetting.enableTouchClick()
 
     // Click on one of the roadbook
     val destID = DestinationRecords.RECORDS[2].destID

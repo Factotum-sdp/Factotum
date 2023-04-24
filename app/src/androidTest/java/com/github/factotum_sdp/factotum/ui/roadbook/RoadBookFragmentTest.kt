@@ -1,7 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
 import android.Manifest
-import android.content.Context
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider
@@ -64,18 +63,8 @@ class RoadBookFragmentTest {
         }
     }
 
-    private fun setPrefs(sharedKey: String, activity: MainActivity, value: Boolean) {
-        val sp = activity.getSharedPreferences(sharedKey, Context.MODE_PRIVATE)
-        val edit = sp.edit()
-        edit.putBoolean(sharedKey, value)
-        edit.apply()
-    }
-
     @Before
     fun toRoadBookFragment() {
-    testRule.scenario.onActivity {
-        setAllPrefs(activity = it)
-    }
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))
@@ -614,6 +603,7 @@ class RoadBookFragmentTest {
             .check(matches(isDisplayed()))
 
         navigateOutsideAndComeBack()
+        clickOnShowArchivedButton()
 
         // Check that the record is still archived
         onView(allOf(withId(R.id.archivedIcon), withEffectiveVisibility(Visibility.VISIBLE)))

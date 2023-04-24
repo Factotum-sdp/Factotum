@@ -2,12 +2,16 @@ package com.github.factotum_sdp.factotum.ui.picture
 
 import android.Manifest
 import android.os.Environment
+import androidx.test.espresso.Espresso
+import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.MainActivity
+import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.ui.picture.*
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.PreferencesSetting
@@ -53,10 +57,6 @@ class PictureFragmentOnlineTest {
         storage.useEmulator("10.0.2.2", 9199)
         emptyLocalFiles(picturesDir)
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-
-        testRule.scenario.onActivity {
-            PreferencesSetting.setPrefs(PreferencesSetting.TOUCH_CLICK_SHARED_KEY, it, true)
-        }
 
         goToPictureFragment()
 

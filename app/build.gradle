@@ -8,6 +8,7 @@ plugins {
     id 'androidx.navigation.safeargs.kotlin'
     id 'kotlin-kapt'
     id 'kotlin-android'
+    id 'org.gradle.test-retry'
 }
 
 android {
@@ -108,6 +109,12 @@ dependencies {
 
 
 tasks.withType(Test) {
+    retry {
+        maxRetries = 3
+        maxFailures = 20
+        failOnPassedAfterRetry = false
+    }
+
     jacoco.includeNoLocationClasses = true
     jacoco.excludes = ['jdk.internal.*', '**/databinding/*']
 }

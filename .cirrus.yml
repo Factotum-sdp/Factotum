@@ -45,6 +45,8 @@ check_android_task:
     ./cc-test-reporter before-build
   screen_record_background_script:
     for n in $(seq 1 20); do adb exec-out screenrecord --time-limit=180 --output-format=h264 - > $n.h264; done
+  start_logcat_background_script:
+    adb logcat > log.log
   check_script: |
     chmod +x firebase
     ./firebase emulators:exec --project sdp-firebase-bootcamp-c795d './gradlew check connectedCheck'
@@ -55,6 +57,10 @@ check_android_task:
   lint_script:
     ./gradlew lintDebug
   always:
+    stop_logcat_script: |
+      if [[ $(adb devices | awk 'NR>1 {print $1}') =~ "emulator.*" ]]; then
+        adb logcat -c
+      fi
     wait_for_screenrecord_script: |
       pkill -2 -x adb
       sleep 2
@@ -69,3 +75,5 @@ check_android_task:
     androidtest_artifacts:
       path: "./app/build/outputs/**/*.xml"
       format: junit
+    logs_artifacts:
+      path: log.log

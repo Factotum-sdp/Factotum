@@ -1,14 +1,13 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import com.github.factotum_sdp.factotum.services.LocationService
-import android.content.ComponentName
 import android.content.ServiceConnection
 import android.location.Location
 import android.os.IBinder
 import androidx.activity.ComponentActivity
-import com.github.factotum_sdp.factotum.data.LocationClient
+import com.github.factotum_sdp.factotum.services.LocationService
 
 class LocationTrackingHandler {
 

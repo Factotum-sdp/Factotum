@@ -1,11 +1,9 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.*
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -16,10 +14,7 @@ import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.data.LocationClient
-import com.github.factotum_sdp.factotum.hasLocationPermission
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import java.lang.ref.ReferenceQueue
 import java.util.*
 
 
@@ -30,7 +25,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
     private lateinit var rbRecyclerView: RecyclerView
     private lateinit var fragMenu: Menu
-    private val rbViewModel: RoadBookViewModel by activityViewModels() {
+    private val rbViewModel: RoadBookViewModel by activityViewModels {
         RoadBookViewModel.RoadBookViewModelFactory(
             MainActivity.getDatabase().reference.child(ROADBOOK_DB_PATH)
         )
@@ -285,7 +280,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private fun fetchMenuItemState(sharedKey: String, menuItem: MenuItem) {
         val sp = requireActivity().getSharedPreferences(sharedKey ,Context.MODE_PRIVATE)
         val savedState = sp.getBoolean(sharedKey, true)
-        menuItem.setChecked(savedState)
+        menuItem.isChecked = savedState
     }
     private fun saveRadioButtonState(sharedKey: String, radioButtonId: Int) {
         val sp = requireActivity().getSharedPreferences(sharedKey,Context.MODE_PRIVATE)

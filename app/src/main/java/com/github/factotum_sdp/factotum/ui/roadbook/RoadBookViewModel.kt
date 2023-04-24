@@ -10,8 +10,6 @@ import com.google.firebase.database.DatabaseReference
 import java.text.DateFormat
 import java.text.SimpleDateFormat.getDateInstance
 import java.util.*
-import kotlin.NoSuchElementException
-import kotlin.collections.HashMap
 
 /**
  * The RoadBook ViewModel
@@ -77,7 +75,7 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         val fromLocation = ls[from]
         ls.removeAt(from)
         ls.add(to, fromLocation)
-        _recordsList.setValue(currentDRecList().replaceDisplayedList(ls))
+        _recordsList.value = currentDRecList().replaceDisplayedList(ls)
     }
     
     /**
@@ -97,7 +95,7 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         val destID = computeDestID(clientID)
         val rec = DestinationRecord(destID, clientID, timeStamp, waitingTime, rate, actions, notes)
         newList.add(rec)
-        _recordsList.setValue(currentDRecList().replaceDisplayedList(newList))
+        _recordsList.value = currentDRecList().replaceDisplayedList(newList)
     }
 
     /**
@@ -109,7 +107,7 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         val newList = arrayListOf<DestinationRecord>()
         newList.addAll(currentDRecList() as Collection<DestinationRecord>)
         newList.removeAt(pos)
-        _recordsList.setValue(currentDRecList().replaceDisplayedList(newList))
+        _recordsList.value = currentDRecList().replaceDisplayedList(newList)
     }
 
     /**
@@ -137,7 +135,7 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         ls.addAll(_recordsList.value as Collection<DestinationRecord>)
         ls[pos] = newRec
         if(currentRec != newRec) {
-            _recordsList.setValue(currentDRecList().replaceDisplayedList(ls))
+            _recordsList.value = currentDRecList().replaceDisplayedList(ls)
             return true
         }
         // Prefer to be explicit with a boolean value, for the front-end to know it has to refresh, or act accordingly.
@@ -151,7 +149,7 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
      * @param pos: Int Index of the target record to archive
      */
     fun archiveRecordAt(pos: Int) {
-        _recordsList.setValue(currentDRecList().archiveRecord(pos))
+        _recordsList.value = currentDRecList().archiveRecord(pos)
     }
 
     /**
@@ -160,7 +158,7 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
      * @param pos: Int Index of the target record to unarchive
      */
     fun unarchiveRecordAt(pos: Int) {
-        _recordsList.setValue(currentDRecList().unarchiveRecord(pos))
+        _recordsList.value = currentDRecList().unarchiveRecord(pos)
     }
 
     /**
@@ -191,14 +189,14 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
      * (i.e all the records will be in the current _recordsList)
      */
     fun showArchivedRecords() {
-        _recordsList.setValue(currentDRecList().withArchived())
+        _recordsList.value = currentDRecList().withArchived()
     }
 
     /**
      * Change the current recordsList state by "removing" the archived records
      */
     fun hideArchivedRecords() {
-        _recordsList.setValue(currentDRecList().withoutArchived())
+        _recordsList.value = currentDRecList().withoutArchived()
     }
 
 
@@ -209,7 +207,7 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
             val destID = computeDestID(it.clientID)
             newList.add(DestinationRecord(destID, it.clientID, it.timeStamp, it.waitingTime, it.rate, it.actions, it.notes))
         }
-        _recordsList.setValue(currentDRecList().replaceDisplayedList(newList))
+        _recordsList.value = currentDRecList().replaceDisplayedList(newList)
     }
 
     private fun currentDRecList(): DRecordList {

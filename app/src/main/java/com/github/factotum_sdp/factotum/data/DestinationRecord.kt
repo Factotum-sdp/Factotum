@@ -1,5 +1,6 @@
 package com.github.factotum_sdp.factotum.data
 
+import com.github.factotum_sdp.factotum.data.DestinationRecord.Action
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*

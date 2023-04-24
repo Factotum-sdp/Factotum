@@ -29,7 +29,7 @@ import com.google.android.material.snackbar.Snackbar
  * - On Swipe Right :
  *          Edition of the DestinationRecord swiped through a custom AlertDialog.
  */
-abstract class RoadBookTHCallback() :
+abstract class RoadBookTHCallback :
     SimpleCallback(
     UP or DOWN,
     LEFT or RIGHT or ACTION_STATE_SWIPE

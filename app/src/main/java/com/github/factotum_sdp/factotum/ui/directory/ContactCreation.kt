@@ -8,23 +8,19 @@ import android.provider.BaseColumns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.EditText
-import android.widget.CursorAdapter
-import android.widget.Spinner
+import android.widget.*
 import androidx.appcompat.widget.SearchView
 import androidx.cursoradapter.widget.SimpleCursorAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.github.factotum_sdp.factotum.MainActivity
-import androidx.lifecycle.lifecycleScope
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.localisation.Location
 import com.github.factotum_sdp.factotum.databinding.FragmentContactCreationBinding
-import kotlinx.coroutines.launch
 import com.github.factotum_sdp.factotum.placeholder.Contact
+import kotlinx.coroutines.launch
 
 /**
  * A simple ContactCreation fragment.
@@ -43,9 +39,6 @@ class ContactCreation : Fragment() {
     private val binding get() = _binding!!
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
     private lateinit var name: EditText
     private lateinit var surname: EditText
     private lateinit var phoneNumber: EditText
@@ -53,7 +46,7 @@ class ContactCreation : Fragment() {
 
     private lateinit var spinner: Spinner
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         // Inflate the layout for this fragment
         _binding = FragmentContactCreationBinding.inflate(inflater, container, false)
         return binding.root

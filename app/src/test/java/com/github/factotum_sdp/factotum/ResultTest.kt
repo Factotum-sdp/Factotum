@@ -1,7 +1,8 @@
 package com.github.factotum_sdp.factotum
 
 import com.github.factotum_sdp.factotum.data.Result
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class ResultTest {
@@ -13,7 +14,6 @@ class ResultTest {
         val result = Result.Success(expectedData)
 
         // Then
-        assertTrue(result is Result.Success)
         assertEquals(expectedData, result.data)
     }
 
@@ -24,7 +24,6 @@ class ResultTest {
         val result = Result.Error(expectedException)
 
         // Then
-        assertTrue(result is Result.Error)
         assertEquals(expectedException, result.exception)
     }
 

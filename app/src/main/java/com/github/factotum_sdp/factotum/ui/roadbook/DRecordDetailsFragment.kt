@@ -1,14 +1,16 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.data.DestinationRecord
-import androidx.appcompat.widget.Toolbar
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.data.DestinationRecord
 import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment
 import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
 import com.github.factotum_sdp.factotum.ui.picture.PictureFragment
@@ -33,7 +35,7 @@ class DRecordDetailsFragment: Fragment() {
         }
 
         val toolbar = requireActivity().findViewById<Toolbar>(R.id.toolbar)
-        toolbar.setTitle("Dest. Record : $destID")
+        toolbar.title = "Dest. Record : $destID"
 
         viewPager = view.findViewById(R.id.viewPager)
         val adapter = DetailsFragmentsAdapter(this)

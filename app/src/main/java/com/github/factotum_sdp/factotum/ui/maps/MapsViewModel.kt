@@ -13,19 +13,19 @@ import com.github.factotum_sdp.factotum.data.localisation.Route
 class MapsViewModel : ViewModel() {
 
     private val _routes: MutableLiveData<List<Route>> = MutableLiveData(listOf())
-    private val _runRoute : MutableLiveData<Route> = MutableLiveData()
-    private val _location : MutableLiveData<Location> = MutableLiveData()
+    private val _runRoute: MutableLiveData<Route> = MutableLiveData()
+    private val _location: MutableLiveData<Location> = MutableLiveData()
     val routesState: LiveData<List<Route>> = _routes
     val runRouteState: LiveData<Route> = _runRoute
-    val location : LiveData<Location> = _location
+    val location: LiveData<Location> = _location
 
     /**
      * Adds a route to be shown on the map
      *
      * @param route : route to be shown
      */
-    fun addRoute(route: Route){
-        _routes.value?.let{
+    fun addRoute(route: Route) {
+        _routes.value?.let {
             val res = it.plus(route)
             _routes.postValue(res)
         }
@@ -47,7 +47,7 @@ class MapsViewModel : ViewModel() {
      * deletes all the routes
      *
      */
-    fun deleteAll(){
+    fun deleteAll() {
         _routes.postValue(listOf())
     }
 
@@ -56,7 +56,7 @@ class MapsViewModel : ViewModel() {
      *
      * @param route : route to be run
      */
-    fun setRunRoute(route: Route){
+    fun setRunRoute(route: Route) {
         _runRoute.postValue(route)
     }
 
@@ -67,7 +67,7 @@ class MapsViewModel : ViewModel() {
      * @param context : Context. Context in which this function is called
      * @return returns the created location
      */
-    fun setLocation(location: Location){
+    fun setLocation(location: Location) {
         _location.value = location
     }
 }

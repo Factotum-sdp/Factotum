@@ -1,9 +1,9 @@
 package com.github.factotum_sdp.factotum
 
-import com.github.factotum_sdp.factotum.data.User
 import com.github.factotum_sdp.factotum.data.LoginDataSource
 import com.github.factotum_sdp.factotum.data.Result
 import com.github.factotum_sdp.factotum.data.Role
+import com.github.factotum_sdp.factotum.data.User
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
@@ -52,7 +52,11 @@ class LoginDataSourceTest {
 
         // when
         loginDataSource = mock(LoginDataSource::class.java)
-        `when`(loginDataSource.login(userName, invalidPassword, profile)).thenReturn(Result.Error(exception))
+        `when`(loginDataSource.login(userName, invalidPassword, profile)).thenReturn(
+            Result.Error(
+                exception
+            )
+        )
         val result = loginDataSource.login(userName, invalidPassword, profile)
 
         // then

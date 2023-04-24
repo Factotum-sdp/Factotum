@@ -13,13 +13,13 @@ object DestinationRecords {
 
     val RECORDS: MutableList<DestinationRecord> = ArrayList()
     val RECORD_TO_ADD: DestinationRecord =
-        DestinationRecord("New#1", "New",null, 0, 2, arrayListOf(Action.PICK), "")
+        DestinationRecord("New#1", "New", null, 0, 2, arrayListOf(Action.PICK), "")
 
     init {
         val cal: Calendar = Calendar.getInstance()
         RECORDS.addAll(
             listOf(
-                DestinationRecord("QG#1", "QG",cal.time, 3, 1, arrayListOf(), ""),
+                DestinationRecord("QG#1", "QG", cal.time, 3, 1, arrayListOf(), ""),
                 DestinationRecord(
                     "Buhagiat#1",
                     "Buhagiat",
@@ -29,7 +29,15 @@ object DestinationRecords {
                     arrayListOf(Action.PICK, Action.PICK, Action.RELAY),
                     ""
                 ),
-                DestinationRecord("X17#1","X17", null, 0, 1, arrayListOf(Action.DELIVER, Action.CONTACT), "")
+                DestinationRecord(
+                    "X17#1",
+                    "X17",
+                    null,
+                    0,
+                    1,
+                    arrayListOf(Action.DELIVER, Action.CONTACT),
+                    ""
+                )
             )
         )
 

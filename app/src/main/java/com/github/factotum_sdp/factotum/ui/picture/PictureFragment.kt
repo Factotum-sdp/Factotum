@@ -12,10 +12,9 @@ import com.github.factotum_sdp.factotum.R
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import java.io.File
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
-class PictureFragment(clientID : String): Fragment() {
+class PictureFragment(clientID: String) : Fragment() {
 
     private lateinit var photoFile: File
     private lateinit var photoUri: Uri

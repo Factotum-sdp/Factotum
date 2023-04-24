@@ -15,9 +15,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import org.hamcrest.Matchers.anything
 import org.hamcrest.Matchers.not
 import org.junit.*
@@ -32,14 +31,10 @@ class SignUpFragmentTest {
     )
 
     companion object {
-        private var auth: FirebaseAuth = Firebase.auth
-
         @BeforeClass
         @JvmStatic
         fun setUpAuth() {
-            auth.useEmulator("10.0.2.2", 9099)
-
-            MainActivity.setAuth(auth)
+            initFirebase()
         }
     }
 

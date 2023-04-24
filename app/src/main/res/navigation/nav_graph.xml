@@ -23,7 +23,7 @@
 
         <action
             android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/routeFragment"/>
+            app:destination="@id/routeFragment" />
     </fragment>
     <fragment
         android:id="@+id/roadBookFragment"
@@ -32,18 +32,18 @@
         tools:layout="@layout/fragment_roadbook">
         <action
             android:id="@+id/action_roadBookFragment_to_DRecordDetailsFragment"
-            app:destination="@id/dRecordDetailsFragment"/>
+            app:destination="@id/dRecordDetailsFragment" />
     </fragment>
     <fragment
         android:id="@+id/dRecordDetailsFragment"
         android:name="com.github.factotum_sdp.factotum.ui.roadbook.DRecordDetailsFragment"
         android:label="Record details"
-        tools:layout="@layout/fragment_drecord_details"/>
+        tools:layout="@layout/fragment_drecord_details" />
     <fragment
         android:id="@+id/directoryFragment"
         android:name="com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment"
         android:label="Directory"
-        tools:layout="@layout/fragment_directory" >
+        tools:layout="@layout/fragment_directory">
         <action
             android:id="@+id/action_directoryFragment_to_contactDetailsFragment2"
             app:destination="@id/contactDetailsFragment2" />
@@ -60,7 +60,7 @@
         android:id="@+id/loginFragment"
         android:name="com.github.factotum_sdp.factotum.ui.login.LoginFragment"
         android:label="Login"
-        tools:layout="@layout/fragment_login" >
+        tools:layout="@layout/fragment_login">
         <action
             android:id="@+id/action_loginFragment_to_roadBookFragment2"
             app:destination="@id/roadBookFragment" />
@@ -72,7 +72,7 @@
         android:id="@+id/signUpFragment"
         android:name="com.github.factotum_sdp.factotum.ui.signup.SignUpFragment"
         android:label="Sign Up"
-        tools:layout="@layout/fragment_signup" >
+        tools:layout="@layout/fragment_signup">
         <action
             android:id="@+id/action_signUpFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
@@ -80,10 +80,13 @@
     <fragment
         android:id="@+id/contactDetailsFragment2"
         android:name="com.github.factotum_sdp.factotum.ui.directory.ContactDetailsFragment"
-        android:label="ContactDetailsFragment" >
+        android:label="ContactDetailsFragment">
         <action
             android:id="@+id/action_contactDetailsFragment2_to_directoryFragment"
             app:destination="@id/directoryFragment" />
+        <action
+            android:id="@+id/action_contactDetailsFragment2_to_contactCreationFragment"
+            app:destination="@id/contactCreationFragment" />
         <action
             android:id="@+id/action_contactDetailsFragment2_to_MapsFragment"
             app:destination="@id/MapsFragment" />
@@ -94,7 +97,7 @@
         android:label="contact_creation">
         <action
             android:id="@+id/action_contactCreation_to_directoryFragment"
-            app:destination="@id/directoryFragment"/>
+            app:destination="@id/directoryFragment" />
     </fragment>
     <fragment
         android:id="@+id/displayFragment"

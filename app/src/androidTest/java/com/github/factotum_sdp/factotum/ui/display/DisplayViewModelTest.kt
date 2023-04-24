@@ -5,6 +5,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.github.factotum_sdp.factotum.ui.display.utils.*
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.runBlocking
@@ -22,7 +23,7 @@ class DisplayViewModelTest {
     @Before
     fun setUp() {
         // Initialize Firebase
-        Firebase.storage.useEmulator("10.0.2.2", 9199)
+        initFirebase()
         context = InstrumentationRegistry.getInstrumentation().context
     }
 
@@ -40,7 +41,10 @@ class DisplayViewModelTest {
         Thread.sleep(WAIT_TIME_INIT)
 
         //Check that the photoReferences is empty
-        Assert.assertTrue("PhotosReference should be empty.", displayViewModel.photoReferences.value?.isEmpty() ?: true)
+        Assert.assertTrue(
+            "PhotosReference should be empty.",
+            displayViewModel.photoReferences.value?.isEmpty() ?: true
+        )
 
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
@@ -52,7 +56,10 @@ class DisplayViewModelTest {
         Thread.sleep(WAIT_TIME_REFRESH)
 
         // Check that the photoReferences is not empty
-        Assert.assertFalse("PhotosReference should not be empty.", displayViewModel.photoReferences.value?.isEmpty() ?: false)
+        Assert.assertFalse(
+            "PhotosReference should not be empty.",
+            displayViewModel.photoReferences.value?.isEmpty() ?: false
+        )
 
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2)
@@ -64,7 +71,11 @@ class DisplayViewModelTest {
         Thread.sleep(WAIT_TIME_REFRESH)
 
         // Check that the photoReferences has two items
-        Assert.assertEquals("PhotosReference should have two items.", 2, displayViewModel.photoReferences.value?.size)
+        Assert.assertEquals(
+            "PhotosReference should have two items.",
+            2,
+            displayViewModel.photoReferences.value?.size
+        )
     }
 
     @Test
@@ -79,7 +90,10 @@ class DisplayViewModelTest {
         Thread.sleep(WAIT_TIME_INIT)
 
         // Check that the photoReferences is not empty
-        Assert.assertFalse("PhotosReference should not be empty.", displayViewModel.photoReferences.value?.isEmpty() ?: false)
+        Assert.assertFalse(
+            "PhotosReference should not be empty.",
+            displayViewModel.photoReferences.value?.isEmpty() ?: false
+        )
     }
 
 }

@@ -22,8 +22,10 @@ object TouchCustomMoves {
         swipeSlowActionOnRecyclerList(pos, 0.5f, 1f, -1f, 1f)
     }
 
-    private fun swipeSlowActionOnRecyclerList(pos: Int, startX: Float, startY: Float,
-                                              endX: Float, endY: Float) {
+    private fun swipeSlowActionOnRecyclerList(
+        pos: Int, startX: Float, startY: Float,
+        endX: Float, endY: Float
+    ) {
         Espresso.onView(ViewMatchers.withId(R.id.list)).perform(
             ViewActions.longClick(),
             RecyclerViewActions.actionOnItemAtPosition<RoadBookViewAdapter.RecordViewHolder>(
@@ -32,8 +34,10 @@ object TouchCustomMoves {
         )
     }
 
-    private fun swipeAction(startX: Float, startY: Float,
-                    endX: Float, endY: Float): GeneralSwipeAction {
+    private fun swipeAction(
+        startX: Float, startY: Float,
+        endX: Float, endY: Float
+    ): GeneralSwipeAction {
         return GeneralSwipeAction(
             Swipe.SLOW,
             {

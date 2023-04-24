@@ -18,14 +18,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.ui.display.utils.*
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.runBlocking
-import org.junit.After
-import org.junit.AfterClass
-import org.junit.Before
-import org.junit.BeforeClass
-import org.junit.Test
+import org.junit.*
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
@@ -35,7 +32,7 @@ class DisplayFragmentTest {
         @JvmStatic
         @BeforeClass
         fun setUpClass() {
-            Firebase.storage.useEmulator("10.0.2.2", 9199)
+            initFirebase()
             Intents.init()
         }
 
@@ -59,6 +56,7 @@ class DisplayFragmentTest {
     fun tearDown() {
         emptyStorageEmulator(Firebase.storage.reference)
     }
+
     @Test
     fun displayFragmentUiElementsDisplayed() {
         onView(withId(R.id.recyclerView)).check(matches(isDisplayed()))

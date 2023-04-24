@@ -20,16 +20,14 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.LocationUtils
 import com.google.android.gms.maps.SupportMapFragment
 import junit.framework.TestCase.assertTrue
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.Matchers.anything
+import org.junit.*
 import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.FixMethodOrder
-import org.junit.Rule
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 import java.util.*
@@ -43,16 +41,26 @@ import java.util.concurrent.TimeUnit
 class MapsFragmentTest {
 
     val device = UiDevice.getInstance(getInstrumentation())
-    val buttonTextAllow = when(Locale.getDefault().language){
+    val buttonTextAllow = when (Locale.getDefault().language) {
         Locale.FRENCH.language -> "Uniquement cette fois-ci"
         else -> "Only this time"
     }
+
+    companion object {
+        @BeforeClass
+        @JvmStatic
+        fun setUpDatabase() {
+            initFirebase()
+        }
+    }
+
     @get:Rule
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
     )
 
-    @Before fun setUp(){
+    @Before
+    fun setUp() {
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.routeFragment))
@@ -61,40 +69,43 @@ class MapsFragmentTest {
     }
 
     @Test
-    fun a_permissionAskPopUp(){
+    fun a_permissionAskPopUp() {
         onData(anything())
             .inAdapterView(withId(R.id.list_view_routes)).atPosition(0).perform(
                 click()
             )
         onView(withId(R.id.button_next)).perform(click())
-        if(LocationUtils.hasLocationPopUp()) {
+        if (LocationUtils.hasLocationPopUp()) {
             assertTrue(device.findObject(UiSelector().textContains(buttonTextAllow)).exists())
         }
     }
 
-    private fun b_permissionAllowShowLocation(){
-            onData(anything())
-                .inAdapterView(withId(R.id.list_view_routes)).atPosition(0).perform(
-                    click()
-                )
-            onView(withId(R.id.button_next)).perform(click())
-        if(LocationUtils.hasLocationPopUp()) {
+    private fun b_permissionAllowShowLocation() {
+        onData(anything())
+            .inAdapterView(withId(R.id.list_view_routes)).atPosition(0).perform(
+                click()
+            )
+        onView(withId(R.id.button_next)).perform(click())
+        if (LocationUtils.hasLocationPopUp()) {
             device.findObject(UiSelector().textContains(buttonTextAllow)).click()
         }
         assertTrue(checkLocationEnabled(testRule))
     }
+
     @Test
-    fun goesToSecondFragement(){
-        onData(anything()).inAdapterView(withId(R.id.list_view_routes)).atPosition(0).perform(click())
+    fun goesToSecondFragement() {
+        onData(anything()).inAdapterView(withId(R.id.list_view_routes)).atPosition(0)
+            .perform(click())
         val nextButton = onView(withId(R.id.button_next))
         nextButton.perform(click())
         onView(withId(R.id.fragment_maps_directors_parent)).check(matches(isDisplayed()))
     }
 
     @Test
-    fun showsDestinationMarker(){
+    fun showsDestinationMarker() {
 
-        onData(anything()).inAdapterView(withId(R.id.list_view_routes)).atPosition(0).perform(click())
+        onData(anything()).inAdapterView(withId(R.id.list_view_routes)).atPosition(0)
+            .perform(click())
         val nextButton = onView(withId(R.id.button_next))
         nextButton.perform(click())
         val endMarker = device.findObject(UiSelector().descriptionContains("Destination"))
@@ -102,38 +113,43 @@ class MapsFragmentTest {
     }
 
     @Test
-    fun showsAllDest(){
+    fun showsAllDest() {
         val nbRoutes = device.findObjects(textContains("->")).size
         val showAll = onView(withId(R.id.button_all))
         showAll.perform(click())
         var endMarker = device.findObjects(descContains("Destination"))
         val endTime = System.nanoTime() + TimeUnit.SECONDS.toNanos(5)
-        while(endMarker.size == 0 && System.nanoTime() < endTime) {
+        while (endMarker.size == 0 && System.nanoTime() < endTime) {
             endMarker = device.findObjects(descContains("Destination"))
         }
         assertEquals(nbRoutes, endMarker.size)
     }
 
     @Test
-    fun runLaunchesMaps(){
+    fun runLaunchesMaps() {
         Intents.init()
         device.findObject(UiSelector().textContains("->")).click()
         val runButton = onView(withId(R.id.button_run))
         runButton.perform(click())
-        intended(allOf(hasAction(Intent.ACTION_VIEW),
-            toPackage(RouteFragment.MAPS_PKG)
-        ))
+        intended(
+            allOf(
+                hasAction(Intent.ACTION_VIEW),
+                toPackage(RouteFragment.MAPS_PKG)
+            )
+        )
         Intents.release()
 
     }
-    private fun checkLocationEnabled(rule:  ActivityScenarioRule<MainActivity>) : Boolean {
+
+    private fun checkLocationEnabled(rule: ActivityScenarioRule<MainActivity>): Boolean {
         var isEnabled = false
         val latch = CountDownLatch(1)
         rule.scenario.onActivity {
-            val navHostFragment = it.supportFragmentManager.primaryNavigationFragment as NavHostFragment
+            val navHostFragment =
+                it.supportFragmentManager.primaryNavigationFragment as NavHostFragment
             val mapsFragment = navHostFragment.childFragmentManager.fragments[0]
             val mapFragment = mapsFragment.childFragmentManager.fragments[0] as SupportMapFragment
-            mapFragment.getMapAsync{
+            mapFragment.getMapAsync {
                 isEnabled = it.isMyLocationEnabled
                 latch.countDown()
             }

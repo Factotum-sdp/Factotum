@@ -29,7 +29,8 @@ private const val CHANNEL_ID = "location_service"
 private const val CHANNEL_NAME = "My Location Service"
 private const val SERVICE_ID = 101
 private const val UPDATE_INTERVAL = 1000L
-class LocationService: Service() {
+
+class LocationService : Service() {
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var onLocationUpdateEvent: ((location: Location) -> Unit)? = null
@@ -43,14 +44,14 @@ class LocationService: Service() {
     override fun onCreate() {
         super.onCreate()
         locationClient = FusedLocationClient(
-                applicationContext,
-                LocationServices.getFusedLocationProviderClient(applicationContext)
-            )
+            applicationContext,
+            LocationServices.getFusedLocationProviderClient(applicationContext)
+        )
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        when(intent?.action) {
+        when (intent?.action) {
             ACTION_START -> start()
             ACTION_STOP -> stop()
         }
@@ -62,7 +63,7 @@ class LocationService: Service() {
     }
 
     private fun start() {
-        startForegroundJob(UPDATE_INTERVAL)  { service, notification ->
+        startForegroundJob(UPDATE_INTERVAL) { service, notification ->
             val updatedNotification = notification.setContentText(
                 getString(R.string.loc_service_notification_message)
             ).setChannelId(CHANNEL_ID)
@@ -70,9 +71,13 @@ class LocationService: Service() {
         }
     }
 
-    private fun startForegroundJob(interval: Long,
-                                   onLocationChanges: (service: NotificationManager,
-                                                       notification: NotificationCompat.Builder) -> Unit) {
+    private fun startForegroundJob(
+        interval: Long,
+        onLocationChanges: (
+            service: NotificationManager,
+            notification: NotificationCompat.Builder
+        ) -> Unit
+    ) {
         val service = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val channelId =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -103,8 +108,10 @@ class LocationService: Service() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun createNotificationChannel(channelId: String, channelName: String,
-                                          service: NotificationManager): String{
+    private fun createNotificationChannel(
+        channelId: String, channelName: String,
+        service: NotificationManager
+    ): String {
         val chan = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH)
         chan.lightColor = Color.BLUE
         chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE

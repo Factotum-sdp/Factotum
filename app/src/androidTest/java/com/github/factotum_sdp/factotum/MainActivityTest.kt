@@ -16,16 +16,15 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiDevice
-import com.github.factotum_sdp.factotum.placeholder.ContactsList
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.ui.login.LoginFragmentTest
+import com.github.factotum_sdp.factotum.utils.ContactsUtils
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getAuth
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matchers
-import org.junit.AfterClass
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.BeforeClass
@@ -48,18 +47,13 @@ class MainActivityTest {
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
-            val database = Firebase.database
-            val auth = Firebase.auth
-            database.useEmulator("10.0.2.2", 9000)
-            auth.useEmulator("10.0.2.2", 9099)
-            MainActivity.setDatabase(database)
-            MainActivity.setAuth(auth)
-            ContactsList.init(database)
+            initFirebase()
+
             runBlocking {
-                ContactsList.populateDatabase()
+                ContactsUtils.populateDatabase()
             }
 
-            UsersPlaceHolder.init(database, auth)
+            UsersPlaceHolder.init(getDatabase(), getAuth())
             runBlocking {
                 UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_BOSS)
             }
@@ -79,14 +73,14 @@ class MainActivityTest {
                 UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_CLIENT)
             }
         }
-
+        /**
         @AfterClass
         @JvmStatic
         fun stopAuthEmulator() {
-            val auth = Firebase.auth
-            auth.signOut()
-            MainActivity.setAuth(auth)
-        }
+        val auth = getAuth()
+        auth.signOut()
+        MainActivity.setAuth(auth)
+        } **/
     }
 
     //========================================================================================

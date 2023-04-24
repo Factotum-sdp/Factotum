@@ -1,5 +1,6 @@
 package com.github.factotum_sdp.factotum.data
 
+import com.github.factotum_sdp.factotum.data.DestinationRecord.Action
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -24,7 +25,7 @@ data class DestinationRecord(
     val rate: Int,
     val actions: List<Action>,
     val notes: String
-){
+) {
     companion object {
 
         /**
@@ -72,6 +73,7 @@ data class DestinationRecord(
             return actionsFormatList.joinToString("| ", "(", ")")
         }
     }
+
     /**
      * The possible actions to achieve on a destination
      */
@@ -81,6 +83,7 @@ data class DestinationRecord(
         CONTACT,
         RELAY,
         UNKNOWN;
+
         override fun toString(): String =
             when (this) {
                 PICK -> "pick"
@@ -89,6 +92,7 @@ data class DestinationRecord(
                 RELAY -> "relay"
                 UNKNOWN -> "unknown"
             }
+
         companion object {
             fun fromString(str: String): Action =
                 when (str) {

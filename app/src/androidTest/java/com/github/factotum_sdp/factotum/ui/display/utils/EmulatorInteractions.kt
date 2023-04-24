@@ -3,8 +3,8 @@ package com.github.factotum_sdp.factotum.ui.display.utils
 import android.content.Context
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.ktx.storage
 import com.google.firebase.storage.UploadTask
+import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.concurrent.CountDownLatch
 import kotlin.coroutines.resume
@@ -41,7 +41,7 @@ suspend fun uploadImageToStorageEmulator(
     }
 }
 
-fun emptyStorageEmulator(storageRef : StorageReference) {
+fun emptyStorageEmulator(storageRef: StorageReference) {
     // Empty Firebase Storage
     val latch = CountDownLatch(1)
 

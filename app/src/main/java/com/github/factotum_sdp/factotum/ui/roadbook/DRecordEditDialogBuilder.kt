@@ -38,10 +38,12 @@ import java.util.*
  *
  * @constructor : Constructs the DRecordAlertDialogBuilder
  */
-class DRecordEditDialogBuilder(context: Context?,
-                               private val host: Fragment,
-                               private val rbViewModel: RoadBookViewModel,
-                               private val rbRecyclerView: RecyclerView) :
+class DRecordEditDialogBuilder(
+    context: Context?,
+    private val host: Fragment,
+    private val rbViewModel: RoadBookViewModel,
+    private val rbRecyclerView: RecyclerView
+) :
     AlertDialog.Builder(ContextThemeWrapper(context, android.R.style.Theme_Holo_Dialog)) {
 
     private val clientIDView: AutoCompleteTextView
@@ -93,7 +95,7 @@ class DRecordEditDialogBuilder(context: Context?,
                     notesView.text.toString()
                 )
                 setSnackBar(host.getString(R.string.snap_text_record_added), 700)
-            } catch(e: java.lang.Exception) {
+            } catch (e: java.lang.Exception) {
                 setSnackBar(host.getString(R.string.edit_rejected_snap_label), 1400)
             }
         })
@@ -118,7 +120,7 @@ class DRecordEditDialogBuilder(context: Context?,
         setViewModelUpdates({ _, _ ->
             // On negative button : Update the screen, no changes to back-end
             rbRecyclerView.adapter!!.notifyItemChanged(position)
-        },{ _, _ ->
+        }, { _, _ ->
             val recHasChanged: Boolean
             try { // On positive button : Try to edit the record
                 recHasChanged =
@@ -133,7 +135,7 @@ class DRecordEditDialogBuilder(context: Context?,
                     )
                 if (recHasChanged)
                     setSnackBar(context.getString(R.string.edit_confirmed_snap_label), 700)
-            } catch(e: java.lang.Exception) {
+            } catch (e: java.lang.Exception) {
                 setSnackBar(host.getString(R.string.edit_rejected_snap_label), 1400)
             }
             rbRecyclerView.adapter!!.notifyItemChanged(position)
@@ -159,8 +161,10 @@ class DRecordEditDialogBuilder(context: Context?,
         notesView.setText(rec.notes)
     }
 
-    private fun setViewModelUpdates(onNegativeButton: DialogInterface.OnClickListener,
-                                    onPositiveButton: DialogInterface.OnClickListener) {
+    private fun setViewModelUpdates(
+        onNegativeButton: DialogInterface.OnClickListener,
+        onPositiveButton: DialogInterface.OnClickListener
+    ) {
         setNegativeButton(host.getString(R.string.edit_dialog_cancel_b), onNegativeButton)
         setPositiveButton(host.getString(R.string.edit_dialog_update_b), onPositiveButton)
     }
@@ -170,9 +174,11 @@ class DRecordEditDialogBuilder(context: Context?,
     private fun setClientIDsAdapter() {
         var lsClientIDs = DestinationRecords.RECORDS.map { it.clientID }.toSet()
         lsClientIDs = lsClientIDs.plus(DestinationRecords.RECORD_TO_ADD.clientID)
-        val clientIDsAdapter = ArrayAdapter(host.requireContext(),
-                                            R.layout.pop_auto_complete_client_id,
-                                                    lsClientIDs.toList())
+        val clientIDsAdapter = ArrayAdapter(
+            host.requireContext(),
+            R.layout.pop_auto_complete_client_id,
+            lsClientIDs.toList()
+        )
         clientIDView.setAdapter(clientIDsAdapter)
         clientIDView.threshold = 1
     }
@@ -193,7 +199,8 @@ class DRecordEditDialogBuilder(context: Context?,
                     },
                     Calendar.getInstance().get(Calendar.HOUR_OF_DAY),
                     Calendar.getInstance().get(Calendar.MINUTE),
-                    false)
+                    false
+                )
                 tp.setButton(DialogInterface.BUTTON_NEUTRAL, ERASE_B_LABEL) { _, _ ->
                     timestampView.setText("") // Empty string converted to null for the timestamp ViewModel data
                 }
@@ -202,31 +209,38 @@ class DRecordEditDialogBuilder(context: Context?,
         }
         timestampView.onFocusChangeListener = focusChangeListener
     }
+
     private fun setActionsAdapter() {
-        val actionsAdapter = ArrayAdapter(host.requireContext(),
-                                            R.layout.pop_auto_complete_action,
-                                                DestinationRecord.Action.values())
+        val actionsAdapter = ArrayAdapter(
+            host.requireContext(),
+            R.layout.pop_auto_complete_action,
+            DestinationRecord.Action.values()
+        )
         actionsView.setAdapter(actionsAdapter)
         actionsView.setTokenizer(MultiAutoCompleteTextView.CommaTokenizer())
         actionsView.threshold = 1
     }
+
     private fun waitTimeOrRateFromString(userEntry: String): Int {
         if (userEntry.isEmpty())
             return 0
         return userEntry.toInt()
     }
+
     private fun timestampFromString(userEntry: String): Date? {
         if (userEntry.isEmpty())
             return null
         return SimpleDateFormat.getTimeInstance().parse(userEntry)
     }
+
     private fun actionsFromString(actions: String): List<DestinationRecord.Action> {
         return actions
             .split(",")
             .map { DestinationRecord.Action.fromString(it.trim().lowercase()) }
             .filter { it != DestinationRecord.Action.UNKNOWN }
     }
-    companion object{
+
+    companion object {
         private const val ERASE_B_LABEL = "Erase"
     }
 }

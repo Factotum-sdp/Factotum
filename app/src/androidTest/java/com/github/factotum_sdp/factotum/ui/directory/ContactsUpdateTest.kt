@@ -2,38 +2,32 @@ package com.github.factotum_sdp.factotum.ui.directory
 
 import android.widget.EditText
 import androidx.recyclerview.widget.RecyclerView
-import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.closeSoftKeyboard
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.*
+import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.action.ViewActions.clearText
+import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.uiautomator.By.*
+import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
-import androidx.test.uiautomator.Until
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.data.localisation.Location
 import com.github.factotum_sdp.factotum.placeholder.Contact
 import com.github.factotum_sdp.factotum.utils.ContactsUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
-import junit.framework.TestCase.*
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 
-@RunWith(AndroidJUnit4::class)
-class ContactsCreationTest {
-
-
+class ContactsUpdateTest {
     @get:Rule
     var activityRule = ActivityScenarioRule(MainActivity::class.java)
 
@@ -42,7 +36,7 @@ class ContactsCreationTest {
 
         @BeforeClass
         @JvmStatic
-        fun firebaseSetup() {
+        fun setUpFirebase() {
             initFirebase()
         }
     }
@@ -57,8 +51,15 @@ class ContactsCreationTest {
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.directoryFragment))
-            .perform(click())
-        onView(withId(R.id.add_contact_button)).perform(click())
+            .perform(ViewActions.click())
+        onView(withId(R.id.contacts_recycler_view))
+            .perform(
+                RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
+                    0,
+                    ViewActions.click()
+                )
+            )
+        onView(withId(R.id.button_modify_contact)).perform(ViewActions.click())
     }
 
     @Test
@@ -74,12 +75,8 @@ class ContactsCreationTest {
 
     @Test
     fun buttonTextIsCorrect() {
-        onView(withId(R.id.create_contact)).check(matches(withText("Create Contact")))
-    }
-
-    @Test
-    fun hasRoles() {
-        onView(withId(R.id.roles_spinner)).check(matches(isDisplayed()))
+        onView(withId(R.id.create_contact))
+            .check(matches(withText("Update Contact")))
     }
 
     @Test
@@ -88,15 +85,15 @@ class ContactsCreationTest {
         val fields = Contact::class.java.declaredFields
         for (param in fields) {
             if (param.isSynthetic) continue
-            val editText = device.findObject(clazz(EditText::class.java.name))
+            val editText = device.findObject(By.clazz(EditText::class.java.name))
             editText.text = "test"
             assertEquals("test", editText.text)
         }
     }
 
     @Test
-    fun canCreateContact() {
-        onView(withId(R.id.create_contact)).perform(click())
+    fun updateDoesntAddOrRemoveContact() {
+        onView(withId(R.id.create_contact)).perform(ViewActions.click())
         //check if recycle view in contacts has 6 items
         onView(withId(R.id.contacts_recycler_view))
             .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
@@ -106,70 +103,71 @@ class ContactsCreationTest {
                 }
                 val recyclerView = view as RecyclerView
                 val adapter = recyclerView.adapter
-                assert(adapter?.itemCount == nbContacts + 1)
+                assert(adapter?.itemCount == nbContacts)
             }
     }
 
 
     @Test
-    fun createdContactHasCorrectValue() {
+    fun fieldsContainContactValues() {
         val nameEditText = onView(withId(R.id.editTextName))
-        nameEditText.perform(replaceText("John"))
+        nameEditText.check(matches(withText(ContactsUtils.getContacts()[0].name)))
 
         val surnameEditText = onView(withId(R.id.editTextSurname))
-        surnameEditText.perform(replaceText("Doe"))
+        surnameEditText.check(matches(withText(ContactsUtils.getContacts()[0].surname)))
+
+        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        val addressEditText = device.findObject(By.text(ContactsUtils.getContacts()[0].address))
+        assert(addressEditText != null)
+
+        val phoneEditText = onView(withId(R.id.contactCreationPhoneNumber))
+        phoneEditText.check(matches(withText(ContactsUtils.getContacts()[0].phone)))
+
+        val notesEditText = onView(withId(R.id.contactCreationNotes))
+        notesEditText.check(matches(withText(ContactsUtils.getContacts()[0].details)))
+
+        val roleSpinner = onView(withId(R.id.roles_spinner))
+        roleSpinner.check(matches(withSpinnerText(ContactsUtils.getContacts()[0].role)))
+    }
+
+    @Test
+    fun updatedContactHasCorrectValue() {
+        val nameEditText = onView(withId(R.id.editTextName))
+        nameEditText.perform(ViewActions.replaceText("John"))
+
+        val surnameEditText = onView(withId(R.id.editTextSurname))
+        surnameEditText.perform(ViewActions.replaceText("Doe"))
 
         onView(withId(androidx.appcompat.R.id.search_src_text)).perform(
+            clearText(),
             typeText("123 Main St")
         )
         closeSoftKeyboard()
 
         val phoneEditText = onView(withId(R.id.contactCreationPhoneNumber))
-        phoneEditText.perform(replaceText("555-555-1234"))
+        phoneEditText.perform(ViewActions.replaceText("555-555-1234"))
 
         val notesEditText = onView(withId(R.id.contactCreationNotes))
-        notesEditText.perform(replaceText("This is a test note."))
+        notesEditText.perform(ViewActions.replaceText("This is a test note."))
 
-        onView(withId(R.id.create_contact)).perform(click())
+        onView(withId(R.id.create_contact)).perform(ViewActions.click())
         onView(withId(R.id.contacts_recycler_view))
             .perform(
                 RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
-                    nbContacts,
-                    click()
+                    0,
+                    ViewActions.click()
                 )
             )
 
-        onView(withId(R.id.contact_name)).check(matches(withText("John")))
-        onView(withId(R.id.contact_surname)).check(matches(withText("Doe")))
-        onView(withId(R.id.contact_address)).check(matches(withText("123 Main St")))
-        onView(withId(R.id.contact_phone)).check(matches(withText("555-555-1234")))
-        onView(withId(R.id.contact_details)).check(matches(withText("This is a test note.")))
+        onView(withId(R.id.contact_name))
+            .check(matches(withText("John")))
+        onView(withId(R.id.contact_surname))
+            .check(matches(withText("Doe")))
+        onView(withId(R.id.contact_address))
+            .check(matches(withText("123 Main St")))
+        onView(withId(R.id.contact_phone))
+            .check(matches(withText("555-555-1234")))
+        onView(withId(R.id.contact_details))
+            .check(matches(withText("This is a test note.")))
     }
-
-
-    @Test
-    fun writeInAddressFieldMakesDropDown() {
-        val city = "Lausanne"
-        onView(withId(androidx.appcompat.R.id.search_src_text)).perform(typeText(city.dropLast(2)))
-        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        val result = device.wait(Until.hasObject(textContains(city)), 5000)
-        assertTrue(result)
-    }
-
-
-    @Test
-    fun selectSuggestionWritesAddress() {
-        val city = "Lausanne"
-        onView(withId(androidx.appcompat.R.id.search_src_text)).perform(typeText(city))
-        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        val lausanneResult =
-            Location.geocoderQuery(city, getApplicationContext())!![0].getAddressLine(0)
-        val address = device.findObject(text(city))
-        val result = device.wait(Until.hasObject(text(lausanneResult)), 5000)
-        assertTrue(result)
-        device.findObject(text(lausanneResult)).click()
-        val addressChanged = address.wait(Until.textMatches(lausanneResult), 5000)
-        assertTrue(addressChanged)
-    }
-
 }

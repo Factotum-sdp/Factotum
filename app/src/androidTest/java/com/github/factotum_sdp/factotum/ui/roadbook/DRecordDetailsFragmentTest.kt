@@ -14,8 +14,10 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightTheRecordAt
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.PreferencesSetting
 import org.junit.Before
+import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,6 +30,14 @@ class DRecordDetailsFragmentTest {
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
     )
+
+    companion object {
+        @BeforeClass
+        @JvmStatic
+        fun setUpDatabase() {
+            initFirebase()
+        }
+    }
 
     @Before
     fun toRoadBookFragment() {
@@ -92,12 +102,12 @@ class DRecordDetailsFragmentTest {
     }
 
     @Test
-    fun swipeLeftTwoTimesDisplaysDirectory() {
+    fun swipeLeftTwoTimesDisplaysContactDetails() {
         toFragment()
-        onView(withId(R.id.fragment_directory_directors_parent)).check(doesNotExist())
+        onView(withId(R.id.contact_details_fragment)).check(doesNotExist())
         onView(withId(R.id.viewPager)).perform(swipeLeft())
         onView(withId(R.id.viewPager)).perform(swipeLeft())
-        onView(withId(R.id.fragment_directory_directors_parent)).check(matches(isDisplayed()))
+        onView(withId(R.id.contact_details_fragment)).check(matches(isDisplayed()))
     }
 
     // I think block in the CI due to the camera authorizations however it begins to be @Jules part,

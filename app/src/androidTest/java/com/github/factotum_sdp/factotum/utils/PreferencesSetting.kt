@@ -17,6 +17,7 @@ object PreferencesSetting {
         edit.putBoolean(sharedKey, value)
         edit.apply()
     }
+
     fun setAllPrefs(activity: MainActivity) {
         setPrefs(SWIPE_L_SHARED_KEY, activity, true)
         setPrefs(SWIPE_R_SHARED_KEY, activity, true)

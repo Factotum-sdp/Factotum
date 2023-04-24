@@ -8,15 +8,13 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.MainActivity
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
-import org.junit.After
+import org.junit.*
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
 
@@ -26,7 +24,8 @@ class PictureFragmentOfflineTest {
     private lateinit var storage: FirebaseStorage
     private lateinit var device: UiDevice
     private val externalDir = Environment.getExternalStorageDirectory()
-    private val picturesDir = File(externalDir, "/Android/data/com.github.factotum_sdp.factotum/files/Pictures")
+    private val picturesDir =
+        File(externalDir, "/Android/data/com.github.factotum_sdp.factotum/files/Pictures")
 
     @get:Rule
     val permissionsRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
@@ -35,6 +34,14 @@ class PictureFragmentOfflineTest {
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
     )
+
+    companion object {
+        @BeforeClass
+        @JvmStatic
+        fun setUpDatabase() {
+            initFirebase()
+        }
+    }
 
     @Before
     fun setUp() {

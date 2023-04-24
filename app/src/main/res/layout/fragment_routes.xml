@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_route_directors_parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    tools:context=".ui.maps.RouteFragment"
-    android:id="@+id/fragment_route_directors_parent">
+    tools:context=".ui.maps.RouteFragment">
 
     <androidx.appcompat.widget.SearchView
         android:id="@+id/search_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:queryHint="Search address..."
-        android:layout_alignParentEnd= "true"
-        app:iconifiedByDefault="false"/>
+        android:layout_alignParentEnd="true"
+        app:iconifiedByDefault="false"
+        app:queryHint="Search address..." />
 
     <LinearLayout
-        android:id= "@+id/search_button_line"
+        android:id="@+id/search_button_line"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_below="@id/search_bar">
+        android:layout_below="@id/search_bar"
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/button_next"
@@ -29,21 +29,22 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/next"
-            android:visibility="invisible"/>
+            android:visibility="invisible" />
+
         <Button
             android:id="@+id/button_run"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/run"
-            android:visibility="invisible"/>
+            android:visibility="invisible" />
+
         <Button
             android:id="@+id/button_all"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/show_all"
-            />
+            android:text="@string/show_all" />
     </LinearLayout>
 
 
@@ -51,5 +52,5 @@
         android:id="@+id/list_view_routes"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/search_button_line"/>
+        android:layout_below="@id/search_button_line" />
 </RelativeLayout>

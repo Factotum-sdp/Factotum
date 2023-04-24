@@ -23,13 +23,14 @@ import kotlin.coroutines.suspendCoroutine
 @RunWith(AndroidJUnit4::class)
 class ContactsListOnlineTest {
 
-   @get:Rule
-   var testRule = ActivityScenarioRule(
-       MainActivity::class.java
-   )
+    @get:Rule
+    var testRule = ActivityScenarioRule(
+        MainActivity::class.java
+    )
 
     companion object {
         private lateinit var database: FirebaseDatabase
+
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {

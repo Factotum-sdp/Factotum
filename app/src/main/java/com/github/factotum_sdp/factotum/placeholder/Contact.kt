@@ -8,4 +8,5 @@ data class Contact(
     val profile_pic_id: Int = 0,
     val address: String = "",
     val phone: String = "",
-    val details: String? = null)
+    val details: String? = null
+)

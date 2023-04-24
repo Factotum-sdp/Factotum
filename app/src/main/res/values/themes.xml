@@ -21,6 +21,7 @@
     </style>
 
     <style name="Theme.Factotum.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
     <style name="Theme.Factotum.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="DialogAnimLeftToRight">

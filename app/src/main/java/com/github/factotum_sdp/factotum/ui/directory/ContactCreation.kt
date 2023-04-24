@@ -32,8 +32,9 @@ class ContactCreation : Fragment() {
     private var currentContact: Contact? = null
     private val isUpdate: Boolean
         get() = currentContact != null
-    private lateinit var viewModel : ContactsViewModel
+    private lateinit var viewModel: ContactsViewModel
     private var _binding: FragmentContactCreationBinding? = null
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -46,7 +47,11 @@ class ContactCreation : Fragment() {
 
     private lateinit var spinner: Spinner
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         // Inflate the layout for this fragment
         _binding = FragmentContactCreationBinding.inflate(inflater, container, false)
         return binding.root
@@ -95,7 +100,7 @@ class ContactCreation : Fragment() {
         }
     }
 
-    private fun initaliseRolesSpinner(view : View) {
+    private fun initaliseRolesSpinner(view: View) {
         spinner = view.findViewById(R.id.roles_spinner)
         // Initializes the spinner for the roles
         ArrayAdapter(
@@ -111,10 +116,12 @@ class ContactCreation : Fragment() {
     }
 
     private fun setAddressSearchTextListener(cursorAdapter: SimpleCursorAdapter) {
-        binding.contactCreationAddress.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        binding.contactCreationAddress.setOnQueryTextListener(object :
+            SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
             }
+
             override fun onQueryTextChange(newText: String?): Boolean {
                 if (newText != null && newText.length > 2) {
                     val cursor =
@@ -132,10 +139,12 @@ class ContactCreation : Fragment() {
         })
     }
 
-    private fun setAddressSearchSuggestions(){
-        binding.contactCreationAddress.setOnSuggestionListener(object : SearchView.OnSuggestionListener {
+    private fun setAddressSearchSuggestions() {
+        binding.contactCreationAddress.setOnSuggestionListener(object :
+            SearchView.OnSuggestionListener {
             override fun onSuggestionClick(position: Int): Boolean {
-                val cursor = binding.contactCreationAddress.suggestionsAdapter.getItem(position) as Cursor
+                val cursor =
+                    binding.contactCreationAddress.suggestionsAdapter.getItem(position) as Cursor
                 val index = cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1)
                 if (index == -1) return true
                 val selection =
@@ -143,6 +152,7 @@ class ContactCreation : Fragment() {
                 binding.contactCreationAddress.setQuery(selection.toString(), false)
                 return true
             }
+
             override fun onSuggestionSelect(position: Int): Boolean {
                 return false
             }
@@ -165,7 +175,7 @@ class ContactCreation : Fragment() {
     }
 
 
-    private fun initialiseApproveFormButton(view : View) {
+    private fun initialiseApproveFormButton(view: View) {
         val approveFormButton = view.findViewById<Button>(R.id.create_contact)
 
         if (isUpdate) {
@@ -195,7 +205,8 @@ class ContactCreation : Fragment() {
                     image = R.drawable.contact_image,
                     address = binding.contactCreationAddress.query.toString(),
                     phone = phoneNumber.text.toString(),
-                    details = details.text.toString())
+                    details = details.text.toString()
+                )
                 it.findNavController().navigate(R.id.action_contactCreation_to_directoryFragment)
             }
         }

@@ -24,7 +24,8 @@ class PictureFragmentOfflineTest {
     private lateinit var storage: FirebaseStorage
     private lateinit var device: UiDevice
     private val externalDir = Environment.getExternalStorageDirectory()
-    private val picturesDir = File(externalDir, "/Android/data/com.github.factotum_sdp.factotum/files/Pictures")
+    private val picturesDir =
+        File(externalDir, "/Android/data/com.github.factotum_sdp.factotum/files/Pictures")
 
     @get:Rule
     val permissionsRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)

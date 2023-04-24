@@ -32,11 +32,11 @@ class MapsFragment : Fragment() {
 
     private var _binding: FragmentMapsBinding? = null
     private val viewModel: MapsViewModel by activityViewModels()
-    private lateinit var mMap : GoogleMap
+    private lateinit var mMap: GoogleMap
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ){ isGranted ->
-        if (isGranted){
+    ) { isGranted ->
+        if (isGranted) {
             requireContext().hasLocationPermission()
         }
     }
@@ -72,14 +72,14 @@ class MapsFragment : Fragment() {
         }
     }
 
-    private fun initMapLocation(googleMap: GoogleMap){
-        if (!requireContext().hasLocationPermission()){
+    private fun initMapLocation(googleMap: GoogleMap) {
+        if (!requireContext().hasLocationPermission()) {
             requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
         googleMap.uiSettings.isMyLocationButtonEnabled = true
     }
 
-    private fun initMapUI(googleMap: GoogleMap){
+    private fun initMapUI(googleMap: GoogleMap) {
         // clears map from previous markers
         googleMap.clear()
 

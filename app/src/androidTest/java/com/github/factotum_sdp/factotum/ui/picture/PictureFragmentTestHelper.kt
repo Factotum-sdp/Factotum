@@ -41,7 +41,7 @@ fun emptyLocalFiles(dir: File) {
     }
 }
 
-fun triggerShutter(device : UiDevice) {
+fun triggerShutter(device: UiDevice) {
     device.executeShellCommand("input keyevent 27")
 }
 

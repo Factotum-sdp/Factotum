@@ -33,6 +33,7 @@ class ContactsUpdateTest {
 
     companion object {
         private const val nbContacts = 5
+
         @BeforeClass
         @JvmStatic
         fun setUpFirebase() {
@@ -52,13 +53,17 @@ class ContactsUpdateTest {
         onView(withId(R.id.directoryFragment))
             .perform(ViewActions.click())
         onView(withId(R.id.contacts_recycler_view))
-            .perform(RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(0,
-                ViewActions.click()))
+            .perform(
+                RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
+                    0,
+                    ViewActions.click()
+                )
+            )
         onView(withId(R.id.button_modify_contact)).perform(ViewActions.click())
     }
 
     @Test
-    fun hasAllTheFields(){
+    fun hasAllTheFields() {
         onView((withId(R.id.contact_image_creation))).check(matches(isDisplayed()))
         onView((withId(R.id.contactCreationAddress))).check(matches(isDisplayed()))
         onView(withId(R.id.roles_spinner)).check(matches(isDisplayed()))
@@ -69,16 +74,16 @@ class ContactsUpdateTest {
     }
 
     @Test
-    fun buttonTextIsCorrect(){
+    fun buttonTextIsCorrect() {
         onView(withId(R.id.create_contact))
             .check(matches(withText("Update Contact")))
     }
 
     @Test
-    fun allFieldsAreEditable(){
+    fun allFieldsAreEditable() {
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         val fields = Contact::class.java.declaredFields
-        for (param in fields){
+        for (param in fields) {
             if (param.isSynthetic) continue
             val editText = device.findObject(By.clazz(EditText::class.java.name))
             editText.text = "test"
@@ -87,7 +92,7 @@ class ContactsUpdateTest {
     }
 
     @Test
-    fun updateDoesntAddOrRemoveContact(){
+    fun updateDoesntAddOrRemoveContact() {
         onView(withId(R.id.create_contact)).perform(ViewActions.click())
         //check if recycle view in contacts has 6 items
         onView(withId(R.id.contacts_recycler_view))
@@ -135,7 +140,8 @@ class ContactsUpdateTest {
 
         onView(withId(androidx.appcompat.R.id.search_src_text)).perform(
             clearText(),
-            typeText("123 Main St"))
+            typeText("123 Main St")
+        )
         closeSoftKeyboard()
 
         val phoneEditText = onView(withId(R.id.contactCreationPhoneNumber))
@@ -147,9 +153,11 @@ class ContactsUpdateTest {
         onView(withId(R.id.create_contact)).perform(ViewActions.click())
         onView(withId(R.id.contacts_recycler_view))
             .perform(
-                RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(0,
+                RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
+                    0,
                     ViewActions.click()
-                ))
+                )
+            )
 
         onView(withId(R.id.contact_name))
             .check(matches(withText("John")))

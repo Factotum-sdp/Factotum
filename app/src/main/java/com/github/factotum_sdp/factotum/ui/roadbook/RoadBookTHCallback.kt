@@ -31,8 +31,8 @@ import com.google.android.material.snackbar.Snackbar
  */
 abstract class RoadBookTHCallback :
     SimpleCallback(
-    UP or DOWN,
-    LEFT or RIGHT or ACTION_STATE_SWIPE
+        UP or DOWN,
+        LEFT or RIGHT or ACTION_STATE_SWIPE
     ) {
 
     abstract fun getHost(): Fragment
@@ -56,7 +56,7 @@ abstract class RoadBookTHCallback :
     }
 
     override fun onSwiped(viewHolder: ViewHolder, direction: Int) {
-        when(direction) {
+        when (direction) {
             RIGHT -> { // Record Edition
                 editOnSwipeRight(viewHolder)
             }
@@ -65,7 +65,7 @@ abstract class RoadBookTHCallback :
                 if (getRbViewModel().isRecordAtArchived(pos)) {
                     unarchiveOnSwipeLeft(pos)
                 } else {
-                    if(getRbViewModel().isRecordAtTimeStamped(pos))
+                    if (getRbViewModel().isRecordAtTimeStamped(pos))
                         archiveOnSwipeLeft(pos)
                     else
                         deleteOnSwipeLeft(pos)
@@ -76,26 +76,32 @@ abstract class RoadBookTHCallback :
 
     private fun editOnSwipeRight(viewHolder: ViewHolder) {
         val dial = // Launch & Delegate the event to a custom AlertDialog
-            DRecordEditDialogBuilder(getHost().requireContext(), getHost(),
-                                        getRbViewModel(), getRecyclerView())
-            .forExistingRecordEdition(viewHolder)
-            .create()
+            DRecordEditDialogBuilder(
+                getHost().requireContext(), getHost(),
+                getRbViewModel(), getRecyclerView()
+            )
+                .forExistingRecordEdition(viewHolder)
+                .create()
         dial.window?.attributes?.windowAnimations = R.style.DialogAnimLeftToRight
         dial.show()
     }
 
     private fun deleteOnSwipeLeft(position: Int) {
-        swipeLeftDialogAndAction(position,
+        swipeLeftDialogAndAction(
+            position,
             R.string.delete_dialog_title,
-            R.string.snap_text_on_rec_delete) {
+            R.string.snap_text_on_rec_delete
+        ) {
             getRbViewModel().deleteRecordAt(position)
         }
     }
 
     private fun unarchiveOnSwipeLeft(position: Int) {
-        swipeLeftDialogAndAction(position,
+        swipeLeftDialogAndAction(
+            position,
             R.string.unarchive_dialog_title,
-            R.string.snap_text_on_rec_unarchive) {
+            R.string.snap_text_on_rec_unarchive
+        ) {
             getRbViewModel().unarchiveRecordAt(position)
         }
     }
@@ -108,8 +114,10 @@ abstract class RoadBookTHCallback :
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun swipeLeftDialogAndAction(position: Int, dialogTitleID: Int,
-                                         snapMessageID: Int, action: () -> Unit) {
+    private fun swipeLeftDialogAndAction(
+        position: Int, dialogTitleID: Int,
+        snapMessageID: Int, action: () -> Unit
+    ) {
         val builder = AlertDialog.Builder(getHost().requireContext())
         builder.setTitle(getHost().getString(dialogTitleID))
         builder.setCancelable(false)

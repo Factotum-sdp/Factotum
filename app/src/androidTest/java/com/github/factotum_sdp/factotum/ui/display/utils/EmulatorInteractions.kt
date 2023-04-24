@@ -41,7 +41,7 @@ suspend fun uploadImageToStorageEmulator(
     }
 }
 
-fun emptyStorageEmulator(storageRef : StorageReference) {
+fun emptyStorageEmulator(storageRef: StorageReference) {
     // Empty Firebase Storage
     val latch = CountDownLatch(1)
 

@@ -30,6 +30,7 @@ class RouteFragment : Fragment() {
         const val MAPS_PKG = "com.google.android.apps.maps"
         const val NO_RESULT = "No address found"
     }
+
     private var _binding: FragmentRoutesBinding? = null
     private val viewModel: MapsViewModel by activityViewModels()
 
@@ -58,19 +59,20 @@ class RouteFragment : Fragment() {
         setListenerSearch()
     }
 
-    private fun setListenerList(){
+    private fun setListenerList() {
         // instantiate fake data
         val listCourse = DUMMY_COURSE
         val listRoute = DUMMY_ROUTE
 
         val listView: ListView = binding.listViewRoutes
-        val adapter: ArrayAdapter<String?> = ArrayAdapter(requireContext(),
+        val adapter: ArrayAdapter<String?> = ArrayAdapter(
+            requireContext(),
             android.R.layout.simple_list_item_1,
             listCourse as List<String?>
         )
         listView.adapter = adapter
         adapter.notifyDataSetChanged()
-        listView.setOnItemClickListener{_, _, position, _ ->
+        listView.setOnItemClickListener { _, _, position, _ ->
             viewModel.addRoute(listRoute[position])
             viewModel.setRunRoute(listRoute[position])
             binding.buttonRun.visibility = Button.VISIBLE
@@ -78,15 +80,15 @@ class RouteFragment : Fragment() {
         }
     }
 
-    private fun setListenerButtons(){
+    private fun setListenerButtons() {
         binding.buttonNext.setOnClickListener {
             findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
         }
-        binding.buttonAll.setOnClickListener{
+        binding.buttonAll.setOnClickListener {
             viewModel.addAll(DUMMY_ROUTE)
             findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
         }
-        binding.buttonRun.setOnClickListener{
+        binding.buttonRun.setOnClickListener {
             val route = viewModel.runRouteState.value!!
             val googleMapsUrl = StringBuilder()
                 .append("http://maps.google.com/maps?")
@@ -102,7 +104,7 @@ class RouteFragment : Fragment() {
         }
     }
 
-    private fun setListenerSearch(){
+    private fun setListenerSearch() {
         binding.searchBar.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
             override fun onQueryTextSubmit(query: String?): Boolean {
@@ -114,6 +116,7 @@ class RouteFragment : Fragment() {
                 }
                 return true
             }
+
             override fun onQueryTextChange(newText: String?): Boolean {
                 return false
             }

@@ -3,25 +3,27 @@ package com.github.factotum_sdp.factotum.ui.roadbook
 import com.github.factotum_sdp.factotum.data.DestinationRecord
 
 
-
 /**
  *   Immutable Decorator for a List<DestinationRecord>
  *
  * - Allows archived records management through a private field containing all the archived items
  * - Allows choice at construction time for the main List, whether it contains or not the archived records.
  */
-private fun displayedRecords(allRecords: List<DestinationRecord>,
-                             archived: List<DestinationRecord>,
-                             showArchived: Boolean): List<DestinationRecord> {
+private fun displayedRecords(
+    allRecords: List<DestinationRecord>,
+    archived: List<DestinationRecord>,
+    showArchived: Boolean
+): List<DestinationRecord> {
     if (showArchived)
         return allRecords
     return allRecords.minus(archived.toSet())
 }
 
-class DRecordList(private val allRecords: List<DestinationRecord> = listOf(),
-                  private val archived: List<DestinationRecord> = listOf(),
-                  private val showArchived: Boolean = false)
-    : List<DestinationRecord> by displayedRecords(allRecords, archived, showArchived) {
+class DRecordList(
+    private val allRecords: List<DestinationRecord> = listOf(),
+    private val archived: List<DestinationRecord> = listOf(),
+    private val showArchived: Boolean = false
+) : List<DestinationRecord> by displayedRecords(allRecords, archived, showArchived) {
 
     private val archivedSet = archived.toSet() // For performance
 
@@ -52,7 +54,7 @@ class DRecordList(private val allRecords: List<DestinationRecord> = listOf(),
      */
     fun replaceDisplayedList(ls: List<DestinationRecord>): DRecordList {
         val allRecs =
-            if(showArchived)
+            if (showArchived)
                 ls
             else
                 archived.plus(ls)

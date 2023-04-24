@@ -52,7 +52,11 @@ class LoginDataSourceTest {
 
         // when
         loginDataSource = mock(LoginDataSource::class.java)
-        `when`(loginDataSource.login(userName, invalidPassword, profile)).thenReturn(Result.Error(exception))
+        `when`(loginDataSource.login(userName, invalidPassword, profile)).thenReturn(
+            Result.Error(
+                exception
+            )
+        )
         val result = loginDataSource.login(userName, invalidPassword, profile)
 
         // then

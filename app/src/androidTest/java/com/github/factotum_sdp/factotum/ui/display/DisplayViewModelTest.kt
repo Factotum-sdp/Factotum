@@ -41,7 +41,10 @@ class DisplayViewModelTest {
         Thread.sleep(WAIT_TIME_INIT)
 
         //Check that the photoReferences is empty
-        Assert.assertTrue("PhotosReference should be empty.", displayViewModel.photoReferences.value?.isEmpty() ?: true)
+        Assert.assertTrue(
+            "PhotosReference should be empty.",
+            displayViewModel.photoReferences.value?.isEmpty() ?: true
+        )
 
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
@@ -53,7 +56,10 @@ class DisplayViewModelTest {
         Thread.sleep(WAIT_TIME_REFRESH)
 
         // Check that the photoReferences is not empty
-        Assert.assertFalse("PhotosReference should not be empty.", displayViewModel.photoReferences.value?.isEmpty() ?: false)
+        Assert.assertFalse(
+            "PhotosReference should not be empty.",
+            displayViewModel.photoReferences.value?.isEmpty() ?: false
+        )
 
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2)
@@ -65,7 +71,11 @@ class DisplayViewModelTest {
         Thread.sleep(WAIT_TIME_REFRESH)
 
         // Check that the photoReferences has two items
-        Assert.assertEquals("PhotosReference should have two items.", 2, displayViewModel.photoReferences.value?.size)
+        Assert.assertEquals(
+            "PhotosReference should have two items.",
+            2,
+            displayViewModel.photoReferences.value?.size
+        )
     }
 
     @Test
@@ -80,7 +90,10 @@ class DisplayViewModelTest {
         Thread.sleep(WAIT_TIME_INIT)
 
         // Check that the photoReferences is not empty
-        Assert.assertFalse("PhotosReference should not be empty.", displayViewModel.photoReferences.value?.isEmpty() ?: false)
+        Assert.assertFalse(
+            "PhotosReference should not be empty.",
+            displayViewModel.photoReferences.value?.isEmpty() ?: false
+        )
     }
 
 }

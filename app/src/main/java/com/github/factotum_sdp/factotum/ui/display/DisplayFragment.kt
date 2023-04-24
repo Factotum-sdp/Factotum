@@ -88,9 +88,10 @@ class DisplayFragment : Fragment() {
             }
 
             // Create a chooser intent with the option to share via general sharing options and WhatsApp
-            val chooserIntent = Intent.createChooser(generalShareIntent, getString(R.string.share)).apply {
-                putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(whatsappIntent, smsIntent))
-            }
+            val chooserIntent =
+                Intent.createChooser(generalShareIntent, getString(R.string.share)).apply {
+                    putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(whatsappIntent, smsIntent))
+                }
 
             startActivity(chooserIntent)
         }
@@ -103,7 +104,6 @@ class DisplayFragment : Fragment() {
         }
         startActivity(intent)
     }
-
 
 
 }

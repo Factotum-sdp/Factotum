@@ -57,7 +57,12 @@ class ContactDetailsFragmentTest {
         onView(withId(R.id.directoryFragment))
             .perform(click())
         onView(withId(R.id.contacts_recycler_view))
-            .perform(RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(0, click()))
+            .perform(
+                RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
+                    0,
+                    click()
+                )
+            )
     }
 
     @Test
@@ -164,10 +169,10 @@ class ContactDetailsFragmentTest {
     }
 
     @Test
-    fun buttonRunOpensGoogleMaps(){
+    fun buttonRunOpensGoogleMaps() {
         Intents.init()
         onView(withId(R.id.run_button)).perform(click())
-        if(LocationUtils.hasLocationPopUp()){
+        if (LocationUtils.hasLocationPopUp()) {
             val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
             device.findObject(UiSelector().textContains(LocationUtils.buttonTextAllow)).click()
         }
@@ -181,9 +186,9 @@ class ContactDetailsFragmentTest {
     }
 
     @Test
-    fun buttonShowDestination(){
+    fun buttonShowDestination() {
         onView(withId(R.id.show_all_button)).perform(click())
-        if(LocationUtils.hasLocationPopUp()){
+        if (LocationUtils.hasLocationPopUp()) {
             val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
             device.findObject(UiSelector().textContains(LocationUtils.buttonTextAllow)).click()
         }

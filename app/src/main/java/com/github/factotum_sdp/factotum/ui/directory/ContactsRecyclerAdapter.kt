@@ -15,9 +15,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.Contact
 
-class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.ContactsViewHolder>(), Filterable {
+class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.ContactsViewHolder>(),
+    Filterable {
 
-    private var originalContacts : List<Contact> = emptyList()
+    private var originalContacts: List<Contact> = emptyList()
     private var filteredContacts = ArrayList<Contact>()
 
     @SuppressLint("NotifyDataSetChanged")
@@ -27,26 +28,36 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
         notifyDataSetChanged()
     }
 
-    class ContactsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) { //this is the view holder for the recycler view
+    class ContactsViewHolder(itemView: View) :
+        RecyclerView.ViewHolder(itemView) { //this is the view holder for the recycler view
 
-        val itemName : TextView
-        val itemImage : ImageView
+        val itemName: TextView
+        val itemImage: ImageView
 
         init {
             itemName = itemView.findViewById(R.id.contact_surname_and_name)
             itemImage = itemView.findViewById(R.id.contact_image)
 
             itemView.setOnClickListener {   //when a contact is clicked, go to the contact details fragment
-                itemView.findNavController().navigate(R.id.action_directoryFragment_to_contactDetailsFragment2, Bundle().apply {
-                    putInt("id", bindingAdapterPosition) // pass the id of the contact to the contact details fragment so that it can display the correct contact
-                })
+                itemView.findNavController().navigate(
+                    R.id.action_directoryFragment_to_contactDetailsFragment2,
+                    Bundle().apply {
+                        putInt(
+                            "id",
+                            bindingAdapterPosition
+                        ) // pass the id of the contact to the contact details fragment so that it can display the correct contact
+                    })
             }
         }
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, i: Int): ContactsViewHolder {
         val v = LayoutInflater.from(viewGroup.context)
-            .inflate(R.layout.single_contact_item, viewGroup, false) //inflate the layout for each contact
+            .inflate(
+                R.layout.single_contact_item,
+                viewGroup,
+                false
+            ) //inflate the layout for each contact
         return ContactsViewHolder(v)
     }
 
@@ -76,7 +87,10 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
                     for (item in originalContacts) { // Use the originalContacts list for filtering
                         val nameSurname = cleanString(item.name + item.surname)
                         val surnameName = cleanString(item.surname + item.name)
-                        if (nameSurname.contains(filterPattern) || surnameName.contains(filterPattern)) {
+                        if (nameSurname.contains(filterPattern) || surnameName.contains(
+                                filterPattern
+                            )
+                        ) {
                             filteredList.add(item)
                         }
                     }

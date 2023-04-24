@@ -73,14 +73,17 @@ class RoadBookViewAdapter(private val onClickListenerFromDestId: (String) -> Vie
             return "$label : $waitTime'"
         return ""
     }
+
     // arrival : _ or arrival : HH:MM:SS AM-PM
     private fun timestampStringFormat(date: Date?, label: String): String {
         return "$label : ${DestinationRecord.timeStampFormat(date)}"
     }
+
     // actions : () or actions : (pick x2 |contact)
     private fun actionsStringFormat(actions: List<Action>, label: String): String {
         return "$label : ${DestinationRecord.actionsFormat(actions)}"
     }
+
     override fun getItemCount(): Int = displayedDRecords.size
 
     /**

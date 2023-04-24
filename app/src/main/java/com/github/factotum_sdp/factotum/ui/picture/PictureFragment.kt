@@ -14,7 +14,7 @@ import com.google.firebase.storage.StorageReference
 import java.io.File
 import java.util.*
 
-class PictureFragment(clientID : String): Fragment() {
+class PictureFragment(clientID: String) : Fragment() {
 
     private lateinit var photoFile: File
     private lateinit var photoUri: Uri

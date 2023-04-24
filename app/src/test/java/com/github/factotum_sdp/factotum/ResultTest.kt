@@ -2,7 +2,6 @@ package com.github.factotum_sdp.factotum
 
 import com.github.factotum_sdp.factotum.data.Result
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class ResultTest {

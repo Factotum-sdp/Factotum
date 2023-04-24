@@ -26,9 +26,10 @@ class PictureFragmentOnlineTest {
 
     // Those tests need to run with a firebase storage emulator
     private lateinit var storage: FirebaseStorage
-    private lateinit var device : UiDevice
+    private lateinit var device: UiDevice
     private val externalDir = Environment.getExternalStorageDirectory()
-    private val picturesDir = File(externalDir, "/Android/data/com.github.factotum_sdp.factotum/files/Pictures")
+    private val picturesDir =
+        File(externalDir, "/Android/data/com.github.factotum_sdp.factotum/files/Pictures")
 
     @get:Rule
     val permissionsRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
@@ -116,8 +117,8 @@ class PictureFragmentOnlineTest {
             // Check that the local picture directory contains no files (folders are not counted
             // but should be empty)
             val directories = picturesDir.listFiles()?.filter { it.isDirectory } ?: emptyList()
-            assertTrue(directories.all { it.listFiles()?.isEmpty() == true})
-        }.addOnFailureListener{ except ->
+            assertTrue(directories.all { it.listFiles()?.isEmpty() == true })
+        }.addOnFailureListener { except ->
             fail(except.message)
         }
     }

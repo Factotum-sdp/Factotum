@@ -73,13 +73,13 @@ class MainActivityTest {
                 UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_CLIENT)
             }
         }
-/**
+        /**
         @AfterClass
         @JvmStatic
         fun stopAuthEmulator() {
-            val auth = getAuth()
-            auth.signOut()
-            MainActivity.setAuth(auth)
+        val auth = getAuth()
+        auth.signOut()
+        MainActivity.setAuth(auth)
         } **/
     }
 

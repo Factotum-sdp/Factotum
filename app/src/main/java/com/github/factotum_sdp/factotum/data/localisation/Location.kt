@@ -17,10 +17,10 @@ import java.util.concurrent.CountDownLatch
  * @param query : String. Query of the address that we want to create
  * @param context : Context. Context in which this constructor is called
  */
-class Location(query: String, context : Context) {
+class Location(query: String, context: Context) {
 
-    val address : Address?
-    val addressName : String?
+    val address: Address?
+    val addressName: String?
 
     companion object {
         const val CACHE_FILE_NAME = "locations.txt"
@@ -35,9 +35,9 @@ class Location(query: String, context : Context) {
          * @param context : Context. Context in which this method is called
          * @return returns the location that has been added to the file, or null if no address was found
          */
-        fun createAndStore(query: String, context: Context): Location?{
+        fun createAndStore(query: String, context: Context): Location? {
             val location = Location(query, context)
-            if(location.address == null){
+            if (location.address == null) {
                 return null
             }
 
@@ -46,15 +46,16 @@ class Location(query: String, context : Context) {
             //creates the header if it is a new file
             if (cacheFile.length() == 0L) cacheFile.appendText("location${CACHE_FILE_SEPARATOR}latitude${CACHE_FILE_SEPARATOR}longitude\n")
             // stores
-            val toStore = "${location.addressName}$CACHE_FILE_SEPARATOR${location.address.latitude}$CACHE_FILE_SEPARATOR${location.address.longitude}\n"
+            val toStore =
+                "${location.addressName}$CACHE_FILE_SEPARATOR${location.address.latitude}$CACHE_FILE_SEPARATOR${location.address.longitude}\n"
             //checks if already if file
             var alreadyExists = false
             cacheFile.forEachLine { line ->
-                if(line.contains(location.addressName.toString())) {
+                if (line.contains(location.addressName.toString())) {
                     alreadyExists = true
                 }
             }
-            if(!alreadyExists) cacheFile.appendText(toStore)
+            if (!alreadyExists) cacheFile.appendText(toStore)
             return location
         }
 
@@ -65,24 +66,24 @@ class Location(query: String, context : Context) {
          * @param context : Context. Context in which this function is called
          * @return : List<Address>?. Null if no result
          */
-        fun geocoderQuery(query: String, context: Context): List<Address>?{
+        fun geocoderQuery(query: String, context: Context): List<Address>? {
             // must handle differently depending on SDK.
             // getLocationFromName(String, int) deprecated in SDK 33
             val geocoder = Geocoder(context)
             return if (Build.VERSION.SDK_INT >= TIRAMISU) {
                 tiramisuResultHandler(query, geocoder)
-            } else{
+            } else {
                 resultHandler(query, geocoder)
             }
         }
 
         @RequiresApi(TIRAMISU)
         private fun tiramisuResultHandler(query: String, geocoder: Geocoder): List<Address>? {
-            var result : List<Address>? = listOf()
+            var result: List<Address>? = listOf()
             val latch = CountDownLatch(1)
             // blocking
             geocoder.getFromLocationName(query, MAX_RESULT) { addresses ->
-                result = if(addresses.size > 0) addresses else null
+                result = if (addresses.size > 0) addresses else null
                 latch.countDown()
             }
             latch.await()
@@ -90,11 +91,12 @@ class Location(query: String, context : Context) {
         }
 
         private fun resultHandler(query: String, geocoder: Geocoder): List<Address>? {
-            var result : List<Address>? = listOf()
+            var result: List<Address>? = listOf()
             try {
                 val geocodeResult = geocoder.getFromLocationName(query, MAX_RESULT)
-                result = if (geocodeResult == null || geocodeResult.isEmpty()) null else geocodeResult
-            } catch (e : Exception){
+                result =
+                    if (geocodeResult == null || geocodeResult.isEmpty()) null else geocodeResult
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
             return result
@@ -105,12 +107,6 @@ class Location(query: String, context : Context) {
         address = geocoderQuery(query, context)?.get(0)
         addressName = address?.getAddressLine(0)
     }
-
-
-
-
-
-
 
 
 }

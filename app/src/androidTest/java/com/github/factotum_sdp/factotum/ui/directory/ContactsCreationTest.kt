@@ -39,6 +39,7 @@ class ContactsCreationTest {
 
     companion object {
         private const val nbContacts = 5
+
         @BeforeClass
         @JvmStatic
         fun firebaseSetup() {
@@ -61,7 +62,7 @@ class ContactsCreationTest {
     }
 
     @Test
-    fun hasAllTheFields(){
+    fun hasAllTheFields() {
         onView((withId(R.id.contact_image_creation))).check(matches(isDisplayed()))
         onView((withId(R.id.contactCreationAddress))).check(matches(isDisplayed()))
         onView(withId(R.id.roles_spinner)).check(matches(isDisplayed()))
@@ -72,20 +73,20 @@ class ContactsCreationTest {
     }
 
     @Test
-    fun buttonTextIsCorrect(){
+    fun buttonTextIsCorrect() {
         onView(withId(R.id.create_contact)).check(matches(withText("Create Contact")))
     }
 
     @Test
-    fun hasRoles(){
+    fun hasRoles() {
         onView(withId(R.id.roles_spinner)).check(matches(isDisplayed()))
     }
 
     @Test
-    fun allFieldsAreEditable(){
+    fun allFieldsAreEditable() {
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         val fields = Contact::class.java.declaredFields
-        for (param in fields){
+        for (param in fields) {
             if (param.isSynthetic) continue
             val editText = device.findObject(clazz(EditText::class.java.name))
             editText.text = "test"
@@ -94,7 +95,7 @@ class ContactsCreationTest {
     }
 
     @Test
-    fun canCreateContact(){
+    fun canCreateContact() {
         onView(withId(R.id.create_contact)).perform(click())
         //check if recycle view in contacts has 6 items
         onView(withId(R.id.contacts_recycler_view))
@@ -131,7 +132,12 @@ class ContactsCreationTest {
 
         onView(withId(R.id.create_contact)).perform(click())
         onView(withId(R.id.contacts_recycler_view))
-            .perform(RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(nbContacts, click()))
+            .perform(
+                RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
+                    nbContacts,
+                    click()
+                )
+            )
 
         onView(withId(R.id.contact_name)).check(matches(withText("John")))
         onView(withId(R.id.contact_surname)).check(matches(withText("Doe")))
@@ -142,7 +148,7 @@ class ContactsCreationTest {
 
 
     @Test
-    fun writeInAddressFieldMakesDropDown(){
+    fun writeInAddressFieldMakesDropDown() {
         val city = "Lausanne"
         onView(withId(androidx.appcompat.R.id.search_src_text)).perform(typeText(city.dropLast(2)))
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
@@ -152,11 +158,12 @@ class ContactsCreationTest {
 
 
     @Test
-    fun selectSuggestionWritesAddress(){
+    fun selectSuggestionWritesAddress() {
         val city = "Lausanne"
         onView(withId(androidx.appcompat.R.id.search_src_text)).perform(typeText(city))
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        val lausanneResult = Location.geocoderQuery(city, getApplicationContext())!![0].getAddressLine(0)
+        val lausanneResult =
+            Location.geocoderQuery(city, getApplicationContext())!![0].getAddressLine(0)
         val address = device.findObject(text(city))
         val result = device.wait(Until.hasObject(text(lausanneResult)), 5000)
         assertTrue(result)

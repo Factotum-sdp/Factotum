@@ -15,18 +15,18 @@ class LoginDataSource {
         val authResultFuture = CompletableFuture<Result<User>>()
 
         auth.signInWithEmailAndPassword(userEmail, password).addOnCompleteListener { authTask ->
-                if (authTask.isSuccessful) {
-                    authResultFuture.complete(Result.Success(user))
-                } else {
-                    authResultFuture.complete(
-                        Result.Error(
-                            IOException(
-                                "Error logging in", authTask.exception
-                            )
+            if (authTask.isSuccessful) {
+                authResultFuture.complete(Result.Success(user))
+            } else {
+                authResultFuture.complete(
+                    Result.Error(
+                        IOException(
+                            "Error logging in", authTask.exception
                         )
                     )
-                }
+                )
             }
+        }
 
         return authResultFuture.get()
     }

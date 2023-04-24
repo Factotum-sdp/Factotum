@@ -102,12 +102,12 @@ class DRecordDetailsFragmentTest {
     }
 
     @Test
-    fun swipeLeftTwoTimesDisplaysDirectory() {
+    fun swipeLeftTwoTimesDisplaysContactDetails() {
         toFragment()
-        onView(withId(R.id.fragment_directory_directors_parent)).check(doesNotExist())
+        onView(withId(R.id.contact_details_fragment)).check(doesNotExist())
         onView(withId(R.id.viewPager)).perform(swipeLeft())
         onView(withId(R.id.viewPager)).perform(swipeLeft())
-        onView(withId(R.id.fragment_directory_directors_parent)).check(matches(isDisplayed()))
+        onView(withId(R.id.contact_details_fragment)).check(matches(isDisplayed()))
     }
 
     // I think block in the CI due to the camera authorizations however it begins to be @Jules part,

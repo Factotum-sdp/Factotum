@@ -43,7 +43,7 @@ abstract class BaseAuthFragment : Fragment() {
     }
 
     abstract fun updateUi(model: Any)
-    private fun showSignUpFailed(@StringRes errorString: Int){
+    private fun showSignUpFailed(@StringRes errorString: Int) {
         Snackbar.make(requireView(), errorString, Snackbar.LENGTH_SHORT).show()
     }
 }

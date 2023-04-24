@@ -48,7 +48,15 @@ class ContactsRepositoryTest {
     @Test
     fun savesContactToSharedPreferences() = runBlocking {
         // Save a contact to the cache
-        val contact = Contact("1", "Manager", "John", "Doe", R.drawable.contact_image, "123 Main St", "555-555-1234")
+        val contact = Contact(
+            "1",
+            "Manager",
+            "John",
+            "Doe",
+            R.drawable.contact_image,
+            "123 Main St",
+            "555-555-1234"
+        )
         repository.saveContactToSharedPreferences(contact)
 
         // Verify that the contact was saved to the cache
@@ -60,7 +68,15 @@ class ContactsRepositoryTest {
 
     @Test
     fun savesContactOnline() = runBlocking {
-        val contact = Contact("1", "Manager", "John", "Doe", R.drawable.contact_image, "123 Main St", "555-555-1234")
+        val contact = Contact(
+            "1",
+            "Manager",
+            "John",
+            "Doe",
+            R.drawable.contact_image,
+            "123 Main St",
+            "555-555-1234"
+        )
         val latch = CountDownLatch(1)
 
         repository.saveContact(contact)

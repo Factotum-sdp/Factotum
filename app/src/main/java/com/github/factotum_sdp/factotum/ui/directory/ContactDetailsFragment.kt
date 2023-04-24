@@ -37,7 +37,8 @@ class ContactDetailsFragment : Fragment() {
         val contactsViewModel = //retrieve list of contacts
             ViewModelProvider(requireActivity())[ContactsViewModel::class.java]
 
-        currentContact = contactsViewModel.contacts.value?.get(arguments?.getInt("id")!!) ?: Contact()
+        currentContact =
+            contactsViewModel.contacts.value?.get(arguments?.getInt("id")!!) ?: Contact()
 
         setContactDetails(view, currentContact) //set contact details
 
@@ -65,7 +66,8 @@ class ContactDetailsFragment : Fragment() {
 
     private fun initialiseAllButtons(view: View, contactsViewModel: ContactsViewModel) {
 
-        val returnToContactsButton = view.findViewById<Button>(R.id.button) // connect the button to the layout
+        val returnToContactsButton =
+            view.findViewById<Button>(R.id.button) // connect the button to the layout
         returnToContactsButton.setOnClickListener {
             it.findNavController()
                 .navigate(R.id.action_contactDetailsFragment2_to_directoryFragment)
@@ -88,7 +90,8 @@ class ContactDetailsFragment : Fragment() {
 
         view.findViewById<Button>(R.id.run_button).setOnClickListener {
             val route = DUMMY_ROUTE[0] //remove when merged with contact creation and use real route
-            val uri = Uri.parse("google.navigation:q=${route.dst.latitude},${route.dst.longitude}&mode=b")
+            val uri =
+                Uri.parse("google.navigation:q=${route.dst.latitude},${route.dst.longitude}&mode=b")
             val intent = Intent(Intent.ACTION_VIEW, uri)
             intent.setPackage(RouteFragment.MAPS_PKG)
             requireContext().startActivity(intent)

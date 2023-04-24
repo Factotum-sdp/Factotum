@@ -82,7 +82,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private fun setOnDRecordClickListener(): (String) -> View.OnClickListener {
         return {
             View.OnClickListener { v ->
-                if(isTClickEnabled) {
+                if (isTClickEnabled) {
                     v
                         ?.findNavController()
                         ?.navigate(R.id.action_roadBookFragment_to_DRecordDetailsFragment,
@@ -98,8 +98,10 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private fun setRoadBookEvents(rbViewModel: RoadBookViewModel, view: View) {
         // Add record on positive floating button click
         view.findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
-            DRecordEditDialogBuilder(context, requireParentFragment(),
-                                            rbViewModel, rbRecyclerView)
+            DRecordEditDialogBuilder(
+                context, requireParentFragment(),
+                rbViewModel, rbRecyclerView
+            )
                 .forNewRecordEdition()
                 .show()
         }
@@ -145,8 +147,10 @@ class RoadBookFragment : Fragment(), MenuProvider {
         itemTouchHelper.attachToRecyclerView(rbRecyclerView)
     }
 
-    private fun setRBonClickListeners(rbDD: MenuItem, rbSL: MenuItem, rbSR: MenuItem,
-                                      rbTC: MenuItem, rbSA: MenuItem) {
+    private fun setRBonClickListeners(
+        rbDD: MenuItem, rbSL: MenuItem, rbSR: MenuItem,
+        rbTC: MenuItem, rbSA: MenuItem
+    ) {
         rbDD.setOnMenuItemClickListener {
             it.isChecked = !it.isChecked
             isDDropEnabled = !isDDropEnabled
@@ -186,14 +190,15 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
     private fun setLiveLocationSwitch(menu: Menu) {
         val locationMenu = menu.findItem(R.id.location_switch)
-        val locationSwitch = locationMenu.actionView!!.findViewById<SwitchCompat>(R.id.menu_item_switch)
+        val locationSwitch =
+            locationMenu.actionView!!.findViewById<SwitchCompat>(R.id.menu_item_switch)
         locationSwitch?.let {// Load current state to set the switch item
             it.isChecked = locationTrackingHandler.isTrackingEnabled()
         }
         locationSwitch!!.setOnCheckedChangeListener { _, isChecked ->
-            if(isChecked)
+            if (isChecked)
                 locationTrackingHandler.startLocationService(requireContext(), requireActivity())
-            else if(lifecycle.currentState == Lifecycle.State.RESUMED && this.isVisible) {
+            else if (lifecycle.currentState == Lifecycle.State.RESUMED && this.isVisible) {
                 locationTrackingHandler.stopLocationService(requireContext(), requireActivity())
             }
         }
@@ -207,6 +212,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
             true
         }
     }
+
     private fun newItemTHCallBack(): Callback {
 
         // Overriding the getDragDirs and getSwipeDirs() to
@@ -248,7 +254,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         return itemTHCallback
     }
 
-    companion object{
+    companion object {
         private const val ROADBOOK_DB_PATH: String = "Sheet-shift"
         private const val SWIPE_L_SHARED_KEY = "SwipeLeftButton"
         private const val SWIPE_R_SHARED_KEY = "SwipeRightButton"
@@ -278,12 +284,13 @@ class RoadBookFragment : Fragment(), MenuProvider {
     }
 
     private fun fetchMenuItemState(sharedKey: String, menuItem: MenuItem) {
-        val sp = requireActivity().getSharedPreferences(sharedKey ,Context.MODE_PRIVATE)
+        val sp = requireActivity().getSharedPreferences(sharedKey, Context.MODE_PRIVATE)
         val savedState = sp.getBoolean(sharedKey, true)
         menuItem.isChecked = savedState
     }
+
     private fun saveRadioButtonState(sharedKey: String, radioButtonId: Int) {
-        val sp = requireActivity().getSharedPreferences(sharedKey,Context.MODE_PRIVATE)
+        val sp = requireActivity().getSharedPreferences(sharedKey, Context.MODE_PRIVATE)
         val edit = sp.edit()
         val radioButton = fragMenu.findItem(radioButtonId)
         radioButton?.let {

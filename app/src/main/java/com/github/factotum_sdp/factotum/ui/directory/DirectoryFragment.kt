@@ -51,12 +51,15 @@ class DirectoryFragment : Fragment() {
         }
 
         val createContactButton = view.findViewById<FloatingActionButton>(R.id.add_contact_button)
-        createContactButton.setOnClickListener{
-            it.findNavController().navigate(R.id.action_directoryFragment_to_contactCreationFragment)
+        createContactButton.setOnClickListener {
+            it.findNavController()
+                .navigate(R.id.action_directoryFragment_to_contactCreationFragment)
         }
 
-        val recycler = view.findViewById <RecyclerView>(R.id.contacts_recycler_view) // connect the recycler view to the layout
-        val searchView = view.findViewById <SearchView>(R.id.contacts_search_view) // connect the search view to the layout
+        val recycler =
+            view.findViewById<RecyclerView>(R.id.contacts_recycler_view) // connect the recycler view to the layout
+        val searchView =
+            view.findViewById<SearchView>(R.id.contacts_search_view) // connect the search view to the layout
         emptyContactsMessage = view.findViewById(R.id.empty_contacts_message)
 
         //the recycler is just the way we chose to represent the list of contacts

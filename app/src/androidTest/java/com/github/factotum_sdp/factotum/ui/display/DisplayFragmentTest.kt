@@ -56,6 +56,7 @@ class DisplayFragmentTest {
     fun tearDown() {
         emptyStorageEmulator(Firebase.storage.reference)
     }
+
     @Test
     fun displayFragmentUiElementsDisplayed() {
         onView(withId(R.id.recyclerView)).check(matches(isDisplayed()))

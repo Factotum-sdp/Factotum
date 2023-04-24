@@ -13,7 +13,7 @@ class GeneralUtils {
     companion object {
         private lateinit var database: FirebaseDatabase
         private lateinit var auth: FirebaseAuth
-        private lateinit var storage : FirebaseStorage
+        private lateinit var storage: FirebaseStorage
 
         fun initFirebase() {
             database = Firebase.database
@@ -26,6 +26,7 @@ class GeneralUtils {
             MainActivity.setDatabase(database)
             MainActivity.setAuth(auth)
         }
+
         fun getDatabase(): FirebaseDatabase {
             return database
         }

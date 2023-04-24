@@ -91,11 +91,11 @@ dependencies {
 
     implementation 'com.google.android.gms:play-services-location:21.0.1'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
-    testImplementation 'org.mockito:mockito-core:3.12.4'
-    testImplementation 'org.mockito:mockito-inline:2.13.0'
-    testImplementation 'io.mockk:mockk:1.12.0'
-    androidTestImplementation 'io.mockk:mockk-android:1.12.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+    testImplementation 'org.mockito:mockito-core:5.3.0'
+    testImplementation 'org.mockito:mockito-inline:5.2.0'
+    testImplementation 'io.mockk:mockk:1.13.5'
+    androidTestImplementation 'io.mockk:mockk-android:1.13.5'
     //androidTestImplementation 'org.mockito:mockito-android:3.12.4'
 
     androidTestImplementation 'androidx.arch.core:core-testing:2.2.0'
@@ -114,8 +114,8 @@ dependencies {
     debugImplementation "androidx.test:monitor:1.6.1"
     debugImplementation "androidx.fragment:fragment-testing:1.5.6"
 
-    implementation 'com.google.code.gson:gson:2.9.0'
-    testImplementation "org.jetbrains.kotlin:kotlin-test:1.6.10"
+    implementation 'com.google.code.gson:gson:2.10.1'
+    testImplementation "org.jetbrains.kotlin:kotlin-test:1.8.20"
     //androidTestImplementation "org.jetbrains.kotlin:kotlin-test-junit:1.6.10"
 }
 
@@ -133,12 +133,12 @@ task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'crea
 
 
     def fileFilter = [
-        '**/R.class',
-        '**/R$*.class',
-        '**/BuildConfig.*',
-        '**/Manifest*.*',
-        '**/*Test*.*',
-        'android/**/*.*',
+            '**/R.class',
+            '**/R$*.class',
+            '**/BuildConfig.*',
+            '**/Manifest*.*',
+            '**/*Test*.*',
+            'android/**/*.*',
     ]
     def debugTree = fileTree(dir: "$project.buildDir/tmp/kotlin-classes/debug", excludes: fileFilter)
     def mainSrc = "$project.projectDir/src/main/java"

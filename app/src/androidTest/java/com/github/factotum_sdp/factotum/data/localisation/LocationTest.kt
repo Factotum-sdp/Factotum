@@ -16,15 +16,15 @@ import java.util.concurrent.CountDownLatch
 @RunWith(AndroidJUnit4::class)
 class LocationTest {
     @Test
-    fun rightLocationCreates(){
+    fun rightLocationCreates() {
         val addressName = "Route Cantonale 15, 1015 Lausanne"
         val location = Location(addressName, getApplicationContext())
-        val geocoder =  Geocoder(getApplicationContext())
-        var result : Address? = null
+        val geocoder = Geocoder(getApplicationContext())
+        var result: Address? = null
         val latch = CountDownLatch(1)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             geocoder.getFromLocationName(addressName, 1) { addresses ->
-                result = if(addresses.size != 0) addresses[0] else null
+                result = if (addresses.size != 0) addresses[0] else null
                 latch.countDown()
             }
             latch.await()
@@ -37,7 +37,7 @@ class LocationTest {
     }
 
     @Test
-    fun wrongLocationCreatesNull(){
+    fun wrongLocationCreatesNull() {
         val addressName = "dfjsdk"
         val location = Location(addressName, getApplicationContext())
         assertEquals(location.address, null)
@@ -45,9 +45,9 @@ class LocationTest {
     }
 
     @Test
-    fun searchQueryAddsToCache(){
+    fun searchQueryAddsToCache() {
         val query = "Lausanne"
-        val context : Context = getApplicationContext()
+        val context: Context = getApplicationContext()
         val locationCache = Location.createAndStore(query, context)
         val location = Location(query, context)
         val cacheFile = File(context.cacheDir, Location.CACHE_FILE_NAME)
@@ -56,21 +56,25 @@ class LocationTest {
         var containsLat = false
         var containsLng = false
         cacheFile.forEachLine { line ->
-            if (line.contains(location.addressName.toString())){
-            containsAddress = true}
-            if (line.contains(location.address!!.latitude.toString())){
-                containsLat = true}
-            if (line.contains(location.address!!.longitude.toString())){
-                containsLng = true}
+            if (line.contains(location.addressName.toString())) {
+                containsAddress = true
+            }
+            if (line.contains(location.address!!.latitude.toString())) {
+                containsLat = true
+            }
+            if (line.contains(location.address!!.longitude.toString())) {
+                containsLng = true
+            }
         }
         assertTrue(containsAddress)
         assertTrue(containsLat)
         assertTrue(containsLng)
     }
+
     @Test
-    fun searchQueryDoNotAddIfNull(){
+    fun searchQueryDoNotAddIfNull() {
         val query = "wrong_query"
-        val context : Context = getApplicationContext()
+        val context: Context = getApplicationContext()
         val cacheFile = File(context.cacheDir, Location.CACHE_FILE_NAME)
         val cacheSizeBefore = cacheFile.length()
         val locationCache = Location.createAndStore(query, context)
@@ -79,9 +83,9 @@ class LocationTest {
     }
 
     @Test
-    fun searchQueryDoNotDuplicate(){
+    fun searchQueryDoNotDuplicate() {
         val query = "Lausanne"
-        val context : Context = getApplicationContext()
+        val context: Context = getApplicationContext()
         val cacheFile = File(context.cacheDir, Location.CACHE_FILE_NAME)
         Location.createAndStore(query, context)
         val cacheSizeBefore = cacheFile.length()
@@ -91,7 +95,7 @@ class LocationTest {
     }
 
     @Test
-    fun rightQueryReturnsMultiplesResults(){
+    fun rightQueryReturnsMultiplesResults() {
         val query = "rue de Genève"
         val result = Location.geocoderQuery(query, getApplicationContext())
         assertTrue(result!!.size > 1)

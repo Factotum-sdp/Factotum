@@ -18,7 +18,8 @@ class ContactsUtils {
         private val randomNames = listOf("John", "Jane", "Joe")
         private var randomSurnames = listOf("Smith", "Jones", "Williams")
         private val roles = listOf("Boss", "Courier", "Client")
-        private val randomAddresses = listOf("123 Fake Street", "456 Fake Street", "789 Fake Street")
+        private val randomAddresses =
+            listOf("123 Fake Street", "456 Fake Street", "789 Fake Street")
         private val randomPhones = listOf("123456789", "987654321", "123987456")
         private val randomDetails = listOf("I am a boss", "I am a courier", "I am a client")
 
@@ -31,10 +32,11 @@ class ContactsUtils {
                 randomSurnames[position % randomSurnames.size], image,
                 randomAddresses[position % randomAddresses.size],
                 randomPhones[position % randomPhones.size],
-                randomDetails[position % randomDetails.size])
+                randomDetails[position % randomDetails.size]
+            )
         }
 
-        private fun createRandomContacts(count : Int) {
+        private fun createRandomContacts(count: Int) {
             randomContacts.clear()
             for (i in randomContacts.size until count) {
                 randomContacts.add(createContact(i))

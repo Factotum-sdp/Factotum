@@ -116,22 +116,16 @@ class RoadBookFragmentTest {
         .check(doesNotExist())
     }
 
-    /*
     @Test
     fun swipeLeftButCancelLetTheRecord() {
+        swipeLeftTheRecordAt(2)
+        onView(withText(R.string.delete_dialog_title))
+        onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
+        Thread.sleep(WORST_REFRESH_TIME)
 
-    // Record just added is displayed at the end of the list
-    onView((withText(DestinationRecords.RECORDS[2].destID)))
-    .check(matches(isDisplayed()))
-
-    swipeLeftTheRecordAt(2)
-    onView(withText(R.string.delete_dialog_title))
-    onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
-
-    // Record added previously is now deleted
-    onView((withText(DestinationRecords.RECORDS[2].destID)))
-    .check(matches(isDisplayed()))
-    } */
+        onView((withText(DestinationRecords.RECORDS[2].destID)))
+            .check(matches(isDisplayed()))
+    }
 
     // ============================================================================================
     // ================================== Add record Tests ========================================

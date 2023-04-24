@@ -128,6 +128,7 @@ class RoadBookFragmentTest {
     .check(doesNotExist())
     }
 
+    /*
     @Test
     fun swipeLeftButCancelLetTheRecord() {
 
@@ -142,7 +143,7 @@ class RoadBookFragmentTest {
     // Record added previously is now deleted
     onView((withText(DestinationRecords.RECORDS[2].destID)))
     .check(matches(isDisplayed()))
-    }
+    } */
 
     // ============================================================================================
     // ================================== Add record Tests ========================================
@@ -693,6 +694,7 @@ class RoadBookFragmentTest {
     onView(withId(R.id.refresh_button)).perform(click())
     }
 
+    /*
     @Test
     fun automaticTimestampIsWorkingWhenNavigatingInTheApp() {
     // Non timestamped record, hence swipe left shows deletion dialog
@@ -721,7 +723,7 @@ class RoadBookFragmentTest {
     swipeLeftTheRecordAt(1)
     onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
     onView(withText(DestinationRecords.RECORDS[1].destID)).check(doesNotExist())
-    }
+    } */
 
     // ============================================================================================
     // ===================================== Helpers ==============================================

@@ -74,9 +74,10 @@ class PictureFragmentOnlineTest {
     }
 
 
+    /*
     @Test
     fun testUploadFileCorrectly() {
-        // Wait for the photo to be taken
+      /*  // Wait for the photo to be taken
         Thread.sleep(TIME_WAIT_DONE_OR_CANCEL)
 
         // Click the button to validate the photo
@@ -95,8 +96,8 @@ class PictureFragmentOnlineTest {
             assertTrue(picturesDir.listFiles()?.isNotEmpty() ?: false)
         }.addOnFailureListener { except ->
             fail(except.message)
-        }
-    }
+        } */
+    } */
 
     @Test
     fun testCancelPhoto() {

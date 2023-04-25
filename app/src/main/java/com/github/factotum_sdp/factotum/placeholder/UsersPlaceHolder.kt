@@ -2,6 +2,7 @@ package com.github.factotum_sdp.factotum.placeholder
 
 import android.util.Log
 import com.github.factotum_sdp.factotum.data.LoginDataSource
+import com.github.factotum_sdp.factotum.data.LoginDataSource.Companion.DISPATCH_DB_PATH
 import com.github.factotum_sdp.factotum.data.Role
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
@@ -64,16 +65,13 @@ object UsersPlaceHolder {
         users.add(USER1)
         users.add(USER2)
         users.add(USER3)
-        users.add(USER_BOSS)
-        users.add(USER_COURIER)
-        users.add(USER_CLIENT)
     }
 
     /**
      * Populates the database with users.
      */
     suspend fun addUserToDb(user: User) = suspendCoroutine { continuation ->
-        dataSource.getReference(LoginDataSource.DISPATCH_DB_PATH).push().setValue(user)
+        dataSource.getReference(DISPATCH_DB_PATH).push().setValue(user)
             .addOnSuccessListener {
                 continuation.resume(Unit)
             }
@@ -83,18 +81,12 @@ object UsersPlaceHolder {
     }
 
 
-    suspend fun addAuthUser(user: User) {
-        val deferred = CompletableDeferred<Unit>()
-
-        auth.createUserWithEmailAndPassword(user.email, password)
-            .addOnSuccessListener {
-                deferred.complete(Unit)
-            }
-            .addOnFailureListener { exception ->
-                deferred.completeExceptionally(exception)
-            }
-
-        deferred.await()
+    suspend fun addAuthUser(user: User) = suspendCoroutine { continuation ->
+        auth.createUserWithEmailAndPassword(user.email, password).addOnSuccessListener {
+            continuation.resume(Unit)
+        }.addOnFailureListener { exception ->
+            continuation.resumeWithException(exception)
+        }
     }
 
     fun emptyFirebaseDatabase(database: FirebaseDatabase) {

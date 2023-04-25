@@ -30,6 +30,7 @@ import com.github.factotum_sdp.factotum.ui.picture.emptyFirebaseStorage
 import com.github.factotum_sdp.factotum.utils.ContactsUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -51,19 +52,22 @@ class DisplayFragmentTest {
         MainActivity::class.java
     )
 
+
     companion object {
         @JvmStatic
         @BeforeClass
         fun setUpClass() {
             initFirebase()
-            runBlocking {
-                deleteProfileDispatch(Firebase.database.reference)
-            }
 
             UsersPlaceHolder.init(GeneralUtils.getDatabase(), GeneralUtils.getAuth())
 
             runBlocking {
-                UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_CLIENT)
+                try {
+                    UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_CLIENT)
+                } catch (e : FirebaseAuthUserCollisionException) {
+                    e.message?.let { Log.e("DisplayFragmentTest", it) }
+                }
+
                 UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_CLIENT)
             }
 
@@ -74,12 +78,7 @@ class DisplayFragmentTest {
         @AfterClass
         fun tearDownClass() {
             Intents.release()
-            val auth = Firebase.auth
-            auth.signOut()
-            MainActivity.setAuth(auth)
-            runBlocking {
-                deleteProfileDispatch(Firebase.database.reference)
-            }
+            runBlocking{emptyFirebaseStorage(Firebase.storage.reference)}
         }
     }
 
@@ -160,7 +159,7 @@ class DisplayFragmentTest {
 
 
     @Test
-    fun displayFragmentDisplayMixingFormatPhotosWorks() {
+    fun displayFragmentDisplayMixingFormatPhotosWorksOneWay() {
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
         }
@@ -175,17 +174,16 @@ class DisplayFragmentTest {
 
         val recyclerView = onView(withId(R.id.recyclerView))
         recyclerView.check(matches(hasItemCount(2)))
+    }
 
+    @Test
+    fun displayFragmentDisplayMixingFormatPhotosWorksOtherWay() {
         runBlocking {
-            emptyFirebaseStorage(FirebaseStorage.getInstance().reference)
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2)
         }
 
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH4, TEST_IMAGE_PATH4)
-        }
-
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2)
         }
 
 
@@ -193,6 +191,7 @@ class DisplayFragmentTest {
 
         Thread.sleep(WAIT_TIME_REFRESH)
 
+        val recyclerView = onView(withId(R.id.recyclerView))
         recyclerView.check(matches(hasItemCount(2)))
     }
 

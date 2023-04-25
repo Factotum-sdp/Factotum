@@ -32,7 +32,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-const val LOGIN_REFRESH_TIME = 3000L
+const val LOGIN_REFRESH_TIME = 4000L
 const val DRAWER_REFRESH_TIME = 1000L
 
 @RunWith(AndroidJUnit4::class)
@@ -55,22 +55,16 @@ class MainActivityTest {
 
             UsersPlaceHolder.init(getDatabase(), getAuth())
             runBlocking {
+                UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_BOSS)
                 UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_BOSS)
             }
             runBlocking {
+                UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_COURIER)
                 UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_COURIER)
             }
             runBlocking {
-                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_CLIENT)
-            }
-            runBlocking {
-                UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_BOSS)
-            }
-            runBlocking {
-                UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_COURIER)
-            }
-            runBlocking {
                 UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_CLIENT)
+                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_CLIENT)
             }
         }
         /**

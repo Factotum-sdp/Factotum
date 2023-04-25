@@ -4,14 +4,21 @@ import android.content.Context
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.matcher.BoundedMatcher
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.UploadTask
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.hamcrest.Description
 import org.hamcrest.Matcher
+import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 const val WAIT_TIME_REFRESH = 1000L
 const val WAIT_TIME_INIT = 1000L
@@ -43,6 +50,18 @@ suspend fun uploadImageToStorageEmulator(
         continuation.resumeWithException(exception)
     }
 }
+
+suspend fun deleteProfileDispatch(database: DatabaseReference) = suspendCoroutine { continuation ->
+    val profileDispatchRef = database.child("profile-dispatch")
+    profileDispatchRef.removeValue().addOnCompleteListener { task ->
+        if (task.isSuccessful) {
+            continuation.resume(Unit)
+        } else {
+            continuation.resumeWithException(task.exception!!)
+        }
+    }
+}
+
 
 fun hasItemCount(count: Int): Matcher<View> {
     return object : BoundedMatcher<View, RecyclerView>(RecyclerView::class.java) {

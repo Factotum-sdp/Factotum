@@ -65,9 +65,6 @@ object UsersPlaceHolder {
         users.add(USER1)
         users.add(USER2)
         users.add(USER3)
-        users.add(USER_BOSS)
-        users.add(USER_COURIER)
-        users.add(USER_CLIENT)
     }
 
     /**

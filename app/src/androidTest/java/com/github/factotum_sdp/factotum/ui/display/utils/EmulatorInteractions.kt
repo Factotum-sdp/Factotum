@@ -4,6 +4,9 @@ import android.content.Context
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.matcher.BoundedMatcher
+import com.github.factotum_sdp.factotum.data.LoginDataSource
+import com.github.factotum_sdp.factotum.data.LoginDataSource.Companion.DISPATCH_DB_PATH
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -21,7 +24,6 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 const val WAIT_TIME_REFRESH = 1000L
-const val WAIT_TIME_INIT = 1000L
 const val TEST_IMAGE_PATH1 = "USER_25-03-2023_17-57-11.jpg"
 const val TEST_IMAGE_PATH2 = "USER_26-03-2023_17-57-11.jpg"
 const val TEST_IMAGE_PATH3 = "test_image3.jpg"
@@ -50,18 +52,6 @@ suspend fun uploadImageToStorageEmulator(
         continuation.resumeWithException(exception)
     }
 }
-
-suspend fun deleteProfileDispatch(database: DatabaseReference) = suspendCoroutine { continuation ->
-    val profileDispatchRef = database.child("profile-dispatch")
-    profileDispatchRef.removeValue().addOnCompleteListener { task ->
-        if (task.isSuccessful) {
-            continuation.resume(Unit)
-        } else {
-            continuation.resumeWithException(task.exception!!)
-        }
-    }
-}
-
 
 fun hasItemCount(count: Int): Matcher<View> {
     return object : BoundedMatcher<View, RecyclerView>(RecyclerView::class.java) {

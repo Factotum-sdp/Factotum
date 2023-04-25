@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers.*
@@ -16,10 +17,15 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.github.factotum_sdp.factotum.LOGIN_REFRESH_TIME
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.ui.display.utils.*
+import com.github.factotum_sdp.factotum.ui.login.LoginFragmentTest
+import com.github.factotum_sdp.factotum.ui.picture.PictureFragment
+import com.github.factotum_sdp.factotum.ui.picture.emptyFirebaseStorage
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.runBlocking
 import org.junit.*
@@ -43,39 +49,24 @@ class DisplayFragmentTest {
         }
     }
 
-    private lateinit var scenario: FragmentScenario<DisplayFragment>
     private lateinit var context: Context
 
     @Before
     fun setUp() {
-        scenario = launchFragmentInContainer(themeResId = R.style.Theme_Factotum)
+        LoginFragmentTest.fillUserEntryAndGoToRBFragment("client@gmail.com", "123456")
+        Thread.sleep(LOGIN_REFRESH_TIME)
+        goToDisplayFragment();
+        Thread.sleep(WAIT_TIME_INIT)
         context = InstrumentationRegistry.getInstrumentation().context
     }
 
+
     @After
     fun tearDown() {
-        emptyStorageEmulator(Firebase.storage.reference)
-    }
-
-    @Test
-    fun displayFragmentUiElementsDisplayed() {
-        onView(withId(R.id.recyclerView)).check(matches(isDisplayed()))
-        onView(withId(R.id.refreshButton)).check(matches(isDisplayed()))
-    }
-
-    @Test
-    fun displayFragmentRecyclerViewHasCorrectLayoutManager() {
-        scenario.onFragment { fragment ->
-            val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
-            assert(recyclerView.layoutManager is LinearLayoutManager)
+        runBlocking {
+            emptyFirebaseStorage(FirebaseStorage.getInstance().reference)
         }
     }
-
-    @Test
-    fun displayFragmentRefreshButtonClicked() {
-        onView(withId(R.id.refreshButton)).perform(click())
-    }
-
     @Test
     fun displayFragmentDisplayOnlyOnePhotoIfSame() {
         runBlocking {
@@ -98,10 +89,10 @@ class DisplayFragmentTest {
 
         Thread.sleep(WAIT_TIME_REFRESH)
 
-        scenario.onFragment { fragment ->
-            val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
-            assert(recyclerView.adapter?.itemCount == 1)
-        }
+        val recyclerView = onView(withId(R.id.recyclerView))
+
+        //Check if only one photo is displayed
+        recyclerView.check(matches(hasItemCount(1)))
     }
 
     @Test
@@ -126,10 +117,8 @@ class DisplayFragmentTest {
 
         Thread.sleep(WAIT_TIME_REFRESH)
 
-        scenario.onFragment { fragment ->
-            val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
-            assert(recyclerView.adapter?.itemCount == 2)
-        }
+        val recyclerView = onView(withId(R.id.recyclerView))
+        recyclerView.check(matches(hasItemCount(2)))
     }
 
     @Test
@@ -144,10 +133,8 @@ class DisplayFragmentTest {
 
         Thread.sleep(WAIT_TIME_REFRESH)
 
-        scenario.onFragment { fragment ->
-            val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
-            assert(recyclerView.adapter?.itemCount == 1)
-        }
+        val recyclerView = onView(withId(R.id.recyclerView))
+        recyclerView.check(matches(hasItemCount(1)))
     }
 
 
@@ -167,14 +154,12 @@ class DisplayFragmentTest {
 
         Thread.sleep(WAIT_TIME_REFRESH)
 
-        scenario.onFragment { fragment ->
-            val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
-            assert(recyclerView.adapter?.itemCount == 2)
+        val recyclerView = onView(withId(R.id.recyclerView))
+        recyclerView.check(matches(hasItemCount(2)))
+
+        runBlocking {
+            emptyFirebaseStorage(FirebaseStorage.getInstance().reference)
         }
-
-        //Empty storage
-        emptyStorageEmulator(Firebase.storage.reference)
-
 
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH4, TEST_IMAGE_PATH4)
@@ -190,10 +175,7 @@ class DisplayFragmentTest {
 
         Thread.sleep(WAIT_TIME_REFRESH)
 
-        scenario.onFragment { fragment ->
-            val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
-            assert(recyclerView.adapter?.itemCount == 2)
-        }
+        recyclerView.check(matches(hasItemCount(2)))
     }
 
 
@@ -213,27 +195,20 @@ class DisplayFragmentTest {
 
         Thread.sleep(WAIT_TIME_REFRESH)
 
-        scenario.onFragment { fragment ->
-            val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
-            assert(recyclerView.adapter?.itemCount == 2)
-        }
+        val recyclerView = onView(withId(R.id.recyclerView))
+        recyclerView.check(matches(hasItemCount(2)))
     }
 
     @Test
     fun displayFragmentDisplayNoPhotosIfEmpty() {
-        scenario.onFragment { fragment ->
-            val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
-            assert(recyclerView.adapter?.itemCount == 0)
-        }
+        val recyclerView = onView(withId(R.id.recyclerView))
+        recyclerView.check(matches(hasItemCount(0)))
 
         onView(withId(R.id.refreshButton)).perform(click())
 
         Thread.sleep(WAIT_TIME_REFRESH)
 
-        scenario.onFragment { fragment ->
-            val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
-            assert(recyclerView.adapter?.itemCount == 0)
-        }
+        recyclerView.check(matches(hasItemCount(0)))
     }
 
     @Test
@@ -274,5 +249,12 @@ class DisplayFragmentTest {
 
         //Check if the intent of sharing has been called
         Intents.intended(hasAction(Intent.ACTION_CHOOSER))
+    }
+
+    private fun goToDisplayFragment() {
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.displayFragment))
+            .perform(click())
     }
 }

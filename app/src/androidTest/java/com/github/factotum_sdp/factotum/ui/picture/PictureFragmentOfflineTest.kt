@@ -28,7 +28,7 @@ class PictureFragmentOfflineTest {
         File(externalDir, "/Android/data/com.github.factotum_sdp.factotum/files/Pictures")
 
     @get:Rule
-    val permissionsRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
+    val permissionsRule: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
 
     @get:Rule
     var testRule = ActivityScenarioRule(

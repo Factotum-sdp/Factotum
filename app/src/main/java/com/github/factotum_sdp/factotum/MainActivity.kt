@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val auth: FirebaseAuth = getAuth()
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -111,9 +112,10 @@ class MainActivity : AppCompatActivity() {
                 navMenu.findItem(R.id.roadBookFragment).isVisible = false
                 navMenu.findItem(R.id.directoryFragment).isVisible = false
                 navMenu.findItem(R.id.routeFragment).isVisible = false
-                navMenu.findItem(R.id.displayFragment).isVisible = true
             }
-
+            Role.COURIER -> {
+                navMenu.findItem(R.id.displayFragment).isVisible = false
+            }
             else -> {
                 navMenu.findItem(R.id.roadBookFragment).isVisible = true
                 navMenu.findItem(R.id.directoryFragment).isVisible = true

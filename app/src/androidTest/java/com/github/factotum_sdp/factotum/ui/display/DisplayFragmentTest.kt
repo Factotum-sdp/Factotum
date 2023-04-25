@@ -2,6 +2,7 @@ package com.github.factotum_sdp.factotum.ui.display
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,10 +31,15 @@ import com.github.factotum_sdp.factotum.utils.ContactsUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import net.bytebuddy.agent.VirtualMachine.ForOpenJ9.Dispatcher
 import org.junit.*
 import org.junit.runner.RunWith
 
@@ -50,15 +56,14 @@ class DisplayFragmentTest {
         @BeforeClass
         fun setUpClass() {
             initFirebase()
-
             runBlocking {
-                ContactsUtils.populateDatabase()
+                deleteProfileDispatch(Firebase.database.reference)
             }
 
-            MainActivity.setAuth(GeneralUtils.getAuth())
             UsersPlaceHolder.init(GeneralUtils.getDatabase(), GeneralUtils.getAuth())
 
             runBlocking {
+                UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_CLIENT)
                 UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_CLIENT)
             }
 
@@ -72,6 +77,9 @@ class DisplayFragmentTest {
             val auth = Firebase.auth
             auth.signOut()
             MainActivity.setAuth(auth)
+            runBlocking {
+                deleteProfileDispatch(Firebase.database.reference)
+            }
         }
     }
 
@@ -97,17 +105,12 @@ class DisplayFragmentTest {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
         }
 
-        Thread.sleep(WAIT_TIME_INIT)
-
         onView(withId(R.id.refreshButton)).perform(click())
-
-        Thread.sleep(WAIT_TIME_REFRESH)
 
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
         }
 
-        Thread.sleep(WAIT_TIME_INIT)
 
         onView(withId(R.id.refreshButton)).perform(click())
 
@@ -125,8 +128,6 @@ class DisplayFragmentTest {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
         }
 
-        Thread.sleep(WAIT_TIME_INIT)
-
         onView(withId(R.id.refreshButton)).perform(click())
 
         Thread.sleep(WAIT_TIME_REFRESH)
@@ -134,8 +135,6 @@ class DisplayFragmentTest {
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2)
         }
-
-        Thread.sleep(WAIT_TIME_INIT)
 
         onView(withId(R.id.refreshButton)).perform(click())
 
@@ -150,8 +149,6 @@ class DisplayFragmentTest {
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3)
         }
-
-        Thread.sleep(WAIT_TIME_INIT)
 
         onView(withId(R.id.refreshButton)).perform(click())
 
@@ -172,8 +169,6 @@ class DisplayFragmentTest {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3)
         }
 
-        Thread.sleep(WAIT_TIME_INIT)
-
         onView(withId(R.id.refreshButton)).perform(click())
 
         Thread.sleep(WAIT_TIME_REFRESH)
@@ -193,7 +188,6 @@ class DisplayFragmentTest {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2)
         }
 
-        Thread.sleep(WAIT_TIME_INIT)
 
         onView(withId(R.id.refreshButton)).perform(click())
 
@@ -213,7 +207,6 @@ class DisplayFragmentTest {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH4, TEST_IMAGE_PATH4)
         }
 
-        Thread.sleep(WAIT_TIME_INIT)
 
         onView(withId(R.id.refreshButton)).perform(click())
 
@@ -262,8 +255,6 @@ class DisplayFragmentTest {
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
         }
-
-        Thread.sleep(WAIT_TIME_INIT)
 
         onView(withId(R.id.refreshButton)).perform(click())
 

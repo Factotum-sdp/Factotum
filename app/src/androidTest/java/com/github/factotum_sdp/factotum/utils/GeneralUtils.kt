@@ -15,6 +15,7 @@ class GeneralUtils {
         private lateinit var auth: FirebaseAuth
         private lateinit var storage: FirebaseStorage
 
+
         fun initFirebase() {
             database = Firebase.database
             auth = Firebase.auth

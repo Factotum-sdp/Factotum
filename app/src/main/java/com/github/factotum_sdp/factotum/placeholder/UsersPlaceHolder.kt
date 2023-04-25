@@ -1,10 +1,14 @@
 package com.github.factotum_sdp.factotum.placeholder
 
+import android.util.Log
 import com.github.factotum_sdp.factotum.data.LoginDataSource
 import com.github.factotum_sdp.factotum.data.Role
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.CompletableDeferred
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * Temporary PlaceHolder object for fake users data
@@ -68,19 +72,16 @@ object UsersPlaceHolder {
     /**
      * Populates the database with users.
      */
-    suspend fun addUserToDb(user: User) {
-        val deferred = CompletableDeferred<Unit>()
-
+    suspend fun addUserToDb(user: User) = suspendCoroutine { continuation ->
         dataSource.getReference(LoginDataSource.DISPATCH_DB_PATH).push().setValue(user)
             .addOnSuccessListener {
-                deferred.complete(Unit)
+                continuation.resume(Unit)
             }
             .addOnFailureListener { exception ->
-                deferred.completeExceptionally(exception)
+                continuation.resumeWithException(exception)
             }
-
-        deferred.await()
     }
+
 
     suspend fun addAuthUser(user: User) {
         val deferred = CompletableDeferred<Unit>()

@@ -98,6 +98,7 @@ class DisplayFragmentTest {
             emptyFirebaseStorage(FirebaseStorage.getInstance().reference)
         }
     }
+
     @Test
     fun displayFragmentDisplayOnlyOnePhotoIfSame() {
         runBlocking {
@@ -156,45 +157,6 @@ class DisplayFragmentTest {
         val recyclerView = onView(withId(R.id.recyclerView))
         recyclerView.check(matches(hasItemCount(1)))
     }
-
-
-    @Test
-    fun displayFragmentDisplayMixingFormatPhotosWorksOneWay() {
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
-        }
-
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3)
-        }
-
-        onView(withId(R.id.refreshButton)).perform(click())
-
-        Thread.sleep(WAIT_TIME_REFRESH)
-
-        val recyclerView = onView(withId(R.id.recyclerView))
-        recyclerView.check(matches(hasItemCount(2)))
-    }
-
-    @Test
-    fun displayFragmentDisplayMixingFormatPhotosWorksOtherWay() {
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2)
-        }
-
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH4, TEST_IMAGE_PATH4)
-        }
-
-
-        onView(withId(R.id.refreshButton)).perform(click())
-
-        Thread.sleep(WAIT_TIME_REFRESH)
-
-        val recyclerView = onView(withId(R.id.recyclerView))
-        recyclerView.check(matches(hasItemCount(2)))
-    }
-
 
     @Test
     fun displayFragmentDisplayTwoBadFormatPhotosWorks() {

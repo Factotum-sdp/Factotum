@@ -26,6 +26,7 @@ import com.github.factotum_sdp.factotum.ui.display.utils.*
 import com.github.factotum_sdp.factotum.ui.login.LoginFragmentTest
 import com.github.factotum_sdp.factotum.ui.picture.PictureFragment
 import com.github.factotum_sdp.factotum.ui.picture.emptyFirebaseStorage
+import com.github.factotum_sdp.factotum.utils.ContactsUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.auth.ktx.auth
@@ -49,6 +50,10 @@ class DisplayFragmentTest {
         @BeforeClass
         fun setUpClass() {
             initFirebase()
+
+            runBlocking {
+                ContactsUtils.populateDatabase()
+            }
 
             MainActivity.setAuth(GeneralUtils.getAuth())
             UsersPlaceHolder.init(GeneralUtils.getDatabase(), GeneralUtils.getAuth())
@@ -76,8 +81,6 @@ class DisplayFragmentTest {
     fun setUp() {
         LoginFragmentTest.fillUserEntryAndGoToRBFragment("client@gmail.com", "123456")
         Thread.sleep(LOGIN_REFRESH_TIME)
-        goToDisplayFragment();
-        Thread.sleep(WAIT_TIME_INIT)
         context = InstrumentationRegistry.getInstrumentation().context
     }
 
@@ -272,10 +275,4 @@ class DisplayFragmentTest {
         Intents.intended(hasAction(Intent.ACTION_CHOOSER))
     }
 
-    private fun goToDisplayFragment() {
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.displayFragment))
-            .perform(click())
-    }
 }

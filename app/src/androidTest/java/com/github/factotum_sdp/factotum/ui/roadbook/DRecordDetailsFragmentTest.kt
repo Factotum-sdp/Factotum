@@ -41,9 +41,6 @@ class DRecordDetailsFragmentTest {
 
     @Before
     fun toRoadBookFragment() {
-        testRule.scenario.onActivity {
-            PreferencesSetting.setAllPrefs(it)
-        }
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))
@@ -51,8 +48,7 @@ class DRecordDetailsFragmentTest {
     }
 
     private fun toFragment() {
-        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
-        onView(withText(R.string.rb_label_touch_click)).perform(click())
+        PreferencesSetting.enableTouchClick()
         val destID = DestinationRecords.RECORDS[2].destID
         onView(withText(destID)).perform(click())
     }

@@ -37,7 +37,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private var isSLEnabled = true
     private var isSREnabled = true
     private var isDDropEnabled = true
-    private var isTClickEnabled = true
+    private var isTClickEnabled = false
     private var isShowArchivedEnabled = false
 
     override fun onCreateView(
@@ -71,11 +71,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
     override fun onPause() {
         rbViewModel.backUp()
-        saveRadioButtonState(SWIPE_R_SHARED_KEY, R.id.rbSwipeREdition)
-        saveRadioButtonState(SWIPE_L_SHARED_KEY, R.id.rbSwipeLDeletion)
-        saveRadioButtonState(DRAG_N_DROP_SHARED_KEY, R.id.rbDragDrop)
-        saveRadioButtonState(TOUCH_CLICK_SHARED_KEY, R.id.rbTouchClick)
-        saveRadioButtonState(SHOW_ARCHIVED_KEY, R.id.showArchived)
         super.onPause()
     }
 
@@ -122,12 +117,11 @@ class RoadBookFragment : Fragment(), MenuProvider {
         val rbTC = menu.findItem(R.id.rbTouchClick)
         val rbSA = menu.findItem(R.id.showArchived)
 
-        // fetch saved States
-        fetchMenuItemState(DRAG_N_DROP_SHARED_KEY, rbDD)
-        fetchMenuItemState(SWIPE_L_SHARED_KEY, rbSL)
-        fetchMenuItemState(SWIPE_R_SHARED_KEY, rbSR)
-        fetchMenuItemState(TOUCH_CLICK_SHARED_KEY, rbTC)
-        fetchMenuItemState(SHOW_ARCHIVED_KEY, rbSA)
+        rbDD.isChecked = true
+        rbSL.isChecked = true
+        rbSR.isChecked = true
+        rbTC.isChecked = false
+        rbSA.isChecked = false
 
         // init globals to saved preference state
         isDDropEnabled = rbDD.isChecked
@@ -270,11 +264,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
     }
 
     override fun onDestroyView() {
-        saveRadioButtonState(SWIPE_R_SHARED_KEY, R.id.rbSwipeREdition)
-        saveRadioButtonState(SWIPE_L_SHARED_KEY, R.id.rbSwipeLDeletion)
-        saveRadioButtonState(DRAG_N_DROP_SHARED_KEY, R.id.rbDragDrop)
-        saveRadioButtonState(TOUCH_CLICK_SHARED_KEY, R.id.rbTouchClick)
-        saveRadioButtonState(SHOW_ARCHIVED_KEY, R.id.showArchived)
         super.onDestroyView()
     }
 

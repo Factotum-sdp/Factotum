@@ -15,15 +15,20 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers.*
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.github.factotum_sdp.factotum.LOGIN_REFRESH_TIME
+import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.ui.display.utils.*
 import com.github.factotum_sdp.factotum.ui.login.LoginFragmentTest
 import com.github.factotum_sdp.factotum.ui.picture.PictureFragment
 import com.github.factotum_sdp.factotum.ui.picture.emptyFirebaseStorage
+import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
@@ -34,11 +39,24 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class DisplayFragmentTest {
 
+    @get:Rule
+    var testRule = ActivityScenarioRule(
+        MainActivity::class.java
+    )
+
     companion object {
         @JvmStatic
         @BeforeClass
         fun setUpClass() {
             initFirebase()
+
+            MainActivity.setAuth(GeneralUtils.getAuth())
+            UsersPlaceHolder.init(GeneralUtils.getDatabase(), GeneralUtils.getAuth())
+
+            runBlocking {
+                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_CLIENT)
+            }
+
             Intents.init()
         }
 
@@ -46,6 +64,9 @@ class DisplayFragmentTest {
         @AfterClass
         fun tearDownClass() {
             Intents.release()
+            val auth = Firebase.auth
+            auth.signOut()
+            MainActivity.setAuth(auth)
         }
     }
 

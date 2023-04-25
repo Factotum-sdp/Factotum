@@ -62,12 +62,6 @@ class DisplayFragmentTest {
             UsersPlaceHolder.init(GeneralUtils.getDatabase(), GeneralUtils.getAuth())
 
             runBlocking {
-                try {
-                    UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_CLIENT)
-                } catch (e : FirebaseAuthUserCollisionException) {
-                    e.message?.let { Log.e("DisplayFragmentTest", it) }
-                }
-
                 UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_CLIENT)
             }
 

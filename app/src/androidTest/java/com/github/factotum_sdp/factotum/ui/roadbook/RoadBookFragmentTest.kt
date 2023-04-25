@@ -616,18 +616,18 @@ class RoadBookFragmentTest {
 
         onView(withId(R.id.location_switch)).perform(click())
         Thread.sleep(WORST_REFRESH_TIME)
-
-        onView(withId(R.id.refresh_button)).perform(click())
         Thread.sleep(WORST_REFRESH_TIME)
-
-        // Disable location
-        onView(withId(R.id.location_switch)).perform(click())
-        Thread.sleep(1000)
+        Thread.sleep(WORST_REFRESH_TIME)
+        Thread.sleep(WORST_REFRESH_TIME)
 
         // Now swipe left archive the record
         swipeLeftTheRecordAt(1)
         onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
         onView(withText(DestinationRecords.RECORDS[1].destID)).check(doesNotExist())
+
+        // Disable location
+        onView(withId(R.id.location_switch)).perform(click())
+        onView(withId(R.id.refresh_button)).perform(click())
     }
 
     // ============================================================================================

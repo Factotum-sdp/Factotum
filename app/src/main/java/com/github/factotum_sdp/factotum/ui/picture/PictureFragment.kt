@@ -25,6 +25,7 @@ class PictureFragment(clientID: String) : Fragment() {
     private val folderName: String = clientID.ifBlank { "default" }
     private val userID : String = FirebaseAuth.getInstance().currentUser?.uid.toString()
 
+
     override fun onStart() {
         super.onStart()
         readCameraPermissionResult.launch(Manifest.permission.CAMERA)

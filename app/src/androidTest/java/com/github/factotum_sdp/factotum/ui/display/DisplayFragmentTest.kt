@@ -145,6 +145,25 @@ class DisplayFragmentTest {
     }*/
 
     @Test
+    fun displayFragmentDisplayMixingFormatPhotosWorks() {
+        runBlocking {
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
+        }
+
+        runBlocking {
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3)
+        }
+
+        onView(withId(R.id.refreshButton)).perform(click())
+
+        Thread.sleep(WAIT_TIME_REFRESH)
+
+        val recyclerView = onView(withId(R.id.recyclerView))
+        recyclerView.check(matches(hasItemCount(2)))
+    }
+
+
+    @Test
     fun displayFragmentDisplayOneBadFormatPhotosWorks() {
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3)

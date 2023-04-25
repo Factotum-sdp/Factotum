@@ -7,9 +7,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.databinding.FragmentDisplayBinding
 import com.github.factotum_sdp.factotum.ui.display.utils.PhotoAdapter
 import com.google.firebase.storage.StorageReference
@@ -20,9 +25,12 @@ const val PHONE_NUMBER = "1234567890"
 class DisplayFragment : Fragment() {
 
     // View model for this fragment
-    private val viewModel: DisplayViewModel by viewModels()
+    private val viewModel: DisplayViewModel by viewModels { DisplayViewModelFactory(userID) }
+    private val userViewModel: UserViewModel by activityViewModels()
     private var _binding: FragmentDisplayBinding? = null
     private val binding get() = _binding!!
+    private val userID = MutableLiveData("Unknown")
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,9 +59,13 @@ class DisplayFragment : Fragment() {
             photoAdapter.submitList(photoReferences)
         }
 
+        userViewModel.loggedInUser.observe(viewLifecycleOwner) { user ->
+            userID.value = user.name
+        }
+
         // Set up the refresh button click listener
         binding.refreshButton.setOnClickListener {
-            viewModel.refreshImages()
+            userID.value?.let { viewModel.refreshImages(it) }
         }
 
         return binding.root
@@ -105,5 +117,16 @@ class DisplayFragment : Fragment() {
         startActivity(intent)
     }
 
-
 }
+
+class DisplayViewModelFactory(private val userName: MutableLiveData<String>) : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(DisplayViewModel::class.java)) {
+            return DisplayViewModel(userName) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
+
+

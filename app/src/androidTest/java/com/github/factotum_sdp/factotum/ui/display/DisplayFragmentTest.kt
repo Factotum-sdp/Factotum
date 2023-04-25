@@ -61,16 +61,6 @@ class DisplayFragmentTest {
 
             UsersPlaceHolder.init(GeneralUtils.getDatabase(), GeneralUtils.getAuth())
 
-            runBlocking {
-                try {
-                    UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_CLIENT)
-                } catch (e : FirebaseAuthUserCollisionException) {
-                    e.message?.let { Log.e("DisplayFragmentTest", it) }
-                }
-
-                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_CLIENT)
-            }
-
             Intents.init()
         }
 
@@ -89,6 +79,17 @@ class DisplayFragmentTest {
         LoginFragmentTest.fillUserEntryAndGoToRBFragment("client@gmail.com", "123456")
         Thread.sleep(LOGIN_REFRESH_TIME)
         context = InstrumentationRegistry.getInstrumentation().context
+
+        // DO NOT REMOVE THIS PART OR PUT IT IN A @BeforeClass
+        runBlocking {
+            try {
+                UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_CLIENT)
+            } catch (e : FirebaseAuthUserCollisionException) {
+                e.message?.let { Log.e("DisplayFragmentTest", it) }
+            }
+
+            UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_CLIENT)
+        }
     }
 
 
@@ -122,7 +123,7 @@ class DisplayFragmentTest {
         recyclerView.check(matches(hasItemCount(1)))
     }
 
-    /*@Test
+    @Test
     fun displayFragmentDisplayTwoDifferentPhotosWorks() {
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
@@ -142,10 +143,10 @@ class DisplayFragmentTest {
 
         val recyclerView = onView(withId(R.id.recyclerView))
         recyclerView.check(matches(hasItemCount(2)))
-    }*/
+    }
 
     @Test
-    fun displayFragmentDisplayMixingFormatPhotosWorks() {
+    fun displayFragmentDisplayMixingFormatPhotosWorksOneWay() {
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
         }
@@ -162,6 +163,24 @@ class DisplayFragmentTest {
         recyclerView.check(matches(hasItemCount(2)))
     }
 
+    @Test
+    fun displayFragmentDisplayMixingFormatPhotosWorksOtherWay() {
+        runBlocking {
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2)
+        }
+
+        runBlocking {
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH4, TEST_IMAGE_PATH4)
+        }
+
+
+        onView(withId(R.id.refreshButton)).perform(click())
+
+        Thread.sleep(WAIT_TIME_REFRESH)
+
+        val recyclerView = onView(withId(R.id.recyclerView))
+        recyclerView.check(matches(hasItemCount(2)))
+    }
 
     @Test
     fun displayFragmentDisplayOneBadFormatPhotosWorks() {

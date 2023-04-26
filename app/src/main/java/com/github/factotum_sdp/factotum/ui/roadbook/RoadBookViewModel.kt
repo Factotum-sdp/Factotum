@@ -1,19 +1,13 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.github.factotum_sdp.factotum.data.DestinationRecord
-import com.github.factotum_sdp.factotum.data.User
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
-import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookFragment.Companion.DELIVERY_LOG_DB_PATH
 import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
 import java.text.DateFormat
-import java.text.SimpleDateFormat
 import java.text.SimpleDateFormat.getDateInstance
 import java.util.*
 
@@ -29,12 +23,9 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         MutableLiveData(DRecordList())
     val recordsListState: LiveData<DRecordList> = _recordsList
 
-    private val _loggedInUser: MutableLiveData<User> = MutableLiveData()
-
     private var dbRef: DatabaseReference
     private val clientOccurences = HashMap<String, Int>()
-    private val _dbLogRef: DatabaseReference = FirebaseDatabase.getInstance().reference
-        .child(DELIVERY_LOG_DB_PATH)
+
 
     init {
         val date = Calendar.getInstance().time
@@ -216,32 +207,6 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
     fun hideArchivedRecords() {
         _recordsList.value = currentDRecList().withoutArchived()
     }
-
-    /**
-     * Sets the logged user
-     */
-    fun setLoggedUser(user: User) {
-        _loggedInUser.value = user
-    }
-
-    /**
-     * logs the delivery of the current day
-     */
-    fun logDeliveries() {
-        _recordsList.value?.forEach { destRec ->
-            if (destRec.timeStamp != null) {
-                _dbLogRef
-                    .child(_loggedInUser.value?.name.toString())
-                    .child(dateFormatted())
-                    .child(destRec.hashCode().toString()).setValue(destRec)
-            }
-        }
-    }
-
-    private fun dateFormatted(): String {
-        return SimpleDateFormat("ddMMyyyy", Locale.getDefault()).format(Date())
-    }
-
 
     //Needed to update the destIDOccurrences cache
     private fun addDemoRecords(ls: List<DestinationRecord>) {

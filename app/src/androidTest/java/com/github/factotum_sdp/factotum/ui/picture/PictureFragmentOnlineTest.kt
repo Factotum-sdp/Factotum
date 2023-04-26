@@ -20,6 +20,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
 import junit.framework.TestCase.assertTrue
 import junit.framework.TestCase.fail
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -102,6 +103,7 @@ class PictureFragmentOnlineTest {
         } */
     } */
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun testCancelPhoto()  = runTest {
         runBlocking {

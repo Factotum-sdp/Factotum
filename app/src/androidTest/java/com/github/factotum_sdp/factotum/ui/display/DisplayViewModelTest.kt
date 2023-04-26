@@ -42,7 +42,9 @@ class DisplayViewModelTest {
         // Initialize the ViewModel
         displayViewModel = DisplayViewModel()
 
-        delay(WAIT_TIME_INIT)
+        runBlocking {
+            delay(WAIT_TIME_INIT)
+        }
 
         //Check that the photoReferences is empty
         Assert.assertTrue(

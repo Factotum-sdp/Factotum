@@ -19,7 +19,9 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.utils.ContactsUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -37,6 +39,7 @@ class DirectoryFragmentTest {
     companion object {
         private const val nbContacts = 10
 
+        @OptIn(ExperimentalCoroutinesApi::class)
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
@@ -44,8 +47,10 @@ class DirectoryFragmentTest {
 
             ContactsUtils.emptyFirebaseDatabase()
 
-            runBlocking {
-                ContactsUtils.populateDatabase(nbContacts)
+            runTest {
+                runBlocking {
+                    ContactsUtils.populateDatabase(nbContacts)
+                }
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.directory
 
+import androidx.test.espresso.Espresso.pressBack
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
@@ -93,7 +94,6 @@ class DirectoryFragmentTest {
 
     @Test
     fun allContactsCanBeClickedOn() {
-        val device = UiDevice.getInstance(getInstrumentation())
         for (i in 0 until nbContacts) {
             onView(withId(R.id.contacts_recycler_view))
                 .perform(
@@ -102,10 +102,8 @@ class DirectoryFragmentTest {
                         click()
                     )
                 )
-            val contactName =
-                device.findObject(UiSelector().descriptionContains("All contact Info"))
-            assertTrue(contactName.exists())
-            device.pressBack()
+            onView(withId(R.id.contact_details_fragment)).check(matches(isDisplayed()))
+            pressBack()
         }
     }
 

@@ -125,7 +125,6 @@ class RoadBookFragmentTest {
         swipeLeftTheRecordAt(2)
         onView(withText(R.string.delete_dialog_title))
         onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
-        
 
         onView((withText(DestinationRecords.RECORDS[2].destID)))
             .check(matches(isDisplayed()))
@@ -246,7 +245,6 @@ class RoadBookFragmentTest {
             .perform(click(), typeText("edited"), closeSoftKeyboard())
         onView(withId(R.id.editTextTimestamp)).perform(click())
         onView(withText(timePickerCancelBLabel)).perform(click())
-
         onView(withId(R.id.editTextTimestamp)).perform(typeText("2222"))
         onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
 
@@ -273,7 +271,6 @@ class RoadBookFragmentTest {
         onView(withId(R.id.editTextTimestamp)).perform(click())
         onView(withText(timePickerCancelBLabel)).perform(click())
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
-        
 
         onView(withText(startsWith("arrival : ${timestampUntilHourFormat(cal)}"))).check(doesNotExist())
     }
@@ -303,7 +300,6 @@ class RoadBookFragmentTest {
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
 
         // Check edited record is corretly displayed :
-        
         onView(withText("NewEvery#1")).check(matches(isDisplayed()))
 
         eraseFirstRecTimestamp() // For having no ambiguity btw Timestamp on screen
@@ -532,7 +528,6 @@ class RoadBookFragmentTest {
         onView(withId(R.id.editTextTimestamp)).perform(click())
         onView(withText(timePickerUpdateBLabel)).perform(click())
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
-        
 
         swipeLeftTheRecordAt(3)
         onView((withText(DestinationRecords.RECORDS[3].destID)))

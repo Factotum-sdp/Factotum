@@ -43,7 +43,7 @@ class DisplayFragmentTest {
         fun setUpClass() {
             initFirebase()
             UsersPlaceHolder.init(GeneralUtils.getDatabase(), GeneralUtils.getAuth())
-            addUserToDatabase(UsersPlaceHolder.USER_CLIENT)
+            GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_CLIENT)
             Intents.init()
         }
 
@@ -62,7 +62,7 @@ class DisplayFragmentTest {
         LoginFragmentTest.fillUserEntryAndGoToRBFragment("client@gmail.com", "123456")
         Thread.sleep(WAIT_TIME_REFRESH)
         context = InstrumentationRegistry.getInstrumentation().context
-        addUserToDatabase(UsersPlaceHolder.USER_CLIENT)
+        GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_CLIENT)
     }
 
     @After

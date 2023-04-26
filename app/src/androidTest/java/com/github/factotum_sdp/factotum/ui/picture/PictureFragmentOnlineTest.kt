@@ -2,43 +2,45 @@ package com.github.factotum_sdp.factotum.ui.picture
 
 import android.Manifest
 import android.os.Environment
-import androidx.test.espresso.Espresso
-import androidx.test.espresso.action.ViewActions
-import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.MainActivity
-import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
-import com.github.factotum_sdp.factotum.ui.display.utils.addUserToDatabase
 import com.github.factotum_sdp.factotum.ui.picture.*
+import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
-import com.github.factotum_sdp.factotum.utils.PreferencesSetting
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.ktx.storage
+import com.google.firebase.storage.ListResult
+import com.google.firebase.storage.StorageReference
 import junit.framework.TestCase.assertTrue
 import junit.framework.TestCase.fail
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.tasks.await
 import org.junit.*
 import org.junit.runner.RunWith
 import java.io.File
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 @RunWith(AndroidJUnit4::class)
 class PictureFragmentOnlineTest {
 
     // Those tests need to run with a firebase storage emulator
-    private lateinit var storage: FirebaseStorage
     private lateinit var device: UiDevice
     private val externalDir = Environment.getExternalStorageDirectory()
     private val picturesDir =
         File(externalDir, "/Android/data/com.github.factotum_sdp.factotum/files/Pictures")
 
     @get:Rule
-    val permissionsRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
+    val permissionsRule: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
 
     @get:Rule
     var testRule = ActivityScenarioRule(
@@ -50,14 +52,15 @@ class PictureFragmentOnlineTest {
         @JvmStatic
         fun setUpDatabase() {
             initFirebase()
-            addUserToDatabase(UsersPlaceHolder.USER_COURIER)
+            UsersPlaceHolder.init(GeneralUtils.getDatabase(), GeneralUtils.getAuth())
+            GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_COURIER)
         }
     }
 
     @Before
     fun setUp() {
         emptyLocalFiles(picturesDir)
-        addUserToDatabase(UsersPlaceHolder.USER_COURIER)
+        GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_COURIER)
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
         goToPictureFragment()
@@ -67,52 +70,49 @@ class PictureFragmentOnlineTest {
 
         // Take a photo
         triggerShutter(device)
+
+        // Wait for the photo to be taken
+        Thread.sleep(TIME_WAIT_DONE_OR_CANCEL)
     }
 
     @After
     fun tearDown() {
-        runBlocking { emptyFirebaseStorage(storage.reference) }
+        runBlocking { emptyFirebaseStorage(GeneralUtils.getStorage().reference) }
         emptyLocalFiles(picturesDir)
     }
 
-
     @Test
     fun testUploadFileCorrectly() {
-        // Wait for the photo to be taken
-        Thread.sleep(TIME_WAIT_DONE_OR_CANCEL)
-
-        // Click the button to validate the photo
         triggerDone(device)
 
-        // Wait for the photo to be uploaded
-        Thread.sleep(TIME_WAIT_UPLOAD)
+        runBlocking {
+            delay(TIME_WAIT_UPLOAD_PHOTO)
+        }
 
-        // Check that the storage contains at least one file
-        storage.reference.listAll().addOnSuccessListener { listResult ->
-            // Check that there is one folder that is not empty
-            assertTrue(listResult.prefixes.isNotEmpty())
-
-            // Check that the local picture directory contains one folder
-            // and check that the folder is empty
-            assertTrue(picturesDir.listFiles()?.isNotEmpty() ?: false)
+        GeneralUtils.getStorage().reference.child(CLIENT_ID).listAll().addOnSuccessListener { files ->
+            assertTrue(files.items.size == 1)
         }.addOnFailureListener { except ->
             fail(except.message)
         }
+
+        // Check if the folder in the local storage with the same name as the firebase folder
+        // is empty
+        val localFolder = File(picturesDir, CLIENT_ID)
+        assertTrue(localFolder.listFiles()?.isEmpty() == true)
     }
+
 
     @Test
     fun testCancelPhoto() {
-        // Wait for the photo to be taken
-        Thread.sleep(TIME_WAIT_DONE_OR_CANCEL)
-
         // Click the button to cancel the photo
         triggerCancel(device)
 
-        // Wait for the photo to be uploaded
-        Thread.sleep(TIME_WAIT_UPLOAD)
+        runBlocking {
+            delay(TIME_WAIT_UPLOAD_PHOTO)
+        }
 
         // Check that the storage contains no files
-        storage.reference.listAll().addOnSuccessListener { listResult ->
+        GeneralUtils.getStorage().reference.child(CLIENT_ID).listAll().addOnSuccessListener { listResult ->
             // Check that the folder in the storage is empty
             assertTrue(listResult.items.isEmpty())
 
@@ -124,6 +124,5 @@ class PictureFragmentOnlineTest {
             fail(except.message)
         }
     }
-
 
 }

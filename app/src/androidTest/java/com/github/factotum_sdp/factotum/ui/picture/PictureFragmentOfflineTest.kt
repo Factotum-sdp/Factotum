@@ -8,7 +8,13 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.MainActivity
+import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
+import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
@@ -21,7 +27,6 @@ import java.io.File
 
 @RunWith(AndroidJUnit4::class)
 class PictureFragmentOfflineTest {
-    private lateinit var storage: FirebaseStorage
     private lateinit var device: UiDevice
     private val externalDir = Environment.getExternalStorageDirectory()
     private val picturesDir =
@@ -39,15 +44,14 @@ class PictureFragmentOfflineTest {
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
-            initFirebase()
+            initFirebase(online = false)
+            UsersPlaceHolder.init(GeneralUtils.getDatabase(), GeneralUtils.getAuth())
+            GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_COURIER)
         }
     }
 
-    @Before
-    fun setUp() {
-        // Initialize Firebase Storage
-        storage = Firebase.storage
-        storage.useEmulator("10.0.2.2", 9198)
+    @Test
+    fun testDoesNotDeleteFileIfUploadFails() {
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         emptyLocalFiles(picturesDir)
 
@@ -55,15 +59,7 @@ class PictureFragmentOfflineTest {
 
         // Wait for the camera to open
         Thread.sleep(TIME_WAIT_SHUTTER)
-    }
 
-    @After
-    fun tearDown() {
-        emptyLocalFiles(picturesDir)
-    }
-
-    @Test
-    fun testDoesNotDeleteFileIfUploadFails() {
         // Take a photo
         triggerShutter(device)
 
@@ -73,10 +69,8 @@ class PictureFragmentOfflineTest {
         // Click the button to validate the photo
         triggerDone(device)
 
-        // Wait for the photo to be uploaded
-        Thread.sleep(TIME_WAIT_UPLOAD)
 
-        storage.reference.listAll().addOnSuccessListener { listResult ->
+        Firebase.storage.reference.listAll().addOnSuccessListener {
             fail("Should not succeed")
         }
 
@@ -84,5 +78,6 @@ class PictureFragmentOfflineTest {
         val directories = picturesDir.listFiles()?.filter { it.isDirectory } ?: emptyList()
         assertTrue(directories.isNotEmpty())
 
+        emptyLocalFiles(picturesDir)
     }
 }

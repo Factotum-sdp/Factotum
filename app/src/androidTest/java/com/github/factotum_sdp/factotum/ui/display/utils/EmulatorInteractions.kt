@@ -1,17 +1,12 @@
 package com.github.factotum_sdp.factotum.ui.display.utils
 
 import android.content.Context
-import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.matcher.BoundedMatcher
-import androidx.test.uiautomator.UiDevice
-import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
-import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.UploadTask
 import com.google.firebase.storage.ktx.storage
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.hamcrest.Description
 import org.hamcrest.Matcher
@@ -60,17 +55,5 @@ fun hasItemCount(count: Int): Matcher<View> {
     }
 }
 
-fun addUserToDatabase(user : UsersPlaceHolder.User) {
-    // DO NOT REMOVE THIS PART OR PUT IT IN A @BeforeClass
-    runBlocking {
-        try {
-            UsersPlaceHolder.addAuthUser(user)
-        } catch (e : FirebaseAuthUserCollisionException) {
-            e.message?.let { Log.e("DisplayFragmentTest", it) }
-        }
-
-        UsersPlaceHolder.addUserToDb(user)
-    }
-}
 
 

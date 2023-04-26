@@ -117,9 +117,6 @@ tasks.withType(Test) {
         maxRetries = 3
         maxFailures = 20
         failOnPassedAfterRetry = false
-        afterSuite {
-            retryOnFailures()
-        }
     }
 
     jacoco.includeNoLocationClasses = true

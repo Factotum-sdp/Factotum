@@ -29,7 +29,7 @@ check_android_task:
     ./gradlew assembleDebugAndroidTest
       
   download_firebase_emulator_script: |
-    curl -Lo ./firebase https://firebase.tools/bin/linux/latest
+    curl -Lo ./firebase https://github.com/firebase/firebase-tools/releases/download/v11.28.0/firebase-tools-linux
   assemble_instrumented_tests_script: |
     chmod +x gradlew
     ./gradlew assembleDebugAndroidTest

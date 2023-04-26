@@ -21,7 +21,10 @@ import com.github.factotum_sdp.factotum.ui.display.utils.*
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.runner.RunWith
 
@@ -76,27 +79,28 @@ class DisplayFragmentTest {
         onView(withId(R.id.refreshButton)).perform(click())
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentDisplayOnlyOnePhotoIfSame() {
+    fun displayFragmentDisplayOnlyOnePhotoIfSame()  = runTest { 
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
         }
 
-        Thread.sleep(WAIT_TIME_INIT)
-
-        onView(withId(R.id.refreshButton)).perform(click())
-
-        Thread.sleep(WAIT_TIME_REFRESH)
+        runBlocking {
+            delay(WAIT_TIME_INIT)
+            onView(withId(R.id.refreshButton)).perform(click())
+            delay(WAIT_TIME_REFRESH)
+        }
 
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
         }
 
-        Thread.sleep(WAIT_TIME_INIT)
-
-        onView(withId(R.id.refreshButton)).perform(click())
-
-        Thread.sleep(WAIT_TIME_REFRESH)
+        runBlocking {
+            delay(WAIT_TIME_INIT)
+            onView(withId(R.id.refreshButton)).perform(click())
+            delay(WAIT_TIME_REFRESH)
+        }
 
         scenario.onFragment { fragment ->
             val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
@@ -104,27 +108,28 @@ class DisplayFragmentTest {
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentDisplayTwoDifferentPhotosWorks() {
+    fun displayFragmentDisplayTwoDifferentPhotosWorks() = runTest {
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
         }
 
-        Thread.sleep(WAIT_TIME_INIT)
-
-        onView(withId(R.id.refreshButton)).perform(click())
-
-        Thread.sleep(WAIT_TIME_REFRESH)
+        runBlocking {
+            delay(WAIT_TIME_INIT)
+            onView(withId(R.id.refreshButton)).perform(click())
+            delay(WAIT_TIME_REFRESH)
+        }
 
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2)
         }
 
-        Thread.sleep(WAIT_TIME_INIT)
-
-        onView(withId(R.id.refreshButton)).perform(click())
-
-        Thread.sleep(WAIT_TIME_REFRESH)
+        runBlocking {
+            delay(WAIT_TIME_INIT)
+            onView(withId(R.id.refreshButton)).perform(click())
+            delay(WAIT_TIME_REFRESH)
+        }
 
         scenario.onFragment { fragment ->
             val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
@@ -138,11 +143,11 @@ class DisplayFragmentTest {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3)
         }
 
-        Thread.sleep(WAIT_TIME_INIT)
-
-        onView(withId(R.id.refreshButton)).perform(click())
-
-        Thread.sleep(WAIT_TIME_REFRESH)
+        runBlocking {
+            delay(WAIT_TIME_INIT)
+            onView(withId(R.id.refreshButton)).perform(click())
+            delay(WAIT_TIME_REFRESH)
+        }
 
         scenario.onFragment { fragment ->
             val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
@@ -151,8 +156,9 @@ class DisplayFragmentTest {
     }
 
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentDisplayMixingFormatPhotosWorks() {
+    fun displayFragmentDisplayMixingFormatPhotosWorks() = runTest {
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
         }
@@ -161,11 +167,11 @@ class DisplayFragmentTest {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3)
         }
 
-        Thread.sleep(WAIT_TIME_INIT)
-
-        onView(withId(R.id.refreshButton)).perform(click())
-
-        Thread.sleep(WAIT_TIME_REFRESH)
+        runBlocking {
+            delay(WAIT_TIME_INIT)
+            onView(withId(R.id.refreshButton)).perform(click())
+            delay(WAIT_TIME_REFRESH)
+        }
 
         scenario.onFragment { fragment ->
             val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
@@ -184,11 +190,11 @@ class DisplayFragmentTest {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2)
         }
 
-        Thread.sleep(WAIT_TIME_INIT)
-
-        onView(withId(R.id.refreshButton)).perform(click())
-
-        Thread.sleep(WAIT_TIME_REFRESH)
+        runBlocking {
+            delay(WAIT_TIME_INIT)
+            onView(withId(R.id.refreshButton)).perform(click())
+            delay(WAIT_TIME_REFRESH)
+        }
 
         scenario.onFragment { fragment ->
             val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
@@ -197,8 +203,9 @@ class DisplayFragmentTest {
     }
 
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentDisplayTwoBadFormatPhotosWorks() {
+    fun displayFragmentDisplayTwoBadFormatPhotosWorks() = runTest {
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3)
         }
@@ -207,11 +214,11 @@ class DisplayFragmentTest {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH4, TEST_IMAGE_PATH4)
         }
 
-        Thread.sleep(WAIT_TIME_INIT)
-
-        onView(withId(R.id.refreshButton)).perform(click())
-
-        Thread.sleep(WAIT_TIME_REFRESH)
+        runBlocking {
+            delay(WAIT_TIME_INIT)
+            onView(withId(R.id.refreshButton)).perform(click())
+            delay(WAIT_TIME_REFRESH)
+        }
 
         scenario.onFragment { fragment ->
             val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
@@ -219,16 +226,18 @@ class DisplayFragmentTest {
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentDisplayNoPhotosIfEmpty() {
+    fun displayFragmentDisplayNoPhotosIfEmpty() = runTest {
         scenario.onFragment { fragment ->
             val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
             assert(recyclerView.adapter?.itemCount == 0)
         }
 
-        onView(withId(R.id.refreshButton)).perform(click())
-
-        Thread.sleep(WAIT_TIME_REFRESH)
+        runBlocking {
+            onView(withId(R.id.refreshButton)).perform(click())
+            delay(WAIT_TIME_REFRESH)
+        }
 
         scenario.onFragment { fragment ->
             val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
@@ -236,15 +245,17 @@ class DisplayFragmentTest {
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentClickingOnPhotosFireCorrectIntents() {
+    fun displayFragmentClickingOnPhotosFireCorrectIntents() = runTest {
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
         }
 
-        onView(withId(R.id.refreshButton)).perform(click())
-
-        Thread.sleep(WAIT_TIME_REFRESH)
+        runBlocking {
+            onView(withId(R.id.refreshButton)).perform(click())
+            delay(WAIT_TIME_REFRESH)
+        }
 
         onView(withId(R.id.recyclerView)).perform(
             RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
@@ -258,17 +269,18 @@ class DisplayFragmentTest {
         Intents.intended(hasFlag(Intent.FLAG_GRANT_READ_URI_PERMISSION))
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentSharingPhotoWorks() {
+    fun displayFragmentSharingPhotoWorks() = runTest {
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
         }
 
-        Thread.sleep(WAIT_TIME_INIT)
-
-        onView(withId(R.id.refreshButton)).perform(click())
-
-        Thread.sleep(WAIT_TIME_REFRESH)
+        runBlocking {
+            delay(WAIT_TIME_INIT)
+            onView(withId(R.id.refreshButton)).perform(click())
+            delay(WAIT_TIME_REFRESH)
+        }
 
         onView(withId(R.id.shareButton)).perform(click())
 

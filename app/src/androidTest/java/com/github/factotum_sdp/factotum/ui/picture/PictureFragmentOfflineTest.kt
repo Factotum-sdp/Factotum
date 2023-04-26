@@ -18,6 +18,8 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.junit.*
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
@@ -47,6 +49,9 @@ class PictureFragmentOfflineTest {
             initFirebase(online = false)
             UsersPlaceHolder.init(GeneralUtils.getDatabase(), GeneralUtils.getAuth())
             GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_COURIER)
+            GeneralUtils.getStorage().maxUploadRetryTimeMillis = 100L
+            GeneralUtils.getStorage().maxOperationRetryTimeMillis = 100L
+            GeneralUtils.getStorage().maxDownloadRetryTimeMillis = 100L
         }
     }
 
@@ -69,9 +74,11 @@ class PictureFragmentOfflineTest {
         // Click the button to validate the photo
         triggerDone(device)
 
-
-        Firebase.storage.reference.listAll().addOnSuccessListener {
-            fail("Should not succeed")
+        runBlocking {
+            GeneralUtils.getStorage().reference.child(CLIENT_ID).listAll().addOnSuccessListener {
+                fail("Should not succeed")
+            }
+            delay(TIME_WAIT_UPLOAD_PHOTO)
         }
 
         //Check if there is a folder with a file in it

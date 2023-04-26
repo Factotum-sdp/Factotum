@@ -20,7 +20,9 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
 import junit.framework.TestCase.assertTrue
 import junit.framework.TestCase.fail
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.runner.RunWith
 import java.io.File
@@ -60,11 +62,6 @@ class PictureFragmentOnlineTest {
 
         goToPictureFragment()
 
-        // Wait for the camera to open
-        Thread.sleep(TIME_WAIT_SHUTTER)
-
-        // Take a photo
-        triggerShutter(device)
     }
 
     @After
@@ -77,6 +74,12 @@ class PictureFragmentOnlineTest {
     /*
     @Test
     fun testUploadFileCorrectly() {
+
+     // Wait for the camera to open
+        Thread.sleep(TIME_WAIT_SHUTTER)
+
+        // Take a photo
+        triggerShutter(device)
       /*  // Wait for the photo to be taken
         Thread.sleep(TIME_WAIT_DONE_OR_CANCEL)
 
@@ -100,15 +103,23 @@ class PictureFragmentOnlineTest {
     } */
 
     @Test
-    fun testCancelPhoto() {
-        // Wait for the photo to be taken
-        Thread.sleep(TIME_WAIT_DONE_OR_CANCEL)
+    fun testCancelPhoto()  = runTest {
+        runBlocking {
+            // Wait for the camera to open
+            delay(TIME_WAIT_SHUTTER)
 
-        // Click the button to cancel the photo
-        triggerCancel(device)
+            // Take a photo
+            triggerShutter(device)
 
-        // Wait for the photo to be uploaded
-        Thread.sleep(TIME_WAIT_UPLOAD)
+            // Wait for the photo to be taken
+            delay(TIME_WAIT_DONE_OR_CANCEL)
+
+            // Click the button to cancel the photo
+            triggerCancel(device)
+
+            // Wait for the photo to be uploaded
+            delay(TIME_WAIT_UPLOAD)
+        }
 
         // Check that the storage contains no files
         storage.reference.listAll().addOnSuccessListener { listResult ->
@@ -123,6 +134,4 @@ class PictureFragmentOnlineTest {
             fail(except.message)
         }
     }
-
-
 }

@@ -27,7 +27,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class DirectoryFragmentTest {
-    private val _waitForAnimation = 500L
 
     @get:Rule
     var testRule = ActivityScenarioRule(
@@ -107,7 +106,6 @@ class DirectoryFragmentTest {
                 device.findObject(UiSelector().descriptionContains("All contact Info"))
             assertTrue(contactName.exists())
             device.pressBack()
-            Thread.sleep(_waitForAnimation)
         }
     }
 

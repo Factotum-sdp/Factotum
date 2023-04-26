@@ -23,7 +23,9 @@ import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getAuth
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.Matchers
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -31,9 +33,6 @@ import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-
-const val LOGIN_REFRESH_TIME = 4000L
-const val DRAWER_REFRESH_TIME = 1000L
 
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest {
@@ -44,27 +43,36 @@ class MainActivityTest {
     )
 
     companion object {
+        @OptIn(ExperimentalCoroutinesApi::class)
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
             initFirebase()
 
-            runBlocking {
-                ContactsUtils.populateDatabase()
-            }
+            runTest {
+                runBlocking {
+                    ContactsUtils.populateDatabase()
+                }
 
-            UsersPlaceHolder.init(getDatabase(), getAuth())
-            runBlocking {
-                UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_BOSS)
-                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_BOSS)
-            }
-            runBlocking {
-                UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_COURIER)
-                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_COURIER)
-            }
-            runBlocking {
-                UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_CLIENT)
-                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_CLIENT)
+                UsersPlaceHolder.init(getDatabase(), getAuth())
+                runBlocking {
+                    UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_BOSS)
+                }
+                runBlocking {
+                    UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_COURIER)
+                }
+                runBlocking {
+                    UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_CLIENT)
+                }
+                runBlocking {
+                    UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_BOSS)
+                }
+                runBlocking {
+                    UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_COURIER)
+                }
+                runBlocking {
+                    UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_CLIENT)
+                }
             }
         }
         /**
@@ -168,7 +176,6 @@ class MainActivityTest {
     fun pressingBackOnAMenuFragmentLeadsToRBFragment() {
         // First need to login to trigger the change of navGraph's start fragment
         LoginFragmentTest.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
-        Thread.sleep(LOGIN_REFRESH_TIME)
 
         navigateToAndPressBackLeadsToRB(R.id.directoryFragment)
         navigateToAndPressBackLeadsToRB(R.id.displayFragment)
@@ -184,7 +191,7 @@ class MainActivityTest {
     @Test
     fun pressingBackOnRBFragmentLeadsOutOfTheApp() {
         LoginFragmentTest.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
-        Thread.sleep(LOGIN_REFRESH_TIME)
+        
         pressBackUnconditionally()
         val uiDevice = UiDevice.getInstance(getInstrumentation())
         assertFalse(uiDevice.currentPackageName == "com.github.factotum_sdp.factotum")
@@ -194,7 +201,7 @@ class MainActivityTest {
     @Test
     fun navHeaderDisplaysUserData() {
         LoginFragmentTest.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
-        Thread.sleep(LOGIN_REFRESH_TIME)
+        
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("boss@gmail.com")).check(matches(isDisplayed()))
         onView(withText("Boss (BOSS)")).check(matches(isDisplayed()))
@@ -203,11 +210,7 @@ class MainActivityTest {
     @Test
     fun drawerMenuIsCorrectlyDisplayedForBoss() {
         LoginFragmentTest.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
-        Thread.sleep(LOGIN_REFRESH_TIME)
-
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
-
-        Thread.sleep(DRAWER_REFRESH_TIME)
 
         // Check that the menu items are displayed
         onView(withText("RoadBook")).check(matches(isDisplayed()))
@@ -219,11 +222,7 @@ class MainActivityTest {
     @Test
     fun drawerMenuIsCorrectlyDisplayedForClient() {
         LoginFragmentTest.fillUserEntryAndGoToRBFragment("client@gmail.com", "123456")
-        Thread.sleep(LOGIN_REFRESH_TIME)
-
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
-
-        Thread.sleep(DRAWER_REFRESH_TIME)
 
         // Check that the menu items are displayed
         onView(withText("RoadBook")).check(doesNotExist())
@@ -236,16 +235,15 @@ class MainActivityTest {
     // The second user Helen Bates can't be found.
     private fun navHeaderStillDisplaysCorrectlyAfterLogout() {
         LoginFragmentTest.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
-        Thread.sleep(LOGIN_REFRESH_TIME)
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("boss@gmail.com")).check(matches(isDisplayed()))
         onView(withText("Boss (BOSS)")).check(matches(isDisplayed()))
 
         onView(withId(R.id.signoutButton)).perform(click())
-        Thread.sleep(LOGIN_REFRESH_TIME)
+        
         LoginFragmentTest.fillUserEntryAndGoToRBFragment("helen.bates@gmail.com", "123456")
-        Thread.sleep(LOGIN_REFRESH_TIME)
+        
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("helen.bates@gmail.com")).check(matches(isDisplayed()))
         onView(withText("Helen Bates (COURIER)")).check(matches(isDisplayed()))

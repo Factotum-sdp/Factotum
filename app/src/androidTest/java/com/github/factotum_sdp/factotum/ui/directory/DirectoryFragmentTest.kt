@@ -1,5 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.directory
 
+import androidx.test.espresso.Espresso.pressBack
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
@@ -18,7 +19,9 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.utils.ContactsUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -27,7 +30,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class DirectoryFragmentTest {
-    private val _waitForAnimation = 500L
 
     @get:Rule
     var testRule = ActivityScenarioRule(
@@ -37,6 +39,7 @@ class DirectoryFragmentTest {
     companion object {
         private const val nbContacts = 10
 
+        @OptIn(ExperimentalCoroutinesApi::class)
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
@@ -44,8 +47,10 @@ class DirectoryFragmentTest {
 
             ContactsUtils.emptyFirebaseDatabase()
 
-            runBlocking {
-                ContactsUtils.populateDatabase(nbContacts)
+            runTest {
+                runBlocking {
+                    ContactsUtils.populateDatabase(nbContacts)
+                }
             }
         }
     }
@@ -94,7 +99,6 @@ class DirectoryFragmentTest {
 
     @Test
     fun allContactsCanBeClickedOn() {
-        val device = UiDevice.getInstance(getInstrumentation())
         for (i in 0 until nbContacts) {
             onView(withId(R.id.contacts_recycler_view))
                 .perform(
@@ -103,11 +107,8 @@ class DirectoryFragmentTest {
                         click()
                     )
                 )
-            val contactName =
-                device.findObject(UiSelector().descriptionContains("All contact Info"))
-            assertTrue(contactName.exists())
-            device.pressBack()
-            Thread.sleep(_waitForAnimation)
+            onView(withId(R.id.contact_details_fragment)).check(matches(isDisplayed()))
+            pressBack()
         }
     }
 

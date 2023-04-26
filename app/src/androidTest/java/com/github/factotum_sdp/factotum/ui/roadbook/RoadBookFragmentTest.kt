@@ -24,6 +24,10 @@ import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeLeftTheRecordAt
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightTheRecordAt
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.*
 import org.junit.Before
 import org.junit.BeforeClass
@@ -53,7 +57,7 @@ class RoadBookFragmentTest {
     )
 
     companion object {
-        const val WORST_REFRESH_TIME = 2000L
+        const val WORST_REFRESH_TIME = 500L
 
         @BeforeClass
         @JvmStatic
@@ -103,17 +107,17 @@ class RoadBookFragmentTest {
 
     @Test
     fun swipeLeftDeleteRecord() {
-    // Record is there
-    onView((withText(DestinationRecords.RECORDS[2].destID)))
-        .check(matches(isDisplayed()))
+        // Record is there
+        onView((withText(DestinationRecords.RECORDS[2].destID)))
+            .check(matches(isDisplayed()))
 
-    swipeLeftTheRecordAt(2)
-    onView(withText(R.string.delete_dialog_title))
-    onView(withText(R.string.swipeleft_confirm_button_label)).perform(click())
+        swipeLeftTheRecordAt(2)
+        onView(withText(R.string.delete_dialog_title))
+        onView(withText(R.string.swipeleft_confirm_button_label)).perform(click())
 
-    // Record added previously is now deleted
-    onView((withText(DestinationRecords.RECORDS[2].destID)))
-        .check(doesNotExist())
+        // Record added previously is now deleted
+        onView((withText(DestinationRecords.RECORDS[2].destID)))
+            .check(doesNotExist())
     }
 
     @Test
@@ -121,7 +125,6 @@ class RoadBookFragmentTest {
         swipeLeftTheRecordAt(2)
         onView(withText(R.string.delete_dialog_title))
         onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
-        Thread.sleep(WORST_REFRESH_TIME)
 
         onView((withText(DestinationRecords.RECORDS[2].destID)))
             .check(matches(isDisplayed()))
@@ -221,13 +224,17 @@ class RoadBookFragmentTest {
         onView((withText("X17edited#1"))).check(matches(isDisplayed()))
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun editWithAnExistingClientID() { // Means clientID already used by one record in the roadbook
+    fun editWithAnExistingClientID() = runTest {
+        // Means clientID already used by one record in the roadbook
         val clientID = DestinationRecords.RECORDS[2].clientID
-        swipeRightTheRecordAt(3) // edit one record displayed below which has another clientID
-        onView(withId(R.id.autoCompleteClientID)).perform(clearText(), typeText(clientID)) // set for the same client that different record
-        onView(withText(R.string.edit_dialog_update_b)).perform(click())
-        Thread.sleep(WORST_REFRESH_TIME)
+        runBlocking {
+            swipeRightTheRecordAt(3) // edit one record displayed below which has another clientID
+            onView(withId(R.id.autoCompleteClientID)).perform(clearText(), typeText(clientID)) // set for the same client that different record
+            onView(withText(R.string.edit_dialog_update_b)).perform(click())
+            delay(WORST_REFRESH_TIME)
+        }
         onView(withText("$clientID#2")).check(matches(isDisplayed())) // unique destID is computed
     }
 
@@ -238,7 +245,6 @@ class RoadBookFragmentTest {
             .perform(click(), typeText("edited"), closeSoftKeyboard())
         onView(withId(R.id.editTextTimestamp)).perform(click())
         onView(withText(timePickerCancelBLabel)).perform(click())
-
         onView(withId(R.id.editTextTimestamp)).perform(typeText("2222"))
         onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
 
@@ -265,7 +271,6 @@ class RoadBookFragmentTest {
         onView(withId(R.id.editTextTimestamp)).perform(click())
         onView(withText(timePickerCancelBLabel)).perform(click())
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
-        Thread.sleep(WORST_REFRESH_TIME)
 
         onView(withText(startsWith("arrival : ${timestampUntilHourFormat(cal)}"))).check(doesNotExist())
     }
@@ -295,7 +300,6 @@ class RoadBookFragmentTest {
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
 
         // Check edited record is corretly displayed :
-        Thread.sleep(WORST_REFRESH_TIME)
         onView(withText("NewEvery#1")).check(matches(isDisplayed()))
 
         eraseFirstRecTimestamp() // For having no ambiguity btw Timestamp on screen
@@ -328,27 +332,30 @@ class RoadBookFragmentTest {
     // ============================================================================================
     // ================================== Move records Tests ======================================
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun dragAndDropByInjectionIsWorking() {
-        // Not possible for the moment in to cover the onMove() of the ItemtTouchHelper Callback,
-        // However here, I simulate its behavior to triggers the ViewModel change.
+    fun dragAndDropByInjectionIsWorking() = runTest {
+            // Not possible for the moment in to cover the onMove() of the ItemtTouchHelper Callback,
+            // However here, I simulate its behavior to triggers the ViewModel change.
+            runBlocking {
+                onView(withText("X17#1")).check(isCompletelyAbove(withText("More#1")))
+                testRule.scenario.onActivity {
+                    val fragment = it.supportFragmentManager.fragments.first() as NavHostFragment
 
-        onView(withText("X17#1")).check(isCompletelyAbove(withText("More#1")))
-        testRule.scenario.onActivity {
-            val fragment = it.supportFragmentManager.fragments.first() as NavHostFragment
-
-            fragment.let {
-                val curr = it.childFragmentManager.primaryNavigationFragment as RoadBookFragment
-                val recyclerView = curr.view!!.findViewById<RecyclerView>(R.id.list)
-                recyclerView.adapter?.notifyItemMoved(2,3)
-                curr.getRBViewModelForTest().moveRecord(2,2)
-                recyclerView.adapter?.notifyItemMoved(3,4)
-                curr.getRBViewModelForTest().moveRecord(3,3)
+                    fragment.let {
+                        val curr =
+                            it.childFragmentManager.primaryNavigationFragment as RoadBookFragment
+                        val recyclerView = curr.view!!.findViewById<RecyclerView>(R.id.list)
+                        recyclerView.adapter?.notifyItemMoved(2, 3)
+                        curr.getRBViewModelForTest().moveRecord(2, 2)
+                        recyclerView.adapter?.notifyItemMoved(3, 4)
+                        curr.getRBViewModelForTest().moveRecord(3, 3)
+                    }
+                }
+                delay(WORST_REFRESH_TIME)
             }
-        }
 
         onView(withText("X17#1")).check(matches(isDisplayed()))
-        Thread.sleep(4000) // This one is needed to let the Screen enough time to be updated
         onView(withText("X17#1")).check(isCompletelyBelow(withText("More#1")))
     }
 
@@ -512,7 +519,6 @@ class RoadBookFragmentTest {
 
         // On non timestamped record swipe left should show deletion dialog
         onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
-        Thread.sleep(3000)
         onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
         onView((withText(DestinationRecords.RECORDS[3].destID)))
             .check(matches(isDisplayed()))
@@ -522,7 +528,6 @@ class RoadBookFragmentTest {
         onView(withId(R.id.editTextTimestamp)).perform(click())
         onView(withText(timePickerUpdateBLabel)).perform(click())
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
-        Thread.sleep(WORST_REFRESH_TIME)
 
         swipeLeftTheRecordAt(3)
         onView((withText(DestinationRecords.RECORDS[3].destID)))
@@ -605,29 +610,27 @@ class RoadBookFragmentTest {
 
     // ============================================================================================
     // ================================Automatic Timestamp ========================================
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun automaticTimestampIsWorkingOnRBFragment() {
-
+    fun automaticTimestampIsWorkingOnRBFragment() = runTest {
         // Non timestamped record, hence swipe left shows deletion dialog
         swipeLeftTheRecordAt(1)
         onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
         onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
-        Thread.sleep(WORST_REFRESH_TIME)
 
         onView(withId(R.id.location_switch)).perform(click())
-        Thread.sleep(WORST_REFRESH_TIME)
-        Thread.sleep(WORST_REFRESH_TIME)
-        Thread.sleep(WORST_REFRESH_TIME)
-        Thread.sleep(WORST_REFRESH_TIME)
+        runBlocking {
+            delay(8000L)
 
-        // Now swipe left archive the record
-        swipeLeftTheRecordAt(1)
-        onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
-        onView(withText(DestinationRecords.RECORDS[1].destID)).check(doesNotExist())
+            // Now swipe left archive the record
+            swipeLeftTheRecordAt(1)
+            onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
+            onView(withText(DestinationRecords.RECORDS[1].destID)).check(doesNotExist())
 
-        // Disable location
-        onView(withId(R.id.location_switch)).perform(click())
-        onView(withId(R.id.refresh_button)).perform(click())
+            // Disable location
+            onView(withId(R.id.location_switch)).perform(click())
+            onView(withId(R.id.refresh_button)).perform(click())
+        }
     }
 
     // ============================================================================================

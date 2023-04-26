@@ -10,6 +10,7 @@ import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
@@ -45,8 +46,9 @@ class ContactsRepositoryTest {
         sharedPreferences.edit().clear().commit()
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun savesContactToSharedPreferences() = runBlocking {
+    fun savesContactToSharedPreferences() = runTest {
         // Save a contact to the cache
         val contact = Contact(
             "1",
@@ -57,8 +59,10 @@ class ContactsRepositoryTest {
             "123 Main St",
             "555-555-1234"
         )
-        repository.saveContactToSharedPreferences(contact)
 
+        runBlocking {
+            repository.saveContactToSharedPreferences(contact)
+        }
         // Verify that the contact was saved to the cache
         val cachedContacts = repository.getCachedContacts()
         Assert.assertEquals(1, cachedContacts.size)
@@ -66,8 +70,9 @@ class ContactsRepositoryTest {
     }
 
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun savesContactOnline() = runBlocking {
+    fun savesContactOnline() = runTest {
         val contact = Contact(
             "1",
             "Manager",
@@ -79,7 +84,9 @@ class ContactsRepositoryTest {
         )
         val latch = CountDownLatch(1)
 
-        repository.saveContact(contact)
+        runBlocking {
+            repository.saveContact(contact)
+        }
 
         val contacts = repository.getContacts().first()
 

@@ -12,6 +12,10 @@ import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebas
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
@@ -52,9 +56,6 @@ class PictureFragmentOfflineTest {
         emptyLocalFiles(picturesDir)
 
         goToPictureFragment()
-
-        // Wait for the camera to open
-        Thread.sleep(TIME_WAIT_SHUTTER)
     }
 
     @After
@@ -62,19 +63,25 @@ class PictureFragmentOfflineTest {
         emptyLocalFiles(picturesDir)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun testDoesNotDeleteFileIfUploadFails() {
-        // Take a photo
-        triggerShutter(device)
+    fun testDoesNotDeleteFileIfUploadFails() = runTest {
+        runBlocking {
+            // Wait for the camera to open
+            delay(TIME_WAIT_SHUTTER)
 
-        // Wait for the photo to be taken
-        Thread.sleep(TIME_WAIT_DONE_OR_CANCEL)
+            // Take a photo
+            triggerShutter(device)
 
-        // Click the button to validate the photo
-        triggerDone(device)
+            // Wait for the photo to be taken
+            delay(TIME_WAIT_DONE_OR_CANCEL)
 
-        // Wait for the photo to be uploaded
-        Thread.sleep(TIME_WAIT_UPLOAD)
+            // Click the button to validate the photo
+            triggerDone(device)
+
+            // Wait for the photo to be uploaded
+            delay(TIME_WAIT_UPLOAD)
+        }
 
         storage.reference.listAll().addOnSuccessListener { listResult ->
             fail("Should not succeed")
@@ -83,6 +90,5 @@ class PictureFragmentOfflineTest {
         //Check if there is a folder with a file in it
         val directories = picturesDir.listFiles()?.filter { it.isDirectory } ?: emptyList()
         assertTrue(directories.isNotEmpty())
-
     }
 }

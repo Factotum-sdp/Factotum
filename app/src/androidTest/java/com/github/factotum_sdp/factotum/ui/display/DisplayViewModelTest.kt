@@ -8,7 +8,10 @@ import com.github.factotum_sdp.factotum.ui.display.utils.*
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.runner.RunWith
 
@@ -33,12 +36,15 @@ class DisplayViewModelTest {
     }
 
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun testFetchPhotoReferences() {
+    fun testFetchPhotoReferences()  = runTest {
         // Initialize the ViewModel
         displayViewModel = DisplayViewModel()
 
-        Thread.sleep(WAIT_TIME_INIT)
+        runBlocking {
+            delay(WAIT_TIME_INIT)
+        }
 
         //Check that the photoReferences is empty
         Assert.assertTrue(
@@ -50,10 +56,11 @@ class DisplayViewModelTest {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
         }
 
-        // Refresh the images
-        displayViewModel.refreshImages()
-
-        Thread.sleep(WAIT_TIME_REFRESH)
+        runBlocking {
+            // Refresh the images
+            displayViewModel.refreshImages()
+            delay(WAIT_TIME_REFRESH)
+        }
 
         // Check that the photoReferences is not empty
         Assert.assertFalse(
@@ -65,10 +72,11 @@ class DisplayViewModelTest {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2)
         }
 
-        // Refresh the images
-        displayViewModel.refreshImages()
-
-        Thread.sleep(WAIT_TIME_REFRESH)
+        runBlocking {
+            // Refresh the images
+            displayViewModel.refreshImages()
+            delay(WAIT_TIME_REFRESH)
+        }
 
         // Check that the photoReferences has two items
         Assert.assertEquals(
@@ -78,16 +86,18 @@ class DisplayViewModelTest {
         )
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun testFetchPhotoShouldHaveOnePhotoRefAfterInit() {
+    fun testFetchPhotoShouldHaveOnePhotoRefAfterInit() = runTest {
         runBlocking {
             uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
         }
 
-        // Initialize the ViewModel
-        displayViewModel = DisplayViewModel()
-
-        Thread.sleep(WAIT_TIME_INIT)
+        runBlocking {
+            // Initialize the ViewModel
+            displayViewModel = DisplayViewModel()
+            delay(WAIT_TIME_INIT)
+        }
 
         // Check that the photoReferences is not empty
         Assert.assertFalse(

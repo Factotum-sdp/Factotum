@@ -1,9 +1,11 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -14,6 +16,7 @@ import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.data.DeliveryLogger
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.*
@@ -33,6 +36,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     }
     private val locationTrackingHandler: LocationTrackingHandler = LocationTrackingHandler()
     private val deliveryLogger: DeliveryLogger = DeliveryLogger()
+    private val userViewModel: UserViewModel by activityViewModels()
 
 
     // Checked OptionMenu States with default values
@@ -74,7 +78,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
     override fun onPause() {
         rbViewModel.backUp()
-        rbViewModel.recordsListState.value?.let { deliveryLogger.logDeliveries(it) }
         saveRadioButtonState(SWIPE_R_SHARED_KEY, R.id.rbSwipeREdition)
         saveRadioButtonState(SWIPE_L_SHARED_KEY, R.id.rbSwipeLDeletion)
         saveRadioButtonState(DRAG_N_DROP_SHARED_KEY, R.id.rbDragDrop)
@@ -145,11 +148,13 @@ class RoadBookFragment : Fragment(), MenuProvider {
         setRBonClickListeners(rbDD, rbSL, rbSR, rbTC, rbSA)
         setLiveLocationSwitch(fragMenu)
         setRefreshButtonListener(fragMenu)
+        setEndShiftButtonListener(fragMenu)
 
         // Only at menu initialization
         val itemTouchHelper = ItemTouchHelper(newItemTHCallBack())
         itemTouchHelper.attachToRecyclerView(rbRecyclerView)
     }
+
 
     private fun setRBonClickListeners(
         rbDD: MenuItem, rbSL: MenuItem, rbSR: MenuItem,
@@ -213,6 +218,38 @@ class RoadBookFragment : Fragment(), MenuProvider {
         val refreshButton = menu.findItem(R.id.refresh_button)
         refreshButton.setOnMenuItemClickListener {
             rbRecyclerView.adapter?.notifyDataSetChanged()
+            true
+        }
+    }
+
+    private fun setEndShiftButtonListener(fragMenu: Menu) {
+        val endShiftButton = fragMenu.findItem(R.id.finish_shift)
+        endShiftButton.setOnMenuItemClickListener {
+            val dialogBuilder = AlertDialog.Builder(requireContext())
+            dialogBuilder.setMessage(R.string.finish_shift_alert_question)
+                .setPositiveButton(R.string.end_shift) { dialog, _ ->
+                    rbViewModel.recordsListState.value?.let { deliveryLogger.logDeliveries(it, userViewModel.loggedInUser.value!!.name)
+                        Toast.makeText(
+                            requireContext(),
+                            R.string.shift_ended,
+                            Toast.LENGTH_SHORT
+                        ).show()}
+                        ?: run {
+                            Toast.makeText(
+                                requireContext(),
+                                R.string.user_not_found,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            dialog.cancel()
+                        }
+
+                }
+                .setNegativeButton("Not now") { dialog, _ ->
+                    dialog.cancel()
+                }
+            val alert = dialogBuilder.create()
+            alert.setTitle(R.string.)
+            alert.show()
             true
         }
     }

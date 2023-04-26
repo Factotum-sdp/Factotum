@@ -141,4 +141,7 @@
     <string name="search_contacts">Search contacts …</string>
     <string name="loc_service_notification_message">Location service for Factotum is working</string>
     <string name="loc_service_notification_title">Tracking location</string>
+    <string name="end_shift">end shift</string>
+    <string name="finish_shift_alert_question">"Are you sure you want to end your shift?"</string>
+    <string name="shift_ended">Shift ended</string>
 </resources>

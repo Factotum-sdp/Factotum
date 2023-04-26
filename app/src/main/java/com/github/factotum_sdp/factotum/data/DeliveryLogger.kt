@@ -2,6 +2,7 @@ package com.github.factotum_sdp.factotum.data
 
 import android.util.Log
 import com.github.factotum_sdp.factotum.ui.roadbook.DRecordList
+import com.github.factotum_sdp.factotum.utils.FirebaseStringFormat.Companion.firebaseSafeString
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
@@ -20,7 +21,7 @@ class DeliveryLogger {
     /**
      * logs the delivery of the current day
      */
-    fun logDeliveries(recordsList : DRecordList) {
+    fun logDeliveries(recordsList : DRecordList, userName: String) {
         if (Firebase.auth.currentUser == null) {
             Log.w("DeliveryLogger", "No user logged in")
             return
@@ -28,9 +29,9 @@ class DeliveryLogger {
             recordsList.forEach { destRec ->
                 if (destRec.timeStamp != null) {
                     dbLogRef
-                        .child(Firebase.auth.currentUser!!.uid)
+                        .child(firebaseSafeString(userName))
                         .child(dateFormatted())
-                        .child(destRec.hashCode().toString()).setValue(destRec)
+                        .child(firebaseSafeString(destRec.destID)).setValue(destRec)
                 }
             }
         }

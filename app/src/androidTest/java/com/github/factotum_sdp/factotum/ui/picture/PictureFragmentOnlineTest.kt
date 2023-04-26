@@ -12,6 +12,8 @@ import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
+import com.github.factotum_sdp.factotum.ui.display.utils.addUserToDatabase
 import com.github.factotum_sdp.factotum.ui.picture.*
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.PreferencesSetting
@@ -48,14 +50,14 @@ class PictureFragmentOnlineTest {
         @JvmStatic
         fun setUpDatabase() {
             initFirebase()
+            addUserToDatabase(UsersPlaceHolder.USER_COURIER)
         }
     }
 
     @Before
     fun setUp() {
-        storage = Firebase.storage
-        storage.useEmulator("10.0.2.2", 9199)
         emptyLocalFiles(picturesDir)
+        addUserToDatabase(UsersPlaceHolder.USER_COURIER)
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
         goToPictureFragment()
@@ -74,10 +76,9 @@ class PictureFragmentOnlineTest {
     }
 
 
-    /*
     @Test
     fun testUploadFileCorrectly() {
-      /*  // Wait for the photo to be taken
+        // Wait for the photo to be taken
         Thread.sleep(TIME_WAIT_DONE_OR_CANCEL)
 
         // Click the button to validate the photo
@@ -96,8 +97,8 @@ class PictureFragmentOnlineTest {
             assertTrue(picturesDir.listFiles()?.isNotEmpty() ?: false)
         }.addOnFailureListener { except ->
             fail(except.message)
-        } */
-    } */
+        }
+    }
 
     @Test
     fun testCancelPhoto() {

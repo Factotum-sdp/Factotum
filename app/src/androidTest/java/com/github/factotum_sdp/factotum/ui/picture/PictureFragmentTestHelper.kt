@@ -9,6 +9,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
+import com.github.factotum_sdp.factotum.ui.login.LoginFragmentTest
 import com.github.factotum_sdp.factotum.utils.PreferencesSetting
 import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.tasks.await
@@ -60,6 +61,8 @@ fun triggerCancel(device: UiDevice) {
 }
 
 fun goToPictureFragment() {
+    LoginFragmentTest.fillUserEntryAndGoToRBFragment("courier@gmail.com", "123456")
+
     // Open the drawer
     onView(withId(R.id.drawer_layout))
         .perform(open())

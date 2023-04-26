@@ -15,7 +15,9 @@ import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebas
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.Matchers.not
 import org.junit.AfterClass
 import org.junit.BeforeClass
@@ -33,6 +35,7 @@ class LoginFragmentTest {
 
     companion object {
 
+        @OptIn(ExperimentalCoroutinesApi::class)
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
@@ -41,17 +44,19 @@ class LoginFragmentTest {
             MainActivity.setAuth(getAuth())
             UsersPlaceHolder.init(getDatabase(), getAuth())
 
-            runBlocking {
-                UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER1)
-            }
-            runBlocking {
-                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER1)
-            }
-            runBlocking {
-                UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER2)
-            }
-            runBlocking {
-                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER3)
+            runTest {
+                runBlocking {
+                    UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER1)
+                }
+                runBlocking {
+                    UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER1)
+                }
+                runBlocking {
+                    UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER3)
+                }
+                runBlocking {
+                    UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER2)
+                }
             }
         }
 

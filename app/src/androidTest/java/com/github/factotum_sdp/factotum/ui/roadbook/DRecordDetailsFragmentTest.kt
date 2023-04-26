@@ -16,13 +16,15 @@ import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightTheRecordAt
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.PreferencesSetting
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
-
 @RunWith(AndroidJUnit4::class)
 class DRecordDetailsFragmentTest {
 
@@ -118,14 +120,17 @@ class DRecordDetailsFragmentTest {
     }*/
 
     @Test
-    fun swipeRightAfterSwipeLeftDisplaysInfo() {
-        toFragment()
-        onView(withId(R.id.viewPager)).perform(click())
-        onView(withId(R.id.fragment_drecord_info_directors_parent)).check(matches(isDisplayed()))
-        onView(withId(R.id.viewPager)).perform(swipeLeft())
-        Thread.sleep(2000)
+    fun swipeRightAfterSwipeLeftDisplaysInfo() = runTest {
+        runBlocking {
+            toFragment()
+            onView(withId(R.id.viewPager)).perform(click())
+            onView(withId(R.id.fragment_drecord_info_directors_parent)).check(matches(isDisplayed()))
+            onView(withId(R.id.viewPager)).perform(swipeLeft())
+            delay(500L)
+        }
         onView(withId(R.id.fragment_drecord_info_directors_parent)).check(doesNotExist())
         onView(withId(R.id.viewPager)).perform(swipeRight())
         onView(withId(R.id.fragment_drecord_info_directors_parent)).check(matches(isDisplayed()))
     }
 }
+

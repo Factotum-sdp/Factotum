@@ -56,22 +56,22 @@ class MainActivityTest {
 
                 UsersPlaceHolder.init(getDatabase(), getAuth())
                 runBlocking {
-                    UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_BOSS)
-                }
-                runBlocking {
-                    UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_COURIER)
-                }
-                runBlocking {
-                    UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_CLIENT)
-                }
-                runBlocking {
                     UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_BOSS)
+                }
+                runBlocking {
+                    UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_BOSS)
                 }
                 runBlocking {
                     UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_COURIER)
                 }
                 runBlocking {
+                    UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_COURIER)
+                }
+                runBlocking {
                     UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_CLIENT)
+                }
+                runBlocking {
+                    UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_CLIENT)
                 }
             }
         }
@@ -268,6 +268,7 @@ class MainActivityTest {
         Espresso.onData(Matchers.anything()).inRoot(RootMatchers.isPlatformPopup()).atPosition(1)
             .perform(click())
         onView(withId(R.id.signup)).perform(click())
+        pressBack()
         FirebaseAuth.AuthStateListener {
             onView(withId(R.id.fragment_login_directors_parent)).check(
                 matches(
@@ -285,7 +286,6 @@ class MainActivityTest {
                     )
                 )
             }
-
         }
     }
 }

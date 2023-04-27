@@ -2,6 +2,7 @@ package com.github.factotum_sdp.factotum.ui.signup
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.LoginRepository
@@ -10,7 +11,6 @@ import com.github.factotum_sdp.factotum.data.SignUpDataSink
 import com.github.factotum_sdp.factotum.data.User
 import com.github.factotum_sdp.factotum.ui.auth.BaseAuthResult
 import com.github.factotum_sdp.factotum.ui.auth.BaseAuthState
-import com.github.factotum_sdp.factotum.ui.auth.BaseAuthViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,23 +19,23 @@ import kotlinx.coroutines.withContext
 class SignUpViewModel(
     private val signUpDataSink: SignUpDataSink,
     private val loginRepository: LoginRepository
-) : BaseAuthViewModel() {
+) : ViewModel() {
 
     private val _signupForm = MutableLiveData<SignUpFormState>()
     val signupFormState: LiveData<SignUpFormState> = _signupForm
 
-    private val _signupResult = MutableLiveData<BaseAuthResult<*>>()
-    override val authResult: LiveData<BaseAuthResult<*>> = _signupResult
+    private val _signupResult = MutableLiveData<BaseAuthResult>()
+    val authResult: LiveData<BaseAuthResult> = _signupResult
 
-    private val _updateUsersResult = MutableLiveData<UpdateUsersResult>()
-    val updateUsersResult: LiveData<UpdateUsersResult> = _updateUsersResult
+    private val _updateUserResult = MutableLiveData<UpdateUsersResult>()
+    val updateUserResult: LiveData<UpdateUsersResult> = _updateUserResult
 
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 
     /**
      * Called when the sign up button is clicked.
      */
-    override fun auth(email: String, password: String) {
+    fun auth(email: String, password: String) {
         viewModelScope.launch {
             val result = withContext(dispatcher) { signUpDataSink.signUp(email, password) }
             if (result is Result.Success) {
@@ -49,17 +49,17 @@ class SignUpViewModel(
         }
     }
 
-    fun updateUsersList(user: User) {
+    fun updateUser(userUID: String, user: User) {
         // launch in a separate asynchronous job
         viewModelScope.launch {
-            val result = withContext(dispatcher) { signUpDataSink.updateUsersList(user) }
+            val result = withContext(dispatcher) { signUpDataSink.updateUsersList(userUID, user) }
             if (result is Result.Success) {
-                _updateUsersResult.value =
+                _updateUserResult.value =
                     UpdateUsersResult(
                         success = result.data
                     )
             } else {
-                _updateUsersResult.value = UpdateUsersResult(error = R.string.update_users_failed)
+                _updateUserResult.value = UpdateUsersResult(error = R.string.update_users_failed)
             }
         }
     }
@@ -97,5 +97,5 @@ class SignUpViewModel(
     data class SignUpResult(
         override val success: String? = null,
         override val error: Int? = null
-    ) : BaseAuthResult<String>(success, error)
+    ) : BaseAuthResult(success, error)
 }

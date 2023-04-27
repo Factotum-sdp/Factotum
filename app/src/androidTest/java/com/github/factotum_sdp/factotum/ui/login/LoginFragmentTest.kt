@@ -46,13 +46,13 @@ class LoginFragmentTest {
 
             runTest {
                 runBlocking {
+                    UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER1)
+                }
+                runBlocking {
                     UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER1)
                 }
                 runBlocking {
                     UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER3)
-                }
-                runBlocking {
-                    UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER1)
                 }
                 runBlocking {
                     UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER2)

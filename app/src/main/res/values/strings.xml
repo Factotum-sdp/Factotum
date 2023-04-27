@@ -70,8 +70,8 @@
     <string name="no_role_selected">Please select a role</string>
     <string name="login_failed">"Login failed"</string>
     <string name="user_not_found">"User not found"</string>
-    <string name="retrieve_users_failed">Error retrieving users</string>
-    <string name="retrieve_users_success">Users retrieved successfully</string>
+    <string name="retrieve_user_failed">Error retrieving user</string>
+    <string name="retrieve_user_success">User retrieved successfully</string>
     <string name="web_client_id">"539052463718–6gefd2fnlvbb1h9aiq09kil6sip37i0u.apps.googleusercontent.com"</string>
     <string name="forgot_my_password_text">Forgot my password</string>
     <string name="password_text">Password</string>

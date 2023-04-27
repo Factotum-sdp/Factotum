@@ -1,10 +1,13 @@
 package com.github.factotum_sdp.factotum.placeholder
 
+import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.data.LoginDataSource
 import com.github.factotum_sdp.factotum.data.Role
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-import kotlinx.coroutines.CompletableDeferred
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * Temporary PlaceHolder object for fake users data
@@ -12,7 +15,6 @@ import kotlinx.coroutines.CompletableDeferred
  */
 object UsersPlaceHolder {
 
-    private val users = mutableListOf<User>()
     private lateinit var dataSource: FirebaseDatabase
     private lateinit var auth: FirebaseAuth
 
@@ -57,43 +59,33 @@ object UsersPlaceHolder {
     fun init(dataSource: FirebaseDatabase, auth: FirebaseAuth) {
         this.dataSource = dataSource
         this.auth = auth
-        users.add(USER1)
-        users.add(USER2)
-        users.add(USER3)
-        users.add(USER_BOSS)
-        users.add(USER_COURIER)
-        users.add(USER_CLIENT)
     }
 
     /**
-     * Populates the database with users.
+     * Populates the database with user.
      */
-    suspend fun addUserToDb(user: User) {
-        val deferred = CompletableDeferred<Unit>()
-
-        dataSource.getReference(LoginDataSource.DISPATCH_DB_PATH).push().setValue(user)
+    suspend fun addUserToDb(user: User) = suspendCoroutine { continuation ->
+        dataSource.getReference(LoginDataSource.DISPATCH_DB_PATH)
+            .child(MainActivity.getAuth().currentUser?.uid ?: "")
+            .setValue(user)
             .addOnSuccessListener {
-                deferred.complete(Unit)
+                continuation.resume(Unit)
             }
             .addOnFailureListener { exception ->
-                deferred.completeExceptionally(exception)
+                continuation.resumeWithException(exception)
             }
 
-        deferred.await()
+        auth.signOut()
     }
 
-    suspend fun addAuthUser(user: User) {
-        val deferred = CompletableDeferred<Unit>()
-
+    suspend fun addAuthUser(user: User) = suspendCoroutine { continuation ->
         auth.createUserWithEmailAndPassword(user.email, password)
             .addOnSuccessListener {
-                deferred.complete(Unit)
+                continuation.resume(Unit)
             }
             .addOnFailureListener { exception ->
-                deferred.completeExceptionally(exception)
+                continuation.resumeWithException(exception)
             }
-
-        deferred.await()
     }
 
     fun emptyFirebaseDatabase(database: FirebaseDatabase) {

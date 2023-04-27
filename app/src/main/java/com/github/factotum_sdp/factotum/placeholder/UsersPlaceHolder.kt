@@ -5,8 +5,9 @@ import com.github.factotum_sdp.factotum.data.LoginDataSource
 import com.github.factotum_sdp.factotum.data.Role
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.suspendCoroutine
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * Temporary PlaceHolder object for fake users data
@@ -68,10 +69,10 @@ object UsersPlaceHolder {
             .child(MainActivity.getAuth().currentUser?.uid ?: "")
             .setValue(user)
             .addOnSuccessListener {
-                continuation.complete(Unit)
+                continuation.resume(Unit)
             }
             .addOnFailureListener { exception ->
-                continuation.completeExceptionally(exception)
+                continuation.resumeWithException(exception)
             }
 
         auth.signOut()
@@ -80,10 +81,10 @@ object UsersPlaceHolder {
     suspend fun addAuthUser(user: User) = suspendCoroutine { continuation ->
         auth.createUserWithEmailAndPassword(user.email, password)
             .addOnSuccessListener {
-                continuation.complete(Unit)
+                continuation.resume(Unit)
             }
             .addOnFailureListener { exception ->
-                continuation.completeExceptionally(exception)
+                continuation.resumeWithException(exception)
             }
     }
 

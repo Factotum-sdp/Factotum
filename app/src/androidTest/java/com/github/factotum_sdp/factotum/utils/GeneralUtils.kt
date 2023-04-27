@@ -1,13 +1,17 @@
 package com.github.factotum_sdp.factotum.utils
 
+import android.util.Log
 import com.github.factotum_sdp.factotum.MainActivity
+import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.runBlocking
 
 class GeneralUtils {
     companion object {
@@ -34,9 +38,9 @@ class GeneralUtils {
         fun getAuth(): FirebaseAuth {
             return auth
         }
-        /*
+
         fun getStorage(): FirebaseStorage {
             return storage
-        } */
+        }
     }
 }

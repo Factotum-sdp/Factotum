@@ -1,5 +1,5 @@
 container:
-  image: cirrusci/android-sdk:30
+  image: cirrusci/android-sdk:33
   cpu: 8
   memory: 16G
   kvm: true
@@ -8,13 +8,17 @@ env:
   CC_TEST_REPORTER_ID: ENCRYPTED[ca4c0af7dbdaac713bbfd84dcba3b49a8d8d65f83693235e570b944f676fa090bbd8bdb55093d5b6c2be7ef8adb8a92a]
   MAPS_API_KEY: ENCRYPTED[!7d26352921350ef03cf3f093a6d3dbf919cd78b69cb813dd565ed168b905fdb1844751a63bb213bcb46ed98e794a86e0!]
 
+
 check_android_task:
   name: Run Android tests
+  install_jdk17_script: |
+    sudo apt update
+    sudo apt install -y openjdk-17-jdk
   install_emulator_script:
-    sdkmanager --install "system-images;android-30;google_apis_playstore;x86_64"
+    sdkmanager --install "system-images;android-33;google_apis;x86_64"
   create_avd_script: echo no | avdmanager create avd --force
       --name emulator
-      --package "system-images;android-30;google_apis_playstore;x86_64"
+      --package "system-images;android-33;google_apis;x86_64"
   start_avd_background_script: $ANDROID_HOME/emulator/emulator
       -avd emulator
       -no-audio
@@ -27,9 +31,8 @@ check_android_task:
     chmod +x gradlew
     echo MAPS_API_KEY=$MAPS_API_KEY >> local.properties
     ./gradlew assembleDebugAndroidTest
-      
   download_firebase_emulator_script: |
-    curl -Lo ./firebase https://github.com/firebase/firebase-tools/releases/download/v11.28.0/firebase-tools-linux
+    curl -Lo ./firebase https://firebase.tools/bin/linux/latest
   assemble_instrumented_tests_script: |
     chmod +x gradlew
     ./gradlew assembleDebugAndroidTest

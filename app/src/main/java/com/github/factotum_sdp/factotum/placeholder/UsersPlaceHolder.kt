@@ -62,36 +62,28 @@ object UsersPlaceHolder {
     /**
      * Populates the database with user.
      */
-    suspend fun addUserToDb(user: User) {
-        val deferred = CompletableDeferred<Unit>()
-
+    suspend fun addUserToDb(user: User) = suspendCoroutine { continuation ->
         dataSource.getReference(LoginDataSource.DISPATCH_DB_PATH)
             .child(MainActivity.getAuth().currentUser?.uid ?: "")
             .setValue(user)
             .addOnSuccessListener {
-                deferred.complete(Unit)
+                continuation.complete(Unit)
             }
             .addOnFailureListener { exception ->
-                deferred.completeExceptionally(exception)
+                continuation.completeExceptionally(exception)
             }
 
         auth.signOut()
-
-        deferred.await()
     }
 
-    suspend fun addAuthUser(user: User) {
-        val deferred = CompletableDeferred<Unit>()
-
+    suspend fun addAuthUser(user: User) = suspendCoroutine { continuation ->
         auth.createUserWithEmailAndPassword(user.email, password)
             .addOnSuccessListener {
-                deferred.complete(Unit)
+                continuation.complete(Unit)
             }
             .addOnFailureListener { exception ->
-                deferred.completeExceptionally(exception)
+                continuation.completeExceptionally(exception)
             }
-
-        deferred.await()
     }
 
     fun emptyFirebaseDatabase(database: FirebaseDatabase) {

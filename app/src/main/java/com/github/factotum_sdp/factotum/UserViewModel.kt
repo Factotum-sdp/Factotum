@@ -1,10 +1,9 @@
 package com.github.factotum_sdp.factotum
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.github.factotum_sdp.factotum.data.User
+import com.github.factotum_sdp.factotum.models.User
 
 /**
  * ViewModel class for the App User

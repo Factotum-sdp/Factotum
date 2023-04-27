@@ -10,7 +10,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.*
-import com.github.factotum_sdp.factotum.data.Role
+import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth

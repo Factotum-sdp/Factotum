@@ -1,12 +1,13 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.github.factotum_sdp.factotum.data.DestinationRecord
+import androidx.datastore.preferences.core.edit
+import androidx.lifecycle.*
+import com.github.factotum_sdp.factotum.models.DestinationRecord
+import com.github.factotum_sdp.factotum.models.RoadBookPreferences
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
+import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
 import com.google.firebase.database.DatabaseReference
+import kotlinx.coroutines.launch
 import java.text.DateFormat
 import java.text.SimpleDateFormat.getDateInstance
 import java.util.*
@@ -21,10 +22,11 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
 
     private val _recordsList: MutableLiveData<DRecordList> =
         MutableLiveData(DRecordList())
-    val recordsListState: LiveData<DRecordList> = _recordsList
-
     private var dbRef: DatabaseReference
     private val clientOccurences = HashMap<String, Int>()
+    private lateinit var preferencesRepository: RoadBookPreferencesRepository
+
+    val recordsListState: LiveData<DRecordList> = _recordsList
 
     init {
         val date = Calendar.getInstance().time
@@ -35,6 +37,45 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         // Let uncommented for testing purpose. Uncomment it for back-up uniqueness in the DB
         // Only for demo purpose :
         addDemoRecords(DestinationRecords.RECORDS)
+    }
+    fun initialPreferences(): LiveData<RoadBookPreferences> {
+        return liveData {
+            val initPref = preferencesRepository.fetchInitialPreferences()
+            emit(initPref)
+        }
+    }
+    fun setPreferencesRepository(preferences: RoadBookPreferencesRepository) {
+        preferencesRepository = preferences
+    }
+
+    fun updateReordering(isReorderingEnabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.updateReordering(isReorderingEnabled)
+        }
+    }
+
+    fun updateDeletionOrArchiving(isDeletionAndArchivingEnabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.updateDeletionOrArchiving(isDeletionAndArchivingEnabled)
+        }
+    }
+
+    fun updateEdition(isEditionEnabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.updateEdition(isEditionEnabled)
+        }
+    }
+
+    fun updateDetailsAccess(isUpdateDetailsEnabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.updateDetailsAccess(isUpdateDetailsEnabled)
+        }
+    }
+
+    fun updateShowArchived(isShowArchivedEnabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.updateShowArchived(isShowArchivedEnabled)
+        }
     }
 
     /**

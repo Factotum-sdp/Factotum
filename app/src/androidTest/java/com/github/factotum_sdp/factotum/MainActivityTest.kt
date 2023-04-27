@@ -1,6 +1,8 @@
 package com.github.factotum_sdp.factotum
 
+import android.content.Context
 import android.view.Gravity
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.pressBack

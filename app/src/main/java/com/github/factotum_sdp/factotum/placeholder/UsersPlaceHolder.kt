@@ -6,6 +6,7 @@ import com.github.factotum_sdp.factotum.data.Role
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.suspendCoroutine
 
 /**
  * Temporary PlaceHolder object for fake users data

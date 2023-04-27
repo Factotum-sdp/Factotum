@@ -5,7 +5,7 @@
     android:id="@+id/contact_creation_fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.directory.ContactCreation">
+    tools:context=".ui.directory.ContactCreationFragment">
 
     <RelativeLayout
         android:id="@+id/basic_contact_info"

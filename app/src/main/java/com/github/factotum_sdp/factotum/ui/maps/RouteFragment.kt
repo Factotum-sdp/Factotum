@@ -111,7 +111,7 @@ class RouteFragment : Fragment() {
                 if (query != null) {
                     val location = Location.createAndStore(query, requireContext())
                     if (location != null) viewModel.setLocation(location)
-                    val toShow = viewModel.location.value?.address?.toString() ?: NO_RESULT
+                    val toShow = viewModel.location.value?.coordinates?.toString() ?: NO_RESULT
                     Snackbar.make(requireView(), toShow, Snackbar.LENGTH_LONG).show()
                 }
                 return true

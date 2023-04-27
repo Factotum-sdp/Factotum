@@ -26,10 +26,11 @@ class ContactsViewModel(application: Application) : AndroidViewModel(application
         surname: String,
         image: Int,
         address: String,
+        coordinates: String,
         phone: String,
         details: String = ""
     ) {
-        repository.saveNewIDContact(role, name, surname, image, address, phone, details)
+        repository.saveNewIDContact(role, name, surname, image, address, coordinates, phone, details)
     }
 
     fun updateContact(contact: Contact) {

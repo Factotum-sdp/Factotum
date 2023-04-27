@@ -33,6 +33,7 @@ class ContactsRepository(
         surname: String,
         image: Int,
         address: String,
+        coordinates: String,
         phone: String,
         details: String = ""
     ) {
@@ -43,6 +44,7 @@ class ContactsRepository(
             surname,
             image,
             address,
+            coordinates,
             phone,
             details
         )

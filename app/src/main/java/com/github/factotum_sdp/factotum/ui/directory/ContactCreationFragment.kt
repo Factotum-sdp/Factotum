@@ -17,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.data.Role
 import com.github.factotum_sdp.factotum.data.localisation.Location
 import com.github.factotum_sdp.factotum.databinding.FragmentContactCreationBinding
 import com.github.factotum_sdp.factotum.placeholder.Contact
@@ -25,10 +26,10 @@ import kotlinx.coroutines.launch
 /**
  * A simple ContactCreation fragment.
  */
-class ContactCreation : Fragment() {
+class ContactCreationFragment : Fragment() {
 
     // Should not stay like that and instead roles should use roles from future ENUM
-    private val roles = listOf("Boss", "Courier", "Client")
+    private val roles = Role.values().map { it.name }
     private var currentContact: Contact? = null
     private val isUpdate: Boolean
         get() = currentContact != null
@@ -177,10 +178,10 @@ class ContactCreation : Fragment() {
 
     private fun initialiseApproveFormButton(view: View) {
         val approveFormButton = view.findViewById<Button>(R.id.create_contact)
-
         if (isUpdate) {
             approveFormButton.text = getString(R.string.form_button_update)
             approveFormButton.setOnClickListener {
+                val address = validateLocation()
                 viewModel.updateContact(
                     Contact(
                         id = currentContact!!.id,
@@ -188,7 +189,8 @@ class ContactCreation : Fragment() {
                         name = name.text.toString(),
                         surname = surname.text.toString(),
                         profile_pic_id = R.drawable.contact_image,
-                        address = binding.contactCreationAddress.query.toString(),
+                        address = address?.addressName.toString(),
+                        coordinates = address?.coordinates.toString(),
                         phone = phoneNumber.text.toString(),
                         details = details.text.toString()
                     )
@@ -198,17 +200,24 @@ class ContactCreation : Fragment() {
         } else {
             approveFormButton.text = getString(R.string.form_button_create)
             approveFormButton.setOnClickListener {
+                val address = validateLocation()
                 viewModel.saveNewIDContact(
                     role = spinner.selectedItem.toString(),
                     name = name.text.toString(),
                     surname = surname.text.toString(),
                     image = R.drawable.contact_image,
-                    address = binding.contactCreationAddress.query.toString(),
+                    address = address?.addressName.toString(),
+                    coordinates = address?.addressName.toString(),
                     phone = phoneNumber.text.toString(),
                     details = details.text.toString()
                 )
                 it.findNavController().navigate(R.id.action_contactCreation_to_directoryFragment)
             }
         }
+    }
+
+    private fun validateLocation(): Location? {
+        val addressName = binding.contactCreationAddress.query.toString()
+        return Location.createAndStore(addressName, requireContext())
     }
 }

@@ -6,6 +6,7 @@ import android.location.Geocoder
 import android.os.Build
 import android.os.Build.VERSION_CODES.TIRAMISU
 import androidx.annotation.RequiresApi
+import com.google.android.gms.maps.model.LatLng
 import java.io.File
 import java.util.concurrent.CountDownLatch
 
@@ -19,7 +20,7 @@ import java.util.concurrent.CountDownLatch
  */
 class Location(query: String, context: Context) {
 
-    val address: Address?
+    val coordinates: LatLng?
     val addressName: String?
 
     companion object {
@@ -37,7 +38,7 @@ class Location(query: String, context: Context) {
          */
         fun createAndStore(query: String, context: Context): Location? {
             val location = Location(query, context)
-            if (location.address == null) {
+            if (location.coordinates == null) {
                 return null
             }
 
@@ -47,7 +48,7 @@ class Location(query: String, context: Context) {
             if (cacheFile.length() == 0L) cacheFile.appendText("location${CACHE_FILE_SEPARATOR}latitude${CACHE_FILE_SEPARATOR}longitude\n")
             // stores
             val toStore =
-                "${location.addressName}$CACHE_FILE_SEPARATOR${location.address.latitude}$CACHE_FILE_SEPARATOR${location.address.longitude}\n"
+                "${location.addressName}$CACHE_FILE_SEPARATOR${location.coordinates.latitude}$CACHE_FILE_SEPARATOR${location.coordinates.longitude}\n"
             //checks if already if file
             var alreadyExists = false
             cacheFile.forEachLine { line ->
@@ -104,7 +105,8 @@ class Location(query: String, context: Context) {
     }
 
     init {
-        address = geocoderQuery(query, context)?.get(0)
+        val address = geocoderQuery(query, context)?.get(0)
+        coordinates = address?.let { LatLng(it.latitude, it.longitude) }
         addressName = address?.getAddressLine(0)
     }
 

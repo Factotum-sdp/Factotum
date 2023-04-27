@@ -93,7 +93,7 @@
     </fragment>
     <fragment
         android:id="@+id/contactCreationFragment"
-        android:name="com.github.factotum_sdp.factotum.ui.directory.ContactCreation"
+        android:name="com.github.factotum_sdp.factotum.ui.directory.ContactCreationFragment"
         android:label="contact_creation">
         <action
             android:id="@+id/action_contactCreation_to_directoryFragment"

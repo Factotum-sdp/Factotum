@@ -80,7 +80,7 @@ class ContactsUpdateTest {
 
     @Test
     fun buttonTextIsCorrect() {
-        onView(withId(R.id.create_contact))
+        onView(withId(R.id.confirm_form))
             .check(matches(withText("Update Contact")))
     }
 
@@ -98,7 +98,7 @@ class ContactsUpdateTest {
 
     @Test
     fun updateDoesntAddOrRemoveContact() {
-        onView(withId(R.id.create_contact)).perform(ViewActions.click())
+        onView(withId(R.id.confirm_form)).perform(ViewActions.click())
         //check if recycle view in contacts has 6 items
         onView(withId(R.id.contacts_recycler_view))
             .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
@@ -155,7 +155,7 @@ class ContactsUpdateTest {
         val notesEditText = onView(withId(R.id.contactCreationNotes))
         notesEditText.perform(ViewActions.replaceText("This is a test note."))
 
-        onView(withId(R.id.create_contact)).perform(ViewActions.click())
+        onView(withId(R.id.confirm_form)).perform(ViewActions.click())
         onView(withId(R.id.contacts_recycler_view))
             .perform(
                 RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(

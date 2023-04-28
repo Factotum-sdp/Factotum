@@ -21,6 +21,7 @@ import com.github.factotum_sdp.factotum.data.localisation.Location
 import com.github.factotum_sdp.factotum.databinding.FragmentContactCreationBinding
 import com.github.factotum_sdp.factotum.placeholder.Contact
 import kotlinx.coroutines.launch
+import java.util.Random
 
 /**
  * A simple ContactCreation fragment.
@@ -179,13 +180,14 @@ class ContactCreation : Fragment() {
 
 
     private fun initialiseApproveFormButton(view: View) {
-        val approveFormButton = view.findViewById<Button>(R.id.create_contact)
+        val approveFormButton = view.findViewById<Button>(R.id.confirm_form)
         approveFormButton.text = if (isUpdate) getString(R.string.form_button_update) else getString(R.string.form_button_create)
         approveFormButton.setOnClickListener {
             if (currentContact != null) viewModel.deleteContact(currentContact!!)
             viewModel.saveContact(
-                Contact(
-                    username = username.text.toString(),
+                Contact( //if username empty name + surname + random number
+                    username = if (username.text.toString() == "") name.text.toString() + surname.text.toString() + Random().nextInt(1000)
+                                else username.text.toString(),
                     role = spinner.selectedItem.toString(),
                     name = name.text.toString(),
                     surname = surname.text.toString(),

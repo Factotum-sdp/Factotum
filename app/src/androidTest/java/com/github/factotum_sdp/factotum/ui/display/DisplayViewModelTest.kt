@@ -18,21 +18,26 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class DisplayViewModelTest {
     private lateinit var displayViewModel: DisplayViewModel
-    private lateinit var context: Context
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @Before
-    fun setUp() {
-        // Initialize Firebase
-        initFirebase()
-        context = InstrumentationRegistry.getInstrumentation().context
-    }
+    companion object {
+        private lateinit var context: Context
 
-    @After
-    fun tearDown() {
-        emptyStorageEmulator(Firebase.storage.reference)
+        @BeforeClass
+        @JvmStatic
+        fun setUp() {
+            // Initialize Firebase
+            initFirebase()
+            context = InstrumentationRegistry.getInstrumentation().context
+        }
+
+        @AfterClass
+        @JvmStatic
+        fun tearDown() {
+            emptyStorageEmulator(Firebase.storage.reference)
+        }
     }
 
 

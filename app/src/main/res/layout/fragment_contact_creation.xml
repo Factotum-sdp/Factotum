@@ -95,13 +95,13 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/create_contact"
+        android:id="@+id/confirm_form"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="50dp"
-        android:text="@string/create_contact" />
+        android:text="@string/create_contact_text" />
 
 
 </RelativeLayout>

@@ -122,7 +122,7 @@
     <string name="surname">Surname</string>
     <string name="address">Address</string>
     <string name="phone_number">Phone number</string>
-    <string name="create_contact">Create contact</string>
+    <string name="create_contact_text">Create contact</string>
     <string name="notes">Notes</string>
     <string name="drecord_notes_mi_title">DRecord notes</string>
     <string name="textvlabel_destination_id">Destination ID</string>

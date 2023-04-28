@@ -9,6 +9,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
+import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getAuth
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
@@ -17,6 +18,8 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.Matchers.not
@@ -36,33 +39,27 @@ class LoginFragmentTest {
 
     companion object {
 
+        private const val WAIT_TIME_LOGIN = 1000L
+        private const val WAIT_TIME_DB = 500L
+
         @OptIn(ExperimentalCoroutinesApi::class)
         @BeforeClass
         @JvmStatic
-        fun setUpDatabase() {
+        fun setUpDatabase() = runTest {
             initFirebase()
             UsersPlaceHolder.init(getDatabase(), getAuth())
 
-            runBlocking {
-                try {
-                    UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER1)
-                } catch (e: FirebaseAuthUserCollisionException) {
-                    e.printStackTrace()
-                }
-            }
-            runBlocking {
-                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER1)
-            }
-            runBlocking {
+            launch { GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER1) }.join()
+            launch {
                 UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER3)
-            }
-            runBlocking {
-                try {
+                delay(WAIT_TIME_DB)
+            }.join()
+            launch{ try {
                     UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER2)
                 } catch (e: FirebaseAuthUserCollisionException) {
                     e.printStackTrace()
                 }
-            }
+            }.join()
         }
 
         @AfterClass
@@ -83,6 +80,10 @@ class LoginFragmentTest {
                 closeSoftKeyboard()
             )
             onView(withId(R.id.login)).perform(click())
+
+            runBlocking {
+                delay(WAIT_TIME_LOGIN)
+            }
         }
     }
 

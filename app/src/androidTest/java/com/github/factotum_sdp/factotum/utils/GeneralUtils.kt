@@ -21,7 +21,6 @@ class GeneralUtils {
         private lateinit var storage: FirebaseStorage
         private const val WAIT_BETWEEN_DB_ADD = 500L
 
-
         fun initFirebase(online : Boolean = true) {
             database = Firebase.database
             auth = Firebase.auth

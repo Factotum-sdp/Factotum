@@ -7,6 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
@@ -68,8 +69,7 @@ class PictureFragmentOfflineTest {
         // Wait for the photo to be taken
         runBlocking { delay(TIME_WAIT_DONE_OR_CANCEL) }
 
-        // Click the button to validate the photo
-        triggerDone(device)
+        device.findObject(UiSelector().description("Done")).click()
 
         runBlocking {
             GeneralUtils.getStorage().reference.child(CLIENT_ID).listAll().addOnSuccessListener {

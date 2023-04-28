@@ -1,22 +1,16 @@
 package com.github.factotum_sdp.factotum.ui.picture
 
-import android.util.Log
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.swipeLeft
-import androidx.test.espresso.contrib.DrawerActions.open
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
-import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.ui.login.LoginFragmentTest
 import com.github.factotum_sdp.factotum.utils.PreferencesSetting
-import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.storage.StorageReference
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import java.io.File
 
@@ -53,18 +47,7 @@ fun triggerShutter(device: UiDevice) {
     device.executeShellCommand("input keyevent 27")
 }
 
-fun triggerDone(device: UiDevice) {
-    device.executeShellCommand("input keyevent 61")
-    device.executeShellCommand("input keyevent 61")
-    device.executeShellCommand("input keyevent 62")
-}
 
-fun triggerCancel(device: UiDevice) {
-    device.executeShellCommand("input keyevent 61")
-    device.executeShellCommand("input keyevent 61")
-    device.executeShellCommand("input keyevent 61")
-    device.executeShellCommand("input keyevent 62")
-}
 
 fun goToPictureFragment() {
     LoginFragmentTest.fillUserEntryAndGoToRBFragment("courier@gmail.com", "123456")

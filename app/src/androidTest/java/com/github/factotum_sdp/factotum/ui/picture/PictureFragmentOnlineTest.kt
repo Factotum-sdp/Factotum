@@ -7,6 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.ui.picture.*
@@ -22,6 +23,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.runner.RunWith
 import java.io.File
+
 
 @RunWith(AndroidJUnit4::class)
 class PictureFragmentOnlineTest {
@@ -74,7 +76,7 @@ class PictureFragmentOnlineTest {
 
     @Test
     fun testUploadFileCorrectly() {
-        triggerDone(device)
+        device.findObject(UiSelector().description("Done")).click()
 
         runBlocking {
             delay(TIME_WAIT_UPLOAD_PHOTO)
@@ -96,7 +98,7 @@ class PictureFragmentOnlineTest {
     @Test
     fun testCancelPhoto() {
         // Click the button to cancel the photo
-        triggerCancel(device)
+        device.findObject(UiSelector().description("Cancel")).click()
 
         runBlocking {
             delay(TIME_WAIT_UPLOAD_PHOTO)

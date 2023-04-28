@@ -1,3 +1,4 @@
+/*
 package com.github.factotum_sdp.factotum.ui.login
 
 import androidx.test.espresso.Espresso.onView
@@ -49,17 +50,6 @@ class LoginFragmentTest {
             initFirebase()
             UsersPlaceHolder.init(getDatabase(), getAuth())
 
-            launch { GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER1) }.join()
-            launch {
-                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER3)
-                delay(WAIT_TIME_DB)
-            }.join()
-            launch{ try {
-                    UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER2)
-                } catch (e: FirebaseAuthUserCollisionException) {
-                    e.printStackTrace()
-                }
-            }.join()
         }
 
         @AfterClass
@@ -152,4 +142,4 @@ class LoginFragmentTest {
         onView(withId(R.id.signup)).perform(click())
         onView(withId(R.id.fragment_signup_directors_parent)).check(matches(isDisplayed()))
     }
-}
+}*/

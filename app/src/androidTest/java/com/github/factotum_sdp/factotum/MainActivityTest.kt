@@ -57,19 +57,9 @@ class MainActivityTest {
             launch { GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_BOSS) }.join()
             launch { GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_CLIENT) }.join()
 
-            runBlocking {
-                ContactsUtils.populateDatabase()
-            }
+            launch { ContactsUtils.populateDatabase() }.join()
 
         }
-        /**
-        @AfterClass
-        @JvmStatic
-        fun stopAuthEmulator() {
-        val auth = getAuth()
-        auth.signOut()
-        MainActivity.setAuth(auth)
-        } **/
     }
 
     //========================================================================================

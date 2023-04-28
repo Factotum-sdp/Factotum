@@ -26,13 +26,11 @@ class GeneralUtils {
             auth = Firebase.auth
             storage = Firebase.storage
 
+            database.useEmulator("10.0.2.2", 9000)
+            auth.useEmulator("10.0.2.2", 9099)
             if (online) {
-                database.useEmulator("10.0.2.2", 9000)
-                auth.useEmulator("10.0.2.2", 9099)
                 storage.useEmulator("10.0.2.2", 9199)
             } else {
-                database.useEmulator("10.0.2.2", 9000)
-                auth.useEmulator("10.0.2.2", 9099)
                 storage.useEmulator("10.0.2.2", 9198)
             }
 

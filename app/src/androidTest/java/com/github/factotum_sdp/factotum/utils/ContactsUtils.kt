@@ -27,12 +27,14 @@ class ContactsUtils {
 
         private fun createContact(position: Int): Contact {
             return Contact(
-                position.toString(),
-                roles[position % roles.size], randomNames[position % randomNames.size],
-                randomSurnames[position % randomSurnames.size], image,
-                randomAddresses[position % randomAddresses.size],
-                randomPhones[position % randomPhones.size],
-                randomDetails[position % randomDetails.size]
+                username = position.toString(),
+                role = roles[position % roles.size],
+                name = randomNames[position % randomNames.size],
+                surname = randomSurnames[position % randomSurnames.size],
+                profile_pic_id = image,
+                address = randomAddresses[position % randomAddresses.size],
+                phone = randomPhones[position % randomPhones.size],
+                details = randomDetails[position % randomDetails.size]
             )
         }
 
@@ -56,7 +58,7 @@ class ContactsUtils {
             createRandomContacts(count)
 
             for (contact in randomContacts) {
-                getDatabase().getReference("contacts").child(contact.id).setValue(contact)
+                getDatabase().getReference("contacts").child(contact.username).setValue(contact)
                     .addOnSuccessListener {
                         deferred.complete(Unit)
                     }

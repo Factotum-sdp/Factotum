@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.dataStore
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
 import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
@@ -43,6 +44,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
     private var usePreferences = false
     private val locationTrackingHandler: LocationTrackingHandler = LocationTrackingHandler()
+    private val contactsViewModel : ContactsViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -101,7 +103,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         view.findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
             DRecordEditDialogBuilder(
                 context, requireParentFragment(),
-                rbViewModel, rbRecyclerView
+                rbViewModel, rbRecyclerView, contactsViewModel
             )
                 .forNewRecordEdition()
                 .show()
@@ -228,6 +230,10 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
             override fun getRecyclerView(): RecyclerView {
                 return rbRecyclerView
+            }
+
+            override fun getContactsViewModel(): ContactsViewModel {
+                return contactsViewModel
             }
 
             override fun getDragDirs(

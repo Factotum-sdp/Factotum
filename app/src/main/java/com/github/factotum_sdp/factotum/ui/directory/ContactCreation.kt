@@ -182,7 +182,7 @@ class ContactCreation : Fragment() {
         val approveFormButton = view.findViewById<Button>(R.id.create_contact)
         approveFormButton.text = if (isUpdate) getString(R.string.form_button_update) else getString(R.string.form_button_create)
         approveFormButton.setOnClickListener {
-            viewModel.deleteContact(currentContact)
+            if (currentContact != null) viewModel.deleteContact(currentContact!!)
             viewModel.saveContact(
                 Contact(
                     username = username.text.toString(),

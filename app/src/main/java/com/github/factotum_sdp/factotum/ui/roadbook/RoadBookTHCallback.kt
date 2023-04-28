@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.ItemTouchHelper.*
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.google.android.material.snackbar.Snackbar
 
 /**
@@ -38,6 +39,7 @@ abstract class RoadBookTHCallback :
     abstract fun getHost(): Fragment
     abstract fun getRbViewModel(): RoadBookViewModel
     abstract fun getRecyclerView(): RecyclerView
+    abstract fun getContactsViewModel(): ContactsViewModel
 
     override fun onMove(
         recyclerView: RecyclerView,
@@ -78,7 +80,7 @@ abstract class RoadBookTHCallback :
         val dial = // Launch & Delegate the event to a custom AlertDialog
             DRecordEditDialogBuilder(
                 getHost().requireContext(), getHost(),
-                getRbViewModel(), getRecyclerView()
+                getRbViewModel(), getRecyclerView(), getContactsViewModel()
             )
                 .forExistingRecordEdition(viewHolder)
                 .create()

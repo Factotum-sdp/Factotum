@@ -3,17 +3,19 @@ package com.github.factotum_sdp.factotum.ui.directory
 import android.content.SharedPreferences
 import com.github.factotum_sdp.factotum.placeholder.Contact
 import com.google.firebase.database.*
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import java.util.*
 
 class ContactsRepository(
     private val sharedPreferences: SharedPreferences
 ) {
 
-    private lateinit var firebaseContactsRef: DatabaseReference
+    private val database = Firebase.database
+    private var firebaseContactsRef: DatabaseReference = database.reference.child("contacts")
 
     fun setDatabase(database: FirebaseDatabase) {
         firebaseContactsRef = database.reference.child("contacts")

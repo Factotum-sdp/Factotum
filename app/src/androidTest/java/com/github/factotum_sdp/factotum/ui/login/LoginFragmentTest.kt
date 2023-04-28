@@ -1,4 +1,3 @@
-/*
 package com.github.factotum_sdp.factotum.ui.login
 
 import androidx.test.espresso.Espresso.onView
@@ -77,7 +76,7 @@ class LoginFragmentTest {
         }
     }
 
-    @Test
+    /*@Test
     fun loginFormInitialStateIsEmpty() {
         onView(withId(R.id.email)).check(matches(withText("")))
         onView(withId(R.id.password)).check(matches(withText("")))
@@ -141,5 +140,5 @@ class LoginFragmentTest {
     fun clickOnSignUpLeadsToSignUpFragment() {
         onView(withId(R.id.signup)).perform(click())
         onView(withId(R.id.fragment_signup_directors_parent)).check(matches(isDisplayed()))
-    }
-}*/
+    }*/
+}

@@ -42,8 +42,16 @@
                 android:id="@+id/editTextSurname"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:autofillHints="name"
+                android:autofillHints="surname"
                 android:hint="@string/surname"
+                android:inputType="textPersonName" />
+
+            <EditText
+                android:id="@+id/editTextUsername"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints="username"
+                android:hint="@string/textUsername"
                 android:inputType="textPersonName" />
         </LinearLayout>
     </RelativeLayout>

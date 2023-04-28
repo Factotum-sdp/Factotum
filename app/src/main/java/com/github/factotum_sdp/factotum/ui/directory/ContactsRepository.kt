@@ -20,33 +20,11 @@ class ContactsRepository(
     }
 
     fun saveContactToSharedPreferences(contact: Contact) =
-        sharedPreferences.edit().putString(contact.id, Gson().toJson(contact)).apply()
+        sharedPreferences.edit().putString(contact.username, Gson().toJson(contact)).apply()
 
     fun saveContact(contact: Contact) {
         saveContactToSharedPreferences(contact)
-        firebaseContactsRef.child(contact.id).setValue(contact)
-    }
-
-    fun saveNewIDContact(
-        role: String,
-        name: String,
-        surname: String,
-        image: Int,
-        address: String,
-        phone: String,
-        details: String = ""
-    ) {
-        val contact = Contact(
-            UUID.randomUUID().toString(),
-            role,
-            name,
-            surname,
-            image,
-            address,
-            phone,
-            details
-        )
-        saveContact(contact)
+        firebaseContactsRef.child(contact.username).setValue(contact)
     }
 
     fun setContacts(contacts: List<Contact>) {
@@ -67,8 +45,8 @@ class ContactsRepository(
     }
 
     fun deleteContact(contact: Contact) {
-        sharedPreferences.edit().remove(contact.id).apply()
-        firebaseContactsRef.child(contact.id).removeValue()
+        sharedPreferences.edit().remove(contact.username).apply()
+        firebaseContactsRef.child(contact.username).removeValue()
     }
 
     fun getContacts(): Flow<List<Contact>> {

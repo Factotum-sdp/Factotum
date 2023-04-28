@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Build.VERSION_CODES.TIRAMISU
 import androidx.annotation.RequiresApi
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.database.FirebaseDatabase
 import java.io.File
 import java.util.concurrent.CountDownLatch
 
@@ -18,15 +19,27 @@ import java.util.concurrent.CountDownLatch
  * @param query : String. Query of the address that we want to create
  * @param context : Context. Context in which this constructor is called
  */
-class Location(query: String, context: Context) {
+class Location {
 
     val coordinates: LatLng?
     val addressName: String?
+    constructor(query: String, context: Context){
+        val address = geocoderQuery(query, context)?.get(0)
+        coordinates = address?.let { LatLng(it.latitude, it.longitude) }
+        addressName = address?.getAddressLine(0)
+    }
+
+    constructor(){
+        coordinates = null
+        addressName = null
+    }
+
 
     companion object {
         const val CACHE_FILE_NAME = "locations.txt"
         const val CACHE_FILE_SEPARATOR = "|"
         const val MAX_RESULT = 4
+        private val locationDbRef = FirebaseDatabase.getInstance().reference.child("locations")
 
         /**
          * Creates a location and stores it in a file named CACHE_FILE_NAME in cache if an address was found.
@@ -41,7 +54,6 @@ class Location(query: String, context: Context) {
             if (location.coordinates == null) {
                 return null
             }
-
             val cacheFile = File(context.cacheDir, CACHE_FILE_NAME)
             cacheFile.deleteOnExit()
             //creates the header if it is a new file
@@ -56,7 +68,9 @@ class Location(query: String, context: Context) {
                     alreadyExists = true
                 }
             }
-            if (!alreadyExists) cacheFile.appendText(toStore)
+            if (!alreadyExists){
+                cacheFile.appendText(toStore)
+            }
             return location
         }
 
@@ -103,12 +117,5 @@ class Location(query: String, context: Context) {
             return result
         }
     }
-
-    init {
-        val address = geocoderQuery(query, context)?.get(0)
-        coordinates = address?.let { LatLng(it.latitude, it.longitude) }
-        addressName = address?.getAddressLine(0)
-    }
-
 
 }

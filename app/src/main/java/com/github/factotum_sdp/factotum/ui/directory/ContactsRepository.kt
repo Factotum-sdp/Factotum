@@ -16,7 +16,7 @@ class ContactsRepository(
     private lateinit var firebaseContactsRef: DatabaseReference
 
     fun setDatabase(database: FirebaseDatabase) {
-        firebaseContactsRef = database.reference.child("contacts")
+        firebaseContactsRef = database.reference.child("contacts-daniel")
     }
 
     fun saveContactToSharedPreferences(contact: Contact) =
@@ -32,8 +32,9 @@ class ContactsRepository(
         name: String,
         surname: String,
         image: Int,
-        address: String,
-        coordinates: String,
+        addressName: String?,
+        latitude: Double?,
+        longitude: Double?,
         phone: String,
         details: String = ""
     ) {
@@ -43,8 +44,9 @@ class ContactsRepository(
             name,
             surname,
             image,
-            address,
-            coordinates,
+            addressName,
+            latitude,
+            longitude,
             phone,
             details
         )
@@ -79,7 +81,7 @@ class ContactsRepository(
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val contactsList = mutableListOf<Contact>()
                     for (contactSnapshot in snapshot.children) {
-                        val contact = contactSnapshot.getValue(Contact::class.java)
+                            val contact = contactSnapshot.getValue(Contact::class.java)
                         contact?.let {
                             contactsList.add(it)
                             saveContactToSharedPreferences(it)

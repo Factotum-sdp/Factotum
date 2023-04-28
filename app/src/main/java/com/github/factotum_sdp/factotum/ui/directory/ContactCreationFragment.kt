@@ -95,7 +95,7 @@ class ContactCreationFragment : Fragment() {
             spinner.setSelection(roles.indexOf(contact.role))
             name.setText(contact.name)
             surname.setText(contact.surname)
-            binding.contactCreationAddress.setQuery(contact.address, false)
+            binding.contactCreationAddress.setQuery(contact.addressName, false)
             phoneNumber.setText(contact.phone)
             details.setText(contact.details)
         }
@@ -189,8 +189,9 @@ class ContactCreationFragment : Fragment() {
                         name = name.text.toString(),
                         surname = surname.text.toString(),
                         profile_pic_id = R.drawable.contact_image,
-                        address = address?.addressName.toString(),
-                        coordinates = address?.coordinates.toString(),
+                        addressName = address?.addressName,
+                        latitude = address?.coordinates?.latitude,
+                        longitude = address?.coordinates?.longitude,
                         phone = phoneNumber.text.toString(),
                         details = details.text.toString()
                     )
@@ -206,8 +207,9 @@ class ContactCreationFragment : Fragment() {
                     name = name.text.toString(),
                     surname = surname.text.toString(),
                     image = R.drawable.contact_image,
-                    address = address?.addressName.toString(),
-                    coordinates = address?.addressName.toString(),
+                    addressName = address?.addressName,
+                    latitude = address?.coordinates?.latitude,
+                    longitude = address?.coordinates?.longitude,
                     phone = phoneNumber.text.toString(),
                     details = details.text.toString()
                 )

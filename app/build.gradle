@@ -23,15 +23,17 @@ android {
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-
     packagingOptions {
-        exclude 'META-INF/LICENSE.md'
-        exclude 'META-INF/LICENSE-notice.md'
+        resources {
+            excludes += ['META-INF/LICENSE.md', 'META-INF/LICENSE-notice.md']
+        }
     }
+
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources = true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
 
@@ -48,11 +50,11 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
     buildFeatures {
         viewBinding true
@@ -87,11 +89,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth-ktx'
     implementation 'com.google.firebase:firebase-database-ktx:20.2.0'
     implementation 'com.google.firebase:firebase-storage-ktx:20.1.0'
-    implementation platform('com.google.firebase:firebase-bom:31.2.3') // Firebase BOM
+    implementation platform('com.google.firebase:firebase-bom:31.5.0') // Firebase BOM
 
-
-    testImplementation 'io.mockk:mockk:1.13.5'
-    androidTestImplementation 'io.mockk:mockk-android:1.13.5'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
     testImplementation 'org.mockito:mockito-core:5.3.0'
@@ -104,13 +103,14 @@ dependencies {
     debugImplementation "androidx.test:monitor:1.6.1"
     androidTestImplementation 'androidx.test:rules:1.5.0'
     androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestUtil 'androidx.test.services:test-services:1.4.2'
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.3.0-alpha03'
     androidTestImplementation 'androidx.navigation:navigation-testing:2.5.3'
+
 }
 
 
 tasks.withType(Test) {
-    maxParallelForks = 1
     retry {
         maxRetries = 3
         maxFailures = 20
@@ -127,7 +127,6 @@ task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'crea
         xml.required = true
         html.required = true
     }
-
 
     def fileFilter = [
             '**/R.class',

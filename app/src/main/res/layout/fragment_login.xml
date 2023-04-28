@@ -67,14 +67,6 @@
             android:selectAllOnFocus="true" />
 
         <TextView
-            android:id="@+id/profile_retrival_error"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/retrieve_users_failed"
-            android:textColor="#FF0000"
-            android:visibility="gone" />
-
-        <TextView
             android:id="@+id/pwdForgot"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

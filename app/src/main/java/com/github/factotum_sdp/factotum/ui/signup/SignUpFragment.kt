@@ -9,6 +9,9 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ProgressBar
+import androidx.annotation.StringRes
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -16,12 +19,11 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.*
 import com.github.factotum_sdp.factotum.databinding.FragmentSignupBinding
-import com.github.factotum_sdp.factotum.ui.auth.BaseAuthFragment
 import com.google.android.material.snackbar.Snackbar
 
-class SignUpFragment : BaseAuthFragment() {
+class SignUpFragment : Fragment() {
 
-    override lateinit var viewModel: SignUpViewModel
+    private lateinit var viewModel: SignUpViewModel
     private var _binding: FragmentSignupBinding? = null
 
     private val roles = listOf("BOSS", "COURIER", "CLIENT")
@@ -144,18 +146,49 @@ class SignUpFragment : BaseAuthFragment() {
         roleAutoCompleteTextView.addTextChangedListener(afterTextChangedListener)
     }
 
-    override fun updateUi(model: Any) {
-        val welcome = getString(R.string.welcome) + " " + (model as String)
+    private fun listenToAuthButton(
+        authButton: Button,
+        loadingProgressBar: ProgressBar,
+        emailEditText: EditText,
+        passwordEditText: EditText
+    ) {
+        authButton.setOnClickListener {
+            loadingProgressBar.visibility = View.VISIBLE
+            viewModel.auth(
+                emailEditText.text.toString(),
+                passwordEditText.text.toString()
+            )
+        }
+    }
+
+    private fun observeAuthResult(loadingProgressBar: View) {
+        viewModel.authResult.observe(viewLifecycleOwner,
+            Observer { authResult ->
+                authResult ?: return@Observer
+                loadingProgressBar.visibility = View.GONE
+                authResult.error?.let {
+                    showSignUpFailed(it)
+                }
+                authResult.success?.let {
+                    updateUi(it)
+                }
+            })
+    }
+
+    private fun updateUi(model: String) {
+        val welcome = getString(R.string.welcome) + " " + model
         Snackbar.make(requireView(), welcome, Snackbar.LENGTH_LONG).show()
         val newUser = User(
             binding.username.text.toString(),
             binding.email.text.toString(),
             Role.valueOf(binding.role.text.toString())
         )
-        viewModel.updateUsersList(newUser)
-        MainActivity.getAuth().signOut()
-        MainActivity().finish()
-        startActivity(requireActivity().intent)
+        val newUserUID = MainActivity.getAuth().currentUser?.uid ?: "no uid"
+        viewModel.updateUser(newUserUID, newUser)
+    }
+
+    private fun showSignUpFailed(@StringRes errorString: Int) {
+        Snackbar.make(requireView(), errorString, Snackbar.LENGTH_SHORT).show()
     }
 
     override fun onDestroyView() {

@@ -8,22 +8,24 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import android.widget.TextView
+import android.widget.ProgressBar
+import androidx.annotation.StringRes
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.data.User
 import com.github.factotum_sdp.factotum.databinding.FragmentLoginBinding
-import com.github.factotum_sdp.factotum.ui.auth.BaseAuthFragment
 import com.google.android.material.snackbar.Snackbar
 
 
-class LoginFragment : BaseAuthFragment() {
+class LoginFragment : Fragment() {
 
-    override lateinit var viewModel: LoginViewModel
+    private lateinit var viewModel: LoginViewModel
     private var _binding: FragmentLoginBinding? = null
 
     private val userViewModel: UserViewModel by activityViewModels()
@@ -54,13 +56,6 @@ class LoginFragment : BaseAuthFragment() {
         val loginButton = binding.login
         val signupButton = binding.signup
         val loadingProgressBar = binding.loading
-        val profileRetrieveErrorText = binding.profileRetrivalError
-
-        // Retrieve profiles of all users in the database
-        viewModel.retrieveUsersList()
-
-        // Observe the result of retrieving profiles and show it in a snackbar.
-        observeRetrieveProfilesResult(profileRetrieveErrorText)
 
         // Observe the login result and show it in a snackbar
         observeAuthResult(loadingProgressBar)
@@ -102,15 +97,6 @@ class LoginFragment : BaseAuthFragment() {
         }
     }
 
-    private fun observeRetrieveProfilesResult(profileRetrieveErrorText: TextView) {
-        viewModel.retrieveUsersResult.observe(viewLifecycleOwner) { usersResult ->
-            usersResult ?: return@observe
-            usersResult.error?.let {
-                profileRetrieveErrorText.visibility = View.VISIBLE
-            }
-        }
-    }
-
     private fun observeLoginFormState(
         loginButton: Button,
         usernameEditText: EditText,
@@ -140,9 +126,56 @@ class LoginFragment : BaseAuthFragment() {
         passwordEditText.addTextChangedListener(afterTextChangedListener)
     }
 
-    override fun updateUi(model: Any) {
-        val welcome = getString(R.string.welcome) + " " + (model as User).name + "!"
+    private fun listenToAuthButton(
+        authButton: Button,
+        loadingProgressBar: ProgressBar,
+        emailEditText: EditText,
+        passwordEditText: EditText
+    ) {
+        authButton.setOnClickListener {
+            loadingProgressBar.visibility = View.VISIBLE
+            viewModel.auth(
+                emailEditText.text.toString(),
+                passwordEditText.text.toString()
+            )
+        }
+    }
+
+    private fun observeAuthResult(loadingProgressBar: View) {
+        viewModel.authResult.observe(viewLifecycleOwner,
+            Observer { authResult ->
+                authResult ?: return@Observer
+                loadingProgressBar.visibility = View.GONE
+                authResult.error?.let {
+                    showLoginFailed(it)
+                }
+                authResult.success?.let {
+                    viewModel.retrieveUser(it)
+                }
+            })
+
+        viewModel.retrieveUsersResult.observe(viewLifecycleOwner,
+            Observer { result ->
+                result ?: return@Observer
+                loadingProgressBar.visibility = View.GONE
+                result.error?.let {
+                    showLoginFailed(it)
+                }
+                result.success?.let {
+                    updateUi(it)
+                }
+            })
+    }
+
+    private fun updateUi(model: User) {
+        val welcome = getString(R.string.welcome) + " " + model.name + "!"
+        userViewModel.setLoggedInUser(model)
+        Snackbar.make(requireView(), welcome, Snackbar.LENGTH_LONG).show()
         updateNGraphStartDestination()
+    }
+
+    private fun showLoginFailed(@StringRes errorString: Int) {
+        Snackbar.make(requireView(), errorString, Snackbar.LENGTH_SHORT).show()
     }
 
     private fun updateNGraphStartDestination() {

@@ -50,6 +50,7 @@ class GeneralUtils {
         fun getStorage(): FirebaseStorage {
             return storage
         }
+        }
 
         fun addUserToDatabase(user : UsersPlaceHolder.User) {
             // DO NOT REMOVE THIS PART OR PUT IT IN A @BeforeClass

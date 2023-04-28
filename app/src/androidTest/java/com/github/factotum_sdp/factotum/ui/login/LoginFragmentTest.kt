@@ -13,6 +13,7 @@ import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getAuth
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -40,22 +41,26 @@ class LoginFragmentTest {
         @JvmStatic
         fun setUpDatabase() {
             initFirebase()
-
-            MainActivity.setAuth(getAuth())
             UsersPlaceHolder.init(getDatabase(), getAuth())
 
-            runTest {
-                runBlocking {
+            runBlocking {
+                try {
                     UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER1)
+                } catch (e: FirebaseAuthUserCollisionException) {
+                    e.printStackTrace()
                 }
-                runBlocking {
-                    UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER1)
-                }
-                runBlocking {
-                    UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER3)
-                }
-                runBlocking {
+            }
+            runBlocking {
+                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER1)
+            }
+            runBlocking {
+                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER3)
+            }
+            runBlocking {
+                try {
                     UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER2)
+                } catch (e: FirebaseAuthUserCollisionException) {
+                    e.printStackTrace()
                 }
             }
         }
@@ -106,6 +111,7 @@ class LoginFragmentTest {
         }
     }
 
+    @Test
     fun correctUserEntryLeadsToRoadBook() {
         fillUserEntryAndGoToRBFragment("jane.doe@gmail.com", "123456")
         FirebaseAuth.AuthStateListener { firebaseAuth ->

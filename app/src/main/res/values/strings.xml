@@ -144,4 +144,5 @@
     <string name="search_contacts">Search contacts …</string>
     <string name="loc_service_notification_message">Location service for Factotum is working</string>
     <string name="loc_service_notification_title">Tracking location</string>
+    <string name="clientid_text">ClientId</string>
 </resources>

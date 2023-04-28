@@ -23,9 +23,9 @@ import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getAuth
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runTest
 import org.hamcrest.Matchers
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -43,36 +43,41 @@ class MainActivityTest {
     )
 
     companion object {
-        @OptIn(ExperimentalCoroutinesApi::class)
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
             initFirebase()
+            UsersPlaceHolder.init(getDatabase(), getAuth())
 
-            runTest {
-                runBlocking {
-                    ContactsUtils.populateDatabase()
-                }
+            runBlocking {
+                ContactsUtils.populateDatabase()
+            }
 
-                UsersPlaceHolder.init(getDatabase(), getAuth())
-                runBlocking {
-                    UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_BOSS)
-                }
-                runBlocking {
-                    UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_BOSS)
-                }
-                runBlocking {
+            runBlocking{
+                try {
                     UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_COURIER)
+                } catch (e : FirebaseAuthUserCollisionException) {
+                    e.printStackTrace()
                 }
-                runBlocking {
-                    UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_COURIER)
-                }
-                runBlocking {
+                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_COURIER)
+            }
+
+            runBlocking{
+                try {
                     UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_CLIENT)
+                } catch (e : FirebaseAuthUserCollisionException) {
+                    e.printStackTrace()
                 }
-                runBlocking {
-                    UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_CLIENT)
+                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_CLIENT)
+            }
+
+            runBlocking{
+                try {
+                    UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_BOSS)
+                } catch (e : FirebaseAuthUserCollisionException) {
+                    e.printStackTrace()
                 }
+                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_BOSS)
             }
         }
         /**
@@ -232,7 +237,7 @@ class MainActivityTest {
     }
 
     // Work when executing the scenario manually but emulators issues make it fails in the connectedCheck
-    // The second user Helen Bates can't be found.
+    // The second user Helen Bates can't be found
     private fun navHeaderStillDisplaysCorrectlyAfterLogout() {
         LoginFragmentTest.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
 

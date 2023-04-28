@@ -14,8 +14,8 @@ import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.tasks.await
 import java.io.File
 
-const val TIME_WAIT_SHUTTER = 3000L
-const val TIME_WAIT_DONE_OR_CANCEL = 1500L
+const val TIME_WAIT_SHUTTER = 4000L
+const val TIME_WAIT_DONE_OR_CANCEL = 2000L
 const val TIME_WAIT_UPLOAD_PHOTO = 1500L
 const val CLIENT_ID = "X17"
 

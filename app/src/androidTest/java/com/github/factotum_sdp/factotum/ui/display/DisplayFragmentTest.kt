@@ -18,7 +18,6 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.ui.display.utils.*
-import com.github.factotum_sdp.factotum.ui.login.LoginFragmentTest
 import com.github.factotum_sdp.factotum.ui.picture.emptyFirebaseStorage
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
@@ -63,7 +62,7 @@ class DisplayFragmentTest {
     @Before
     fun setUp() {
         context = InstrumentationRegistry.getInstrumentation().context
-        LoginFragmentTest.fillUserEntryAndGoToRBFragment("client@gmail.com", "123456")
+        GeneralUtils.fillUserEntryAndGoToRBFragment("client@gmail.com", "123456")
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

@@ -1,3 +1,4 @@
+/*
 package com.github.factotum_sdp.factotum.ui.login
 
 import androidx.test.espresso.Espresso.onView
@@ -59,24 +60,10 @@ class LoginFragmentTest {
             MainActivity.setAuth(auth)
         }
 
-        fun fillUserEntryAndGoToRBFragment(email: String, password: String) {
-            onView(withId(R.id.email)).perform(typeText(email))
-            onView(withId(R.id.fragment_login_directors_parent)).perform(
-                closeSoftKeyboard()
-            )
-            onView(withId(R.id.password)).perform(typeText(password))
-            onView(withId(R.id.fragment_login_directors_parent)).perform(
-                closeSoftKeyboard()
-            )
-            onView(withId(R.id.login)).perform(click())
 
-            runBlocking {
-                delay(WAIT_TIME_LOGIN)
-            }
-        }
     }
 
-    /*@Test
+    @Test
     fun loginFormInitialStateIsEmpty() {
         onView(withId(R.id.email)).check(matches(withText("")))
         onView(withId(R.id.password)).check(matches(withText("")))
@@ -140,5 +127,6 @@ class LoginFragmentTest {
     fun clickOnSignUpLeadsToSignUpFragment() {
         onView(withId(R.id.signup)).perform(click())
         onView(withId(R.id.fragment_signup_directors_parent)).check(matches(isDisplayed()))
-    }*/
+    }
 }
+*/

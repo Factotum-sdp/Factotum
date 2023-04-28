@@ -8,13 +8,13 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
-import com.github.factotum_sdp.factotum.ui.login.LoginFragmentTest
+import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.PreferencesSetting
 import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.tasks.await
 import java.io.File
 
-const val TIME_WAIT_SHUTTER = 1500L
+const val TIME_WAIT_SHUTTER = 3000L
 const val TIME_WAIT_DONE_OR_CANCEL = 1500L
 const val TIME_WAIT_UPLOAD_PHOTO = 1500L
 const val CLIENT_ID = "X17"
@@ -50,7 +50,7 @@ fun triggerShutter(device: UiDevice) {
 
 
 fun goToPictureFragment() {
-    LoginFragmentTest.fillUserEntryAndGoToRBFragment("courier@gmail.com", "123456")
+    GeneralUtils.fillUserEntryAndGoToRBFragment("courier@gmail.com", "123456")
 
     PreferencesSetting.enableTouchClick()
 

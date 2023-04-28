@@ -1,7 +1,11 @@
 package com.github.factotum_sdp.factotum.utils
 
 import android.util.Log
+import androidx.test.espresso.Espresso
+import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.matcher.ViewMatchers
 import com.github.factotum_sdp.factotum.MainActivity
+import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
@@ -20,6 +24,7 @@ class GeneralUtils {
         private lateinit var auth: FirebaseAuth
         private lateinit var storage: FirebaseStorage
         private const val WAIT_BETWEEN_DB_ADD = 500L
+        private const val WAIT_TIME_LOGIN = 1000L
 
         fun initFirebase(online : Boolean = true) {
             database = Firebase.database
@@ -59,6 +64,23 @@ class GeneralUtils {
             UsersPlaceHolder.addUserToDb(user)
 
             delay(WAIT_BETWEEN_DB_ADD)
+        }
+
+        fun fillUserEntryAndGoToRBFragment(email: String, password: String) {
+            Espresso.onView(ViewMatchers.withId(R.id.email)).perform(ViewActions.typeText(email))
+            Espresso.onView(ViewMatchers.withId(R.id.fragment_login_directors_parent)).perform(
+                ViewActions.closeSoftKeyboard()
+            )
+            Espresso.onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.typeText(password))
+            Espresso.onView(ViewMatchers.withId(R.id.fragment_login_directors_parent)).perform(
+                ViewActions.closeSoftKeyboard()
+            )
+            Espresso.onView(ViewMatchers.withId(R.id.login)).perform(ViewActions.click())
+
+            runBlocking {
+                delay(WAIT_TIME_LOGIN)
+            }
         }
     }
 }

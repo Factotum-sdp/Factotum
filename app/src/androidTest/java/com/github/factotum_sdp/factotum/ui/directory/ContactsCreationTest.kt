@@ -58,7 +58,7 @@ class ContactsCreationTest {
 
     @Test
     fun buttonTextIsCorrect() {
-        onView(withId(R.id.create_contact)).check(matches(withText("Create Contact")))
+        onView(withId(R.id.confirm_form)).check(matches(withText("Create Contact")))
     }
 
     @Test
@@ -81,7 +81,7 @@ class ContactsCreationTest {
     /* // Get the actual number of contacts from the database not by an hardcoded value
     @Test
     fun canCreateContact() {
-        onView(withId(R.id.create_contact)).perform(click())
+        onView(withId(R.id.confirm_form)).perform(click())
         //check if recycle view in contacts has 6 items
         onView(withId(R.id.contacts_recycler_view))
             .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
@@ -101,6 +101,10 @@ class ContactsCreationTest {
     /*
     @Test
     fun createdContactHasCorrectValue() {
+
+        val usernameEditText = onView(withId(R.id.editTextUsername))
+        usernameEditText.perform(replaceText("JohnDoe"))
+
         val nameEditText = onView(withId(R.id.editTextName))
         nameEditText.perform(replaceText("John"))
 
@@ -118,7 +122,8 @@ class ContactsCreationTest {
         val notesEditText = onView(withId(R.id.contactCreationNotes))
         notesEditText.perform(replaceText("This is a test note."))
 
-        onView(withId(R.id.create_contact)).perform(click())
+        Thread.sleep(1000)
+        onView(withId(R.id.confirm_form)).perform(click())
         onView(withId(R.id.contacts_recycler_view))
             .perform(
                 RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
@@ -127,6 +132,7 @@ class ContactsCreationTest {
                 )
             )
 
+        onView(withId(R.id.contact_username)).check(matches(withText("@JohnDoe")))
         onView(withId(R.id.contact_name)).check(matches(withText("John")))
         onView(withId(R.id.contact_surname)).check(matches(withText("Doe")))
         onView(withId(R.id.contact_address)).check(matches(withText("123 Main St")))

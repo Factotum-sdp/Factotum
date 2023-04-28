@@ -1,6 +1,7 @@
 package com.github.factotum_sdp.factotum
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
@@ -12,6 +13,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.*
 import com.github.factotum_sdp.factotum.data.Role
 import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
+import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -24,6 +26,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private val auth: FirebaseAuth = getAuth()
+    private lateinit var contactsViewModel: ContactsViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +37,10 @@ class MainActivity : AppCompatActivity() {
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
+
+        contactsViewModel = ViewModelProvider(this)[ContactsViewModel::class.java]
+        contactsViewModel.setDatabase(getDatabase())
+        Log.d("contacts", contactsViewModel.contacts.value.toString()) // Force the contacts to be fetched from the database
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment

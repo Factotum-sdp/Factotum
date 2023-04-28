@@ -8,26 +8,18 @@ import android.view.ViewGroup
 import android.widget.SearchView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.firebase.database.FirebaseDatabase
 
 class DirectoryFragment : Fragment() {
 
-    private lateinit var db: FirebaseDatabase
     private lateinit var adapter: ContactsRecyclerAdapter
-    private lateinit var viewModel: ContactsViewModel
+    private val viewModel : ContactsViewModel by activityViewModels()
     private lateinit var emptyContactsMessage: TextView
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        db = MainActivity.getDatabase()
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,8 +33,7 @@ class DirectoryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = ViewModelProvider(requireActivity())[ContactsViewModel::class.java]
-        viewModel.setDatabase(db)
+
         adapter = ContactsRecyclerAdapter()
         adapter.updateContacts(viewModel.contacts.value ?: emptyList())
 

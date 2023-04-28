@@ -38,8 +38,9 @@ class ContactDetailsFragment : Fragment() {
         val contactsViewModel = //retrieve list of contacts
             ViewModelProvider(requireActivity())[ContactsViewModel::class.java]
 
-        currentContact =
-            contactsViewModel.contacts.value?.get(arguments?.getInt("id")!!) ?: Contact()
+        currentContact = if (arguments?.getBoolean("useListLoc")!!)
+            contactsViewModel.contacts.value?.get(arguments?.getInt("id")!!) ?: Contact() else
+            contactsViewModel.contacts.value?.find { it.username == arguments?.getString("username") } ?: Contact()
 
         setContactDetails(view, currentContact) //set contact details
 

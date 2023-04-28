@@ -42,6 +42,10 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
                 itemView.findNavController().navigate(
                     R.id.action_directoryFragment_to_contactDetailsFragment2,
                     Bundle().apply {
+                        putBoolean(
+                            "useListLoc",
+                            true
+                        )
                         putInt(
                             "id",
                             bindingAdapterPosition

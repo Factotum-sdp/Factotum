@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.*
 
@@ -31,6 +32,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         )
     }
     private val locationTrackingHandler: LocationTrackingHandler = LocationTrackingHandler()
+    private val contactsViewModel : ContactsViewModel by activityViewModels()
 
     // Checked OptionMenu States with default values
     // overridden by the device saved SharedPreference
@@ -95,7 +97,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         view.findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
             DRecordEditDialogBuilder(
                 context, requireParentFragment(),
-                rbViewModel, rbRecyclerView
+                rbViewModel, rbRecyclerView, contactsViewModel
             )
                 .forNewRecordEdition()
                 .show()
@@ -222,6 +224,10 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
             override fun getRecyclerView(): RecyclerView {
                 return rbRecyclerView
+            }
+
+            override fun getContactsViewModel(): ContactsViewModel {
+                return contactsViewModel
             }
 
             override fun getDragDirs(

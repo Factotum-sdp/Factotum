@@ -88,10 +88,6 @@ object UsersPlaceHolder {
             }
     }
 
-    fun emptyFirebaseDatabase(database: FirebaseDatabase) {
-        database.reference.child(LoginDataSource.DISPATCH_DB_PATH).removeValue()
-    }
-
     data class User(
         val name: String,
         val email: String,

@@ -61,6 +61,8 @@ class PictureFragmentOnlineTest {
         emptyLocalFiles(picturesDir)
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
+        // Ensure "use RoadBook preferences" is disabled
+        PreferencesSetting.setRoadBookPrefs(testRule)
         goToPictureFragment()
 
     }

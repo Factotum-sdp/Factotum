@@ -17,6 +17,11 @@ import com.github.factotum_sdp.factotum.ui.picture.PictureFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
+/**
+ * The container fragment which display all the details of a DestinationRecord
+ *
+ * The sliding event shows different fragments related to the DestinationRecord
+ */
 class DRecordDetailsFragment : Fragment() {
 
     private val rbViewModel: RoadBookViewModel by activityViewModels()

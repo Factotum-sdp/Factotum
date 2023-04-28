@@ -1,12 +1,10 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.view.MenuProvider
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -15,15 +13,12 @@ import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.dataStore
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
 import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
+import com.github.factotum_sdp.factotum.ui.settings.SettingsViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.*
-
-private const val ROADBOOK_PREFERENCES_NAME = "factotum_preferences"
-private val Context.dataStore by preferencesDataStore(
-    name = ROADBOOK_PREFERENCES_NAME
-)
 
 /**
  * A fragment representing a RoadBook which is a list of DestinationRecord
@@ -31,6 +26,7 @@ private val Context.dataStore by preferencesDataStore(
 class RoadBookFragment : Fragment(), MenuProvider {
 
     private lateinit var rbRecyclerView: RecyclerView
+    private val settings: SettingsViewModel by activityViewModels()
     private val rbViewModel: RoadBookViewModel by activityViewModels {
         RoadBookViewModel.RoadBookViewModelFactory(
             MainActivity.getDatabase().reference.child(ROADBOOK_DB_PATH)
@@ -45,6 +41,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private lateinit var touchClickButton: MenuItem
     private lateinit var showArchivedButton: MenuItem
 
+    private var usePreferences = false
     private val locationTrackingHandler: LocationTrackingHandler = LocationTrackingHandler()
 
     override fun onCreateView(
@@ -130,20 +127,23 @@ class RoadBookFragment : Fragment(), MenuProvider {
         rbViewModel.setPreferencesRepository(RoadBookPreferencesRepository(dataStore))
         loadDefaultPreferencesButtonState()
 
-        // Load DataStore Preferences todo here check global boolean from setting if use of user Preferences
+        settings.settingsLiveData.observe(viewLifecycleOwner) {
+            usePreferences = it.useRoadBookPreferences
+        }
         rbViewModel.initialPreferences().observe(viewLifecycleOwner) {
-            loadPreferencesButtonState(it)
+            if(usePreferences) {
+                loadPreferencesButtonState(it)
+            }
+            showOrHideArchived(isShowArchivedEnabled())
         }
 
         // Events and displays according to the preferences state
-        showOrHideArchived(isShowArchivedEnabled())
-        setPrefButtonsOnClickListeners(
-            dragAndDropButton,
-            swipeLeftButton,
-            swipeRightButton,
-            touchClickButton,
-            showArchivedButton
-        )
+        setPrefButtonsOnClickListeners(dragAndDropButton, swipeLeftButton, swipeRightButton, touchClickButton)
+        showArchivedButton.setOnMenuItemClickListener {
+            it.isChecked = !it.isChecked
+            showOrHideArchived(isShowArchivedEnabled())
+            true
+        }
         setLiveLocationSwitch(fragMenu)
         setRefreshButtonListener(fragMenu)
 

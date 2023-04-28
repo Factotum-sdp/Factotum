@@ -9,6 +9,7 @@ import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
+import com.github.factotum_sdp.factotum.utils.PreferencesSetting
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
@@ -55,6 +56,8 @@ class PictureFragmentOfflineTest {
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         emptyLocalFiles(picturesDir)
 
+        // Ensure "use RoadBook preferences" is disabled
+        PreferencesSetting.setRoadBookPrefs(testRule)
         goToPictureFragment()
     }
 

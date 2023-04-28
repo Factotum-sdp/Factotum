@@ -1,6 +1,5 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
-import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.*
 import com.github.factotum_sdp.factotum.models.DestinationRecord
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
@@ -23,7 +22,7 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
     private val _recordsList: MutableLiveData<DRecordList> =
         MutableLiveData(DRecordList())
     private var dbRef: DatabaseReference
-    private val clientOccurences = HashMap<String, Int>()
+    private val clientOccurrences = HashMap<String, Int>()
     private lateinit var preferencesRepository: RoadBookPreferencesRepository
 
     val recordsListState: LiveData<DRecordList> = _recordsList
@@ -274,7 +273,7 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
     }
 
     private fun computeDestID(clientID: String): String {
-        val occ = clientOccurences.compute(clientID) { _, oldOcc ->
+        val occ = clientOccurrences.compute(clientID) { _, oldOcc ->
             var occ = oldOcc ?: 0
             ++occ
         }

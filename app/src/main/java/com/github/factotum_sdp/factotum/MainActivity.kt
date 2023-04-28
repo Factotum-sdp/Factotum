@@ -12,6 +12,8 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.*
 import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
+import com.github.factotum_sdp.factotum.repositories.SettingsRepository
+import com.github.factotum_sdp.factotum.ui.settings.SettingsViewModel
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -24,6 +26,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private val auth: FirebaseAuth = getAuth()
+    private lateinit var settings: SettingsViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +48,7 @@ class MainActivity : AppCompatActivity() {
             setOf(
                 R.id.roadBookFragment, R.id.directoryFragment,
                 R.id.loginFragment, R.id.routeFragment,
-                R.id.displayFragment
+                R.id.displayFragment, R.id.settingsFragment
             ), drawerLayout
         )
 
@@ -58,11 +61,20 @@ class MainActivity : AppCompatActivity() {
         // Set the OnNavigationItemSelectedListener for the NavigationView
         navView.setNavigationItemSelectedListener(onNavigationItemSelectedListener)
 
+        // Launch the Application Settings ViewModel
+        val repository = SettingsRepository(dataStore)
+        val settingsFactory = SettingsViewModel.SettingsViewModelFactory(repository)
+        settings = ViewModelProvider(this, settingsFactory)[SettingsViewModel::class.java]
+
         // Bind user data displayed in the Navigation Header
         setUserHeader()
 
         // Set listener on logout button
         listenLogoutButton()
+    }
+
+    fun applicationSettingsViewModel(): SettingsViewModel {
+        return settings
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -112,6 +124,7 @@ class MainActivity : AppCompatActivity() {
                 navMenu.findItem(R.id.directoryFragment).isVisible = false
                 navMenu.findItem(R.id.routeFragment).isVisible = false
                 navMenu.findItem(R.id.displayFragment).isVisible = true
+                navMenu.findItem(R.id.settingsFragment).isVisible = false
             }
 
             else -> {
@@ -119,6 +132,7 @@ class MainActivity : AppCompatActivity() {
                 navMenu.findItem(R.id.directoryFragment).isVisible = true
                 navMenu.findItem(R.id.routeFragment).isVisible = true
                 navMenu.findItem(R.id.displayFragment).isVisible = true
+                navMenu.findItem(R.id.settingsFragment).isVisible = true
             }
         }
     }

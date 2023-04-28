@@ -1,18 +1,17 @@
 package com.github.factotum_sdp.factotum.repositories
 
-import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.emptyPreferences
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.Flow
-import java.io.IOException
 
+/**
+ * The RoadBookPreferencesRepository
+ *
+ * With DataStore as unique data source to save locally the RoadBook preferences state.
+ */
 class RoadBookPreferencesRepository(private val dataStore: DataStore<Preferences>) {
 
     private object PreferencesKeys {
@@ -23,60 +22,70 @@ class RoadBookPreferencesRepository(private val dataStore: DataStore<Preferences
         val SHOW_ARCHIVED = booleanPreferencesKey("roadbook_show_archived")
     }
 
-    private val TAG: String = "RoadBookPreferencesRepo"
-
+    /**
+     * Suspend function to fetch the initial preferences for the RoadBook
+     *
+     * @return RoadBookPreferences
+     */
+    suspend fun fetchInitialPreferences(): RoadBookPreferences =
+        mapRoadBookPreferences(dataStore.data.first().toPreferences())
 
     /**
-     * Get the user preferences flow.
+     * Suspend function to update the reordering RoodBook preference
+     *
+     * @param isReorderingEnabled: Boolean
      */
-    val userPreferencesFlow: Flow<RoadBookPreferences> = dataStore.data
-        .catch { exception ->
-            // dataStore.data throws an IOException when an error is encountered when reading data
-            if (exception is IOException) {
-                Log.e(TAG, "Error reading preferences.", exception)
-                emit(emptyPreferences())
-            } else {
-                throw exception
-            }
-        }.map { preferences ->
-            mapUserPreferences(preferences)
-        }
-
-    suspend fun fetchInitialPreferences(): RoadBookPreferences =
-        mapUserPreferences(dataStore.data.first().toPreferences())
-
-
     suspend fun updateReordering(isReorderingEnabled: Boolean) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.REORDERING] = isReorderingEnabled
         }
     }
 
+    /**
+     * Suspend function to update the deletion and archiving RoodBook preference
+     *
+     * @param isDeletionAndArchivingEnabled: Boolean
+     */
     suspend fun updateDeletionOrArchiving(isDeletionAndArchivingEnabled: Boolean) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.DELETION_AND_ARCHIVING] = isDeletionAndArchivingEnabled
         }
     }
 
+    /**
+     * Suspend function to update the edition RoodBook preference
+     *
+     * @param isEditionEnabled: Boolean
+     */
     suspend fun updateEdition(isEditionEnabled: Boolean) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.EDITION] = isEditionEnabled
         }
     }
 
-    suspend fun updateDetailsAccess(isUpdateDetailsEnabled: Boolean) {
+    /**
+     * Suspend function to update the access details RoodBook preference
+     *
+     * @param isAccessDetailsEnabled: Boolean
+     */
+    suspend fun updateDetailsAccess(isAccessDetailsEnabled: Boolean) {
         dataStore.edit { preferences ->
-            preferences[PreferencesKeys.DETAILS_ACCESS] = isUpdateDetailsEnabled
+            preferences[PreferencesKeys.DETAILS_ACCESS] = isAccessDetailsEnabled
         }
     }
 
+    /**
+     * Suspend function to update the show archived RoodBook preference
+     *
+     * @param isShowArchivedEnabled: Boolean
+     */
     suspend fun updateShowArchived(isShowArchivedEnabled: Boolean) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.SHOW_ARCHIVED] = isShowArchivedEnabled
         }
     }
 
-    private fun mapUserPreferences(preferences: Preferences): RoadBookPreferences {
+    private fun mapRoadBookPreferences(preferences: Preferences): RoadBookPreferences {
         // Get our show completed value, defaulting to false if not set:
         val enableReordering = preferences[PreferencesKeys.REORDERING] ?: false
         val enableArchivingAndDeletion = preferences[PreferencesKeys.DELETION_AND_ARCHIVING] ?: false

@@ -31,22 +31,21 @@ private val Context.dataStore by preferencesDataStore(
 class RoadBookFragment : Fragment(), MenuProvider {
 
     private lateinit var rbRecyclerView: RecyclerView
-    private lateinit var fragMenu: Menu
-
     private val rbViewModel: RoadBookViewModel by activityViewModels {
         RoadBookViewModel.RoadBookViewModelFactory(
             MainActivity.getDatabase().reference.child(ROADBOOK_DB_PATH)
         )
     }
-    private val locationTrackingHandler: LocationTrackingHandler = LocationTrackingHandler()
 
-    // Checked OptionMenu States with unused init values
-    // overridden by the device saved SharedPreference or defaults values in onCreateMenu()
-    private var isSLEnabled = true
-    private var isSREnabled = true
-    private var isDDropEnabled = true
-    private var isTClickEnabled = false
-    private var isShowArchivedEnabled = false
+    // Following fields loaded in onCreateMenu()
+    private lateinit var fragMenu: Menu
+    private lateinit var dragAndDropButton: MenuItem
+    private lateinit var swipeLeftButton: MenuItem
+    private lateinit var swipeRightButton: MenuItem
+    private lateinit var touchClickButton: MenuItem
+    private lateinit var showArchivedButton: MenuItem
+
+    private val locationTrackingHandler: LocationTrackingHandler = LocationTrackingHandler()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -56,13 +55,13 @@ class RoadBookFragment : Fragment(), MenuProvider {
         val view = inflater.inflate(R.layout.fragment_roadbook, container, false)
         val adapter = RoadBookViewAdapter(setOnDRecordClickListener())
 
-        // Observe the roadbook ViewModel, to detect data changes
+        // Observe the RoadBook ViewModel, to detect data changes
         // and update the displayed RecyclerView accordingly
         rbViewModel.recordsListState.observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }
 
-        // Set events that triggers change in the roadbook ViewModel
+        // Set events that triggers change in the Roadoook ViewModel
         setRoadBookEvents(rbViewModel, view)
 
         // Set up the RoadBook RecyclerView
@@ -87,7 +86,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private fun setOnDRecordClickListener(): (String) -> View.OnClickListener {
         return {
             View.OnClickListener { v ->
-                if (isTClickEnabled) {
+                if (isTouchClickEnabled()) {
                     v
                         ?.findNavController()
                         ?.navigate(R.id.action_roadBookFragment_to_DRecordDetailsFragment,
@@ -101,7 +100,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     }
 
     private fun setRoadBookEvents(rbViewModel: RoadBookViewModel, view: View) {
-        // Add record on positive floating button click
+        // Add record on floating "addition" button click
         view.findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
             DRecordEditDialogBuilder(
                 context, requireParentFragment(),
@@ -121,48 +120,30 @@ class RoadBookFragment : Fragment(), MenuProvider {
         menuInflater.inflate(R.menu.main, menu)
         fragMenu = menu
 
-        val dragAndDropButton = menu.findItem(R.id.rbDragDrop)
-        val swipeLeftButton = menu.findItem(R.id.rbSwipeLDeletion)
-        val swipeRightButton = menu.findItem(R.id.rbSwipeREdition)
-        val touchClickButton = menu.findItem(R.id.rbTouchClick)
-        val showArchivedButton = menu.findItem(R.id.showArchived)
+        dragAndDropButton = menu.findItem(R.id.rbDragDrop)
+        swipeLeftButton = menu.findItem(R.id.rbSwipeLDeletion)
+        swipeRightButton = menu.findItem(R.id.rbSwipeREdition)
+        touchClickButton = menu.findItem(R.id.rbTouchClick)
+        showArchivedButton = menu.findItem(R.id.showArchived)
 
-        val dStore = requireContext().dataStore // todo set here global setting option of using Roadbook Preferences
-        rbViewModel.setPreferencesRepository(RoadBookPreferencesRepository(dStore))
-        val initialPreferences = RoadBookPreferences( // or defaults
-            enableReordering = true,
-            enableArchivingAndDeletion = true,
-            enableEdition = true,
-            enableDetailsAccess = false,
-            showArchived = false
-        )
-        dragAndDropButton.isChecked = initialPreferences.enableReordering
-        swipeLeftButton.isChecked = initialPreferences.enableArchivingAndDeletion
-        swipeRightButton.isChecked = initialPreferences.enableEdition
-        touchClickButton.isChecked = initialPreferences.enableDetailsAccess
-        showArchivedButton.isChecked = initialPreferences.showArchived
-        isDDropEnabled = dragAndDropButton.isChecked
-        isSLEnabled = swipeLeftButton.isChecked
-        isSREnabled = swipeRightButton.isChecked
-        isTClickEnabled = touchClickButton.isChecked
-        isShowArchivedEnabled = showArchivedButton.isChecked
+        val dataStore = requireContext().dataStore
+        rbViewModel.setPreferencesRepository(RoadBookPreferencesRepository(dataStore))
+        loadDefaultPreferencesButtonState()
 
+        // Load DataStore Preferences todo here check global boolean from setting if use of user Preferences
         rbViewModel.initialPreferences().observe(viewLifecycleOwner) {
-            dragAndDropButton.isChecked = it.enableReordering
-            swipeLeftButton.isChecked = it.enableArchivingAndDeletion
-            swipeRightButton.isChecked = it.enableEdition
-            touchClickButton.isChecked = it.enableDetailsAccess
-            showArchivedButton.isChecked = it.showArchived
-            isDDropEnabled = dragAndDropButton.isChecked
-            isSLEnabled = swipeLeftButton.isChecked
-            isSREnabled = swipeRightButton.isChecked
-            isTClickEnabled = touchClickButton.isChecked
-            isShowArchivedEnabled = showArchivedButton.isChecked
+            loadPreferencesButtonState(it)
         }
 
-
-        showOrHideArchived(isShowArchivedEnabled)
-        setRBonClickListeners(dragAndDropButton, swipeLeftButton, swipeRightButton, touchClickButton, showArchivedButton)
+        // Events and displays according to the preferences state
+        showOrHideArchived(isShowArchivedEnabled())
+        setPrefButtonsOnClickListeners(
+            dragAndDropButton,
+            swipeLeftButton,
+            swipeRightButton,
+            touchClickButton,
+            showArchivedButton
+        )
         setLiveLocationSwitch(fragMenu)
         setRefreshButtonListener(fragMenu)
 
@@ -171,35 +152,30 @@ class RoadBookFragment : Fragment(), MenuProvider {
         itemTouchHelper.attachToRecyclerView(rbRecyclerView)
     }
 
-    private fun setRBonClickListeners(
-        rbDD: MenuItem, rbSL: MenuItem, rbSR: MenuItem,
-        rbTC: MenuItem, rbSA: MenuItem
-    ) {
-        rbDD.setOnMenuItemClickListener {
-            isDDropEnabled = !isDDropEnabled
-            it.isChecked = isDDropEnabled
-            true
-        }
-        rbSL.setOnMenuItemClickListener {
-            isSLEnabled = !isSLEnabled
-            it.isChecked = isSLEnabled
-            true
-        }
-        rbSR.setOnMenuItemClickListener {
-            isSREnabled = !isSREnabled
-            it.isChecked = isSREnabled
-            true
-        }
-        rbTC.setOnMenuItemClickListener {
-            isTClickEnabled = !isTClickEnabled
-            it.isChecked = isTClickEnabled
-            true
-        }
-        rbSA.setOnMenuItemClickListener {
-            isShowArchivedEnabled = !isShowArchivedEnabled
-            it.isChecked = isShowArchivedEnabled
-            showOrHideArchived(it.isChecked)
-            true
+    private fun loadDefaultPreferencesButtonState() {
+        val defaultPreferences = RoadBookPreferences(
+            enableReordering = true,
+            enableArchivingAndDeletion = true,
+            enableEdition = true,
+            enableDetailsAccess = false,
+            showArchived = false
+        )
+        loadPreferencesButtonState(defaultPreferences)
+    }
+    private fun loadPreferencesButtonState(preferences: RoadBookPreferences) {
+        dragAndDropButton.isChecked = preferences.enableReordering
+        swipeLeftButton.isChecked = preferences.enableArchivingAndDeletion
+        swipeRightButton.isChecked = preferences.enableEdition
+        touchClickButton.isChecked = preferences.enableDetailsAccess
+        showArchivedButton.isChecked = preferences.showArchived
+    }
+
+    private fun setPrefButtonsOnClickListeners(vararg preferenceButtons: MenuItem) {
+        preferenceButtons.forEach { button ->
+            button.setOnMenuItemClickListener {
+                it.isChecked = !it.isChecked
+                true
+            }
         }
     }
 
@@ -257,8 +233,8 @@ class RoadBookFragment : Fragment(), MenuProvider {
             override fun getDragDirs(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder
-            ): Int {
-                if (!isDDropEnabled) // setting IDLE setting to disable drag up or down detection
+            ): Int { // Set IDLE setting to disable drag up or down detection
+                if (!isDragAndDropEnabled())
                     return ACTION_STATE_IDLE
                 return super.getDragDirs(recyclerView, viewHolder)
             }
@@ -268,14 +244,30 @@ class RoadBookFragment : Fragment(), MenuProvider {
                 viewHolder: RecyclerView.ViewHolder
             ): Int {
                 var swipeFlags = ACTION_STATE_SWIPE
-                if (isSLEnabled) swipeFlags = swipeFlags or LEFT
-                if (isSREnabled) swipeFlags = swipeFlags or RIGHT
+                if (isSwipeLeftEnabled()) swipeFlags = swipeFlags or LEFT
+                if (isSwipeRightEnabled()) swipeFlags = swipeFlags or RIGHT
 
                 return swipeFlags
             }
 
         }
         return itemTHCallback
+    }
+
+    private fun isDragAndDropEnabled(): Boolean {
+        return dragAndDropButton.isChecked
+    }
+    private fun isTouchClickEnabled(): Boolean {
+        return touchClickButton.isChecked
+    }
+    private fun isSwipeLeftEnabled(): Boolean {
+        return swipeLeftButton.isChecked
+    }
+    private fun isSwipeRightEnabled(): Boolean {
+        return swipeRightButton.isChecked
+    }
+    private fun isShowArchivedEnabled(): Boolean {
+        return showArchivedButton.isChecked
     }
 
     companion object {
@@ -299,11 +291,14 @@ class RoadBookFragment : Fragment(), MenuProvider {
     }
 
     private fun saveButtonStates() {
-        rbViewModel.updateReordering(isDDropEnabled)
-        rbViewModel.updateDeletionOrArchiving(isSLEnabled)
-        rbViewModel.updateEdition(isSREnabled)
-        rbViewModel.updateDetailsAccess(isTClickEnabled)
-        rbViewModel.updateShowArchived(isShowArchivedEnabled)
+        val currentPreferences = RoadBookPreferences(
+            enableReordering = isDragAndDropEnabled(),
+            enableArchivingAndDeletion = isSwipeLeftEnabled(),
+            enableEdition = isSwipeRightEnabled(),
+            enableDetailsAccess = isTouchClickEnabled(),
+            showArchived = isShowArchivedEnabled()
+        )
+        rbViewModel.updateRoadBookPreferences(currentPreferences)
     }
 
     @SuppressLint("NotifyDataSetChanged")

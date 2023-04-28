@@ -38,43 +38,45 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         // Only for demo purpose :
         addDemoRecords(DestinationRecords.RECORDS)
     }
-    fun initialPreferences(): LiveData<RoadBookPreferences> {
-        return liveData {
-            val initPref = preferencesRepository.fetchInitialPreferences()
-            emit(initPref)
-        }
-    }
+
+    /**
+     * Set the preferencesRepository field of this ViewModel
+     *
+     * To be called before any call to a function dealing with the RoadBookPreferences i.e :
+     * initialPreferences()
+     * updateRoadBookPreferences()
+     *
+     * @param preferences: RoadBookPreferencesRepository
+     */
     fun setPreferencesRepository(preferences: RoadBookPreferencesRepository) {
         preferencesRepository = preferences
     }
 
-    fun updateReordering(isReorderingEnabled: Boolean) {
-        viewModelScope.launch {
-            preferencesRepository.updateReordering(isReorderingEnabled)
+    /**
+     * Fetch the initial observable RoadBookPreferences state
+     *
+     * @return LiveData<RoadBookPreferences> The initial preferences state
+     */
+    fun initialPreferences(): LiveData<RoadBookPreferences> {
+        return liveData {
+            emit(preferencesRepository.fetchInitialPreferences())
         }
     }
 
-    fun updateDeletionOrArchiving(isDeletionAndArchivingEnabled: Boolean) {
+    /**
+     * Update the DataStore RoadBookPreferences state
+     *
+     * @param preferences: RoadBookPreferences
+     */
+    fun updateRoadBookPreferences(preferences: RoadBookPreferences) {
         viewModelScope.launch {
-            preferencesRepository.updateDeletionOrArchiving(isDeletionAndArchivingEnabled)
-        }
-    }
-
-    fun updateEdition(isEditionEnabled: Boolean) {
-        viewModelScope.launch {
-            preferencesRepository.updateEdition(isEditionEnabled)
-        }
-    }
-
-    fun updateDetailsAccess(isUpdateDetailsEnabled: Boolean) {
-        viewModelScope.launch {
-            preferencesRepository.updateDetailsAccess(isUpdateDetailsEnabled)
-        }
-    }
-
-    fun updateShowArchived(isShowArchivedEnabled: Boolean) {
-        viewModelScope.launch {
-            preferencesRepository.updateShowArchived(isShowArchivedEnabled)
+            preferences.apply {
+                preferencesRepository.updateReordering(enableReordering)
+                preferencesRepository.updateDeletionOrArchiving(enableArchivingAndDeletion)
+                preferencesRepository.updateEdition(enableEdition)
+                preferencesRepository.updateDetailsAccess(enableDetailsAccess)
+                preferencesRepository.updateShowArchived(showArchived)
+            }
         }
     }
 

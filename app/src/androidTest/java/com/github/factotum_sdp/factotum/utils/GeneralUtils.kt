@@ -34,9 +34,9 @@ class GeneralUtils {
         fun getAuth(): FirebaseAuth {
             return auth
         }
-        /*
+
         fun getStorage(): FirebaseStorage {
             return storage
-        } */
+        }
     }
 }

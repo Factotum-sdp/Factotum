@@ -23,37 +23,43 @@ object UsersPlaceHolder {
         "Valentino Rossi",
         "valentino.rossi@epfl.ch",
         Role.BOSS,
-        password
+        password,
+        "clientID"
     )
     val USER2 = User(
         "Marc Marquez",
         "marc.marquez@epfl.ch",
         Role.BOSS,
-        password
+        password,
+        "clientID"
     )
     val USER3 = User(
         "Jane Doe",
         "jane.doe@gmail.com",
         Role.BOSS,
-        password
+        password,
+        "clientID"
     )
     val USER_BOSS = User(
         "Boss",
         "boss@gmail.com",
         Role.BOSS,
-        password
+        password,
+        "clientID"
     )
     val USER_COURIER = User(
         "Courier",
         "courier@gmail.com",
         Role.COURIER,
-        password
+        password,
+        "clientID"
     )
     val USER_CLIENT = User(
         "Client",
         "client@gmail.com",
         Role.CLIENT,
-        password
+        password,
+        "clientID"
     )
 
     fun init(dataSource: FirebaseDatabase, auth: FirebaseAuth) {
@@ -92,6 +98,7 @@ object UsersPlaceHolder {
         val name: String,
         val email: String,
         val role: Role,
-        val password: String
+        val password: String,
+        val clientID: String
     )
 }

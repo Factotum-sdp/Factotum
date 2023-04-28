@@ -42,6 +42,7 @@ class ContactCreation : Fragment() {
 
     private lateinit var name: EditText
     private lateinit var surname: EditText
+    private lateinit var username: EditText
     private lateinit var phoneNumber: EditText
     private lateinit var details: EditText
 
@@ -87,6 +88,7 @@ class ContactCreation : Fragment() {
     private fun setContactFields(view: View, contact: Contact?) {
         name = view.findViewById(R.id.editTextName)
         surname = view.findViewById(R.id.editTextSurname)
+        username = view.findViewById(R.id.editTextUsername)
         phoneNumber = view.findViewById(R.id.contactCreationPhoneNumber)
         details = view.findViewById(R.id.contactCreationNotes)
 
@@ -94,6 +96,7 @@ class ContactCreation : Fragment() {
             spinner.setSelection(roles.indexOf(contact.role))
             name.setText(contact.name)
             surname.setText(contact.surname)
+            username.setText(contact.username)
             binding.contactCreationAddress.setQuery(contact.address, false)
             phoneNumber.setText(contact.phone)
             details.setText(contact.details)
@@ -177,38 +180,22 @@ class ContactCreation : Fragment() {
 
     private fun initialiseApproveFormButton(view: View) {
         val approveFormButton = view.findViewById<Button>(R.id.create_contact)
-
-        if (isUpdate) {
-            approveFormButton.text = getString(R.string.form_button_update)
-            approveFormButton.setOnClickListener {
-                viewModel.updateContact(
-                    Contact(
-                        id = currentContact!!.id,
-                        role = spinner.selectedItem.toString(),
-                        name = name.text.toString(),
-                        surname = surname.text.toString(),
-                        profile_pic_id = R.drawable.contact_image,
-                        address = binding.contactCreationAddress.query.toString(),
-                        phone = phoneNumber.text.toString(),
-                        details = details.text.toString()
-                    )
-                )
-                it.findNavController().navigate(R.id.action_contactCreation_to_directoryFragment)
-            }
-        } else {
-            approveFormButton.text = getString(R.string.form_button_create)
-            approveFormButton.setOnClickListener {
-                viewModel.saveNewIDContact(
+        approveFormButton.text = if (isUpdate) getString(R.string.form_button_update) else getString(R.string.form_button_create)
+        approveFormButton.setOnClickListener {
+            viewModel.deleteContact(currentContact)
+            viewModel.saveContact(
+                Contact(
+                    username = username.text.toString(),
                     role = spinner.selectedItem.toString(),
                     name = name.text.toString(),
                     surname = surname.text.toString(),
-                    image = R.drawable.contact_image,
+                    profile_pic_id = R.drawable.contact_image,
                     address = binding.contactCreationAddress.query.toString(),
                     phone = phoneNumber.text.toString(),
                     details = details.text.toString()
                 )
-                it.findNavController().navigate(R.id.action_contactCreation_to_directoryFragment)
-            }
+            )
+            it.findNavController().navigate(R.id.action_contactCreation_to_directoryFragment)
         }
     }
 }

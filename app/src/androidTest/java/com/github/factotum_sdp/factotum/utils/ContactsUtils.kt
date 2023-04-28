@@ -9,6 +9,7 @@ import kotlinx.coroutines.CompletableDeferred
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.TypeSafeMatcher
+import kotlin.random.Random
 
 class ContactsUtils {
 
@@ -31,6 +32,8 @@ class ContactsUtils {
                 roles[position % roles.size], randomNames[position % randomNames.size],
                 randomSurnames[position % randomSurnames.size], image,
                 randomAddresses[position % randomAddresses.size],
+                Random.nextDouble(25.0),
+                Random.nextDouble(25.0),
                 randomPhones[position % randomPhones.size],
                 randomDetails[position % randomDetails.size]
             )

@@ -122,7 +122,7 @@ class ContactsUpdateTest {
         surnameEditText.check(matches(withText(ContactsUtils.getContacts()[0].surname)))
 
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        val addressEditText = device.findObject(By.text(ContactsUtils.getContacts()[0].address))
+        val addressEditText = device.findObject(By.text(ContactsUtils.getContacts()[0].addressName.toString()))
         assert(addressEditText != null)
 
         val phoneEditText = onView(withId(R.id.contactCreationPhoneNumber))

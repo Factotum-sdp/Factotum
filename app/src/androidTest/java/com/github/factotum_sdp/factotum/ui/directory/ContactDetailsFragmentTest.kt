@@ -114,7 +114,7 @@ class ContactDetailsFragmentTest {
         onView(withId(R.id.contact_role))
             .check(matches(withText(ContactsUtils.getContacts()[0].role)))
         onView(withId(R.id.contact_address))
-            .check(matches(withText(ContactsUtils.getContacts()[0].address)))
+            .check(matches(withText(ContactsUtils.getContacts()[0].addressName)))
         if (ContactsUtils.getContacts()[0].details != null) {
             onView(withId(R.id.contact_details))
                 .check(matches(withText(ContactsUtils.getContacts()[0].details)))

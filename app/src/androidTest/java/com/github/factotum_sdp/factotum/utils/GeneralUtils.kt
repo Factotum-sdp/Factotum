@@ -11,6 +11,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 
 class GeneralUtils {
@@ -18,6 +19,7 @@ class GeneralUtils {
         private lateinit var database: FirebaseDatabase
         private lateinit var auth: FirebaseAuth
         private lateinit var storage: FirebaseStorage
+        private const val WAIT_BETWEEN_DB_ADD = 500L
 
 
         fun initFirebase(online : Boolean = true) {
@@ -50,20 +52,16 @@ class GeneralUtils {
         fun getStorage(): FirebaseStorage {
             return storage
         }
-        }
 
-        fun addUserToDatabase(user : UsersPlaceHolder.User) {
-            // DO NOT REMOVE THIS PART OR PUT IT IN A @BeforeClass
-            runBlocking {
-                try {
-                    UsersPlaceHolder.addAuthUser(user)
-                } catch (e : FirebaseAuthUserCollisionException) {
-                    e.message?.let { Log.e("DisplayFragmentTest", it) }
-                }
-
-                UsersPlaceHolder.addUserToDb(user)
+        suspend fun addUserToDatabase(user: UsersPlaceHolder.User) {
+            try {
+                UsersPlaceHolder.addAuthUser(user)
+            } catch (e: FirebaseAuthUserCollisionException) {
+                e.message?.let { Log.e("DisplayFragmentTest", it) }
             }
-        }
+            UsersPlaceHolder.addUserToDb(user)
 
+            delay(WAIT_BETWEEN_DB_ADD)
+        }
     }
 }

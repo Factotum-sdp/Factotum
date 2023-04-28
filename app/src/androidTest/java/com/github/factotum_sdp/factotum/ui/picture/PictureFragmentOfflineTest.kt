@@ -11,15 +11,11 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
@@ -43,12 +39,13 @@ class PictureFragmentOfflineTest {
     )
 
     companion object {
+        @OptIn(ExperimentalCoroutinesApi::class)
         @BeforeClass
         @JvmStatic
-        fun setUpDatabase() {
+        fun setUpDatabase() = runTest {
             initFirebase(online = false)
             UsersPlaceHolder.init(GeneralUtils.getDatabase(), GeneralUtils.getAuth())
-            GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_COURIER)
+            launch { GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_COURIER) }.join()
             GeneralUtils.getStorage().maxUploadRetryTimeMillis = 100L
             GeneralUtils.getStorage().maxOperationRetryTimeMillis = 100L
             GeneralUtils.getStorage().maxDownloadRetryTimeMillis = 100L
@@ -63,13 +60,13 @@ class PictureFragmentOfflineTest {
         goToPictureFragment()
 
         // Wait for the camera to open
-        Thread.sleep(TIME_WAIT_SHUTTER)
+        runBlocking { delay(TIME_WAIT_SHUTTER) }
 
         // Take a photo
         triggerShutter(device)
 
         // Wait for the photo to be taken
-        Thread.sleep(TIME_WAIT_DONE_OR_CANCEL)
+        runBlocking { delay(TIME_WAIT_DONE_OR_CANCEL) }
 
         // Click the button to validate the photo
         triggerDone(device)

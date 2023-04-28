@@ -19,13 +19,16 @@ import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.ui.login.LoginFragmentTest
 import com.github.factotum_sdp.factotum.utils.ContactsUtils
+import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getAuth
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.Matchers
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -43,42 +46,21 @@ class MainActivityTest {
     )
 
     companion object {
+        @OptIn(ExperimentalCoroutinesApi::class)
         @BeforeClass
         @JvmStatic
-        fun setUpDatabase() {
+        fun setUpDatabase() = runTest {
             initFirebase()
             UsersPlaceHolder.init(getDatabase(), getAuth())
+
+            launch { GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_COURIER) }.join()
+            launch { GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_BOSS) }.join()
+            launch { GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_CLIENT) }.join()
 
             runBlocking {
                 ContactsUtils.populateDatabase()
             }
 
-            runBlocking{
-                try {
-                    UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_COURIER)
-                } catch (e : FirebaseAuthUserCollisionException) {
-                    e.printStackTrace()
-                }
-                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_COURIER)
-            }
-
-            runBlocking{
-                try {
-                    UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_CLIENT)
-                } catch (e : FirebaseAuthUserCollisionException) {
-                    e.printStackTrace()
-                }
-                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_CLIENT)
-            }
-
-            runBlocking{
-                try {
-                    UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_BOSS)
-                } catch (e : FirebaseAuthUserCollisionException) {
-                    e.printStackTrace()
-                }
-                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_BOSS)
-            }
         }
         /**
         @AfterClass

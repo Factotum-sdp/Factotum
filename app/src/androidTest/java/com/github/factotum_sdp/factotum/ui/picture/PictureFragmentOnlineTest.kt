@@ -12,23 +12,16 @@ import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.ui.picture.*
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
-import com.google.firebase.storage.ListResult
-import com.google.firebase.storage.StorageReference
 import junit.framework.TestCase.assertTrue
 import junit.framework.TestCase.fail
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.runner.RunWith
 import java.io.File
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
 @RunWith(AndroidJUnit4::class)
 class PictureFragmentOnlineTest {
@@ -48,36 +41,34 @@ class PictureFragmentOnlineTest {
     )
 
     companion object {
+        @OptIn(ExperimentalCoroutinesApi::class)
         @BeforeClass
         @JvmStatic
-        fun setUpDatabase() {
+        fun setUpDatabase() = runTest {
             initFirebase()
             UsersPlaceHolder.init(GeneralUtils.getDatabase(), GeneralUtils.getAuth())
-            GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_COURIER)
+            launch { GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_COURIER) }.join()
         }
     }
 
     @Before
     fun setUp() {
         emptyLocalFiles(picturesDir)
-        GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_COURIER)
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
         goToPictureFragment()
 
-        // Wait for the camera to open
-        Thread.sleep(TIME_WAIT_SHUTTER)
+        runBlocking { delay(TIME_WAIT_SHUTTER) }
 
-        // Take a photo
         triggerShutter(device)
 
-        // Wait for the photo to be taken
-        Thread.sleep(TIME_WAIT_DONE_OR_CANCEL)
+        runBlocking { delay(TIME_WAIT_DONE_OR_CANCEL) }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @After
-    fun tearDown() {
-        runBlocking { emptyFirebaseStorage(GeneralUtils.getStorage().reference) }
+    fun tearDown() = runTest {
+        launch { emptyFirebaseStorage(GeneralUtils.getStorage().reference) }.join()
         emptyLocalFiles(picturesDir)
     }
 

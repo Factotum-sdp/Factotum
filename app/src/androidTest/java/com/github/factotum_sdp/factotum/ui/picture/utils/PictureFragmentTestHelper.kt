@@ -20,9 +20,9 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import java.io.File
 
-const val TIME_WAIT_SHUTTER = 1000L
-const val TIME_WAIT_DONE_OR_CANCEL = 1000L
-const val TIME_WAIT_UPLOAD_PHOTO = 1000L
+const val TIME_WAIT_SHUTTER = 1500L
+const val TIME_WAIT_DONE_OR_CANCEL = 1500L
+const val TIME_WAIT_UPLOAD_PHOTO = 1500L
 const val CLIENT_ID = "X17"
 
 
@@ -79,17 +79,4 @@ fun goToPictureFragment() {
     onView(withId(R.id.viewPager)).perform(swipeLeft())
     onView(withId(R.id.viewPager)).perform(swipeLeft())
     onView(withId(R.id.viewPager)).perform(swipeLeft())
-}
-
-fun addUserToDatabase(user : UsersPlaceHolder.User) {
-    // DO NOT REMOVE THIS PART OR PUT IT IN A @BeforeClass
-    runBlocking {
-        try {
-            UsersPlaceHolder.addAuthUser(user)
-        } catch (e : FirebaseAuthUserCollisionException) {
-            e.message?.let { Log.e("DisplayFragmentTest", it) }
-        }
-
-        UsersPlaceHolder.addUserToDb(user)
-    }
 }

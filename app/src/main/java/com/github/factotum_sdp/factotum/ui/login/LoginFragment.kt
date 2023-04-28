@@ -168,9 +168,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun updateUi(model: User) {
-        val welcome = getString(R.string.welcome) + " " + model.name + "!"
         userViewModel.setLoggedInUser(model)
-        Snackbar.make(requireView(), welcome, Snackbar.LENGTH_LONG).show()
         updateNGraphStartDestination()
     }
 

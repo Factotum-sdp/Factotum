@@ -51,6 +51,7 @@ class SignUpFragment : Fragment() {
         val emailEditText = binding.email
         val passwordEditText = binding.password
         val roleAutoCompleteTextView = binding.role
+        val clientIdEditText = binding.clientId
         val loadingProgressBar = binding.loading
         val signUpButton = binding.signup
 
@@ -58,7 +59,8 @@ class SignUpFragment : Fragment() {
             signUpButton,
             usernameEditText,
             emailEditText,
-            passwordEditText
+            passwordEditText,
+            clientIdEditText
         )
 
         val afterTextChangedListener = createTextWatcher(
@@ -66,7 +68,8 @@ class SignUpFragment : Fragment() {
             usernameEditText,
             emailEditText,
             passwordEditText,
-            roleAutoCompleteTextView
+            roleAutoCompleteTextView,
+            clientIdEditText
         )
 
         addListeners(
@@ -74,10 +77,15 @@ class SignUpFragment : Fragment() {
             emailEditText,
             passwordEditText,
             roleAutoCompleteTextView,
-            afterTextChangedListener
+            clientIdEditText,
+            afterTextChangedListener,
         )
 
-        listenToAuthButton(signUpButton, loadingProgressBar, emailEditText, passwordEditText)
+        listenToAuthButton(signUpButton,
+            loadingProgressBar,
+            emailEditText,
+            passwordEditText
+        )
 
         observeAuthResult(loadingProgressBar)
 
@@ -90,7 +98,8 @@ class SignUpFragment : Fragment() {
         signupButton: Button,
         usernameEditText: EditText,
         emailEditText: EditText,
-        passwordEditText: EditText
+        passwordEditText: EditText,
+        clientIdEditText: EditText
     ) {
         viewModel.signupFormState.observe(viewLifecycleOwner,
             Observer { signupFormState ->
@@ -107,6 +116,9 @@ class SignUpFragment : Fragment() {
                 signupFormState.passwordError?.let {
                     passwordEditText.error = getString(it)
                 }
+                signupFormState.clientIdError?.let {
+                    clientIdEditText.error = getString(it)
+                }
             })
     }
 
@@ -115,7 +127,8 @@ class SignUpFragment : Fragment() {
         usernameEditText: EditText,
         emailEditText: EditText,
         passwordEditText: EditText,
-        roleAutoCompleteTextView: EditText
+        roleAutoCompleteTextView: EditText,
+        clientIdEditText: EditText
     ): TextWatcher {
         return object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -127,7 +140,8 @@ class SignUpFragment : Fragment() {
                     usernameEditText.text.toString(),
                     emailEditText.text.toString(),
                     passwordEditText.text.toString(),
-                    roleAutoCompleteTextView.text.toString()
+                    roleAutoCompleteTextView.text.toString(),
+                    clientIdEditText.text.toString()
                 )
             }
         }
@@ -138,11 +152,13 @@ class SignUpFragment : Fragment() {
         emailEditText: EditText,
         passwordEditText: EditText,
         roleAutoCompleteTextView: EditText,
+        clientIdEditText: EditText,
         afterTextChangedListener: TextWatcher
     ) {
         usernameEditText.addTextChangedListener(afterTextChangedListener)
         emailEditText.addTextChangedListener(afterTextChangedListener)
         passwordEditText.addTextChangedListener(afterTextChangedListener)
+        clientIdEditText.addTextChangedListener(afterTextChangedListener)
         roleAutoCompleteTextView.addTextChangedListener(afterTextChangedListener)
     }
 
@@ -181,7 +197,8 @@ class SignUpFragment : Fragment() {
         val newUser = User(
             binding.username.text.toString(),
             binding.email.text.toString(),
-            Role.valueOf(binding.role.text.toString())
+            Role.valueOf(binding.role.text.toString()),
+            binding.clientId.text.toString()
         )
         val newUserUID = MainActivity.getAuth().currentUser?.uid ?: "no uid"
         viewModel.updateUser(newUserUID, newUser)

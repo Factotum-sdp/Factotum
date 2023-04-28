@@ -68,6 +68,27 @@ class ContactsUtils {
             deferred.await()
         }
 
+        /**
+         * Populates the database with random contacts-bis.
+         */
+        suspend fun populateDatabaseBis(count: Int = 5) {
+            val deferred = CompletableDeferred<Unit>()
+
+            createRandomContacts(count)
+
+            for (contact in randomContacts) {
+                getDatabase().getReference("contacts-bis").child("clientId${contact.id}").setValue(contact)
+                    .addOnSuccessListener {
+                        deferred.complete(Unit)
+                    }
+                    .addOnFailureListener { exception ->
+                        deferred.completeExceptionally(exception)
+                    }
+            }
+
+            deferred.await()
+        }
+
         fun emptyFirebaseDatabase() {
             getDatabase().reference.child("contacts").removeValue()
         }

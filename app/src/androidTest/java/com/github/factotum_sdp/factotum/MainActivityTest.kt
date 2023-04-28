@@ -267,6 +267,7 @@ class MainActivityTest {
         onView(withId(R.id.role)).perform(click())
         Espresso.onData(Matchers.anything()).inRoot(RootMatchers.isPlatformPopup()).atPosition(1)
             .perform(click())
+        onView(withId(R.id.clientId)).perform(typeText("clientId"))
         onView(withId(R.id.signup)).perform(click())
         pressBack()
         FirebaseAuth.AuthStateListener {

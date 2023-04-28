@@ -91,6 +91,9 @@
     <string name="create_account_text">Create Account</string>
     <string name="select_role_text">Select Role</string>
     <string name="signup_failed">"Sign Up failed"</string>
+    <string name="database_error">"Connection to database impossible"</string>
+    <string name="invalid_clientId">Client ID already in use</string>
+    <string name="empty_clientId_error">You need a client ID</string>
     <string name="update_users_failed">"Updating users failed"</string>
 
 

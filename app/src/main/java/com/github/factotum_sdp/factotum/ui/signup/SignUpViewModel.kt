@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.LoginRepository
 import com.github.factotum_sdp.factotum.data.Result
@@ -64,7 +65,13 @@ class SignUpViewModel(
         }
     }
 
-    fun signUpDataChanged(username: String, email: String, password: String, role: String) {
+    fun signUpDataChanged(
+        username: String,
+        email: String,
+        password: String,
+        role: String,
+        clientId: String
+    ) {
         if (!isUserNameValid(username)) {
             _signupForm.value = SignUpFormState(usernameError = R.string.invalid_username)
         } else if (!BaseAuthState.isEmailValid(email)) {
@@ -72,6 +79,8 @@ class SignUpViewModel(
         } else if (!BaseAuthState.isPasswordValid(password)) {
             _signupForm.value = SignUpFormState(passwordError = R.string.invalid_password)
         } else if (role.isBlank()) {
+            //
+        } else if (!isClientIdValid(clientId)) {
             //
         } else {
             _signupForm.value = SignUpFormState(isDataValid = true)
@@ -81,6 +90,27 @@ class SignUpViewModel(
     // A placeholder username validation check
     private fun isUserNameValid(username: String): Boolean {
         return username.isNotBlank()
+    }
+
+    private fun isClientIdValid(clientId: String): Boolean {
+        val dbRef = MainActivity.getDatabase().reference
+        var isClientIdValid = true
+        if (clientId.isBlank()) {
+            _signupForm.value = SignUpFormState(clientIdError = R.string.empty_clientId_error)
+            return false
+        }
+        dbRef.child("contacts-bis")
+            .child(clientId)
+            .get().addOnSuccessListener {
+                if (it.exists()) {
+                    isClientIdValid = false
+                    _signupForm.value = SignUpFormState(clientIdError = R.string.invalid_clientId)
+                }
+            }.addOnFailureListener {
+                isClientIdValid = false
+                _signupForm.value = SignUpFormState(clientIdError = R.string.database_error)
+            }
+        return isClientIdValid
     }
 
     /**

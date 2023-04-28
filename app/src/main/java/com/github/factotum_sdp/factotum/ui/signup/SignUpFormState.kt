@@ -9,5 +9,6 @@ data class SignUpFormState(
     val usernameError: Int? = null,
     override val emailError: Int? = null,
     override val passwordError: Int? = null,
+    val clientIdError: Int? = null,
     override val isDataValid: Boolean = false
 ) : BaseAuthState()

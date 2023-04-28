@@ -96,6 +96,23 @@
                 android:inputType="none" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="ClientId" />
+
+        <EditText
+            android:id="@+id/clientId"
+            android:layout_width="337dp"
+            android:layout_height="55dp"
+            android:layout_marginBottom="16dp"
+            android:autofillHints=""
+            android:hint="clientId"
+            android:inputType="text"
+            android:selectAllOnFocus="true" />
+
         <ProgressBar
             android:id="@+id/loading"
             android:layout_width="wrap_content"

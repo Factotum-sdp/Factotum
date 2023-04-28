@@ -12,8 +12,8 @@ env:
 check_android_task:
   name: Run Android tests
   install_jdk17_script: |
-    sudo apt update
-    sudo apt install -y openjdk-17-jdk
+    sudo apt-get update
+    sudo apt-get install -y openjdk-17-jdk
   install_emulator_script:
     sdkmanager --install "system-images;android-33;google_apis;x86_64"
   create_avd_script: echo no | avdmanager create avd --force

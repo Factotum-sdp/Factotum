@@ -16,7 +16,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.ui.display.utils.*
 import com.github.factotum_sdp.factotum.ui.picture.emptyFirebaseStorage
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
@@ -45,8 +44,6 @@ class DisplayFragmentTest {
         @BeforeClass
         fun setUpClass()= runTest {
             initFirebase()
-            UsersPlaceHolder.init(GeneralUtils.getDatabase(), GeneralUtils.getAuth())
-            launch { GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_CLIENT) }.join()
             Intents.init()
         }
 

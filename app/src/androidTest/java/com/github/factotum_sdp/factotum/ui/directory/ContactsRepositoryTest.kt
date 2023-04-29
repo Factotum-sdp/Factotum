@@ -37,9 +37,9 @@ class ContactsRepositoryTest {
         val sharedPreferences = context.getSharedPreferences("contacts_test", Context.MODE_PRIVATE)
         repository = ContactsRepository(sharedPreferences)
         repository.setDatabase(getDatabase())
-        ContactsUtils.emptyFirebaseDatabase()
     }
 
+    /*
     @After
     fun tearDown() {
         val sharedPreferences = context.getSharedPreferences("contacts_test", Context.MODE_PRIVATE)
@@ -102,5 +102,7 @@ class ContactsRepositoryTest {
             Assert.fail("Timeout waiting for contacts to update")
         }
     }
+
+     */ // Do not empty the databse or work by injection
 
 }

@@ -23,7 +23,6 @@ class GeneralUtils {
         private lateinit var database: FirebaseDatabase
         private lateinit var auth: FirebaseAuth
         private lateinit var storage: FirebaseStorage
-        private const val WAIT_BETWEEN_DB_ADD = 500L
         private const val WAIT_TIME_LOGIN = 1000L
 
         fun initFirebase(online : Boolean = true) {
@@ -53,17 +52,6 @@ class GeneralUtils {
 
         fun getStorage(): FirebaseStorage {
             return storage
-        }
-
-        suspend fun addUserToDatabase(user: UsersPlaceHolder.User) {
-            try {
-                UsersPlaceHolder.addAuthUser(user)
-            } catch (e: FirebaseAuthUserCollisionException) {
-                e.message?.let { Log.e("DisplayFragmentTest", it) }
-            }
-            UsersPlaceHolder.addUserToDb(user)
-
-            delay(WAIT_BETWEEN_DB_ADD)
         }
 
         fun fillUserEntryAndGoToRBFragment(email: String, password: String) {

@@ -37,14 +37,12 @@ class ContactsListOnlineTest {
             initFirebase()
             database = getDatabase()
         }
-
-        //TODO: MAYBE EMPTY DATABASE
+        
     }
 
     @ExperimentalCoroutinesApi
     @Test
     fun testAddContacts() = runTest {
-        ContactsUtils.populateDatabase()
 
         val ref = database.getReference("contacts")
         val dataSnapshot = suspendCoroutine { continuation ->

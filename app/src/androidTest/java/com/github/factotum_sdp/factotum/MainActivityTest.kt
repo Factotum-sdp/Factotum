@@ -16,15 +16,13 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiDevice
-import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
+import com.github.factotum_sdp.factotum.ui.directory.ContactsCreationTest
 import com.github.factotum_sdp.factotum.utils.ContactsUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
-import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getAuth
-import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.Matchers
 import org.junit.Assert.assertFalse
@@ -48,14 +46,6 @@ class MainActivityTest {
         @JvmStatic
         fun setUpDatabase() = runTest {
             initFirebase()
-            UsersPlaceHolder.init(getDatabase(), getAuth())
-
-            launch { GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_COURIER) }.join()
-            launch { GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_BOSS) }.join()
-            launch { GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_CLIENT) }.join()
-
-            launch { ContactsUtils.populateDatabase() }.join()
-
         }
     }
 

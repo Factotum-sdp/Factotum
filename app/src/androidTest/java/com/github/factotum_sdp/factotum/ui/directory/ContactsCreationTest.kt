@@ -6,6 +6,7 @@ import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.closeSoftKeyboard
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.RecyclerViewActions
@@ -95,7 +96,23 @@ class ContactsCreationTest {
     }
 
     @Test
+    fun cantCreateContactWithEmptyUsername() {
+        onView(withId(R.id.confirm_form)).perform(click())
+        onView(withId(R.id.contacts_recycler_view)).check(doesNotExist())
+    }
+
+    @Test
+    fun cantCreateContactWithAlreadyExistingUsername() {
+        val usernameEditText = onView(withId(R.id.editTextUsername))
+        usernameEditText.perform(replaceText("00"))
+        onView(withId(R.id.confirm_form)).perform(click())
+        onView(withId(R.id.contacts_recycler_view)).check(doesNotExist())
+    }
+
+    @Test
     fun canCreateContact() {
+        val usernameEditText = onView(withId(R.id.editTextUsername))
+        usernameEditText.perform(replaceText("JohnDoe"))
         onView(withId(R.id.confirm_form)).perform(click())
         //check if recycle view in contacts has 6 items
         onView(withId(R.id.contacts_recycler_view))

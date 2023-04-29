@@ -27,7 +27,7 @@ class ContactsUtils {
 
         private fun createContact(position: Int): Contact {
             return Contact(
-                username = position.toString(),
+                username = "0$position",
                 role = roles[position % roles.size],
                 name = randomNames[position % randomNames.size],
                 surname = randomSurnames[position % randomSurnames.size],

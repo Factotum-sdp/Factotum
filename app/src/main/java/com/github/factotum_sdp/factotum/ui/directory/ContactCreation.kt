@@ -8,7 +8,12 @@ import android.provider.BaseColumns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.CursorAdapter
+import android.widget.EditText
+import android.widget.Spinner
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.cursoradapter.widget.SimpleCursorAdapter
 import androidx.fragment.app.Fragment
@@ -21,7 +26,6 @@ import com.github.factotum_sdp.factotum.data.localisation.Location
 import com.github.factotum_sdp.factotum.databinding.FragmentContactCreationBinding
 import com.github.factotum_sdp.factotum.placeholder.Contact
 import kotlinx.coroutines.launch
-import java.util.Random
 
 /**
  * A simple ContactCreation fragment.
@@ -181,23 +185,43 @@ class ContactCreation : Fragment() {
 
     private fun initialiseApproveFormButton(view: View) {
         val approveFormButton = view.findViewById<Button>(R.id.confirm_form)
-        approveFormButton.text = if (isUpdate) getString(R.string.form_button_update) else getString(R.string.form_button_create)
+        approveFormButton.text =
+            if (isUpdate) getString(R.string.form_button_update) else getString(R.string.form_button_create)
         approveFormButton.setOnClickListener {
-            if (currentContact != null) viewModel.deleteContact(currentContact!!)
-            viewModel.saveContact(
-                Contact( //if username empty name + surname + random number
-                    username = if (username.text.toString() == "") name.text.toString() + surname.text.toString() + Random().nextInt(1000)
-                                else username.text.toString(),
-                    role = spinner.selectedItem.toString(),
-                    name = name.text.toString(),
-                    surname = surname.text.toString(),
-                    profile_pic_id = R.drawable.contact_image,
-                    address = binding.contactCreationAddress.query.toString(),
-                    phone = phoneNumber.text.toString(),
-                    details = details.text.toString()
+            if (username.text.toString().isEmpty()) {
+                showErrorToast(R.string.empty_username)
+                return@setOnClickListener
+            } else if (!isUsernameUnique(username.text.toString()) && currentContact?.username != username.text.toString()) {
+                showErrorToast(R.string.username_not_unique)
+                return@setOnClickListener
+            } else {
+                if (currentContact != null) viewModel.deleteContact(currentContact!!)
+                viewModel.saveContact(
+                    Contact(
+                        username = username.text.toString(),
+                        role = spinner.selectedItem.toString(),
+                        name = name.text.toString(),
+                        surname = surname.text.toString(),
+                        profile_pic_id = R.drawable.contact_image,
+                        address = binding.contactCreationAddress.query.toString(),
+                        phone = phoneNumber.text.toString(),
+                        details = details.text.toString()
+                    )
                 )
-            )
-            it.findNavController().navigate(R.id.action_contactCreation_to_directoryFragment)
+                it.findNavController().navigate(R.id.action_contactCreation_to_directoryFragment)
+            }
         }
+    }
+
+    private fun isUsernameUnique(username: String): Boolean {
+        return viewModel.contacts.value?.find { it.username == username } == null
+    }
+
+    private fun showErrorToast(resId: Int) {
+        Toast.makeText(
+            requireContext(),
+            getString(resId),
+            Toast.LENGTH_SHORT
+        ).show()
     }
 }

@@ -1,9 +1,10 @@
 package com.github.factotum_sdp.factotum.utils
 
-import android.util.Log
-import androidx.test.espresso.Espresso
-import androidx.test.espresso.action.ViewActions
-import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
+import androidx.test.espresso.action.ViewActions.typeText
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
@@ -15,16 +16,18 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 class GeneralUtils {
     companion object {
         private lateinit var database: FirebaseDatabase
         private lateinit var auth: FirebaseAuth
         private lateinit var storage: FirebaseStorage
-        private const val WAIT_BETWEEN_DB_ADD = 500L
-        private const val WAIT_TIME_LOGIN = 1000L
+        private const val WAIT_TIME_LOGIN = 1500L
 
         fun initFirebase(online : Boolean = true) {
             database = Firebase.database
@@ -57,30 +60,31 @@ class GeneralUtils {
 
         suspend fun addUserToDatabase(user: UsersPlaceHolder.User) {
             try {
-                UsersPlaceHolder.addAuthUser(user)
+                // Add the user to FirebaseAuth and wait for completion
+                withContext(Dispatchers.IO) {
+                    val authDeferred = async {
+                        UsersPlaceHolder.addAuthUser(user)
+                    }
+                    authDeferred.await()
+                }
             } catch (e: FirebaseAuthUserCollisionException) {
-                e.message?.let { Log.e("DisplayFragmentTest", it) }
+                e.printStackTrace()
             }
-            UsersPlaceHolder.addUserToDb(user)
 
-            delay(WAIT_BETWEEN_DB_ADD)
+            // Add the user to the database after FirebaseAuth is completed
+            withContext(Dispatchers.IO) {
+                UsersPlaceHolder.addUserToDb(user)
+            }
         }
 
         fun fillUserEntryAndGoToRBFragment(email: String, password: String) {
-            Espresso.onView(ViewMatchers.withId(R.id.email)).perform(ViewActions.typeText(email))
-            Espresso.onView(ViewMatchers.withId(R.id.fragment_login_directors_parent)).perform(
-                ViewActions.closeSoftKeyboard()
-            )
-            Espresso.onView(ViewMatchers.withId(R.id.password))
-                .perform(ViewActions.typeText(password))
-            Espresso.onView(ViewMatchers.withId(R.id.fragment_login_directors_parent)).perform(
-                ViewActions.closeSoftKeyboard()
-            )
-            Espresso.onView(ViewMatchers.withId(R.id.login)).perform(ViewActions.click())
+            onView(withId(R.id.email)).perform(typeText(email))
+            onView(withId(R.id.fragment_login_directors_parent)).perform(closeSoftKeyboard())
+            onView(withId(R.id.password)).perform(typeText(password))
+            onView(withId(R.id.fragment_login_directors_parent)).perform(closeSoftKeyboard())
+            onView(withId(R.id.login)).perform(click())
 
-            runBlocking {
-                delay(WAIT_TIME_LOGIN)
-            }
+            runBlocking { delay(WAIT_TIME_LOGIN) }
         }
     }
 }

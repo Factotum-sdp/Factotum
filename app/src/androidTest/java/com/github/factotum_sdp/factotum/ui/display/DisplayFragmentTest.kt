@@ -38,7 +38,6 @@ class DisplayFragmentTest {
         MainActivity::class.java
     )
 
-
     companion object {
         @OptIn(ExperimentalCoroutinesApi::class)
         @JvmStatic

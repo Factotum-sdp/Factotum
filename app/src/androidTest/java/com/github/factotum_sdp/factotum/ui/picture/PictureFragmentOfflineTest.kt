@@ -47,9 +47,6 @@ class PictureFragmentOfflineTest {
             initFirebase(online = false)
             UsersPlaceHolder.init(GeneralUtils.getDatabase(), GeneralUtils.getAuth())
             launch { GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_COURIER) }.join()
-            GeneralUtils.getStorage().maxUploadRetryTimeMillis = 100L
-            GeneralUtils.getStorage().maxOperationRetryTimeMillis = 100L
-            GeneralUtils.getStorage().maxDownloadRetryTimeMillis = 100L
         }
     }
 

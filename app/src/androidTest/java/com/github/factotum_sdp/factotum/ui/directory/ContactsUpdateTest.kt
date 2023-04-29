@@ -139,6 +139,9 @@ class ContactsUpdateTest {
         val surnameEditText = onView(withId(R.id.editTextSurname))
         surnameEditText.perform(ViewActions.replaceText("Doe"))
 
+        val usernameEditText = onView(withId(R.id.editTextUsername))
+        usernameEditText.perform(ViewActions.replaceText("johndoe"))
+
         onView(withId(androidx.appcompat.R.id.search_src_text)).perform(
             clearText(),
             typeText("123 Main St")
@@ -152,18 +155,15 @@ class ContactsUpdateTest {
         notesEditText.perform(ViewActions.replaceText("This is a test note."))
 
         onView(withId(R.id.confirm_form)).perform(ViewActions.click())
-        onView(withId(R.id.contacts_recycler_view))
-            .perform(
-                RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
-                    0,
-                    ViewActions.click()
-                )
-            )
+
+        onView(withText("@johndoe")).perform(ViewActions.click())
 
         onView(withId(R.id.contact_name))
             .check(matches(withText("John")))
         onView(withId(R.id.contact_surname))
             .check(matches(withText("Doe")))
+        onView(withId(R.id.contact_username))
+            .check(matches(withText("@johndoe")))
         onView(withId(R.id.contact_address))
             .check(matches(withText("123 Main St")))
         onView(withId(R.id.contact_phone))

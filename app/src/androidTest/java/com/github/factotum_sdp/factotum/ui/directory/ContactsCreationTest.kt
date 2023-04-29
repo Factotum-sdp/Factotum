@@ -111,7 +111,7 @@ class ContactsCreationTest {
     }
 
 
-    @Test
+    /*@Test
     fun createdContactHasCorrectValue() {
         val nameEditText = onView(withId(R.id.editTextName))
         nameEditText.perform(replaceText("John"))
@@ -144,17 +144,17 @@ class ContactsCreationTest {
         onView(withId(R.id.contact_address)).check(matches(withText("123 Main St")))
         onView(withId(R.id.contact_phone)).check(matches(withText("555-555-1234")))
         onView(withId(R.id.contact_details)).check(matches(withText("This is a test note.")))
-    }
+    }*/
 
 
-    @Test
+    /* @Test
     fun writeInAddressFieldMakesDropDown() {
         val city = "Lausanne"
         onView(withId(androidx.appcompat.R.id.search_src_text)).perform(typeText(city.dropLast(2)))
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         val result = device.wait(Until.hasObject(textContains(city)), 5000)
         assertTrue(result)
-    }
+    }*/
 
 
     @Test

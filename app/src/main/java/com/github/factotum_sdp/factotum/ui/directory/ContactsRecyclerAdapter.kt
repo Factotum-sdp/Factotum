@@ -32,11 +32,13 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
         RecyclerView.ViewHolder(itemView) { //this is the view holder for the recycler view
 
         val itemName: TextView
+        val itemUsername: TextView
         val itemImage: ImageView
 
         init {
             itemName = itemView.findViewById(R.id.contact_surname_and_name)
             itemImage = itemView.findViewById(R.id.contact_image)
+            itemUsername = itemView.findViewById(R.id.contact_username)
 
             itemView.setOnClickListener {   //when a contact is clicked, go to the contact details fragment
                 itemView.findNavController().navigate(
@@ -68,6 +70,7 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ContactsViewHolder, i: Int) {
         holder.itemName.text = filteredContacts[i].surname + " " + filteredContacts[i].name
+        holder.itemUsername.text = "@" + filteredContacts[i].username
         holder.itemImage.setImageResource(filteredContacts[i].profile_pic_id)
     }
 
@@ -83,7 +86,7 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
         return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
                 val filteredList = ArrayList<Contact>()
-                if (constraint == null || constraint.isEmpty()) {
+                if (constraint.isNullOrEmpty()) {
                     filteredList.addAll(originalContacts) // Use the originalContacts list here
                 } else {
                     // remove all whitespace from the constraint and the names such that names are matched even if they have different whitespace
@@ -91,9 +94,10 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
                     for (item in originalContacts) { // Use the originalContacts list for filtering
                         val nameSurname = cleanString(item.name + item.surname)
                         val surnameName = cleanString(item.surname + item.name)
-                        if (nameSurname.contains(filterPattern) || surnameName.contains(
-                                filterPattern
-                            )
+                        val username = cleanString(item.username)
+                        if (nameSurname.contains(filterPattern) ||
+                            surnameName.contains(filterPattern) ||
+                            username.contains(filterPattern)
                         ) {
                             filteredList.add(item)
                         }

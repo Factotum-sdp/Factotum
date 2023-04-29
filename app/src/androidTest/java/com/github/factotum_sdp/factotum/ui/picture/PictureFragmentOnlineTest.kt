@@ -55,7 +55,7 @@ class PictureFragmentOnlineTest {
 
     @Before
     fun setUp() {
-        emptyLocalFiles(picturesDir)
+        runBlocking { emptyLocalFiles(picturesDir) }
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
         goToPictureFragment()
@@ -86,6 +86,10 @@ class PictureFragmentOnlineTest {
             assertTrue(files.items.size == 1)
         }.addOnFailureListener { except ->
             fail(except.message)
+        }
+
+        runBlocking {
+            delay(TIME_WAIT_DELETE_PHOTO)
         }
 
         // Check if the folder in the local storage with the same name as the firebase folder

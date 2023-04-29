@@ -11,12 +11,15 @@ import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.PreferencesSetting
 import com.google.firebase.storage.StorageReference
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.io.File
 
 const val TIME_WAIT_SHUTTER = 4000L
 const val TIME_WAIT_DONE_OR_CANCEL = 2000L
 const val TIME_WAIT_UPLOAD_PHOTO = 1500L
+const val TIME_WAIT_DELETE_PHOTO = 1000L
 const val CLIENT_ID = "X17"
 
 
@@ -34,10 +37,10 @@ suspend fun emptyFirebaseStorage(storageRef: StorageReference) {
 }
 
 
-fun emptyLocalFiles(dir: File) {
+suspend fun emptyLocalFiles(dir: File) : Unit = withContext(Dispatchers.IO) {
     dir.listFiles()?.forEach { file ->
         if (file.isDirectory) {
-            emptyLocalFiles(file) // Recursively delete files in the directory
+            emptyLocalFiles(file)
         }
         file.delete()
     }

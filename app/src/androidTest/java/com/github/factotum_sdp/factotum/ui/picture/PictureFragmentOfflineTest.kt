@@ -53,7 +53,7 @@ class PictureFragmentOfflineTest {
     @Test
     fun testDoesNotDeleteFileIfUploadFails() {
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        emptyLocalFiles(picturesDir)
+        runBlocking { emptyLocalFiles(picturesDir) }
 
         goToPictureFragment()
 
@@ -79,6 +79,6 @@ class PictureFragmentOfflineTest {
         val directories = picturesDir.listFiles()?.filter { it.isDirectory } ?: emptyList()
         assertTrue(directories.isNotEmpty())
 
-        emptyLocalFiles(picturesDir)
+        runBlocking { emptyLocalFiles(picturesDir) }
     }
 }

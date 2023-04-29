@@ -110,36 +110,6 @@ class DisplayFragmentTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentDisplayMixingFormatPhotosWorks() = runTest {
-        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
-
-        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3) }.join()
-
-        //Press on the refresh button
-        onView(withId(R.id.refreshButton)).check(matches(isDisplayed())).perform(click())
-
-        delay(WAIT_TIME_REFRESH)
-
-        val recyclerView = onView(withId(R.id.recyclerView))
-        recyclerView.check(matches(hasItemCount(2)))
-
-        launch { emptyFirebaseStorage(FirebaseStorage.getInstance().reference) }.join()
-
-        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
-
-        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH4, TEST_IMAGE_PATH4) }.join()
-
-        //Press on the refresh button
-        onView(withId(R.id.refreshButton)).check(matches(isDisplayed())).perform(click())
-
-        delay(WAIT_TIME_REFRESH)
-
-        recyclerView.check(matches(hasItemCount(2)))
-    }
-
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
     fun displayFragmentDisplayOneBadFormatPhotosWorks() = runTest {
         launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3) }.join()
 

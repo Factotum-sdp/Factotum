@@ -60,14 +60,8 @@ class PictureFragmentOnlineTest {
     fun setUp() = runTest{
         launch { emptyLocalFiles(picturesDir) }.join()
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-
         goToPictureFragment()
-
-        delay(TIME_WAIT_SHUTTER)
-
         triggerShutter(device)
-
-        delay(TIME_WAIT_DONE_OR_CANCEL)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -80,7 +74,7 @@ class PictureFragmentOnlineTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun testUploadFileCorrectly() = runTest {
-        device.findObject(UiSelector().description("Done")).click()
+        triggerDone(device)
 
         // Really needed to wait for the upload to finish
         runBlocking { delay(TIME_WAIT_UPLOAD_PHOTO) }
@@ -101,7 +95,7 @@ class PictureFragmentOnlineTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun testCancelPhoto() = runTest {
-        device.findObject(UiSelector().description("Cancel")).click()
+        triggerCancel(device)
 
         // Really needed to wait for the upload to finish
         runBlocking { delay(TIME_WAIT_UPLOAD_PHOTO) }

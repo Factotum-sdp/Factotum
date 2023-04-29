@@ -12,12 +12,14 @@ import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.PreferencesSetting
 import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.io.File
 
-const val TIME_WAIT_SHUTTER = 4000L
-const val TIME_WAIT_DONE_OR_CANCEL = 2000L
+const val TIME_WAIT_DONE_OR_CANCEL = 1000L
+const val TIME_WAIT_BETWEEN_INPUTS = 250L
 const val TIME_WAIT_UPLOAD_PHOTO = 1000L
 const val TIME_WAIT_DELETE_PHOTO = 1000L
 const val CLIENT_ID = "X17"
@@ -48,6 +50,26 @@ suspend fun emptyLocalFiles(dir: File) : Unit = withContext(Dispatchers.IO) {
 
 fun triggerShutter(device: UiDevice) {
     device.executeShellCommand("input keyevent 27")
+}
+
+fun triggerDone(device: UiDevice) {
+    runBlocking { delay(TIME_WAIT_DONE_OR_CANCEL) }
+    device.executeShellCommand("input keyevent 61")
+    runBlocking { delay(TIME_WAIT_BETWEEN_INPUTS) }
+    device.executeShellCommand("input keyevent 61")
+    runBlocking { delay(TIME_WAIT_BETWEEN_INPUTS) }
+    device.executeShellCommand("input keyevent 66")
+}
+
+fun triggerCancel(device: UiDevice) {
+    runBlocking { delay(TIME_WAIT_DONE_OR_CANCEL) }
+    device.executeShellCommand("input keyevent 61")
+    runBlocking { delay(TIME_WAIT_BETWEEN_INPUTS) }
+    device.executeShellCommand("input keyevent 61")
+    runBlocking { delay(TIME_WAIT_BETWEEN_INPUTS) }
+    device.executeShellCommand("input keyevent 61")
+    runBlocking { delay(TIME_WAIT_BETWEEN_INPUTS) }
+    device.executeShellCommand("input keyevent 66")
 }
 
 

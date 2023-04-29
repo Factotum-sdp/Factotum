@@ -59,17 +59,8 @@ class PictureFragmentOfflineTest {
         launch{ emptyLocalFiles(picturesDir) }.join()
 
         goToPictureFragment()
-
-        // Wait for the camera to open
-        delay(TIME_WAIT_SHUTTER)
-
-        // Take a photo
         triggerShutter(device)
-
-        // Wait for the photo to be taken
-        delay(TIME_WAIT_DONE_OR_CANCEL)
-
-        device.findObject(UiSelector().description("Done")).click()
+        triggerDone(device)
 
         // Really needed to wait for the upload to finish
         runBlocking { delay(TIME_WAIT_UPLOAD_PHOTO) }

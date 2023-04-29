@@ -170,7 +170,6 @@ class RoadBookFragmentTest {
 
     // ============================================================================================
     // ================================== Update to Database Tests ================================
-
     @Test
     fun roadBookIsBackedUpCorrectly() {
         val date = Calendar.getInstance().time

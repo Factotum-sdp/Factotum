@@ -1,4 +1,4 @@
-//package com.github.factotum_sdp.factotum.ui.picture
+package com.github.factotum_sdp.factotum.ui.picture
 //
 //import android.Manifest
 //import android.os.Environment

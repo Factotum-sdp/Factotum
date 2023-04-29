@@ -1,4 +1,4 @@
-//package com.github.factotum_sdp.factotum.ui.picture
+package com.github.factotum_sdp.factotum.ui.picture
 //
 //import android.Manifest
 //import android.os.Environment
@@ -21,6 +21,7 @@
 //import kotlinx.coroutines.delay
 //import kotlinx.coroutines.launch
 //import kotlinx.coroutines.runBlocking
+//import kotlinx.coroutines.suspendCancellableCoroutine
 //import kotlinx.coroutines.suspendCancellableCoroutine
 //import kotlinx.coroutines.tasks.await
 //import org.junit.*

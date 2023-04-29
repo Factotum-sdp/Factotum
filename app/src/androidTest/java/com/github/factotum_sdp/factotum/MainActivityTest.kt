@@ -16,13 +16,10 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiDevice
-import com.github.factotum_sdp.factotum.ui.directory.ContactsCreationTest
-import com.github.factotum_sdp.factotum.utils.ContactsUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.Matchers
 import org.junit.Assert.assertFalse

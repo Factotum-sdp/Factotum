@@ -18,7 +18,6 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.utils.ContactsUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import junit.framework.TestCase.assertTrue
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -36,7 +35,6 @@ class DirectoryFragmentTest {
     companion object {
         private const val nbContacts = 10
 
-        @OptIn(ExperimentalCoroutinesApi::class)
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
@@ -46,12 +44,10 @@ class DirectoryFragmentTest {
 
     @Before
     fun setUp() {
-
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.directoryFragment))
             .perform(click())
-
     }
 
     @Test
@@ -86,7 +82,7 @@ class DirectoryFragmentTest {
         onView(withId(R.id.contact_creation_fragment)).check(matches(isDisplayed()))
     }
 
-    /* // The number of contact can change easily for less flakyness get it from the database or the current instance
+    /*
     @Test
     fun allContactsCanBeClickedOn() {
         for (i in 0 until nbContacts) {

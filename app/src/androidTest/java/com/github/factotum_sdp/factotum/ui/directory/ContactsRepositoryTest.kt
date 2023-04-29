@@ -5,16 +5,12 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.Contact
-import com.github.factotum_sdp.factotum.utils.ContactsUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 
 @RunWith(AndroidJUnit4::class)
@@ -39,7 +35,7 @@ class ContactsRepositoryTest {
         repository.setDatabase(getDatabase())
     }
 
-    /*
+
     @After
     fun tearDown() {
         val sharedPreferences = context.getSharedPreferences("contacts_test", Context.MODE_PRIVATE)
@@ -49,6 +45,7 @@ class ContactsRepositoryTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun savesContactToSharedPreferences() = runTest {
+
         // Save a contact to the cache
         val contact = Contact(
             "1",
@@ -69,7 +66,8 @@ class ContactsRepositoryTest {
         Assert.assertEquals(contact, cachedContacts[0])
     }
 
-
+    /* // Do not empty the database for one test fill it back after
+    //  Moreover get the actual size of contacts, not hcecking by hardcoded value
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun savesContactOnline() = runTest {
@@ -103,6 +101,6 @@ class ContactsRepositoryTest {
         }
     }
 
-     */ // Do not empty the databse or work by injection
+     */
 
 }

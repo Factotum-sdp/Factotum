@@ -57,7 +57,7 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
 
     private fun mapSettingsPreferences(preferences: Preferences): Settings {
         // Get our show completed value, defaulting to false if not set:
-        val useRoadBookPreferences = preferences[PreferencesKeys.USE_ROADBOOK_PREFERENCES] ?: false
+        val useRoadBookPreferences = preferences[PreferencesKeys.USE_ROADBOOK_PREFERENCES] ?: true
         return Settings(useRoadBookPreferences)
     }
 

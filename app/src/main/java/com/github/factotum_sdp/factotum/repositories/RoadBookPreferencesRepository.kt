@@ -87,11 +87,11 @@ class RoadBookPreferencesRepository(private val dataStore: DataStore<Preferences
 
     private fun mapRoadBookPreferences(preferences: Preferences): RoadBookPreferences {
         // Get our show completed value, defaulting to false if not set:
-        val enableReordering = preferences[PreferencesKeys.REORDERING] ?: false
-        val enableArchivingAndDeletion = preferences[PreferencesKeys.DELETION_AND_ARCHIVING] ?: false
-        val enableEdition = preferences[PreferencesKeys.EDITION] ?: false
-        val enableDetailsAccess = preferences[PreferencesKeys.DETAILS_ACCESS] ?: false
-        val showArchived = preferences[PreferencesKeys.SHOW_ARCHIVED] ?: false
+        val enableReordering = preferences[PreferencesKeys.REORDERING] ?: true
+        val enableArchivingAndDeletion = preferences[PreferencesKeys.DELETION_AND_ARCHIVING] ?: true
+        val enableEdition = preferences[PreferencesKeys.EDITION] ?: true
+        val enableDetailsAccess = preferences[PreferencesKeys.DETAILS_ACCESS] ?: true
+        val showArchived = preferences[PreferencesKeys.SHOW_ARCHIVED] ?: true
         return RoadBookPreferences(enableReordering, enableArchivingAndDeletion,
                                     enableEdition, enableDetailsAccess, showArchived)
     }

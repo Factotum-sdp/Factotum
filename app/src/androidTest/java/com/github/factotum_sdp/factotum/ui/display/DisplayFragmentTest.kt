@@ -138,15 +138,16 @@ class DisplayFragmentTest {
         recyclerView.check(matches(hasItemCount(2)))
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentDisplayNoPhotosIfEmpty() {
+    fun displayFragmentDisplayNoPhotosIfEmpty() = runTest {
         val recyclerView = onView(withId(R.id.recyclerView))
         recyclerView.check(matches(hasItemCount(0)))
 
         //Press on the refresh button
         onView(withId(R.id.refreshButton)).check(matches(isDisplayed())).perform(click())
 
-        runBlocking{ delay(WAIT_TIME_REFRESH) }
+        delay(WAIT_TIME_REFRESH)
 
         recyclerView.check(matches(hasItemCount(0)))
     }

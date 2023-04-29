@@ -12,11 +12,13 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
 import org.junit.*
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
@@ -50,35 +52,37 @@ class PictureFragmentOfflineTest {
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun testDoesNotDeleteFileIfUploadFails() {
+    fun testDoesNotDeleteFileIfUploadFails() = runTest {
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        runBlocking { emptyLocalFiles(picturesDir) }
+        launch{ emptyLocalFiles(picturesDir) }.join()
 
         goToPictureFragment()
 
         // Wait for the camera to open
-        runBlocking { delay(TIME_WAIT_SHUTTER) }
+        delay(TIME_WAIT_SHUTTER)
 
         // Take a photo
         triggerShutter(device)
 
         // Wait for the photo to be taken
-        runBlocking { delay(TIME_WAIT_DONE_OR_CANCEL) }
+        delay(TIME_WAIT_DONE_OR_CANCEL)
 
         device.findObject(UiSelector().description("Done")).click()
 
-        runBlocking {
-            GeneralUtils.getStorage().reference.child(CLIENT_ID).listAll().addOnSuccessListener {
-                fail("Should not succeed")
-            }
-            delay(TIME_WAIT_UPLOAD_PHOTO)
+        withContext(Dispatchers.IO) {
+            Thread.sleep(TIME_WAIT_UPLOAD_PHOTO)
+        }
+
+        GeneralUtils.getStorage().reference.child(CLIENT_ID).listAll().addOnSuccessListener {
+            fail("Should not succeed")
         }
 
         //Check if there is a folder with a file in it
         val directories = picturesDir.listFiles()?.filter { it.isDirectory } ?: emptyList()
         assertTrue(directories.isNotEmpty())
 
-        runBlocking { emptyLocalFiles(picturesDir) }
+        launch { emptyLocalFiles(picturesDir) }.join()
     }
 }

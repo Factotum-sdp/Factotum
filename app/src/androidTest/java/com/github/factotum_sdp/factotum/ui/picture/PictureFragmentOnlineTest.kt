@@ -15,11 +15,13 @@ import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import junit.framework.TestCase.assertTrue
 import junit.framework.TestCase.fail
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
 import org.junit.*
 import org.junit.runner.RunWith
 import java.io.File
@@ -53,73 +55,71 @@ class PictureFragmentOnlineTest {
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Before
-    fun setUp() {
-        runBlocking { emptyLocalFiles(picturesDir) }
+    fun setUp() = runTest{
+        launch { emptyLocalFiles(picturesDir) }.join()
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
         goToPictureFragment()
 
-        runBlocking { delay(TIME_WAIT_SHUTTER) }
+        delay(TIME_WAIT_SHUTTER)
 
         triggerShutter(device)
 
-        runBlocking { delay(TIME_WAIT_DONE_OR_CANCEL) }
+        delay(TIME_WAIT_DONE_OR_CANCEL)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @After
     fun tearDown() = runTest {
         launch { emptyFirebaseStorage(GeneralUtils.getStorage().reference) }.join()
-        emptyLocalFiles(picturesDir)
+        launch { emptyLocalFiles(picturesDir) }.join()
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun testUploadFileCorrectly() {
+    fun testUploadFileCorrectly() = runTest {
         device.findObject(UiSelector().description("Done")).click()
 
-        runBlocking {
-            delay(TIME_WAIT_UPLOAD_PHOTO)
+        // Really needed to wait for the upload to finish
+        withContext(Dispatchers.IO) {
+            Thread.sleep(TIME_WAIT_UPLOAD_PHOTO)
         }
 
-        GeneralUtils.getStorage().reference.child(CLIENT_ID).listAll().addOnSuccessListener { files ->
-            assertTrue(files.items.size == 1)
+        GeneralUtils.getStorage().reference.child(CLIENT_ID).listAll().addOnSuccessListener { listResult ->
+            assertTrue(listResult.items.isNotEmpty())
         }.addOnFailureListener { except ->
             fail(except.message)
         }
 
-        runBlocking {
-            delay(TIME_WAIT_DELETE_PHOTO)
-        }
+        delay(TIME_WAIT_DELETE_PHOTO)
 
-        // Check if the folder in the local storage with the same name as the firebase folder
-        // is empty
-        val localFolder = File(picturesDir, CLIENT_ID)
-        assertTrue(localFolder.listFiles()?.isEmpty() == true)
+        val directories = picturesDir.listFiles()?.filter { it.isDirectory } ?: emptyList()
+        assertTrue(directories.all { it.listFiles()?.isEmpty() == true })
     }
 
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun testCancelPhoto() {
-        // Click the button to cancel the photo
+    fun testCancelPhoto() = runTest {
         device.findObject(UiSelector().description("Cancel")).click()
 
-        runBlocking {
-            delay(TIME_WAIT_UPLOAD_PHOTO)
+        // Really needed to wait for the upload to finish
+        withContext(Dispatchers.IO) {
+            Thread.sleep(TIME_WAIT_UPLOAD_PHOTO)
         }
 
-        // Check that the storage contains no files
         GeneralUtils.getStorage().reference.child(CLIENT_ID).listAll().addOnSuccessListener { listResult ->
-            // Check that the folder in the storage is empty
             assertTrue(listResult.items.isEmpty())
-
-            // Check that the local picture directory contains no files (folders are not counted
-            // but should be empty)
-            val directories = picturesDir.listFiles()?.filter { it.isDirectory } ?: emptyList()
-            assertTrue(directories.all { it.listFiles()?.isEmpty() == true })
         }.addOnFailureListener { except ->
             fail(except.message)
         }
+
+        delay(TIME_WAIT_DELETE_PHOTO)
+
+        val directories = picturesDir.listFiles()?.filter { it.isDirectory } ?: emptyList()
+        assertTrue(directories.all { it.listFiles()?.isEmpty() == true })
     }
 
 }

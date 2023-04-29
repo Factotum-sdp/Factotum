@@ -1,6 +1,6 @@
-/*
-package com.github.factotum_sdp.factotum.ui.login
 
+package com.github.factotum_sdp.factotum.ui.login
+/*
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches

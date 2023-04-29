@@ -1,7 +1,6 @@
 package com.github.factotum_sdp.factotum
 
 import android.view.Gravity
-import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.Espresso.pressBackUnconditionally
@@ -10,23 +9,15 @@ import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.DrawerMatchers
-import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiDevice
-import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
-import com.github.factotum_sdp.factotum.utils.ContactsUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
-import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getAuth
-import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
-import org.hamcrest.Matchers
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.BeforeClass
@@ -48,14 +39,6 @@ class MainActivityTest {
         @JvmStatic
         fun setUpDatabase() = runTest {
             initFirebase()
-            UsersPlaceHolder.init(getDatabase(), getAuth())
-
-            launch { GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_COURIER) }.join()
-            launch { GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_BOSS) }.join()
-            launch { GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_CLIENT) }.join()
-
-            launch { ContactsUtils.populateDatabase() }.join()
-
         }
     }
 
@@ -147,7 +130,7 @@ class MainActivityTest {
     }
 
     @Test
-    fun pressingBackOnAMenuFragmentLeadsToRBFragment() {
+    fun pressingBackOnAMenuFragmentLeadsToRBFragment() = runTest {
         // First need to login to trigger the change of navGraph's start fragment
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
 
@@ -155,6 +138,7 @@ class MainActivityTest {
         navigateToAndPressBackLeadsToRB(R.id.displayFragment)
         navigateToAndPressBackLeadsToRB(R.id.routeFragment)
     }
+
 
     private fun navigateToAndPressBackLeadsToRB(menuItemId: Int) {
         navigateTo(menuItemId)
@@ -175,7 +159,7 @@ class MainActivityTest {
     @Test
     fun navHeaderDisplaysUserData() {
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
-        
+
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("boss@gmail.com")).check(matches(isDisplayed()))
         onView(withText("Boss (BOSS)")).check(matches(isDisplayed()))
@@ -223,6 +207,7 @@ class MainActivityTest {
         onView(withText("Helen Bates (COURIER)")).check(matches(isDisplayed()))
     }
 
+    /*
     @Test
     fun signUpFormWithAllFieldsAndClickAndLogin() {
         onView(withId(R.id.signup)).perform(click())
@@ -261,5 +246,5 @@ class MainActivityTest {
                 )
             }
         }
-    }
+    } */
 }

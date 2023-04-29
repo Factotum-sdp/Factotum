@@ -16,9 +16,9 @@ import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.tasks.await
 import java.io.File
 
-const val TIME_WAIT_SHUTTER = 4000L
-const val TIME_WAIT_DONE_OR_CANCEL = 2000L
-const val TIME_WAIT_UPLOAD_PHOTO = 1500L
+const val TIME_WAIT_SHUTTER = 1000L
+const val TIME_WAIT_DONE_OR_CANCEL = 1000L
+const val TIME_WAIT_UPLOAD_PHOTO = 1000L
 const val CLIENT_ID = "X17"
 
 
@@ -49,7 +49,18 @@ fun triggerShutter(device: UiDevice) {
     device.executeShellCommand("input keyevent 27")
 }
 
+fun triggerDone(device: UiDevice) {
+    device.executeShellCommand("input keyevent 61")
+    device.executeShellCommand("input keyevent 61")
+    device.executeShellCommand("input keyevent 62")
+}
 
+fun triggerCancel(device: UiDevice) {
+    device.executeShellCommand("input keyevent 61")
+    device.executeShellCommand("input keyevent 61")
+    device.executeShellCommand("input keyevent 61")
+    device.executeShellCommand("input keyevent 62")
+}
 
 fun goToPictureFragment(testRule: ActivityScenarioRule<MainActivity>) {
     GeneralUtils.fillUserEntryAndEnterTheApp("courier@gmail.com", "123456")

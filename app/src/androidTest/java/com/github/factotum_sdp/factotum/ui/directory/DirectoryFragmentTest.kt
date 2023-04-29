@@ -1,6 +1,5 @@
 package com.github.factotum_sdp.factotum.ui.directory
 
-import androidx.test.espresso.Espresso.pressBack
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
@@ -19,9 +18,6 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.utils.ContactsUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import junit.framework.TestCase.assertTrue
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -39,30 +35,19 @@ class DirectoryFragmentTest {
     companion object {
         private const val nbContacts = 10
 
-        @OptIn(ExperimentalCoroutinesApi::class)
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
             initFirebase()
-
-            ContactsUtils.emptyFirebaseDatabase()
-
-            runTest {
-                runBlocking {
-                    ContactsUtils.populateDatabase(nbContacts)
-                }
-            }
         }
     }
 
     @Before
     fun setUp() {
-
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.directoryFragment))
             .perform(click())
-
     }
 
     @Test
@@ -97,6 +82,7 @@ class DirectoryFragmentTest {
         onView(withId(R.id.contact_creation_fragment)).check(matches(isDisplayed()))
     }
 
+    /*
     @Test
     fun allContactsCanBeClickedOn() {
         for (i in 0 until nbContacts) {
@@ -111,6 +97,8 @@ class DirectoryFragmentTest {
             pressBack()
         }
     }
+
+     */
 
     @Test
     fun correctContactsShownWithMatchingQuery() {

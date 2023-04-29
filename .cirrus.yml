@@ -52,7 +52,7 @@ check_android_task:
     adb logcat > log.log
   check_script: |
     chmod +x firebase
-    ./firebase emulators:exec --project sdp-firebase-bootcamp-c795d './gradlew check connectedCheck'
+    ./firebase emulators:exec --import=./firebase_emulator_data --project sdp-firebase-bootcamp-c795d './gradlew check connectedCheck'
   report_codeclimate_script: |
     export JACOCO_SOURCE_PATH=app/src/main/java/
     ./cc-test-reporter format-coverage ./app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml --input-type jacoco

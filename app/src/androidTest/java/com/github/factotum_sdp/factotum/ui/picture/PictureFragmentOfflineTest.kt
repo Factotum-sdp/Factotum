@@ -7,16 +7,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
-import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
@@ -40,16 +36,10 @@ class PictureFragmentOfflineTest {
     )
 
     companion object {
-        @OptIn(ExperimentalCoroutinesApi::class)
         @BeforeClass
         @JvmStatic
-        fun setUpDatabase() = runTest {
+        fun setUpDatabase() {
             initFirebase(online = false)
-            UsersPlaceHolder.init(GeneralUtils.getDatabase(), GeneralUtils.getAuth())
-            launch { GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_COURIER) }.join()
-            GeneralUtils.getStorage().maxUploadRetryTimeMillis = 100L
-            GeneralUtils.getStorage().maxOperationRetryTimeMillis = 100L
-            GeneralUtils.getStorage().maxDownloadRetryTimeMillis = 100L
         }
     }
 
@@ -61,15 +51,16 @@ class PictureFragmentOfflineTest {
         goToPictureFragment()
 
         // Wait for the camera to open
-        runBlocking { delay(TIME_WAIT_SHUTTER) }
+        Thread.sleep(TIME_WAIT_SHUTTER)
 
         // Take a photo
         triggerShutter(device)
 
         // Wait for the photo to be taken
-        runBlocking { delay(TIME_WAIT_DONE_OR_CANCEL) }
+        Thread.sleep(TIME_WAIT_DONE_OR_CANCEL)
 
-        device.findObject(UiSelector().description("Done")).click()
+        // Click the button to validate the photo
+        triggerDone(device)
 
         runBlocking {
             GeneralUtils.getStorage().reference.child(CLIENT_ID).listAll().addOnSuccessListener {

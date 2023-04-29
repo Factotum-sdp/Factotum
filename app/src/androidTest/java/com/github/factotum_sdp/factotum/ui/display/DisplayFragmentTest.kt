@@ -9,24 +9,20 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers.*
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.ui.display.utils.*
 import com.github.factotum_sdp.factotum.ui.picture.emptyFirebaseStorage
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
+import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.runner.RunWith
 
@@ -40,13 +36,10 @@ class DisplayFragmentTest {
 
 
     companion object {
-        @OptIn(ExperimentalCoroutinesApi::class)
         @JvmStatic
         @BeforeClass
-        fun setUpClass()= runTest {
+        fun setUpClass() {
             initFirebase()
-            UsersPlaceHolder.init(GeneralUtils.getDatabase(), GeneralUtils.getAuth())
-            launch { GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_CLIENT) }.join()
             Intents.init()
         }
 
@@ -54,6 +47,7 @@ class DisplayFragmentTest {
         @AfterClass
         fun tearDownClass() {
             Intents.release()
+            runBlocking{emptyFirebaseStorage(Firebase.storage.reference)}
         }
     }
 
@@ -61,109 +55,122 @@ class DisplayFragmentTest {
 
     @Before
     fun setUp() {
-        context = InstrumentationRegistry.getInstrumentation().context
         GeneralUtils.fillUserEntryAndGoToRBFragment("client@gmail.com", "123456")
+        Thread.sleep(WAIT_TIME_REFRESH)
+        context = InstrumentationRegistry.getInstrumentation().context
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @After
-    fun tearDown() = runTest {
-        launch { emptyFirebaseStorage(FirebaseStorage.getInstance().reference) }.join()
+    fun tearDown() {
+        runBlocking {
+            emptyFirebaseStorage(FirebaseStorage.getInstance().reference)
+        }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentDisplayOnlyOnePhotoIfSame() = runTest {
-        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
+    fun displayFragmentDisplayOnlyOnePhotoIfSame() {
+        runBlocking {
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
+        }
 
         //Press on the refresh button
-        onView(withId(R.id.refreshButton)).check(matches(isDisplayed())).perform(click())
+        onView(withId(R.id.refreshButton)).perform(click())
 
-        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
+        runBlocking {
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
+        }
 
         //Press on the refresh button
-        onView(withId(R.id.refreshButton)).check(matches(isDisplayed())).perform(click())
+        onView(withId(R.id.refreshButton)).perform(click())
 
-        delay(WAIT_TIME_REFRESH)
+        val recyclerView = onView(withId(R.id.recyclerView))
+
+        //Check if only one photo is displayed
+        recyclerView.check(matches(hasItemCount(1)))
+    }
+
+    @Test
+    fun displayFragmentDisplayTwoDifferentPhotosWorks() {
+        runBlocking {
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
+        }
+
+        //Press on the refresh button
+        onView(withId(R.id.refreshButton)).perform(click())
+
+
+        runBlocking {
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2)
+        }
+
+        //Press on the refresh button
+        onView(withId(R.id.refreshButton)).perform(click())
+
+
+        val recyclerView = onView(withId(R.id.recyclerView))
+        recyclerView.check(matches(hasItemCount(2)))
+    }
+
+    @Test
+    fun displayFragmentDisplayMixingFormatPhotosWorksOneWay() {
+        runBlocking {
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
+        }
+
+        runBlocking {
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3)
+        }
+
+        //Press on the refresh button
+        onView(withId(R.id.refreshButton)).perform(click())
+
+        val recyclerView = onView(withId(R.id.recyclerView))
+        recyclerView.check(matches(hasItemCount(2)))
+    }
+
+    @Test
+    fun displayFragmentDisplayMixingFormatPhotosWorksOtherWay() {
+        runBlocking {
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2)
+        }
+
+        runBlocking {
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH4, TEST_IMAGE_PATH4)
+        }
+
+        //Press on the refresh button
+        onView(withId(R.id.refreshButton)).perform(click())
+
+        val recyclerView = onView(withId(R.id.recyclerView))
+        recyclerView.check(matches(hasItemCount(2)))
+    }
+
+    @Test
+    fun displayFragmentDisplayOneBadFormatPhotosWorks() {
+        runBlocking {
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3)
+        }
+
+        //Press on the refresh button
+        onView(withId(R.id.refreshButton)).perform(click())
 
         val recyclerView = onView(withId(R.id.recyclerView))
         recyclerView.check(matches(hasItemCount(1)))
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentDisplayTwoDifferentPhotosWorks() = runTest {
-        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
+    fun displayFragmentDisplayTwoBadFormatPhotosWorks() {
+        runBlocking {
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3)
+        }
+
+        runBlocking {
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH4, TEST_IMAGE_PATH4)
+        }
+
 
         //Press on the refresh button
-        onView(withId(R.id.refreshButton)).check(matches(isDisplayed())).perform(click())
-
-        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
-
-        //Press on the refresh button
-        onView(withId(R.id.refreshButton)).check(matches(isDisplayed())).perform(click())
-
-        delay(WAIT_TIME_REFRESH)
-
-        val recyclerView = onView(withId(R.id.recyclerView))
-        recyclerView.check(matches(hasItemCount(2)))
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun displayFragmentDisplayMixingFormatPhotosWorks() = runTest {
-        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
-
-        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3) }.join()
-
-        //Press on the refresh button
-        onView(withId(R.id.refreshButton)).check(matches(isDisplayed())).perform(click())
-
-        delay(WAIT_TIME_REFRESH)
-
-        val recyclerView = onView(withId(R.id.recyclerView))
-        recyclerView.check(matches(hasItemCount(2)))
-
-        launch { emptyFirebaseStorage(FirebaseStorage.getInstance().reference) }.join()
-
-        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
-
-        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH4, TEST_IMAGE_PATH4) }.join()
-
-        //Press on the refresh button
-        onView(withId(R.id.refreshButton)).check(matches(isDisplayed())).perform(click())
-
-        delay(WAIT_TIME_REFRESH)
-
-        recyclerView.check(matches(hasItemCount(2)))
-    }
-
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun displayFragmentDisplayOneBadFormatPhotosWorks() = runTest {
-        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3) }.join()
-
-        //Press on the refresh button
-        onView(withId(R.id.refreshButton)).check(matches(isDisplayed())).perform(click())
-
-        delay(WAIT_TIME_REFRESH)
-
-        val recyclerView = onView(withId(R.id.recyclerView))
-        recyclerView.check(matches(hasItemCount(1)))
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun displayFragmentDisplayTwoBadFormatPhotosWorks() = runTest {
-        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3) }.join()
-
-        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH4, TEST_IMAGE_PATH4) }.join()
-
-        //Press on the refresh button
-        onView(withId(R.id.refreshButton)).check(matches(isDisplayed())).perform(click())
-
-        delay(WAIT_TIME_REFRESH)
+        onView(withId(R.id.refreshButton)).perform(click())
 
         val recyclerView = onView(withId(R.id.recyclerView))
         recyclerView.check(matches(hasItemCount(2)))
@@ -175,21 +182,19 @@ class DisplayFragmentTest {
         recyclerView.check(matches(hasItemCount(0)))
 
         //Press on the refresh button
-        onView(withId(R.id.refreshButton)).check(matches(isDisplayed())).perform(click())
-
-        runBlocking{ delay(WAIT_TIME_REFRESH) }
+        onView(withId(R.id.refreshButton)).perform(click())
 
         recyclerView.check(matches(hasItemCount(0)))
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentClickingOnPhotosFireCorrectIntents() = runTest {
-        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
-        //Press on the refresh button
-        onView(withId(R.id.refreshButton)).check(matches(isDisplayed())).perform(click())
+    fun displayFragmentClickingOnPhotosFireCorrectIntents() {
+        runBlocking {
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
+        }
 
-        delay(WAIT_TIME_REFRESH)
+        //Press on the refresh button
+        onView(withId(R.id.refreshButton)).perform(click())
 
         onView(withId(R.id.recyclerView)).perform(
             RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
@@ -203,15 +208,14 @@ class DisplayFragmentTest {
         Intents.intended(hasFlag(Intent.FLAG_GRANT_READ_URI_PERMISSION))
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentSharingPhotoWorks() = runTest {
-        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
+    fun displayFragmentSharingPhotoWorks() {
+        runBlocking {
+            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
+        }
 
         //Press on the refresh button
-        onView(withId(R.id.refreshButton)).check(matches(isDisplayed())).perform(click())
-
-        delay(WAIT_TIME_REFRESH)
+        onView(withId(R.id.refreshButton)).perform(click())
 
         onView(withId(R.id.shareButton)).perform(click())
 

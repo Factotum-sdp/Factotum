@@ -23,9 +23,8 @@ import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getAuth
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.runTest
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matchers
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -43,20 +42,51 @@ class MainActivityTest {
     )
 
     companion object {
-        @OptIn(ExperimentalCoroutinesApi::class)
         @BeforeClass
         @JvmStatic
-        fun setUpDatabase() = runTest {
+        fun setUpDatabase() {
             initFirebase()
             UsersPlaceHolder.init(getDatabase(), getAuth())
 
-            launch { GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_COURIER) }.join()
-            launch { GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_BOSS) }.join()
-            launch { GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_CLIENT) }.join()
+            runBlocking {
+                ContactsUtils.populateDatabase()
+            }
 
-            launch { ContactsUtils.populateDatabase() }.join()
+            runBlocking{
+                try {
+                    UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_COURIER)
+                } catch (e : FirebaseAuthUserCollisionException) {
+                    e.printStackTrace()
+                }
+                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_COURIER)
+            }
 
+            runBlocking{
+                try {
+                    UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_CLIENT)
+                } catch (e : FirebaseAuthUserCollisionException) {
+                    e.printStackTrace()
+                }
+                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_CLIENT)
+            }
+
+            runBlocking{
+                try {
+                    UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_BOSS)
+                } catch (e : FirebaseAuthUserCollisionException) {
+                    e.printStackTrace()
+                }
+                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_BOSS)
+            }
         }
+        /**
+        @AfterClass
+        @JvmStatic
+        fun stopAuthEmulator() {
+        val auth = getAuth()
+        auth.signOut()
+        MainActivity.setAuth(auth)
+        } **/
     }
 
     //========================================================================================
@@ -165,7 +195,7 @@ class MainActivityTest {
     @Test
     fun pressingBackOnRBFragmentLeadsOutOfTheApp() {
         GeneralUtils.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
-        
+
         pressBackUnconditionally()
         val uiDevice = UiDevice.getInstance(getInstrumentation())
         assertFalse(uiDevice.currentPackageName == "com.github.factotum_sdp.factotum")
@@ -175,7 +205,7 @@ class MainActivityTest {
     @Test
     fun navHeaderDisplaysUserData() {
         GeneralUtils.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
-        
+
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("boss@gmail.com")).check(matches(isDisplayed()))
         onView(withText("Boss (BOSS)")).check(matches(isDisplayed()))
@@ -215,9 +245,9 @@ class MainActivityTest {
         onView(withText("Boss (BOSS)")).check(matches(isDisplayed()))
 
         onView(withId(R.id.signoutButton)).perform(click())
-        
+
         GeneralUtils.fillUserEntryAndGoToRBFragment("helen.bates@gmail.com", "123456")
-        
+
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("helen.bates@gmail.com")).check(matches(isDisplayed()))
         onView(withText("Helen Bates (COURIER)")).check(matches(isDisplayed()))

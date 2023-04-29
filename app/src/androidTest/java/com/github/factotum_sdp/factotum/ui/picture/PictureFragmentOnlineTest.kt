@@ -7,23 +7,28 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
-import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.ui.picture.*
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
+import com.google.firebase.storage.ListResult
+import com.google.firebase.storage.StorageReference
 import junit.framework.TestCase.assertTrue
 import junit.framework.TestCase.fail
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.tasks.await
 import org.junit.*
 import org.junit.runner.RunWith
 import java.io.File
-
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 @RunWith(AndroidJUnit4::class)
 class PictureFragmentOnlineTest {
@@ -43,13 +48,10 @@ class PictureFragmentOnlineTest {
     )
 
     companion object {
-        @OptIn(ExperimentalCoroutinesApi::class)
         @BeforeClass
         @JvmStatic
-        fun setUpDatabase() = runTest {
+        fun setUpDatabase() {
             initFirebase()
-            UsersPlaceHolder.init(GeneralUtils.getDatabase(), GeneralUtils.getAuth())
-            launch { GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_COURIER) }.join()
         }
     }
 
@@ -60,23 +62,25 @@ class PictureFragmentOnlineTest {
 
         goToPictureFragment()
 
-        runBlocking { delay(TIME_WAIT_SHUTTER) }
+        // Wait for the camera to open
+        Thread.sleep(TIME_WAIT_SHUTTER)
 
+        // Take a photo
         triggerShutter(device)
 
-        runBlocking { delay(TIME_WAIT_DONE_OR_CANCEL) }
+        // Wait for the photo to be taken
+        Thread.sleep(TIME_WAIT_DONE_OR_CANCEL)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @After
-    fun tearDown() = runTest {
-        launch { emptyFirebaseStorage(GeneralUtils.getStorage().reference) }.join()
+    fun tearDown() {
+        runBlocking { emptyFirebaseStorage(GeneralUtils.getStorage().reference) }
         emptyLocalFiles(picturesDir)
     }
 
     @Test
     fun testUploadFileCorrectly() {
-        device.findObject(UiSelector().description("Done")).click()
+        triggerDone(device)
 
         runBlocking {
             delay(TIME_WAIT_UPLOAD_PHOTO)
@@ -98,7 +102,7 @@ class PictureFragmentOnlineTest {
     @Test
     fun testCancelPhoto() {
         // Click the button to cancel the photo
-        device.findObject(UiSelector().description("Cancel")).click()
+        triggerCancel(device)
 
         runBlocking {
             delay(TIME_WAIT_UPLOAD_PHOTO)

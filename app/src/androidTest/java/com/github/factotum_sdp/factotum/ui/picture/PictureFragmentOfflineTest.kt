@@ -71,9 +71,8 @@ class PictureFragmentOfflineTest {
 
         device.findObject(UiSelector().description("Done")).click()
 
-        withContext(Dispatchers.IO) {
-            Thread.sleep(TIME_WAIT_UPLOAD_PHOTO)
-        }
+        // Really needed to wait for the upload to finish
+        runBlocking { delay(TIME_WAIT_UPLOAD_PHOTO) }
 
         GeneralUtils.getStorage().reference.child(CLIENT_ID).listAll().addOnSuccessListener {
             fail("Should not succeed")

@@ -83,9 +83,7 @@ class PictureFragmentOnlineTest {
         device.findObject(UiSelector().description("Done")).click()
 
         // Really needed to wait for the upload to finish
-        withContext(Dispatchers.IO) {
-            Thread.sleep(TIME_WAIT_UPLOAD_PHOTO)
-        }
+        runBlocking { delay(TIME_WAIT_UPLOAD_PHOTO) }
 
         GeneralUtils.getStorage().reference.child(CLIENT_ID).listAll().addOnSuccessListener { listResult ->
             assertTrue(listResult.items.isNotEmpty())
@@ -106,9 +104,7 @@ class PictureFragmentOnlineTest {
         device.findObject(UiSelector().description("Cancel")).click()
 
         // Really needed to wait for the upload to finish
-        withContext(Dispatchers.IO) {
-            Thread.sleep(TIME_WAIT_UPLOAD_PHOTO)
-        }
+        runBlocking { delay(TIME_WAIT_UPLOAD_PHOTO) }
 
         GeneralUtils.getStorage().reference.child(CLIENT_ID).listAll().addOnSuccessListener { listResult ->
             assertTrue(listResult.items.isEmpty())

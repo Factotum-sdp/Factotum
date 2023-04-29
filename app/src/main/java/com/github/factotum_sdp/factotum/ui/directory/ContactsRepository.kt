@@ -2,12 +2,16 @@ package com.github.factotum_sdp.factotum.ui.directory
 
 import android.content.SharedPreferences
 import com.github.factotum_sdp.factotum.placeholder.Contact
-import com.google.firebase.database.*
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.gson.Gson
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import java.util.*
+import java.util.UUID
 
 class ContactsRepository(
     private val sharedPreferences: SharedPreferences
@@ -16,7 +20,7 @@ class ContactsRepository(
     private lateinit var firebaseContactsRef: DatabaseReference
 
     fun setDatabase(database: FirebaseDatabase) {
-        firebaseContactsRef = database.reference.child("contacts-daniel")
+        firebaseContactsRef = database.reference.child("contacts")
     }
 
     fun saveContactToSharedPreferences(contact: Contact) =

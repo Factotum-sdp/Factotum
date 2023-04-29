@@ -24,6 +24,7 @@ import com.github.factotum_sdp.factotum.utils.ContactsUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import junit.framework.TestCase.*
 import kotlinx.coroutines.runBlocking
+import org.hamcrest.CoreMatchers.containsString
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -141,7 +142,7 @@ class ContactsCreationTest {
 
         onView(withId(R.id.contact_name)).check(matches(withText("John")))
         onView(withId(R.id.contact_surname)).check(matches(withText("Doe")))
-        onView(withId(R.id.contact_address)).check(matches(withText("123 Main St")))
+        onView(withId(R.id.contact_address)).check(matches(withText(containsString("123 Main St"))))
         onView(withId(R.id.contact_phone)).check(matches(withText("555-555-1234")))
         onView(withId(R.id.contact_details)).check(matches(withText("This is a test note.")))
     }

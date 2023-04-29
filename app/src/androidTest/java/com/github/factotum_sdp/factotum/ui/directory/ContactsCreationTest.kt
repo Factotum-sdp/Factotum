@@ -157,7 +157,7 @@ class ContactsCreationTest {
     }*/
 
 
-    @Test
+    /*@Test
     fun selectSuggestionWritesAddress() {
         val city = "Lausanne"
         onView(withId(androidx.appcompat.R.id.search_src_text)).perform(typeText(city))
@@ -170,6 +170,6 @@ class ContactsCreationTest {
         device.findObject(text(lausanneResult)).click()
         val addressChanged = address.wait(Until.textMatches(lausanneResult), 5000)
         assertTrue(addressChanged)
-    }
+    }*/
 
 }

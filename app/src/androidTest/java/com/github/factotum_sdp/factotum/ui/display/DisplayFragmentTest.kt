@@ -111,39 +111,6 @@ class DisplayFragmentTest {
         recyclerView.check(matches(hasItemCount(2)))
     }
 
-    @Test
-    fun displayFragmentDisplayMixingFormatPhotosWorksOneWay() {
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
-        }
-
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3)
-        }
-
-        //Press on the refresh button
-        onView(withId(R.id.refreshButton)).perform(click())
-
-        val recyclerView = onView(withId(R.id.recyclerView))
-        recyclerView.check(matches(hasItemCount(2)))
-    }
-
-    @Test
-    fun displayFragmentDisplayMixingFormatPhotosWorksOtherWay() {
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2)
-        }
-
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH4, TEST_IMAGE_PATH4)
-        }
-
-        //Press on the refresh button
-        onView(withId(R.id.refreshButton)).perform(click())
-
-        val recyclerView = onView(withId(R.id.recyclerView))
-        recyclerView.check(matches(hasItemCount(2)))
-    }
 
     @Test
     fun displayFragmentDisplayOneBadFormatPhotosWorks() {

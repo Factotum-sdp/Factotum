@@ -24,4 +24,14 @@
         android:text="@string/contact_surname_and_name"
         android:textSize="20sp" />
 
+    <TextView
+        android:id="@+id/contact_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="25dp"
+        android:text="@string/Single_contact_username"
+        android:textStyle="italic"
+        android:textSize="15sp"/>
+
 </LinearLayout>

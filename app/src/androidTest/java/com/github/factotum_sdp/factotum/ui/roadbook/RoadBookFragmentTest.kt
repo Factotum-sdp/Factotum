@@ -24,6 +24,7 @@ import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeLeftTheRecordAt
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightTheRecordAt
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
+import com.github.factotum_sdp.factotum.utils.PreferencesSetting
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -68,6 +69,9 @@ class RoadBookFragmentTest {
 
     @Before
     fun toRoadBookFragment() {
+        // Ensure "use RoadBook preferences" is disabled
+        PreferencesSetting.setRoadBookPrefs(testRule)
+
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))
@@ -606,6 +610,64 @@ class RoadBookFragmentTest {
         onView(allOf(withId(R.id.archivedIcon), withEffectiveVisibility(Visibility.VISIBLE)))
             .check(matches(isDisplayed()))
     }
+
+    // Check that moving somewhere else in the app keep the sharedPref alive.
+    @Test
+    fun movingOutsideRBFragmentKeepsButtonStates() {
+        // Set Save user Preferences check in the Application Settings
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.settingsFragment))
+            .perform(click())
+        onView(withId(R.id.save_roadbook_preferences)).perform(click())
+
+        // Come back to RoadBook Fragment
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.roadBookFragment))
+            .perform(click())
+
+        // Set some states :
+        // Turn SwipeLeft disabled
+        // Keep SwipeRight, DragNDrop enabled and Touch Navigation disabled
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_swipel_deletion)).perform(click())
+
+        // Check features :
+        // Swipe Left disabled
+        swipeLeftTheRecordAt(2)
+        onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
+
+        // SwipeRight enabled
+        swipeRightTheRecordAt(2)
+        onView(withText(R.string.edit_dialog_update_b)).check(matches(isDisplayed()))
+        onView(withText(R.string.edit_dialog_cancel_b)).check(matches(isDisplayed()))
+        onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
+
+        // Navigation on Click disabled
+        Thread.sleep(WORST_REFRESH_TIME)
+        onView(withText(DestinationRecords.RECORDS[2].destID)).perform(click())
+        onView(withId(R.id.fragment_drecord_details_directors_parent)).check(doesNotExist())
+
+        navigateOutsideAndComeBack()
+
+        // Check features again :
+        // Swipe Left disabled
+        swipeLeftTheRecordAt(2)
+        onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
+
+        // SwipeRight enabled
+        swipeRightTheRecordAt(2)
+        onView(withText(R.string.edit_dialog_update_b)).check(matches(isDisplayed()))
+        onView(withText(R.string.edit_dialog_cancel_b)).check(matches(isDisplayed()))
+        onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
+
+        // Navigation on Click disabled
+        Thread.sleep(WORST_REFRESH_TIME)
+        onView(withText(DestinationRecords.RECORDS[2].destID)).perform(click())
+        onView(withId(R.id.fragment_drecord_details_directors_parent)).check(doesNotExist())
+    }
+
 
     // ============================================================================================
     // ================================Automatic Timestamp ========================================

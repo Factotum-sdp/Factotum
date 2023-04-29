@@ -5,7 +5,9 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.uiautomator.UiDevice
+import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
@@ -60,9 +62,11 @@ fun triggerCancel(device: UiDevice) {
     device.executeShellCommand("input keyevent 62")
 }
 
-fun goToPictureFragment() {
-    GeneralUtils.fillUserEntryAndGoToRBFragment("courier@gmail.com", "123456")
+fun goToPictureFragment(testRule: ActivityScenarioRule<MainActivity>) {
+    GeneralUtils.fillUserEntryAndEnterTheApp("courier@gmail.com", "123456")
 
+    // Ensure defaults RoadBook preferences are set to enable touchClick
+    PreferencesSetting.setRoadBookPrefs(testRule)
     PreferencesSetting.enableTouchClick()
 
     // Click on one of the roadbook

@@ -1,4 +1,8 @@
-package com.github.factotum_sdp.factotum.data
+package com.github.factotum_sdp.factotum.repositories
+
+import com.github.factotum_sdp.factotum.data.LoginDataSource
+import com.github.factotum_sdp.factotum.data.Result
+import com.github.factotum_sdp.factotum.models.User
 
 /**
  * Class that requests authentication and user information from the remote data source and

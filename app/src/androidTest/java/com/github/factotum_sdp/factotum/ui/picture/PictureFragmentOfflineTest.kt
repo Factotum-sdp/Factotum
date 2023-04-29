@@ -1,4 +1,5 @@
 package com.github.factotum_sdp.factotum.ui.picture
+
 //
 //import android.Manifest
 //import android.os.Environment
@@ -48,7 +49,7 @@ package com.github.factotum_sdp.factotum.ui.picture
 //        device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 //        emptyLocalFiles(picturesDir)
 //
-//        goToPictureFragment()
+//        goToPictureFragment(testRule)
 //
 //        // Wait for the camera to open
 //        Thread.sleep(TIME_WAIT_SHUTTER)

@@ -1,8 +1,6 @@
 package com.github.factotum_sdp.factotum
 
-import android.content.Context
 import android.view.Gravity
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.pressBack
@@ -19,15 +17,15 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
-import com.github.factotum_sdp.factotum.ui.login.LoginFragmentTest
 import com.github.factotum_sdp.factotum.utils.ContactsUtils
+import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getAuth
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.Matchers
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -45,51 +43,20 @@ class MainActivityTest {
     )
 
     companion object {
+        @OptIn(ExperimentalCoroutinesApi::class)
         @BeforeClass
         @JvmStatic
-        fun setUpDatabase() {
+        fun setUpDatabase() = runTest {
             initFirebase()
             UsersPlaceHolder.init(getDatabase(), getAuth())
 
-            runBlocking {
-                ContactsUtils.populateDatabase()
-            }
+            launch { GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_COURIER) }.join()
+            launch { GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_BOSS) }.join()
+            launch { GeneralUtils.addUserToDatabase(UsersPlaceHolder.USER_CLIENT) }.join()
 
-            runBlocking{
-                try {
-                    UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_COURIER)
-                } catch (e : FirebaseAuthUserCollisionException) {
-                    e.printStackTrace()
-                }
-                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_COURIER)
-            }
+            launch { ContactsUtils.populateDatabase() }.join()
 
-            runBlocking{
-                try {
-                    UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_CLIENT)
-                } catch (e : FirebaseAuthUserCollisionException) {
-                    e.printStackTrace()
-                }
-                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_CLIENT)
-            }
-
-            runBlocking{
-                try {
-                    UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER_BOSS)
-                } catch (e : FirebaseAuthUserCollisionException) {
-                    e.printStackTrace()
-                }
-                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER_BOSS)
-            }
         }
-        /**
-        @AfterClass
-        @JvmStatic
-        fun stopAuthEmulator() {
-        val auth = getAuth()
-        auth.signOut()
-        MainActivity.setAuth(auth)
-        } **/
     }
 
     //========================================================================================
@@ -182,7 +149,7 @@ class MainActivityTest {
     @Test
     fun pressingBackOnAMenuFragmentLeadsToRBFragment() {
         // First need to login to trigger the change of navGraph's start fragment
-        LoginFragmentTest.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
 
         navigateToAndPressBackLeadsToRB(R.id.directoryFragment)
         navigateToAndPressBackLeadsToRB(R.id.displayFragment)
@@ -197,7 +164,7 @@ class MainActivityTest {
 
     @Test
     fun pressingBackOnRBFragmentLeadsOutOfTheApp() {
-        LoginFragmentTest.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         
         pressBackUnconditionally()
         val uiDevice = UiDevice.getInstance(getInstrumentation())
@@ -207,7 +174,7 @@ class MainActivityTest {
 
     @Test
     fun navHeaderDisplaysUserData() {
-        LoginFragmentTest.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("boss@gmail.com")).check(matches(isDisplayed()))
@@ -216,7 +183,7 @@ class MainActivityTest {
 
     @Test
     fun drawerMenuIsCorrectlyDisplayedForBoss() {
-        LoginFragmentTest.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
 
         // Check that the menu items are displayed
@@ -228,7 +195,7 @@ class MainActivityTest {
 
     @Test
     fun drawerMenuIsCorrectlyDisplayedForClient() {
-        LoginFragmentTest.fillUserEntryAndGoToRBFragment("client@gmail.com", "123456")
+        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
 
         // Check that the menu items are displayed
@@ -241,7 +208,7 @@ class MainActivityTest {
     // Work when executing the scenario manually but emulators issues make it fails in the connectedCheck
     // The second user Helen Bates can't be found
     private fun navHeaderStillDisplaysCorrectlyAfterLogout() {
-        LoginFragmentTest.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("boss@gmail.com")).check(matches(isDisplayed()))
@@ -249,7 +216,7 @@ class MainActivityTest {
 
         onView(withId(R.id.signoutButton)).perform(click())
         
-        LoginFragmentTest.fillUserEntryAndGoToRBFragment("helen.bates@gmail.com", "123456")
+        GeneralUtils.fillUserEntryAndEnterTheApp("helen.bates@gmail.com", "123456")
         
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("helen.bates@gmail.com")).check(matches(isDisplayed()))
@@ -283,7 +250,7 @@ class MainActivityTest {
                 )
             )
         }
-        LoginFragmentTest.fillUserEntryAndGoToRBFragment("email@gmail.com", "123456")
+        GeneralUtils.fillUserEntryAndEnterTheApp("email@gmail.com", "123456")
 
         FirebaseAuth.AuthStateListener { firebaseAuth ->
             if (firebaseAuth.currentUser != null) {

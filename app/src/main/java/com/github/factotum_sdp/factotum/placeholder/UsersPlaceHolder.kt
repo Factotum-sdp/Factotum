@@ -2,7 +2,7 @@ package com.github.factotum_sdp.factotum.placeholder
 
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.data.LoginDataSource
-import com.github.factotum_sdp.factotum.data.Role
+import com.github.factotum_sdp.factotum.models.Role
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import kotlin.coroutines.resume

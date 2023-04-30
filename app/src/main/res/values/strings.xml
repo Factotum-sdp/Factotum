@@ -146,4 +146,7 @@
     <string name="Single_contact_username">\@username</string>
     <string name="username_not_unique">Sorry, that username is already taken. Please choose a different username.</string>
     <string name="empty_username">Please enter username to add user.</string>
+    <string name="roadbookpreferencescheckedtextview">RoadBookPreferencesCheckedTextView</string>
+    <string name="application_settings">Application Settings</string>
+    <string name="save_roadbook_preferences">Save RoadBook Preferences</string>
 </resources>

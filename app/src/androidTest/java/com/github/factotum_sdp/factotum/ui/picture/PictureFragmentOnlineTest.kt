@@ -1,5 +1,4 @@
 package com.github.factotum_sdp.factotum.ui.picture
-//
 //import android.Manifest
 //import android.os.Environment
 //import androidx.test.ext.junit.rules.ActivityScenarioRule
@@ -61,7 +60,7 @@ package com.github.factotum_sdp.factotum.ui.picture
 //        emptyLocalFiles(picturesDir)
 //        device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 //
-//        goToPictureFragment()
+//        goToPictureFragment(testRule)
 //
 //        // Wait for the camera to open
 //        Thread.sleep(TIME_WAIT_SHUTTER)

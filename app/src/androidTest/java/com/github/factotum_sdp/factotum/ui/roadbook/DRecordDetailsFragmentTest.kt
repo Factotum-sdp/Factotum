@@ -46,6 +46,8 @@ class DRecordDetailsFragmentTest {
 
     @Before
     fun toRoadBookFragment() {
+        // Ensure "use RoadBook preferences" is disabled
+        PreferencesSetting.setRoadBookPrefs(testRule)
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))

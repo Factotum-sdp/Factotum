@@ -55,7 +55,7 @@ class GeneralUtils {
             return storage
         }
 
-        fun fillUserEntryAndGoToRBFragment(email: String, password: String) {
+        fun fillUserEntryAndEnterTheApp(email: String, password: String) {
             Espresso.onView(ViewMatchers.withId(R.id.email)).perform(ViewActions.typeText(email))
             Espresso.onView(ViewMatchers.withId(R.id.fragment_login_directors_parent)).perform(
                 ViewActions.closeSoftKeyboard()

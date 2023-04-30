@@ -10,13 +10,18 @@ import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.data.DestinationRecord
+import com.github.factotum_sdp.factotum.models.DestinationRecord
 import com.github.factotum_sdp.factotum.ui.directory.ContactDetailsFragment
 import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
 import com.github.factotum_sdp.factotum.ui.picture.PictureFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
+/**
+ * The container fragment which display all the details of a DestinationRecord
+ *
+ * The sliding event shows different fragments related to the DestinationRecord
+ */
 class DRecordDetailsFragment : Fragment() {
 
     private val rbViewModel: RoadBookViewModel by activityViewModels()

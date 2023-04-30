@@ -87,10 +87,13 @@ class PictureFragmentOnlineTest {
             Thread.sleep(TIME_WAIT_UPLOAD_PHOTO)
         }
 
-        GeneralUtils.getStorage().reference.child(CLIENT_ID).listAll().addOnSuccessListener { files ->
-            assertTrue(files.items.size == 1)
-        }.addOnFailureListener { except ->
-            fail(except.message)
+        GeneralUtils.getStorage().reference.child(CLIENT_ID).listAll().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val files = task.result?.items ?: emptyList()
+                assertTrue(files.size == 1)
+            } else {
+                fail(task.exception?.message)
+            }
         }
 
         runBlocking { delay(TIME_WAIT_PHOTO_DELETE) }

@@ -17,8 +17,6 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.Contact
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.models.DestinationRecord
-import com.github.factotum_sdp.factotum.placeholder.Contact
-import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
 import java.util.Calendar

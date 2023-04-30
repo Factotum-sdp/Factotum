@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum.data.localisation
+package com.github.factotum_sdp.factotum.models
 
 import android.content.Context
 import android.location.Address

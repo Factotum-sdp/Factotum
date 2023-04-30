@@ -8,7 +8,11 @@ import android.provider.BaseColumns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.CursorAdapter
+import android.widget.EditText
+import android.widget.Spinner
 import androidx.appcompat.widget.SearchView
 import androidx.cursoradapter.widget.SimpleCursorAdapter
 import androidx.fragment.app.Fragment
@@ -17,9 +21,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.data.Role
-import com.github.factotum_sdp.factotum.data.localisation.Location
 import com.github.factotum_sdp.factotum.databinding.FragmentContactCreationBinding
+import com.github.factotum_sdp.factotum.models.Location
+import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.placeholder.Contact
 import kotlinx.coroutines.launch
 

@@ -1,6 +1,6 @@
-package com.github.factotum_sdp.factotum.data
+package com.github.factotum_sdp.factotum.models
 
-import com.github.factotum_sdp.factotum.data.DestinationRecord.Action
+import com.github.factotum_sdp.factotum.models.DestinationRecord.Action
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*

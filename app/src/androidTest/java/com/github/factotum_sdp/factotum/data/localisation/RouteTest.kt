@@ -3,6 +3,8 @@ package com.github.factotum_sdp.factotum.data.localisation
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.factotum_sdp.factotum.models.Location
+import com.github.factotum_sdp.factotum.models.Route
 import com.github.factotum_sdp.factotum.ui.maps.MapsViewModel
 import com.google.android.gms.maps.model.LatLng
 import junit.framework.TestCase.assertEquals

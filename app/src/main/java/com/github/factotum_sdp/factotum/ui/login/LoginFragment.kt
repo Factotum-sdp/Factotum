@@ -15,7 +15,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.data.User
@@ -168,9 +167,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun updateUi(model: User) {
-        val welcome = getString(R.string.welcome) + " " + model.name + "!"
         userViewModel.setLoggedInUser(model)
-        Snackbar.make(requireView(), welcome, Snackbar.LENGTH_LONG).show()
         updateNGraphStartDestination()
     }
 

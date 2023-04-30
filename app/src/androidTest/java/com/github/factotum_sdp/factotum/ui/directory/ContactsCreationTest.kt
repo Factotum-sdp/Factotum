@@ -3,7 +3,6 @@ package com.github.factotum_sdp.factotum.ui.directory
 import android.widget.EditText
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
-import androidx.test.espresso.Espresso.closeSoftKeyboard
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
@@ -21,10 +20,9 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.localisation.Location
 import com.github.factotum_sdp.factotum.placeholder.Contact
-import com.github.factotum_sdp.factotum.utils.ContactsUtils
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import junit.framework.TestCase.*
-import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -34,27 +32,30 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class ContactsCreationTest {
 
-
     @get:Rule
     var activityRule = ActivityScenarioRule(MainActivity::class.java)
 
     companion object {
-        private const val nbContacts = 5
+        var nbContacts: Int = 0
 
         @BeforeClass
         @JvmStatic
         fun firebaseSetup() {
             initFirebase()
+            nbContacts = getDatabase().reference.child("contacts").get().run {
+                addOnSuccessListener {
+                    nbContacts = it.childrenCount.toInt()
+                }
+                addOnFailureListener {
+                    fail("Could not get the number of contacts in the database")
+                }
+                nbContacts
+            }
         }
     }
 
     @Before
     fun setUp() {
-        ContactsUtils.emptyFirebaseDatabase()
-
-        runBlocking {
-            ContactsUtils.populateDatabase(nbContacts)
-        }
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.directoryFragment))
@@ -111,6 +112,8 @@ class ContactsCreationTest {
 
     @Test
     fun canCreateContact() {
+        //remove contact if it exists
+        getDatabase().reference.child("contacts").child("JohnDoe").removeValue()
         val usernameEditText = onView(withId(R.id.editTextUsername))
         usernameEditText.perform(replaceText("JohnDoe"))
         onView(withId(R.id.confirm_form)).perform(click())
@@ -125,12 +128,12 @@ class ContactsCreationTest {
                 val adapter = recyclerView.adapter
                 assert(adapter?.itemCount == nbContacts + 1)
             }
+        getDatabase().reference.child("contacts").child("JohnDoe").removeValue()
     }
-
 
     @Test
     fun createdContactHasCorrectValue() {
-
+        getDatabase().reference.child("contacts").child("JohnDoe").removeValue()
         val usernameEditText = onView(withId(R.id.editTextUsername))
         usernameEditText.perform(replaceText("JohnDoe"))
 
@@ -141,7 +144,7 @@ class ContactsCreationTest {
         surnameEditText.perform(replaceText("Doe"))
 
         onView(withId(androidx.appcompat.R.id.search_src_text)).perform(
-            typeText("123 Main St")
+            typeText("123 Main St\n")
         )
         closeSoftKeyboard()
 
@@ -151,7 +154,6 @@ class ContactsCreationTest {
         val notesEditText = onView(withId(R.id.contactCreationNotes))
         notesEditText.perform(replaceText("This is a test note."))
 
-        Thread.sleep(1000)
         onView(withId(R.id.confirm_form)).perform(click())
         onView(withId(R.id.contacts_recycler_view))
             .perform(
@@ -167,8 +169,8 @@ class ContactsCreationTest {
         onView(withId(R.id.contact_address)).check(matches(withText("123 Main St")))
         onView(withId(R.id.contact_phone)).check(matches(withText("555-555-1234")))
         onView(withId(R.id.contact_details)).check(matches(withText("This is a test note.")))
+        getDatabase().reference.child("contacts").child("JohnDoe").removeValue()
     }
-
 
     @Test
     fun writeInAddressFieldMakesDropDown() {

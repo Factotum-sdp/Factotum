@@ -14,7 +14,7 @@ class ContactsUtils {
 
     companion object {
         //fake data --> to be replaced with connection to database
-        private val randomContacts = mutableListOf<Contact>()
+        val randomContacts = mutableListOf<Contact>()
         private val randomNames = listOf("John", "Jane", "Joe")
         private var randomSurnames = listOf("Smith", "Jones", "Williams")
         private val roles = listOf("Boss", "Courier", "Client")
@@ -38,7 +38,7 @@ class ContactsUtils {
             )
         }
 
-        private fun createRandomContacts(count: Int) {
+        fun createRandomContacts(count: Int) {
             randomContacts.clear()
             for (i in randomContacts.size until count) {
                 randomContacts.add(createContact(i))

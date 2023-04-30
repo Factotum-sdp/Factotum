@@ -46,7 +46,7 @@ class ContactDetailsFragmentTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Before
-    fun goToContactDetails()  {
+    fun goToContactDetails() {
         ContactsUtils.emptyFirebaseDatabase()
 
         runTest {

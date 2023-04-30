@@ -3,7 +3,6 @@ package com.github.factotum_sdp.factotum.ui.directory
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.MainActivity
-import com.github.factotum_sdp.factotum.utils.ContactsUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.database.DataSnapshot
@@ -38,13 +37,11 @@ class ContactsListOnlineTest {
             database = getDatabase()
         }
 
-        //TODO: MAYBE EMPTY DATABASE
     }
 
     @ExperimentalCoroutinesApi
     @Test
     fun testAddContacts() = runTest {
-        ContactsUtils.populateDatabase()
 
         val ref = database.getReference("contacts")
         val dataSnapshot = suspendCoroutine { continuation ->

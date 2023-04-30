@@ -143,7 +143,7 @@ class RouteFragmentTest {
                 .check(matches(withText(result)))
         }
     }
-    /**
+    /*
     @Test
     fun wrongSearchShowsNoResultSnackbar(){
     val city = "wrong_search"
@@ -151,6 +151,6 @@ class RouteFragmentTest {
     onView(withId(com.google.android.material.R.id.snackbar_text))
     .check(matches(withText(NO_RESULT)))
     }
-     **/
+     */
 
 }

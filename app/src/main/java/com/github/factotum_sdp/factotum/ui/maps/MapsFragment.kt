@@ -79,6 +79,7 @@ class MapsFragment : Fragment() {
         if (!requireContext().hasLocationPermission()) {
             requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
+        activateLocation(googleMap)
     }
 
     private fun activateLocation(googleMap: GoogleMap) {

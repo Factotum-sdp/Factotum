@@ -78,7 +78,7 @@ class MapsFragmentTest {
         }
     }
 
-    /*
+
     @Test
     fun b_permissionAllowShowLocation() {
         onView(withText(startsWith(FIRST_ROUTE_NAME_PREFIX))).perform(click())
@@ -87,7 +87,7 @@ class MapsFragmentTest {
             device.findObject(UiSelector().textContains(buttonTextAllow)).click()
         }
         assertTrue(checkLocationEnabled(testRule))
-    } */
+    }
 
 
     @Test

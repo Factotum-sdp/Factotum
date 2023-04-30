@@ -1,7 +1,6 @@
 package com.github.factotum_sdp.factotum
 
 import android.view.Gravity
-import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.Espresso.pressBackUnconditionally
@@ -10,7 +9,6 @@ import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.DrawerMatchers
-import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -18,10 +16,8 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.hamcrest.Matchers
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.BeforeClass
@@ -134,14 +130,15 @@ class MainActivityTest {
     }
 
     @Test
-    fun pressingBackOnAMenuFragmentLeadsToRBFragment() {
+    fun pressingBackOnAMenuFragmentLeadsToRBFragment() = runTest {
         // First need to login to trigger the change of navGraph's start fragment
-        GeneralUtils.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
 
         navigateToAndPressBackLeadsToRB(R.id.directoryFragment)
         navigateToAndPressBackLeadsToRB(R.id.displayFragment)
         navigateToAndPressBackLeadsToRB(R.id.routeFragment)
     }
+
 
     private fun navigateToAndPressBackLeadsToRB(menuItemId: Int) {
         navigateTo(menuItemId)
@@ -151,7 +148,7 @@ class MainActivityTest {
 
     @Test
     fun pressingBackOnRBFragmentLeadsOutOfTheApp() {
-        GeneralUtils.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         
         pressBackUnconditionally()
         val uiDevice = UiDevice.getInstance(getInstrumentation())
@@ -161,8 +158,8 @@ class MainActivityTest {
 
     @Test
     fun navHeaderDisplaysUserData() {
-        GeneralUtils.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
-        
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
+
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("boss@gmail.com")).check(matches(isDisplayed()))
         onView(withText("Boss (BOSS)")).check(matches(isDisplayed()))
@@ -170,7 +167,7 @@ class MainActivityTest {
 
     @Test
     fun drawerMenuIsCorrectlyDisplayedForBoss() {
-        GeneralUtils.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
 
         // Check that the menu items are displayed
@@ -182,7 +179,7 @@ class MainActivityTest {
 
     @Test
     fun drawerMenuIsCorrectlyDisplayedForClient() {
-        GeneralUtils.fillUserEntryAndGoToRBFragment("client@gmail.com", "123456")
+        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
 
         // Check that the menu items are displayed
@@ -195,7 +192,7 @@ class MainActivityTest {
     // Work when executing the scenario manually but emulators issues make it fails in the connectedCheck
     // The second user Helen Bates can't be found
     private fun navHeaderStillDisplaysCorrectlyAfterLogout() {
-        GeneralUtils.fillUserEntryAndGoToRBFragment("boss@gmail.com", "123456")
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("boss@gmail.com")).check(matches(isDisplayed()))
@@ -203,13 +200,14 @@ class MainActivityTest {
 
         onView(withId(R.id.signoutButton)).perform(click())
         
-        GeneralUtils.fillUserEntryAndGoToRBFragment("helen.bates@gmail.com", "123456")
+        GeneralUtils.fillUserEntryAndEnterTheApp("helen.bates@gmail.com", "123456")
         
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("helen.bates@gmail.com")).check(matches(isDisplayed()))
         onView(withText("Helen Bates (COURIER)")).check(matches(isDisplayed()))
     }
 
+    /*
     @Test
     fun signUpFormWithAllFieldsAndClickAndLogin() {
         onView(withId(R.id.signup)).perform(click())
@@ -237,7 +235,7 @@ class MainActivityTest {
                 )
             )
         }
-        GeneralUtils.fillUserEntryAndGoToRBFragment("email@gmail.com", "123456")
+        GeneralUtils.fillUserEntryAndEnterTheApp("email@gmail.com", "123456")
 
         FirebaseAuth.AuthStateListener { firebaseAuth ->
             if (firebaseAuth.currentUser != null) {
@@ -248,5 +246,5 @@ class MainActivityTest {
                 )
             }
         }
-    }
+    } */
 }

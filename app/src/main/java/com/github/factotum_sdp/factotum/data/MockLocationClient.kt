@@ -15,10 +15,10 @@ class MockLocationClient: LocationClient {
         return flow {
             while (true) {
                 val fakeLocation = Location("fake")
-                fakeLocation.latitude = 37.7749 // Replace with your desired latitude
-                fakeLocation.longitude = -122.4194 // Replace with your desired longitude
-                fakeLocation.time = Calendar.getInstance().timeInMillis // Replace with your desired timestamp
-                fakeLocation.accuracy = 10.0f // Replace with your desired accuracy in meters
+                fakeLocation.latitude = 37.7749
+                fakeLocation.longitude = -122.4194
+                fakeLocation.time = Calendar.getInstance().timeInMillis
+                fakeLocation.accuracy = 10.0f
                 emit(fakeLocation)
                 delay(longerInterval)
             }

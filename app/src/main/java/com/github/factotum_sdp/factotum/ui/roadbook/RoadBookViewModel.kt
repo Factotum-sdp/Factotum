@@ -1,12 +1,12 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.github.factotum_sdp.factotum.data.DestinationRecord
+import androidx.lifecycle.*
+import com.github.factotum_sdp.factotum.models.DestinationRecord
+import com.github.factotum_sdp.factotum.models.RoadBookPreferences
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
+import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
 import com.google.firebase.database.DatabaseReference
+import kotlinx.coroutines.launch
 import java.text.DateFormat
 import java.text.SimpleDateFormat.getDateInstance
 import java.util.*
@@ -21,10 +21,11 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
 
     private val _recordsList: MutableLiveData<DRecordList> =
         MutableLiveData(DRecordList())
-    val recordsListState: LiveData<DRecordList> = _recordsList
-
     private var dbRef: DatabaseReference
-    private val clientOccurences = HashMap<String, Int>()
+    private val clientOccurrences = HashMap<String, Int>()
+    private lateinit var preferencesRepository: RoadBookPreferencesRepository
+
+    val recordsListState: LiveData<DRecordList> = _recordsList
 
     init {
         val date = Calendar.getInstance().time
@@ -35,6 +36,47 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         // Let uncommented for testing purpose. Uncomment it for back-up uniqueness in the DB
         // Only for demo purpose :
         addDemoRecords(DestinationRecords.RECORDS)
+    }
+
+    /**
+     * Set the preferencesRepository field of this ViewModel
+     *
+     * To be called before any call to a function dealing with the RoadBookPreferences i.e :
+     * initialPreferences()
+     * updateRoadBookPreferences()
+     *
+     * @param preferences: RoadBookPreferencesRepository
+     */
+    fun setPreferencesRepository(preferences: RoadBookPreferencesRepository) {
+        preferencesRepository = preferences
+    }
+
+    /**
+     * Fetch the initial observable RoadBookPreferences state
+     *
+     * @return LiveData<RoadBookPreferences> The initial preferences state
+     */
+    fun initialPreferences(): LiveData<RoadBookPreferences> {
+        return liveData {
+            emit(preferencesRepository.fetchInitialPreferences())
+        }
+    }
+
+    /**
+     * Update the DataStore RoadBookPreferences state
+     *
+     * @param preferences: RoadBookPreferences
+     */
+    fun updateRoadBookPreferences(preferences: RoadBookPreferences) {
+        viewModelScope.launch {
+            preferences.apply {
+                preferencesRepository.updateReordering(enableReordering)
+                preferencesRepository.updateDeletionOrArchiving(enableArchivingAndDeletion)
+                preferencesRepository.updateEdition(enableEdition)
+                preferencesRepository.updateDetailsAccess(enableDetailsAccess)
+                preferencesRepository.updateShowArchived(showArchived)
+            }
+        }
     }
 
     /**
@@ -231,7 +273,7 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
     }
 
     private fun computeDestID(clientID: String): String {
-        val occ = clientOccurences.compute(clientID) { _, oldOcc ->
+        val occ = clientOccurrences.compute(clientID) { _, oldOcc ->
             var occ = oldOcc ?: 0
             ++occ
         }

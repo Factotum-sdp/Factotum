@@ -70,8 +70,6 @@ fun triggerCancel(device: UiDevice) {
 }
 
 fun goToPictureFragment() {
-    PreferencesSetting.enableTouchClick()
-
     // Click on one of the roadbook
     val destID = DestinationRecords.RECORDS[2].destID
     onView(withText(destID)).perform(click())

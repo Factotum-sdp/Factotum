@@ -122,4 +122,15 @@ class DirectoryFragmentTest {
             .perform(scrollToHolder(ContactsUtils.withHolderContactName("Smith John")))
     }
 
+    @Test
+    fun incorrectQueryShowsNoMatchingQueryMessage() {
+        onView(withId(R.id.empty_contacts_message)).check(matches(withEffectiveVisibility(Visibility.GONE)))
+        // Type a search query in the search view and close the soft keyboard
+        onView(withId(R.id.contacts_search_view))
+            .perform(typeText("urpioeqwjlfdaff"), closeSoftKeyboard())
+
+        // Check if the expected contact is visible in the RecyclerView
+        onView(withId(R.id.empty_contacts_message)).check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
+    }
+
 }

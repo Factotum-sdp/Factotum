@@ -55,8 +55,14 @@ class ContactsRepository(
 
     fun getContacts(): Flow<List<Contact>> {
         return callbackFlow {
+            val sharedPrefsContacts = getCachedContacts()
+            if (sharedPrefsContacts.isNotEmpty()) {
+                trySend(sharedPrefsContacts).isSuccess
+            }
+
             val valueEventListener = object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
+                    clearSharedPreferences()
                     val contactsList = mutableListOf<Contact>()
                     for (contactSnapshot in snapshot.children) {
                         val contact = contactSnapshot.getValue(Contact::class.java)
@@ -65,6 +71,8 @@ class ContactsRepository(
                             saveContactToSharedPreferences(it)
                         }
                     }
+
+                    // Update the list with data from the database
                     trySend(contactsList).isSuccess
                 }
 
@@ -78,6 +86,8 @@ class ContactsRepository(
             awaitClose { firebaseContactsRef.removeEventListener(valueEventListener) }
         }
     }
+
+
 
     fun getCachedContacts(): List<Contact> {
         val contactsList = mutableListOf<Contact>()

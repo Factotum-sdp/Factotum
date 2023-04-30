@@ -79,6 +79,9 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
         return string.lowercase().replace("\\s".toRegex(), "")
     }
 
+    /**
+     * This method is called when the user types in the search bar. It filters the contacts based on the constraint.
+     */
     override fun getFilter(): Filter {
         return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
@@ -100,7 +103,7 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
                         }
                     }
                 }
-
+                // Create a new FilterResults object to return
                 val results = FilterResults()
                 results.values = filteredList
                 results.count = filteredList.size

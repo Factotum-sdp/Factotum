@@ -14,9 +14,8 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.placeholder.Contact
-import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.models.DestinationRecord
+import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -175,17 +174,10 @@ class DRecordEditDialogBuilder(
     // Here we will need to get the clients IDs through a ViewModel instance
     // initiated in the mainActivity and representing all the clients
     private fun setClientIDsAdapter() {
-        val lsClientIDs : List<Contact> = emptyList()
-        var clientIDsAdapter = ArrayAdapter(
-            host.requireContext(),
-            R.layout.pop_auto_complete_client_id,
-            lsClientIDs.map { it.username }
-        )
-        clientIDView.setAdapter(clientIDsAdapter)
-        clientIDView.threshold = 1
 
+        clientIDView.threshold = 1
         contactsViewModel.contacts.observe(host.viewLifecycleOwner) { it ->
-            clientIDsAdapter = ArrayAdapter(
+            val clientIDsAdapter = ArrayAdapter(
                 host.requireContext(),
                 R.layout.pop_auto_complete_client_id,
                 it.map { it.username }

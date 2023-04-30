@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
@@ -18,12 +20,13 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.ui.display.utils.*
 import com.github.factotum_sdp.factotum.ui.picture.emptyFirebaseStorage
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.fillUserEntryAndGoToRBFragment
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
+import com.github.factotum_sdp.factotum.utils.LoginMenuIdlingResource
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -56,16 +59,23 @@ class DisplayFragmentTest {
     }
 
     private lateinit var context: Context
+    private lateinit var loginMenuIdlingResource: IdlingResource
 
     @Before
     fun setUp() {
-        GeneralUtils.fillUserEntryAndGoToRBFragment("client@gmail.com", "123456")
+        fillUserEntryAndGoToRBFragment("client@gmail.com", "123456")
+        testRule.scenario.onActivity { activity ->
+            loginMenuIdlingResource = LoginMenuIdlingResource(activity)
+            IdlingRegistry.getInstance().register(loginMenuIdlingResource)
+        }
         context = InstrumentationRegistry.getInstrumentation().context
     }
 
+
     @OptIn(ExperimentalCoroutinesApi::class)
     @After
-    fun tearDown() = runTest{
+    fun tearDown() = runTest {
+        IdlingRegistry.getInstance().unregister(loginMenuIdlingResource)
         launch { emptyFirebaseStorage(FirebaseStorage.getInstance().reference) }.join()
     }
 

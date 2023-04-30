@@ -22,7 +22,7 @@ class GeneralUtils {
         private lateinit var database: FirebaseDatabase
         private lateinit var auth: FirebaseAuth
         private lateinit var storage: FirebaseStorage
-        private const val WAIT_TIME_LOGIN = 1000L
+        private const val WAIT_TIME_LOGIN = 1500L
 
         fun initFirebase(online : Boolean = true) {
             database = Firebase.database

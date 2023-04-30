@@ -11,12 +11,15 @@ import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.PreferencesSetting
 import com.google.firebase.storage.StorageReference
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import java.io.File
 
-const val TIME_WAIT_SHUTTER = 1000L
 const val TIME_WAIT_DONE_OR_CANCEL = 1000L
-const val TIME_WAIT_UPLOAD_PHOTO = 1000L
+const val TIME_WAIT_UPLOAD_PHOTO = 1500L
+const val TIME_WAIT_PHOTO_DELETE = 1000L
+const val TIME_WAIT_BETWEEN_ACTIONS = 250L
 const val CLIENT_ID = "X17"
 
 
@@ -48,21 +51,26 @@ fun triggerShutter(device: UiDevice) {
 }
 
 fun triggerDone(device: UiDevice) {
+    runBlocking { delay(TIME_WAIT_BETWEEN_ACTIONS) }
     device.executeShellCommand("input keyevent 61")
+    runBlocking { delay(TIME_WAIT_BETWEEN_ACTIONS) }
     device.executeShellCommand("input keyevent 61")
+    runBlocking { delay(TIME_WAIT_BETWEEN_ACTIONS) }
     device.executeShellCommand("input keyevent 62")
 }
 
 fun triggerCancel(device: UiDevice) {
+    runBlocking { delay(TIME_WAIT_BETWEEN_ACTIONS) }
     device.executeShellCommand("input keyevent 61")
+    runBlocking { delay(TIME_WAIT_BETWEEN_ACTIONS) }
     device.executeShellCommand("input keyevent 61")
+    runBlocking { delay(TIME_WAIT_BETWEEN_ACTIONS) }
     device.executeShellCommand("input keyevent 61")
+    runBlocking { delay(TIME_WAIT_BETWEEN_ACTIONS) }
     device.executeShellCommand("input keyevent 62")
 }
 
 fun goToPictureFragment() {
-    GeneralUtils.fillUserEntryAndGoToRBFragment("courier@gmail.com", "123456")
-
     PreferencesSetting.enableTouchClick()
 
     // Click on one of the roadbook

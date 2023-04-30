@@ -19,7 +19,6 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.ui.display.utils.*
 import com.github.factotum_sdp.factotum.ui.picture.emptyFirebaseStorage
-import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.fillUserEntryAndGoToRBFragment
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.LoginMenuIdlingResource
@@ -98,24 +97,24 @@ class DisplayFragmentTest {
         recyclerView.check(matches(hasItemCount(1)))
     }
 
-//    @OptIn(ExperimentalCoroutinesApi::class)
-//    @Test
-//    fun displayFragmentDisplayTwoDifferentPhotosWorks() = runTest {
-//        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
-//
-//        //Press on the refresh button
-//        onView(withId(R.id.refreshButton)).perform(click())
-//
-//
-//        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
-//
-//        //Press on the refresh button
-//        onView(withId(R.id.refreshButton)).perform(click())
-//
-//
-//        val recyclerView = onView(withId(R.id.recyclerView))
-//        recyclerView.check(matches(hasItemCount(2)))
-//    }
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun displayFragmentDisplayTwoDifferentPhotosWorks() = runTest {
+        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
+
+        //Press on the refresh button
+        onView(withId(R.id.refreshButton)).perform(click())
+
+
+        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
+
+        //Press on the refresh button
+        onView(withId(R.id.refreshButton)).perform(click())
+
+
+        val recyclerView = onView(withId(R.id.recyclerView))
+        recyclerView.check(matches(hasItemCount(2)))
+    }
 
 
     @OptIn(ExperimentalCoroutinesApi::class)

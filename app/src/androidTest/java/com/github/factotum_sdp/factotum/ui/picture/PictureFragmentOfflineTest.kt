@@ -43,9 +43,6 @@ class PictureFragmentOfflineTest {
         @JvmStatic
         fun setUpDatabase() {
             initFirebase(online = false)
-            GeneralUtils.getStorage().maxDownloadRetryTimeMillis = 100
-            GeneralUtils.getStorage().maxUploadRetryTimeMillis = 100
-            GeneralUtils.getStorage().maxOperationRetryTimeMillis = 100
         }
     }
 

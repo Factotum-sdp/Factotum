@@ -16,11 +16,13 @@ import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebas
 import com.github.factotum_sdp.factotum.utils.LoginMenuIdlingResource
 import junit.framework.TestCase.assertTrue
 import junit.framework.TestCase.fail
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
 import org.junit.*
 import org.junit.runner.RunWith
 import java.io.File
@@ -81,10 +83,12 @@ class PictureFragmentOnlineTest {
     fun testUploadFileCorrectly() = runTest {
         triggerDone(device)
 
-        runBlocking { delay(TIME_WAIT_UPLOAD_PHOTO) }
+        withContext(Dispatchers.IO) {
+            Thread.sleep(TIME_WAIT_UPLOAD_PHOTO)
+        }
 
         GeneralUtils.getStorage().reference.child(CLIENT_ID).listAll().addOnSuccessListener { files ->
-            assertTrue(files.items.size >= 1)
+            assertTrue(files.items.size == 1)
         }.addOnFailureListener { except ->
             fail(except.message)
         }
@@ -101,7 +105,9 @@ class PictureFragmentOnlineTest {
     fun testCancelPhoto() = runTest {
         triggerCancel(device)
 
-        runBlocking { delay(TIME_WAIT_UPLOAD_PHOTO) }
+        withContext(Dispatchers.IO) {
+            Thread.sleep(TIME_WAIT_UPLOAD_PHOTO)
+        }
 
         GeneralUtils.getStorage().reference.child(CLIENT_ID).listAll().addOnSuccessListener { listResult ->
             assertTrue(listResult.items.isEmpty())

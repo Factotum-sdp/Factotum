@@ -1,20 +1,26 @@
 package com.github.factotum_sdp.factotum.ui.directory
 
 import android.widget.EditText
+import androidx.recyclerview.widget.RecyclerView
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
+import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By.*
 import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.Until
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.models.Location
 import com.github.factotum_sdp.factotum.placeholder.Contact
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import junit.framework.TestCase.*
 import org.junit.Before
@@ -30,10 +36,21 @@ class ContactsCreationTest {
     var activityRule = ActivityScenarioRule(MainActivity::class.java)
 
     companion object {
+        var nbContacts: Int = 0
+
         @BeforeClass
         @JvmStatic
         fun firebaseSetup() {
             initFirebase()
+            nbContacts = getDatabase().reference.child("contacts").get().run {
+                addOnSuccessListener {
+                    nbContacts = it.childrenCount.toInt()
+                }
+                addOnFailureListener {
+                    fail("Could not get the number of contacts in the database")
+                }
+                nbContacts
+            }
         }
     }
 
@@ -79,7 +96,6 @@ class ContactsCreationTest {
         }
     }
 
-    /* // Get the actual number of contacts from the database not by an hardcoded value
     @Test
     fun cantCreateContactWithEmptyUsername() {
         onView(withId(R.id.confirm_form)).perform(click())
@@ -96,6 +112,8 @@ class ContactsCreationTest {
 
     @Test
     fun canCreateContact() {
+        //remove contact if it exists
+        getDatabase().reference.child("contacts").child("JohnDoe").removeValue()
         val usernameEditText = onView(withId(R.id.editTextUsername))
         usernameEditText.perform(replaceText("JohnDoe"))
         onView(withId(R.id.confirm_form)).perform(click())
@@ -110,15 +128,12 @@ class ContactsCreationTest {
                 val adapter = recyclerView.adapter
                 assert(adapter?.itemCount == nbContacts + 1)
             }
+        getDatabase().reference.child("contacts").child("JohnDoe").removeValue()
     }
 
-     */
-
-
-    /*
     @Test
     fun createdContactHasCorrectValue() {
-
+        getDatabase().reference.child("contacts").child("JohnDoe").removeValue()
         val usernameEditText = onView(withId(R.id.editTextUsername))
         usernameEditText.perform(replaceText("JohnDoe"))
 
@@ -129,7 +144,7 @@ class ContactsCreationTest {
         surnameEditText.perform(replaceText("Doe"))
 
         onView(withId(androidx.appcompat.R.id.search_src_text)).perform(
-            typeText("123 Main St")
+            typeText("123 Main St\n")
         )
         closeSoftKeyboard()
 
@@ -155,11 +170,9 @@ class ContactsCreationTest {
         onView(withId(R.id.contact_address)).check(matches(withText("123 Main St")))
         onView(withId(R.id.contact_phone)).check(matches(withText("555-555-1234")))
         onView(withId(R.id.contact_details)).check(matches(withText("This is a test note.")))
+        getDatabase().reference.child("contacts").child("JohnDoe").removeValue()
     }
 
-     */
-
-/*
     @Test
     fun writeInAddressFieldMakesDropDown() {
         val city = "Lausanne"
@@ -184,6 +197,5 @@ class ContactsCreationTest {
         val addressChanged = address.wait(Until.textMatches(lausanneResult), 5000)
         assertTrue(addressChanged)
     }
-    */
 
 }

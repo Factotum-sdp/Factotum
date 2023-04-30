@@ -36,7 +36,7 @@ class ContactsListOnlineTest {
             initFirebase()
             database = getDatabase()
         }
-        
+
     }
 
     @ExperimentalCoroutinesApi

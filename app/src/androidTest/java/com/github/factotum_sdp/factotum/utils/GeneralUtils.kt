@@ -53,7 +53,7 @@ class GeneralUtils {
             return storage
         }
 
-        fun fillUserEntryAndGoToRBFragment(email: String, password: String) {
+        fun fillUserEntryAndEnterTheApp(email: String, password: String) {
             onView(withId(R.id.email)).perform(typeText(email))
             onView(withId(R.id.fragment_login_directors_parent)).perform(
                 closeSoftKeyboard()

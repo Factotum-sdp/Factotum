@@ -19,7 +19,7 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.ui.display.utils.*
 import com.github.factotum_sdp.factotum.ui.picture.emptyFirebaseStorage
-import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.fillUserEntryAndGoToRBFragment
+import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.LoginMenuIdlingResource
 import com.google.firebase.ktx.Firebase
@@ -62,7 +62,7 @@ class DisplayFragmentTest {
 
     @Before
     fun setUp() {
-        fillUserEntryAndGoToRBFragment("client@gmail.com", "123456")
+        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
         testRule.scenario.onActivity { activity ->
             loginMenuIdlingResource = LoginMenuIdlingResource(activity)
             IdlingRegistry.getInstance().register(loginMenuIdlingResource)

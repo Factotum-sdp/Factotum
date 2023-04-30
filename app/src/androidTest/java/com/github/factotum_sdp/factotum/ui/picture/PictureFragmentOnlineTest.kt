@@ -59,7 +59,7 @@ class PictureFragmentOnlineTest {
     fun setUp() = runTest{
         emptyLocalFiles(picturesDir)
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        GeneralUtils.fillUserEntryAndGoToRBFragment("courier@gmail.com", "123456")
+        GeneralUtils.fillUserEntryAndEnterTheApp("courier@gmail.com", "123456")
         testRule.scenario.onActivity { activity ->
             loginMenuIdlingResource = LoginMenuIdlingResource(activity)
             IdlingRegistry.getInstance().register(loginMenuIdlingResource)

@@ -10,16 +10,13 @@ import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.*
+import com.github.factotum_sdp.factotum.data.FirebaseInstance.getAuth
 import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
 import com.github.factotum_sdp.factotum.repositories.SettingsRepository
 import com.github.factotum_sdp.factotum.ui.settings.SettingsViewModel
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 
 class MainActivity : AppCompatActivity() {
 
@@ -63,7 +60,7 @@ class MainActivity : AppCompatActivity() {
         navView.setNavigationItemSelectedListener(onNavigationItemSelectedListener)
 
         // Launch the Application Settings ViewModel
-        val repository = SettingsRepository(dataStore)
+        val repository = SettingsRepository(preferencesDataStore)
         val settingsFactory = SettingsViewModel.SettingsViewModelFactory(repository)
         settings = ViewModelProvider(this, settingsFactory)[SettingsViewModel::class.java]
 
@@ -180,24 +177,7 @@ class MainActivity : AppCompatActivity() {
 
 
     companion object {
-        private var database: FirebaseDatabase = Firebase.database
-        private var auth: FirebaseAuth = Firebase.auth
 
-        fun getDatabase(): FirebaseDatabase {
-            return database
-        }
-
-        fun getAuth(): FirebaseAuth {
-            return auth
-        }
-
-        fun setDatabase(database: FirebaseDatabase) {
-            this.database = database
-        }
-
-        fun setAuth(auth: FirebaseAuth) {
-            this.auth = auth
-        }
     }
 
 }

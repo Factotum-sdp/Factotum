@@ -5,6 +5,7 @@ import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.matcher.ViewMatchers
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.data.FirebaseInstance
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
@@ -35,8 +36,8 @@ class GeneralUtils {
                 storage.useEmulator("10.0.2.2", 9198)
             }
 
-            MainActivity.setDatabase(database)
-            MainActivity.setAuth(auth)
+            FirebaseInstance.setDatabase(database)
+            FirebaseInstance.setAuth(auth)
         }
 
         fun getDatabase(): FirebaseDatabase {

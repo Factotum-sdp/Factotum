@@ -5,10 +5,8 @@ import com.github.factotum_sdp.factotum.models.DestinationRecord
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
-import com.google.firebase.database.DatabaseReference
+import com.github.factotum_sdp.factotum.repositories.RoadBookRepository
 import kotlinx.coroutines.launch
-import java.text.DateFormat
-import java.text.SimpleDateFormat.getDateInstance
 import java.util.*
 
 /**
@@ -17,24 +15,15 @@ import java.util.*
  *
  * @param _dbRef The database root reference to register RoadBook data
  */
-class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
+class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : ViewModel() {
 
-    private val _recordsList: MutableLiveData<DRecordList> =
-        MutableLiveData(DRecordList())
-    private var dbRef: DatabaseReference
+    private val _recordsList: MutableLiveData<DRecordList> = MutableLiveData(DRecordList())
+    val recordsListState: LiveData<DRecordList> = _recordsList
+
     private val clientOccurrences = HashMap<String, Int>()
     private lateinit var preferencesRepository: RoadBookPreferencesRepository
 
-    val recordsListState: LiveData<DRecordList> = _recordsList
-
     init {
-        val date = Calendar.getInstance().time
-        val dateRef = getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH).format(date)
-        dbRef = _dbRef // ref path to register all back-ups from this RoadBook
-            .child(dateRef)
-        //.child(getTimeInstance().format(date).plus(Random.nextInt().toString()))
-        // Let uncommented for testing purpose. Uncomment it for back-up uniqueness in the DB
-        // Only for demo purpose :
         addDemoRecords(DestinationRecords.RECORDS)
     }
 
@@ -83,7 +72,7 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
      * Send the current recordsList data to the Database referenced at construction time
      */
     fun backUp() {
-        dbRef.setValue(_recordsList.value)
+        roadBookRepository.backUp(currentDRecList())
     }
 
     fun timestampNextDestinationRecord(timeStamp: Date) {
@@ -281,12 +270,12 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
     }
 
     // Factory needed to assign a value at construction time to the class attribute
-    class RoadBookViewModelFactory(private val _dbRef: DatabaseReference) :
+    class RoadBookViewModelFactory(private val repository: RoadBookRepository) :
         ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return modelClass
-                .getConstructor(DatabaseReference::class.java)
-                .newInstance(_dbRef)
+                .getConstructor(RoadBookRepository::class.java)
+                .newInstance(repository)
         }
     }
 }

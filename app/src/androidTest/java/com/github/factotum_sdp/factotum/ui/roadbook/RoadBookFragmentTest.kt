@@ -20,6 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.data.FirebaseInstance
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeLeftTheRecordAt
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightTheRecordAt
@@ -177,7 +178,7 @@ class RoadBookFragmentTest {
     @Test
     fun roadBookIsBackedUpCorrectly() {
         val date = Calendar.getInstance().time
-        val ref = MainActivity.getDatabase().reference
+        val ref = FirebaseInstance.getDatabase().reference
             .child("Sheet-shift")
             .child(SimpleDateFormat.getDateInstance().format(date))
 

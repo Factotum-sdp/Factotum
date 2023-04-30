@@ -8,6 +8,7 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.data.FirebaseInstance
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.fillUserEntryAndEnterTheApp
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getAuth
@@ -48,7 +49,7 @@ class LoginFragmentTest {
         fun stopAuthEmulator() {
             val auth = Firebase.auth
             auth.signOut()
-            MainActivity.setAuth(auth)
+            FirebaseInstance.setAuth(auth)
         }
 
 

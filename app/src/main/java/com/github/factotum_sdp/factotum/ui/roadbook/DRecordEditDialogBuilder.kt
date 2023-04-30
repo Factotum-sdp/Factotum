@@ -15,6 +15,9 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.models.DestinationRecord
+import com.github.factotum_sdp.factotum.models.DestinationRecord.Companion.parseActions
+import com.github.factotum_sdp.factotum.models.DestinationRecord.Companion.parseTimestamp
+import com.github.factotum_sdp.factotum.models.DestinationRecord.Companion.parseWaitTimeOrRate
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
@@ -88,10 +91,10 @@ class DRecordEditDialogBuilder(
             try {
                 rbViewModel.addRecord(
                     clientIDView.text.toString(),
-                    timestampFromString(timestampView.text.toString()),
-                    waitTimeOrRateFromString(waitingTimeView.text.toString()),
-                    waitTimeOrRateFromString(rateView.text.toString()),
-                    actionsFromString(actionsView.text.toString()),
+                    parseTimestamp(timestampView.text.toString()),
+                    parseWaitTimeOrRate(waitingTimeView.text.toString()),
+                    parseWaitTimeOrRate(rateView.text.toString()),
+                    parseActions(actionsView.text.toString()),
                     notesView.text.toString()
                 )
                 setSnackBar(host.getString(R.string.snap_text_record_added), 700)
@@ -127,10 +130,10 @@ class DRecordEditDialogBuilder(
                     rbViewModel.editRecordAt(
                         position,
                         clientIDView.text.toString().trim(),
-                        timestampFromString(timestampView.text.toString()),
-                        waitTimeOrRateFromString(waitingTimeView.text.toString()),
-                        waitTimeOrRateFromString(rateView.text.toString()),
-                        actionsFromString(actionsView.text.toString()),
+                        parseTimestamp(timestampView.text.toString()),
+                        parseWaitTimeOrRate(waitingTimeView.text.toString()),
+                        parseWaitTimeOrRate(rateView.text.toString()),
+                        parseActions(actionsView.text.toString()),
                         notesView.text.toString()
                     )
                 if (recHasChanged)
@@ -219,25 +222,6 @@ class DRecordEditDialogBuilder(
         actionsView.setAdapter(actionsAdapter)
         actionsView.setTokenizer(MultiAutoCompleteTextView.CommaTokenizer())
         actionsView.threshold = 1
-    }
-
-    private fun waitTimeOrRateFromString(userEntry: String): Int {
-        if (userEntry.isEmpty())
-            return 0
-        return userEntry.toInt()
-    }
-
-    private fun timestampFromString(userEntry: String): Date? {
-        if (userEntry.isEmpty())
-            return null
-        return SimpleDateFormat.getTimeInstance().parse(userEntry)
-    }
-
-    private fun actionsFromString(actions: String): List<DestinationRecord.Action> {
-        return actions
-            .split(",")
-            .map { DestinationRecord.Action.fromString(it.trim().lowercase()) }
-            .filter { it != DestinationRecord.Action.UNKNOWN }
     }
 
     companion object {

@@ -63,6 +63,7 @@ class RoadBookViewAdapter(private val onClickListenerFromDestId: (String) -> Vie
         itemView.setOnClickListener(onClickListenerFromDestId(holder.destID.text.toString()))
     }
 
+    // These are specific String format for the RecyclerView UI
     private fun rateStringFormat(rate: Int, label: String): String {
         return "$label : $rate"
     }

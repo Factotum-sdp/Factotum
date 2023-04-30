@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum.data
+package com.github.factotum_sdp.factotum.models
 
 /**
  * Data class that contains user role

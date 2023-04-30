@@ -1,6 +1,9 @@
 package com.github.factotum_sdp.factotum.data
 
 import com.github.factotum_sdp.factotum.MainActivity
+import com.github.factotum_sdp.factotum.models.Role
+import com.github.factotum_sdp.factotum.models.User
+import com.google.firebase.auth.UserProfileChangeRequest
 import java.io.IOException
 import java.util.concurrent.CompletableFuture
 
@@ -11,12 +14,12 @@ class LoginDataSource {
     private val auth = MainActivity.getAuth()
     private val dbRef = MainActivity.getDatabase().reference
 
-    fun login(userEmail: String, password: String, user: User): Result<User> {
-        val authResultFuture = CompletableFuture<Result<User>>()
+    fun login(userEmail: String, password: String): Result<String> {
+        val authResultFuture = CompletableFuture<Result<String>>()
 
         auth.signInWithEmailAndPassword(userEmail, password).addOnCompleteListener { authTask ->
             if (authTask.isSuccessful) {
-                authResultFuture.complete(Result.Success(user))
+                authResultFuture.complete(Result.Success(auth.currentUser?.uid ?: "no uid"))
             } else {
                 authResultFuture.complete(
                     Result.Error(
@@ -31,35 +34,31 @@ class LoginDataSource {
         return authResultFuture.get()
     }
 
-    fun retrieveUsersList(): Result<MutableList<User>> {
-        val profilesResultFuture = CompletableFuture<Result<MutableList<User>>>()
-        var usersList: MutableList<User>
-        dbRef.child(DISPATCH_DB_PATH).get().addOnSuccessListener {
+    fun retrieveUser(uid: String): Result<User> {
+        val profilesResultFuture = CompletableFuture<Result<User>>()
+        dbRef.child(DISPATCH_DB_PATH).child(uid).get().addOnSuccessListener {
             if (!it.exists()) {
                 profilesResultFuture.complete(
-                    Result.Error(IOException("Error retrieving users"))
+                    Result.Error(IOException("Error retrieving user"))
                 )
                 return@addOnSuccessListener
             }
-            val profileList = (it.value as Map<*, *>).values.toList()
-            usersList = profilesToUsers(profileList)
-            profilesResultFuture.complete(Result.Success(usersList))
+            val user = User(
+                it.child("name").value as String,
+                it.child("email").value as String,
+                Role.valueOf(it.child("role").value as String)
+            )
+            auth.currentUser?.updateProfile(
+                UserProfileChangeRequest.Builder()
+                    .setDisplayName(user.name).build()
+            )
+            profilesResultFuture.complete(Result.Success(user))
         }.addOnFailureListener {
             profilesResultFuture.complete(
-                Result.Error(IOException("Error retrieving users", it))
+                Result.Error(IOException("Error retrieving user", it))
             )
         }
         return profilesResultFuture.get()
-    }
-
-    private fun profilesToUsers(usersList: List<*>): MutableList<User> {
-        return usersList.map { user ->
-            val userMap = user as Map<*, *>
-            val displayName = userMap["name"] as String
-            val email = userMap["email"] as String
-            val role = Role.valueOf(userMap["role"] as String)
-            User(displayName, email, role)
-        }.toMutableList()
     }
 
     companion object {

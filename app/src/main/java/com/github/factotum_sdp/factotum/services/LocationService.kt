@@ -14,9 +14,8 @@ import android.os.IBinder
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.data.FusedLocationClient
 import com.github.factotum_sdp.factotum.data.LocationClient
-import com.google.android.gms.location.LocationServices
+import com.github.factotum_sdp.factotum.data.MockLocationClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -24,6 +23,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 
 private const val CHANNEL_ID = "location_service"
 private const val CHANNEL_NAME = "My Location Service"
@@ -43,10 +43,11 @@ class LocationService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        locationClient = FusedLocationClient(
+        locationClient = MockLocationClient()
+            /*FusedLocationClient(
             applicationContext,
             LocationServices.getFusedLocationProviderClient(applicationContext)
-        )
+        )*/
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -98,8 +99,8 @@ class LocationService : Service() {
         locationClient
             .getLocationUpdates(interval)
             .catch { e -> e.printStackTrace() }
+            .onStart { onLocationChanges(service, notification) }
             .onEach { location ->
-                onLocationChanges(service, notification)
                 onLocationUpdateEvent?.let { it(location) }
             }
             .launchIn(serviceScope)

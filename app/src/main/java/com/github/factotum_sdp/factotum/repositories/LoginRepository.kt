@@ -1,6 +1,8 @@
-package com.github.factotum_sdp.factotum.data
+package com.github.factotum_sdp.factotum.repositories
 
-import java.io.IOException
+import com.github.factotum_sdp.factotum.data.LoginDataSource
+import com.github.factotum_sdp.factotum.data.Result
+import com.github.factotum_sdp.factotum.models.User
 
 /**
  * Class that requests authentication and user information from the remote data source and
@@ -11,33 +13,21 @@ class LoginRepository(private val dataSource: LoginDataSource) {
     // in-memory cache of the loggedInUser object
     private var user: User? = null
 
-    private var usersList: List<User>? = null
-
     init {
         // If user credentials will be cached in local storage, it is recommended it be encrypted
         // @see https://developer.android.com/training/articles/keystore
         user = null
-        usersList = null
     }
 
-    fun login(userEmail: String, password: String): Result<User> {
-        val profile = usersList?.find { it.email == userEmail }
-            ?: return Result.Error(IOException("User not found"))
+    fun login(userEmail: String, password: String): Result<String> {
+        return dataSource.login(userEmail, password)
+    }
 
-        val result = dataSource.login(userEmail, password, profile)
+    fun retrieveUser(uid: String): Result<User> {
+        val result = dataSource.retrieveUser(uid)
 
         if (result is Result.Success) {
             setLoggedInUser(result.data)
-        }
-
-        return result
-    }
-
-    fun retrieveUsersList(): Result<List<User>> {
-        val result = dataSource.retrieveUsersList()
-
-        if (result is Result.Success) {
-            setUsersList(result.data)
         }
 
         return result
@@ -47,9 +37,5 @@ class LoginRepository(private val dataSource: LoginDataSource) {
         this.user = loggedInUser
         // If user credentials will be cached in local storage, it is recommended it be encrypted
         // @see https://developer.android.com/training/articles/keystore
-    }
-
-    private fun setUsersList(usersList: List<User>) {
-        this.usersList = usersList
     }
 }

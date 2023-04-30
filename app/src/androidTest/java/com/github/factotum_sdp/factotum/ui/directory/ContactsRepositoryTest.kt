@@ -5,15 +5,12 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.Contact
-import com.github.factotum_sdp.factotum.utils.ContactsUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 
 @RunWith(AndroidJUnit4::class)
@@ -36,8 +33,8 @@ class ContactsRepositoryTest {
         val sharedPreferences = context.getSharedPreferences("contacts_test", Context.MODE_PRIVATE)
         repository = ContactsRepository(sharedPreferences)
         repository.setDatabase(getDatabase())
-        ContactsUtils.emptyFirebaseDatabase()
     }
+
 
     @After
     fun tearDown() {
@@ -45,8 +42,10 @@ class ContactsRepositoryTest {
         sharedPreferences.edit().clear().commit()
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun savesContactToSharedPreferences() = runBlocking {
+    fun savesContactToSharedPreferences() = runTest {
+
         // Save a contact to the cache
         val contact = Contact(
             "1",
@@ -57,17 +56,21 @@ class ContactsRepositoryTest {
             "123 Main St",
             "555-555-1234"
         )
-        repository.saveContactToSharedPreferences(contact)
 
+        runBlocking {
+            repository.saveContactToSharedPreferences(contact)
+        }
         // Verify that the contact was saved to the cache
         val cachedContacts = repository.getCachedContacts()
         Assert.assertEquals(1, cachedContacts.size)
         Assert.assertEquals(contact, cachedContacts[0])
     }
 
-
+    /* // Do not empty the database for one test fill it back after
+    //  Moreover get the actual size of contacts, not hcecking by hardcoded value
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun savesContactOnline() = runBlocking {
+    fun savesContactOnline() = runTest {
         val contact = Contact(
             "1",
             "Manager",
@@ -79,7 +82,9 @@ class ContactsRepositoryTest {
         )
         val latch = CountDownLatch(1)
 
-        repository.saveContact(contact)
+        runBlocking {
+            repository.saveContact(contact)
+        }
 
         val contacts = repository.getContacts().first()
 
@@ -95,5 +100,7 @@ class ContactsRepositoryTest {
             Assert.fail("Timeout waiting for contacts to update")
         }
     }
+
+     */
 
 }

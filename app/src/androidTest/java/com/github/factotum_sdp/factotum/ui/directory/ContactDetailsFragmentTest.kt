@@ -23,9 +23,11 @@ import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
 import com.github.factotum_sdp.factotum.utils.ContactsUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.LocationUtils
-import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -45,24 +47,27 @@ class ContactDetailsFragmentTest {
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Before
-    fun goToContactDetails() {
+    fun goToContactDetails()  {
         ContactsUtils.emptyFirebaseDatabase()
 
-        runBlocking {
-            ContactsUtils.populateDatabase(5)
-        }
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.directoryFragment))
-            .perform(click())
-        onView(withId(R.id.contacts_recycler_view))
-            .perform(
-                RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
-                    0,
-                    click()
+        runTest {
+            runBlocking {
+                ContactsUtils.populateDatabase(5)
+            }
+            onView(withId(R.id.drawer_layout))
+                .perform(DrawerActions.open())
+            onView(withId(R.id.directoryFragment))
+                .perform(click())
+            onView(withId(R.id.contacts_recycler_view))
+                .perform(
+                    RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
+                        0,
+                        click()
+                    )
                 )
-            )
+        }
     }
 
     @Test
@@ -184,6 +189,7 @@ class ContactDetailsFragmentTest {
         )
         Intents.release()
     }
+
 
     @Test
     fun buttonShowDestination() {

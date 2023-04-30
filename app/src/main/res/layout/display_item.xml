@@ -25,18 +25,27 @@
             android:layout_height="wrap_content"
             android:background="@drawable/cardview_clickable_background">
 
+            <ImageView
+                android:id="@+id/imageIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_menu_view"
+                app:layout_constraintBottom_toBottomOf="@+id/displayItemView"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/displayItemView" />
+
             <TextView
                 android:id="@+id/displayItemView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical|start"
-                android:paddingStart="16dp"
+                android:paddingStart="12dp"
                 android:paddingTop="16dp"
                 android:paddingEnd="16dp"
                 android:paddingBottom="16dp"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toStartOf="@+id/shareButton"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imageIcon"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageButton

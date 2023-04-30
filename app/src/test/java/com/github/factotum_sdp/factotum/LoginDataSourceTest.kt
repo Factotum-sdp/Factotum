@@ -2,8 +2,8 @@ package com.github.factotum_sdp.factotum
 
 import com.github.factotum_sdp.factotum.data.LoginDataSource
 import com.github.factotum_sdp.factotum.data.Result
-import com.github.factotum_sdp.factotum.data.Role
-import com.github.factotum_sdp.factotum.data.User
+import com.github.factotum_sdp.factotum.models.Role
+import com.github.factotum_sdp.factotum.models.User
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
@@ -30,19 +30,19 @@ class LoginDataSourceTest {
     @Test
     fun `login with correct credentials returns a LoggedInUser`() {
         // given
-        val expectedUser = User(userName, userEmail, userRole)
+        val expectedResult = "Success"
 
         loginDataSource = mock(LoginDataSource::class.java)
-        `when`(loginDataSource.login(userName, validPassword, profile)).thenReturn(
+        `when`(loginDataSource.login(userName, validPassword)).thenReturn(
             Result.Success(
-                expectedUser
+                expectedResult
             )
         )
         // when
-        val result = loginDataSource.login(userName, validPassword, profile)
+        val result = loginDataSource.login(userName, validPassword)
 
         // then
-        assertThat(result, `is`(Result.Success(expectedUser)))
+        assertThat(result, `is`(Result.Success(expectedResult)))
     }
 
     @Test
@@ -52,12 +52,12 @@ class LoginDataSourceTest {
 
         // when
         loginDataSource = mock(LoginDataSource::class.java)
-        `when`(loginDataSource.login(userName, invalidPassword, profile)).thenReturn(
+        `when`(loginDataSource.login(userName, invalidPassword)).thenReturn(
             Result.Error(
                 exception
             )
         )
-        val result = loginDataSource.login(userName, invalidPassword, profile)
+        val result = loginDataSource.login(userName, invalidPassword)
 
         // then
         assertThat(result, `is`(Result.Error(exception)))
@@ -66,21 +66,17 @@ class LoginDataSourceTest {
     @Test
     fun `retrieve profiles returns a list of users`() {
         // given
-        val users = listOf(
-            User(userName, userEmail, userRole),
-            User("William Taylor", "william.taylor@gmail.com", Role.COURIER),
-            User("Helen Bates", "helen.bates@gmail.com", Role.COURIER)
-        )
+        val user = User(userName, userEmail, userRole)
 
         loginDataSource = mock(LoginDataSource::class.java)
 
-        doReturn(Result.Success(users)).`when`(loginDataSource).retrieveUsersList()
+        doReturn(Result.Success(user)).`when`(loginDataSource).retrieveUser(userEmail)
         // when
-        val result = loginDataSource.retrieveUsersList()
+        val result = loginDataSource.retrieveUser(userEmail)
 
         // then
         assertThat(
-            result, `is`(Result.Success(users))
+            result, `is`(Result.Success(user))
         )
     }
 
@@ -92,8 +88,8 @@ class LoginDataSourceTest {
         loginDataSource = mock(LoginDataSource::class.java)
 
         // when
-        doReturn(Result.Error(exception)).`when`(loginDataSource).retrieveUsersList()
-        val result = loginDataSource.retrieveUsersList()
+        doReturn(Result.Error(exception)).`when`(loginDataSource).retrieveUser(userEmail)
+        val result = loginDataSource.retrieveUser(userEmail)
 
         // then
         assertThat(

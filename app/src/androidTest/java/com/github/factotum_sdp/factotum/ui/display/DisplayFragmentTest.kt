@@ -22,7 +22,11 @@ import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebas
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.runner.RunWith
 
@@ -56,29 +60,24 @@ class DisplayFragmentTest {
     @Before
     fun setUp() {
         GeneralUtils.fillUserEntryAndGoToRBFragment("client@gmail.com", "123456")
-        Thread.sleep(WAIT_TIME_REFRESH)
         context = InstrumentationRegistry.getInstrumentation().context
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @After
-    fun tearDown() {
-        runBlocking {
-            emptyFirebaseStorage(FirebaseStorage.getInstance().reference)
-        }
+    fun tearDown() = runTest{
+        launch { emptyFirebaseStorage(FirebaseStorage.getInstance().reference) }.join()
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentDisplayOnlyOnePhotoIfSame() {
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
-        }
+    fun displayFragmentDisplayOnlyOnePhotoIfSame() = runTest {
+        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
 
         //Press on the refresh button
         onView(withId(R.id.refreshButton)).perform(click())
 
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
-        }
+        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
 
         //Press on the refresh button
         onView(withId(R.id.refreshButton)).perform(click())
@@ -89,19 +88,16 @@ class DisplayFragmentTest {
         recyclerView.check(matches(hasItemCount(1)))
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentDisplayTwoDifferentPhotosWorks() {
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
-        }
+    fun displayFragmentDisplayTwoDifferentPhotosWorks() = runTest {
+        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
 
         //Press on the refresh button
         onView(withId(R.id.refreshButton)).perform(click())
 
 
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2)
-        }
+        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
 
         //Press on the refresh button
         onView(withId(R.id.refreshButton)).perform(click())
@@ -112,11 +108,10 @@ class DisplayFragmentTest {
     }
 
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentDisplayOneBadFormatPhotosWorks() {
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3)
-        }
+    fun displayFragmentDisplayOneBadFormatPhotosWorks() = runTest {
+        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3) }.join()
 
         //Press on the refresh button
         onView(withId(R.id.refreshButton)).perform(click())
@@ -125,16 +120,12 @@ class DisplayFragmentTest {
         recyclerView.check(matches(hasItemCount(1)))
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentDisplayTwoBadFormatPhotosWorks() {
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3)
-        }
+    fun displayFragmentDisplayTwoBadFormatPhotosWorks() = runTest {
+        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3) }.join()
 
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH4, TEST_IMAGE_PATH4)
-        }
-
+        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH4, TEST_IMAGE_PATH4) }.join()
 
         //Press on the refresh button
         onView(withId(R.id.refreshButton)).perform(click())
@@ -154,11 +145,10 @@ class DisplayFragmentTest {
         recyclerView.check(matches(hasItemCount(0)))
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentClickingOnPhotosFireCorrectIntents() {
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
-        }
+    fun displayFragmentClickingOnPhotosFireCorrectIntents() = runTest {
+        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
 
         //Press on the refresh button
         onView(withId(R.id.refreshButton)).perform(click())
@@ -175,11 +165,10 @@ class DisplayFragmentTest {
         Intents.intended(hasFlag(Intent.FLAG_GRANT_READ_URI_PERMISSION))
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentSharingPhotoWorks() {
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
-        }
+    fun displayFragmentSharingPhotoWorks() = runTest {
+        launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
 
         //Press on the refresh button
         onView(withId(R.id.refreshButton)).perform(click())

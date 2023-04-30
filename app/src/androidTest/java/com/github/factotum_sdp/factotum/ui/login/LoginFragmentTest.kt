@@ -1,6 +1,5 @@
-
 package com.github.factotum_sdp.factotum.ui.login
-/*
+
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -10,18 +9,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
-import com.github.factotum_sdp.factotum.utils.GeneralUtils
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.fillUserEntryAndEnterTheApp
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getAuth
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.Matchers.not
 import org.junit.AfterClass
@@ -40,16 +35,12 @@ class LoginFragmentTest {
 
     companion object {
 
-        private const val WAIT_TIME_LOGIN = 1000L
-        private const val WAIT_TIME_DB = 500L
-
         @OptIn(ExperimentalCoroutinesApi::class)
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() = runTest {
             initFirebase()
             UsersPlaceHolder.init(getDatabase(), getAuth())
-
         }
 
         @AfterClass
@@ -90,7 +81,7 @@ class LoginFragmentTest {
 
     @Test
     fun correctUserEntryLeadsToRoadBook() {
-        fillUserEntryAndGoToRBFragment("jane.doe@gmail.com", "123456")
+        fillUserEntryAndEnterTheApp("jane.doe@gmail.com", "123456")
         FirebaseAuth.AuthStateListener { firebaseAuth ->
             if (firebaseAuth.currentUser != null) {
                 onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
@@ -129,4 +120,4 @@ class LoginFragmentTest {
         onView(withId(R.id.fragment_signup_directors_parent)).check(matches(isDisplayed()))
     }
 }
-*/
+

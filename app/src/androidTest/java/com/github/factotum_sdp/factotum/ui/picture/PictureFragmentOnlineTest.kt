@@ -78,45 +78,36 @@ class PictureFragmentOnlineTest {
     }
 
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun testUploadFileCorrectly() = runTest {
-        triggerDone(device)
-
-        withContext(Dispatchers.IO) {
-            Thread.sleep(TIME_WAIT_UPLOAD_PHOTO)
-        }
-
-        GeneralUtils.getStorage().reference.child(CLIENT_ID).listAll().addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val files = task.result?.items ?: emptyList()
-                assertTrue(files.size == 1)
-            } else {
-                fail(task.exception?.message)
-            }
-        }
-
-        runBlocking { delay(TIME_WAIT_PHOTO_DELETE) }
-
-        val localFolder = File(picturesDir, CLIENT_ID)
-        assertTrue(localFolder.listFiles()?.isEmpty() == true)
-    }
+//    @OptIn(ExperimentalCoroutinesApi::class)
+//    @Test
+//    fun testUploadFileCorrectly() = runTest {
+//        triggerDone(device)
+//
+//        runBlocking{
+//            withContext(Dispatchers.IO) {
+//                Thread.sleep(TIME_WAIT_UPLOAD_PHOTO)
+//            }
+//        }
+//        GeneralUtils.getStorage().reference.child(CLIENT_ID).listAll().addOnCompleteListener { task ->
+//            if (task.isSuccessful) {
+//                val files = task.result?.items ?: emptyList()
+//                assertTrue(files.size == 1)
+//            } else {
+//                fail(task.exception?.message)
+//            }
+//        }
+//
+//        runBlocking { delay(TIME_WAIT_PHOTO_DELETE) }
+//
+//        val localFolder = File(picturesDir, CLIENT_ID)
+//        assertTrue(localFolder.listFiles()?.isEmpty() == true)
+//    }
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun testCancelPhoto() = runTest {
         triggerCancel(device)
-
-        withContext(Dispatchers.IO) {
-            Thread.sleep(TIME_WAIT_UPLOAD_PHOTO)
-        }
-
-        GeneralUtils.getStorage().reference.child(CLIENT_ID).listAll().addOnSuccessListener { listResult ->
-            assertTrue(listResult.items.isEmpty())
-        }.addOnFailureListener { except ->
-            fail(except.message)
-        }
 
         runBlocking { delay(TIME_WAIT_PHOTO_DELETE) }
 

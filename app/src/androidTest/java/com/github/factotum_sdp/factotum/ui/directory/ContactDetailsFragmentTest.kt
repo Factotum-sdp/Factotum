@@ -17,8 +17,13 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.placeholder.Contact
 import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
 import com.github.factotum_sdp.factotum.utils.ContactsUtils
+import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.createRandomContacts
+import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.randomContacts
+import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.resetContact
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.LocationUtils
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,34 +42,24 @@ class ContactDetailsFragmentTest {
     var activityRule = ActivityScenarioRule(MainActivity::class.java)
 
     companion object {
+        private lateinit var currContact: Contact
         @BeforeClass
         @JvmStatic
         fun setUp() {
             initFirebase()
+            createRandomContacts(1)
+            currContact = randomContacts[0]
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Before
     fun goToContactDetails() {
-        ContactsUtils.emptyFirebaseDatabase()
-
-        runTest {
-            runBlocking {
-                ContactsUtils.populateDatabase(5)
-            }
             onView(withId(R.id.drawer_layout))
                 .perform(DrawerActions.open())
             onView(withId(R.id.directoryFragment))
                 .perform(click())
-            onView(withId(R.id.contacts_recycler_view))
-                .perform(
-                    RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
-                        0,
-                        click()
-                    )
-                )
-        }
+            onView(withText("@" + currContact.username))
+                .perform(click())
     }
 
     @Test
@@ -101,23 +96,24 @@ class ContactDetailsFragmentTest {
     fun deleteButtonIsClickable() {
         onView(withId(R.id.button_delete_contact))
             .perform(click())
+        resetContact(currContact)
     }
 
     @Test
     fun correctInfoIsDisplayed() {
         onView(withId(R.id.contact_name))
-            .check(matches(withText(ContactsUtils.getContacts()[0].name)))
+            .check(matches(withText(currContact.name)))
         onView(withId(R.id.contact_surname))
-            .check(matches(withText(ContactsUtils.getContacts()[0].surname)))
+            .check(matches(withText(currContact.surname)))
         onView(withId(R.id.contact_phone))
-            .check(matches(withText(ContactsUtils.getContacts()[0].phone)))
+            .check(matches(withText(currContact.phone)))
         onView(withId(R.id.contact_role))
-            .check(matches(withText(ContactsUtils.getContacts()[0].role)))
+            .check(matches(withText(currContact.role)))
         onView(withId(R.id.contact_address))
-            .check(matches(withText(ContactsUtils.getContacts()[0].address)))
-        if (ContactsUtils.getContacts()[0].details != null) {
+            .check(matches(withText(currContact.address)))
+        if (currContact.details != null) {
             onView(withId(R.id.contact_details))
-                .check(matches(withText(ContactsUtils.getContacts()[0].details)))
+                .check(matches(withText(currContact.details)))
         }
     }
 
@@ -149,6 +145,7 @@ class ContactDetailsFragmentTest {
             .perform(click())
         onView(withId(R.id.contacts_recycler_view))
             .check(matches(isDisplayed()))
+        resetContact(currContact)
     }
 
     @Test
@@ -168,6 +165,7 @@ class ContactDetailsFragmentTest {
                 val adapter = recyclerView.adapter
                 assert(adapter?.itemCount == 4)
             }
+        resetContact(currContact)
     }
 
     @Test

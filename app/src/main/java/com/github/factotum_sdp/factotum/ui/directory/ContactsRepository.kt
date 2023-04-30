@@ -24,6 +24,8 @@ class ContactsRepository(
     fun saveContactToSharedPreferences(contact: Contact) =
         sharedPreferences.edit().putString(contact.username, Gson().toJson(contact)).apply()
 
+    fun clearSharedPreferences() = sharedPreferences.edit().clear().apply()
+
     fun saveContact(contact: Contact) {
         saveContactToSharedPreferences(contact)
         firebaseContactsRef.child(contact.username).setValue(contact)

@@ -20,6 +20,10 @@ class ContactsViewModel(application: Application) : AndroidViewModel(application
 
     val contacts: LiveData<List<Contact>> = repository.getContacts().asLiveData()
 
+    fun getSavedContacts(): List<Contact> {
+        return repository.getCachedContacts()
+    }
+
     fun saveContact(contact: Contact) {
         repository.saveContact(contact)
     }

@@ -15,12 +15,12 @@ class ContactsUtils {
     companion object {
         //fake data --> to be replaced with connection to database
         val randomContacts = mutableListOf<Contact>()
-        private val randomNames = listOf("John", "Jane", "Joe")
-        private var randomSurnames = listOf("Smith", "Jones", "Williams")
+        private val randomNames = listOf("John", "Jane", "Joe", "Jack", "Jill")
+        private var randomSurnames = listOf("Smith", "Jones", "Williams", "Brown", "Taylor")
         private val roles = listOf("Boss", "Courier", "Client")
         private val randomAddresses =
-            listOf("123 Fake Street", "456 Fake Street", "789 Fake Street")
-        private val randomPhones = listOf("123456789", "987654321", "123987456")
+            listOf("123 Fake Street", "456 Fake Street", "789 Fake Street", "123 Fake Avenue")
+        private val randomPhones = listOf("123456789", "987654321", "123987456", "456789123")
         private val randomDetails = listOf("I am a boss", "I am a courier", "I am a client")
 
         private const val image = R.drawable.contact_image
@@ -72,6 +72,11 @@ class ContactsUtils {
 
         fun emptyFirebaseDatabase() {
             getDatabase().reference.child("contacts").removeValue()
+        }
+
+        fun resetContact(contact: Contact) {
+            getDatabase().getReference("contacts").child(contact.username).removeValue()
+            getDatabase().getReference("contacts").child(contact.username).setValue(contact)
         }
 
         fun withHolderContactName(name: String): Matcher<RecyclerView.ViewHolder> {

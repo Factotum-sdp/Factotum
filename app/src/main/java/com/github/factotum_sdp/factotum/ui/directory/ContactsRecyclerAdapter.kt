@@ -24,7 +24,8 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
     @SuppressLint("NotifyDataSetChanged")
     fun updateContacts(contacts: List<Contact>) {
         originalContacts = contacts
-        filteredContacts = ArrayList(contacts)
+        originalContacts = originalContacts.sortedBy { it.surname + it.name + it.username }
+        filteredContacts = ArrayList(originalContacts)
         notifyDataSetChanged()
     }
 
@@ -44,13 +45,9 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
                 itemView.findNavController().navigate(
                     R.id.action_directoryFragment_to_contactDetailsFragment2,
                     Bundle().apply {
-                        putBoolean(
-                            "useListLoc",
-                            true
-                        )
-                        putInt(
-                            "id",
-                            bindingAdapterPosition
+                        putString(
+                            "username",
+                            itemUsername.text.toString().substring(1)
                         ) // pass the id of the contact to the contact details fragment so that it can display the correct contact
                     })
             }
@@ -69,7 +66,7 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
 
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ContactsViewHolder, i: Int) {
-        holder.itemName.text = filteredContacts[i].surname + " " + filteredContacts[i].name
+        holder.itemName.text = filteredContacts[i].surname + "  " + filteredContacts[i].name
         holder.itemUsername.text = "@" + filteredContacts[i].username
         holder.itemImage.setImageResource(filteredContacts[i].profile_pic_id)
     }
@@ -103,6 +100,7 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
                         }
                     }
                 }
+
                 val results = FilterResults()
                 results.values = filteredList
                 results.count = filteredList.size

@@ -40,7 +40,7 @@ class ContactsUpdateTest {
     var activityRule = ActivityScenarioRule(MainActivity::class.java)
 
     companion object {
-        private var nbContacts = 0
+        private var nbContacts = 5
         private lateinit var currContact: Contact
 
         @BeforeClass
@@ -166,6 +166,8 @@ class ContactsUpdateTest {
         onView(withId(R.id.confirm_form)).perform(click())
 
         onView(withText("@johndoe")).perform(click())
+
+        Thread.sleep(1000)
 
         onView(withId(R.id.contact_name))
             .check(matches(withText("John")))

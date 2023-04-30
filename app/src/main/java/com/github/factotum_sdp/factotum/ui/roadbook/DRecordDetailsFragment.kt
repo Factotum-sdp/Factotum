@@ -70,7 +70,6 @@ class DRecordDetailsFragment : Fragment() {
 
         val detailsFragment = ContactDetailsFragment::class.java.newInstance()
         detailsFragment.arguments = Bundle().apply {
-            putBoolean("useListLoc", false)
             putString("username", rec.clientID)
         }
 

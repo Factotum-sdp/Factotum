@@ -51,13 +51,21 @@ class DirectoryFragment : Fragment() {
             view.findViewById<RecyclerView>(R.id.contacts_recycler_view) // connect the recycler view to the layout
         val searchView =
             view.findViewById<SearchView>(R.id.contacts_search_view) // connect the search view to the layout
-        emptyContactsMessage = view.findViewById(R.id.empty_contacts_message)
 
         //the recycler is just the way we chose to represent the list of contacts
         recycler.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = this@DirectoryFragment.adapter
         }
+
+        emptyContactsMessage = view.findViewById(R.id.empty_contacts_message)
+
+        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onChanged() {
+                super.onChanged()
+                emptyContactsMessage.visibility = if (adapter.itemCount == 0) View.VISIBLE else View.GONE
+            }
+        })
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {

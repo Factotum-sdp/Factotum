@@ -8,7 +8,6 @@ import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
-import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -154,15 +153,9 @@ class ContactsCreationTest {
         val notesEditText = onView(withId(R.id.contactCreationNotes))
         notesEditText.perform(replaceText("This is a test note."))
 
-        Thread.sleep(1000)
         onView(withId(R.id.confirm_form)).perform(click())
-        onView(withId(R.id.contacts_recycler_view))
-            .perform(
-                RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
-                    nbContacts,
-                    click()
-                )
-            )
+
+        onView(withText("@JohnDoe")).perform(click())
 
         onView(withId(R.id.contact_username)).check(matches(withText("@JohnDoe")))
         onView(withId(R.id.contact_name)).check(matches(withText("John")))

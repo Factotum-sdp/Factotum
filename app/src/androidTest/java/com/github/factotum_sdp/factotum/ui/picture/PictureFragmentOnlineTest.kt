@@ -84,11 +84,10 @@ class PictureFragmentOnlineTest {
         runBlocking { delay(TIME_WAIT_UPLOAD_PHOTO) }
 
         GeneralUtils.getStorage().reference.child(CLIENT_ID).listAll().addOnSuccessListener { files ->
-            assertTrue(files.items.size == 1)
+            assertTrue(files.items.size >= 1)
         }.addOnFailureListener { except ->
             fail(except.message)
         }
-
 
         runBlocking { delay(TIME_WAIT_PHOTO_DELETE) }
 

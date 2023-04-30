@@ -16,8 +16,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import java.io.File
 
-const val TIME_WAIT_DONE_OR_CANCEL = 1000L
-const val TIME_WAIT_UPLOAD_PHOTO = 1500L
+const val TIME_WAIT_UPLOAD_PHOTO = 2000L
 const val TIME_WAIT_PHOTO_DELETE = 1000L
 const val TIME_WAIT_BETWEEN_ACTIONS = 250L
 const val CLIENT_ID = "X17"

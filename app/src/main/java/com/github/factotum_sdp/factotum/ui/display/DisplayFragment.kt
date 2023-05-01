@@ -10,8 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
@@ -19,7 +17,6 @@ import com.github.factotum_sdp.factotum.databinding.FragmentDisplayBinding
 import com.github.factotum_sdp.factotum.ui.display.utils.PhotoAdapter
 import com.google.firebase.storage.StorageReference
 
-const val PHONE_NUMBER = "1234567890"
 
 // Fragment responsible for displaying a list of images from Firebase Storage
 class DisplayFragment : Fragment() {
@@ -30,6 +27,7 @@ class DisplayFragment : Fragment() {
     private var _binding: FragmentDisplayBinding? = null
     private val binding get() = _binding!!
     private val userID = MutableLiveData("Unknown")
+    private val PHONE_NUMBER = "1234567890"
 
 
     override fun onCreateView(
@@ -119,14 +117,5 @@ class DisplayFragment : Fragment() {
 
 }
 
-class DisplayViewModelFactory(private val userName: MutableLiveData<String>) : ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(DisplayViewModel::class.java)) {
-            return DisplayViewModel(userName) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}
 
 

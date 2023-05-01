@@ -29,6 +29,7 @@ import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.Random
 
 @RunWith(AndroidJUnit4::class)
 class ContactsCreationTest {
@@ -134,15 +135,15 @@ class ContactsCreationTest {
 
     @Test
     fun createdContactHasCorrectValue() {
-        getDatabase().reference.child("contacts").child("JohnDoe").removeValue()
+        val username = "johnabby" + Random().nextInt(3000).toString()
         val usernameEditText = onView(withId(R.id.editTextUsername))
-        usernameEditText.perform(replaceText("JohnDoe"))
+        usernameEditText.perform(replaceText(username))
 
         val nameEditText = onView(withId(R.id.editTextName))
         nameEditText.perform(replaceText("John"))
 
         val surnameEditText = onView(withId(R.id.editTextSurname))
-        surnameEditText.perform(replaceText("Doe"))
+        surnameEditText.perform(replaceText("Abby"))
 
         onView(withId(androidx.appcompat.R.id.search_src_text)).perform(
             typeText("123 Main St\n")
@@ -156,16 +157,16 @@ class ContactsCreationTest {
         notesEditText.perform(replaceText("This is a test note."))
 
         onView(withId(R.id.confirm_form)).perform(click())
+        Thread.sleep(3000)
+        onView(withText("@$username")).perform(click())
 
-        onView(withText("@JohnDoe")).perform(click())
-
-        onView(withId(R.id.contact_username)).check(matches(withText("@JohnDoe")))
+        onView(withId(R.id.contact_username)).check(matches(withText("@$username")))
         onView(withId(R.id.contact_name)).check(matches(withText("John")))
-        onView(withId(R.id.contact_surname)).check(matches(withText("Doe")))
+        onView(withId(R.id.contact_surname)).check(matches(withText("Abby")))
         onView(withId(R.id.contact_address)).check(matches(withText("123 Main St")))
         onView(withId(R.id.contact_phone)).check(matches(withText("555-555-1234")))
         onView(withId(R.id.contact_details)).check(matches(withText("This is a test note.")))
-        getDatabase().reference.child("contacts").child("JohnDoe").removeValue()
+        getDatabase().reference.child("contacts").child(username).removeValue()
     }
 
     @Test

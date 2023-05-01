@@ -24,7 +24,11 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
     @SuppressLint("NotifyDataSetChanged")
     fun updateContacts(contacts: List<Contact>) {
         originalContacts = contacts
-        originalContacts = originalContacts.sortedBy { it.surname + it.name + it.username }
+        originalContacts = originalContacts.sortedWith(compareBy(
+            { it.surname.lowercase() },
+            { it.name.lowercase() },
+            { it.username.lowercase() }
+        ))
         filteredContacts = ArrayList(originalContacts)
         notifyDataSetChanged()
     }

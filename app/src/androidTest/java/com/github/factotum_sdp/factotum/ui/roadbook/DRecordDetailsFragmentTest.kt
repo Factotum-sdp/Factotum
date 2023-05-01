@@ -15,8 +15,6 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightTheRecordAt
-import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.emptyFirebaseDatabase
-import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.populateDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.PreferencesSetting
 import kotlinx.coroutines.delay
@@ -28,6 +26,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
+
 @RunWith(AndroidJUnit4::class)
 class DRecordDetailsFragmentTest {
 
@@ -125,8 +124,6 @@ class DRecordDetailsFragmentTest {
 
     @Test
     fun createDRecordWithCorrespondingUsernameDisplaysCorrectContactDetails() {
-        emptyFirebaseDatabase()
-        runBlocking { populateDatabase() }
         RoadBookFragmentTest().newRecordWithId("01")
         toLastFragment()
         onView(withId(R.id.viewPager)).perform(swipeLeft())

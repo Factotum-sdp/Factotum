@@ -24,6 +24,10 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
@@ -163,11 +167,13 @@ class MainActivity : AppCompatActivity() {
 
     // Schedule the upload of the database every INTERVAL_UPLOAD_TIME minutes
     private fun scheduleUpload(role: Role) {
-        if (role == Role.BOSS || role == Role.COURIER) {
-            val uploadWorkRequest =
-                PeriodicWorkRequestBuilder<UploadWorker>(INTERVAL_UPLOAD_TIME, TimeUnit.MINUTES)
-                    .build()
-            WorkManager.getInstance(this).enqueue(uploadWorkRequest)
+        if (role == Role.COURIER) {
+            CoroutineScope(Dispatchers.IO).launch {
+                val uploadWorkRequest =
+                    PeriodicWorkRequestBuilder<UploadWorker>(INTERVAL_UPLOAD_TIME, TimeUnit.MINUTES)
+                        .build()
+                WorkManager.getInstance(this@MainActivity).enqueue(uploadWorkRequest)
+            }
         }
     }
 

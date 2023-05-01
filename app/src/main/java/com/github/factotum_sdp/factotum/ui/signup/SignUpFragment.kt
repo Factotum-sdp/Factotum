@@ -11,14 +11,19 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import androidx.annotation.StringRes
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.*
 import com.github.factotum_sdp.factotum.databinding.FragmentSignupBinding
+import com.github.factotum_sdp.factotum.models.Role
+import com.github.factotum_sdp.factotum.models.User
 import com.google.android.material.snackbar.Snackbar
 
 class SignUpFragment : Fragment() {
@@ -82,9 +87,7 @@ class SignUpFragment : Fragment() {
         )
 
         listenToAuthButton(signUpButton,
-            loadingProgressBar,
-            emailEditText,
-            passwordEditText
+            loadingProgressBar
         )
 
         observeAuthResult(loadingProgressBar)
@@ -164,20 +167,31 @@ class SignUpFragment : Fragment() {
 
     private fun listenToAuthButton(
         authButton: Button,
-        loadingProgressBar: ProgressBar,
-        emailEditText: EditText,
-        passwordEditText: EditText
+        loadingProgressBar: ProgressBar
     ) {
         authButton.setOnClickListener {
             loadingProgressBar.visibility = View.VISIBLE
-            viewModel.auth(
-                emailEditText.text.toString(),
-                passwordEditText.text.toString()
-            )
+            viewModel.fetchClientId(binding.clientId.text.toString())
         }
     }
 
     private fun observeAuthResult(loadingProgressBar: View) {
+
+        viewModel.fetchClientIdResult.observe(viewLifecycleOwner,
+            Observer { fetchClientIdResult ->
+                fetchClientIdResult ?: return@Observer
+                loadingProgressBar.visibility = View.GONE
+                fetchClientIdResult.error?.let {
+                    showSignUpFailed(it)
+                }
+                fetchClientIdResult.success?.let {
+                    viewModel.auth(
+                        binding.email.text.toString(),
+                        binding.password.text.toString()
+                    )
+                }
+            })
+
         viewModel.authResult.observe(viewLifecycleOwner,
             Observer { authResult ->
                 authResult ?: return@Observer
@@ -186,6 +200,25 @@ class SignUpFragment : Fragment() {
                     showSignUpFailed(it)
                 }
                 authResult.success?.let {
+                    val newUser = User(
+                        binding.username.text.toString(),
+                        binding.email.text.toString(),
+                        Role.valueOf(binding.role.text.toString()),
+                        binding.clientId.text.toString()
+                    )
+                    val newUserUID = MainActivity.getAuth().currentUser?.uid ?: "no uid"
+                    viewModel.updateUser(newUserUID, newUser)
+                }
+            })
+
+        viewModel.updateUserResult.observe(viewLifecycleOwner,
+            Observer { updateUserResult ->
+                updateUserResult ?: return@Observer
+                loadingProgressBar.visibility = View.GONE
+                updateUserResult.error?.let {
+                    showSignUpFailed(it)
+                }
+                updateUserResult.success?.let {
                     updateUi(it)
                 }
             })
@@ -194,14 +227,7 @@ class SignUpFragment : Fragment() {
     private fun updateUi(model: String) {
         val welcome = getString(R.string.welcome) + " " + model
         Snackbar.make(requireView(), welcome, Snackbar.LENGTH_LONG).show()
-        val newUser = User(
-            binding.username.text.toString(),
-            binding.email.text.toString(),
-            Role.valueOf(binding.role.text.toString()),
-            binding.clientId.text.toString()
-        )
-        val newUserUID = MainActivity.getAuth().currentUser?.uid ?: "no uid"
-        viewModel.updateUser(newUserUID, newUser)
+        findNavController().navigate(R.id.action_signUpFragment_pop)
     }
 
     private fun showSignUpFailed(@StringRes errorString: Int) {
@@ -222,8 +248,7 @@ class SignUpFragment : Fragment() {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(SignUpViewModel::class.java)) {
                 return SignUpViewModel(
-                    signUpDataSink = SignUpDataSink(),
-                    loginRepository = LoginRepository(LoginDataSource())
+                    signUpDataSink = SignUpDataSink()
                 ) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")

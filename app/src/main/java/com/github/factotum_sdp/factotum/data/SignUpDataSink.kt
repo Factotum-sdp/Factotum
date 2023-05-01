@@ -2,8 +2,8 @@ package com.github.factotum_sdp.factotum.data
 
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.data.LoginDataSource.Companion.DISPATCH_DB_PATH
+import com.github.factotum_sdp.factotum.models.User
 import java.io.IOException
-import java.util.*
 import java.util.concurrent.CompletableFuture
 
 class SignUpDataSink {
@@ -31,17 +31,33 @@ class SignUpDataSink {
         return authResultFuture.get()
     }
 
-    fun updateUsersList(userUID: String, user: User): Result<String> {
-        val updateUsersResultFuture = CompletableFuture<Result<String>>()
+    fun updateUser(userUID: String, user: User): Result<String> {
+        val updateUserResultFuture = CompletableFuture<Result<String>>()
 
         dbRef.child(DISPATCH_DB_PATH).child(userUID).setValue(user)
             .addOnSuccessListener {
-                updateUsersResultFuture.complete(Result.Success("Success updating users"))
+                updateUserResultFuture.complete(Result.Success(user.name))
             }.addOnFailureListener {
-                updateUsersResultFuture.complete(
+                updateUserResultFuture.complete(
                     Result.Error(IOException("Error updating users", it))
                 )
             }
-        return updateUsersResultFuture.get()
+        return updateUserResultFuture.get()
+    }
+
+    fun fetchClientId(clientId: String): Result<String> {
+        val fetchClientIdFuture = CompletableFuture<Result<String>>()
+        dbRef.child("contacts")
+            .child(clientId)
+            .get().addOnSuccessListener {
+                if (it.exists()) {
+                    fetchClientIdFuture.complete(Result.Error(IOException("Client ID already exists")))
+                }else{
+                    fetchClientIdFuture.complete(Result.Success(clientId))
+                }
+            }.addOnFailureListener {
+                fetchClientIdFuture.complete(Result.Error(IOException("Connection to database impossible")))
+            }
+        return fetchClientIdFuture.get()
     }
 }

@@ -1,25 +1,24 @@
 package com.github.factotum_sdp.factotum.ui.signup
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.data.LoginRepository
 import com.github.factotum_sdp.factotum.data.Result
 import com.github.factotum_sdp.factotum.data.SignUpDataSink
-import com.github.factotum_sdp.factotum.data.User
+import com.github.factotum_sdp.factotum.models.User
 import com.github.factotum_sdp.factotum.ui.auth.BaseAuthResult
 import com.github.factotum_sdp.factotum.ui.auth.BaseAuthState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.IOException
 
 class SignUpViewModel(
-    private val signUpDataSink: SignUpDataSink,
-    private val loginRepository: LoginRepository
+    private val signUpDataSink: SignUpDataSink
 ) : ViewModel() {
 
     private val _signupForm = MutableLiveData<SignUpFormState>()
@@ -30,6 +29,9 @@ class SignUpViewModel(
 
     private val _updateUserResult = MutableLiveData<UpdateUsersResult>()
     val updateUserResult: LiveData<UpdateUsersResult> = _updateUserResult
+
+    private val _fetchClientIdResult = MutableLiveData<FetchClientIdResult>()
+    val fetchClientIdResult: LiveData<FetchClientIdResult> = _fetchClientIdResult
 
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 
@@ -45,7 +47,9 @@ class SignUpViewModel(
                         success = result.data
                     )
             } else {
-                _signupResult.value = SignUpResult(error = R.string.signup_failed)
+                _signupResult.value = SignUpResult(
+                    error = R.string.signup_failed
+                )
             }
         }
     }
@@ -53,15 +57,41 @@ class SignUpViewModel(
     fun updateUser(userUID: String, user: User) {
         // launch in a separate asynchronous job
         viewModelScope.launch {
-            val result = withContext(dispatcher) { signUpDataSink.updateUsersList(userUID, user) }
+            val result = withContext(dispatcher) { signUpDataSink.updateUser(userUID, user) }
             if (result is Result.Success) {
                 _updateUserResult.value =
                     UpdateUsersResult(
                         success = result.data
                     )
             } else {
-                _updateUserResult.value = UpdateUsersResult(error = R.string.update_users_failed)
+                _updateUserResult.value = UpdateUsersResult(
+                    error = R.string.update_users_failed
+                )
             }
+        }
+    }
+
+    fun fetchClientId(clientId: String) {
+        // launch in a separate asynchronous job
+        viewModelScope.launch {
+            val result = withContext(dispatcher) { signUpDataSink.fetchClientId(clientId) }
+            if (result is Result.Success) {
+                _fetchClientIdResult.value = FetchClientIdResult(
+                    success = result.data
+                )
+            } else if (result is Result.Error &&
+                result.exception is IOException &&
+                result.exception.message == "Client ID already exists") {
+                _fetchClientIdResult.value = FetchClientIdResult(
+                    error = R.string.invalid_clientId
+                )
+            } else {
+                Log.d("SignUpViewModel", "fetchClientId: ${result.toString()}")
+                _fetchClientIdResult.value = FetchClientIdResult(
+                    error = R.string.database_error
+                )
+            }
+
         }
     }
 
@@ -80,8 +110,8 @@ class SignUpViewModel(
             _signupForm.value = SignUpFormState(passwordError = R.string.invalid_password)
         } else if (role.isBlank()) {
             //
-        } else if (!isClientIdValid(clientId)) {
-            //
+        } else if (clientId.isBlank()) {
+            _signupForm.value = SignUpFormState(clientIdError = R.string.empty_clientId_error)
         } else {
             _signupForm.value = SignUpFormState(isDataValid = true)
         }
@@ -92,26 +122,13 @@ class SignUpViewModel(
         return username.isNotBlank()
     }
 
-    private fun isClientIdValid(clientId: String): Boolean {
-        val dbRef = MainActivity.getDatabase().reference
-        var isClientIdValid = true
-        if (clientId.isBlank()) {
-            _signupForm.value = SignUpFormState(clientIdError = R.string.empty_clientId_error)
-            return false
-        }
-        dbRef.child("contacts-bis")
-            .child(clientId)
-            .get().addOnSuccessListener {
-                if (it.exists()) {
-                    isClientIdValid = false
-                    _signupForm.value = SignUpFormState(clientIdError = R.string.invalid_clientId)
-                }
-            }.addOnFailureListener {
-                isClientIdValid = false
-                _signupForm.value = SignUpFormState(clientIdError = R.string.database_error)
-            }
-        return isClientIdValid
-    }
+    /**
+     * Fetch client ID result : success or error message.
+     */
+    data class FetchClientIdResult(
+        val success: String? = null,
+        val error: Int? = null
+    )
 
     /**
      * Profile update result : success or error message.

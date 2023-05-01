@@ -7,8 +7,11 @@ import android.view.ViewGroup
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.data.DestinationRecord
+import com.github.factotum_sdp.factotum.models.DestinationRecord
 
+/**
+ * The Fragment displaying the informations about a specific record in a read-only way
+ */
 class DRecordInfoFragment(private val record: DestinationRecord) : Fragment() {
 
     override fun onCreateView(

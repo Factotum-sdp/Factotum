@@ -1,39 +1,28 @@
 package com.github.factotum_sdp.factotum.utils
 
-import android.content.Context
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.espresso.Espresso
-import androidx.test.espresso.action.ViewActions
-import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withText
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 
 object PreferencesSetting {
-
-    const val SWIPE_L_SHARED_KEY = "SwipeLeftButton"
-    const val SWIPE_R_SHARED_KEY = "SwipeRightButton"
-    const val DRAG_N_DROP_SHARED_KEY = "DragNDropButton"
-    const val TOUCH_CLICK_SHARED_KEY = "TouchClickButton"
-    const val SHOW_ARCHIVED_KEY = "ShowArchived"
-
-    fun setPrefs(sharedKey: String, activity: MainActivity, value: Boolean) {
-        val sp = activity.getSharedPreferences(sharedKey, Context.MODE_PRIVATE)
-        val edit = sp.edit()
-        edit.putBoolean(sharedKey, value)
-        edit.apply()
+    fun setRoadBookPrefs(testRule: ActivityScenarioRule<MainActivity>) {
+        testRule.scenario.onActivity {
+            val settings = it.applicationSettingsViewModel()
+            settings.updateUseRoadBookPreferences(false)
+        }
     }
-
-    fun setAllPrefs(activity: MainActivity) {
-        setPrefs(SWIPE_L_SHARED_KEY, activity, true)
-        setPrefs(SWIPE_R_SHARED_KEY, activity, true)
-        setPrefs(DRAG_N_DROP_SHARED_KEY, activity, true)
-        setPrefs(TOUCH_CLICK_SHARED_KEY, activity, false)
-        setPrefs(SHOW_ARCHIVED_KEY, activity, false)
-    }
-
     fun enableTouchClick() {
-        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
-        Espresso.onView(ViewMatchers.withText(R.string.rb_label_touch_click))
-            .perform(ViewActions.click())
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_touch_click)).check(matches(isDisplayed()))
+            .perform(click())
     }
 }

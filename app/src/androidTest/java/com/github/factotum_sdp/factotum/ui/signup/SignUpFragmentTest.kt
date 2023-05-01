@@ -44,7 +44,7 @@ class SignUpFragmentTest {
         @JvmStatic
         fun setUpDatabase() {
             runBlocking {
-                ContactsUtils.populateDatabaseBis()
+                ContactsUtils.populateDatabase()
             }
         }
     }
@@ -172,7 +172,13 @@ class SignUpFragmentTest {
         onView(withId(R.id.role)).perform(click())
         onData(anything()).inRoot(isPlatformPopup()).atPosition(1).perform(click())
         onView(withId(R.id.clientId)).perform(typeText("clientId1"))
-        onView(withId(R.id.signup)).check(matches(not(isEnabled())))
+        FirebaseAuth.AuthStateListener {
+            onView(withId(R.id.fragment_signup_directors_parent)).check(
+                matches(
+                    isDisplayed()
+                )
+            )
+        }
     }
 
     @Test

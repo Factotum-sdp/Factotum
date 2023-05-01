@@ -11,12 +11,10 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import androidx.annotation.StringRes
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
@@ -86,7 +84,8 @@ class SignUpFragment : Fragment() {
             afterTextChangedListener,
         )
 
-        listenToAuthButton(signUpButton,
+        listenToAuthButton(
+            signUpButton,
             loadingProgressBar
         )
 

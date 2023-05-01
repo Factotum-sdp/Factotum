@@ -1,6 +1,5 @@
 package com.github.factotum_sdp.factotum.ui.signup
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -81,12 +80,12 @@ class SignUpViewModel(
                 )
             } else if (result is Result.Error &&
                 result.exception is IOException &&
-                result.exception.message == "Client ID already exists") {
+                result.exception.message == "Client ID already exists"
+            ) {
                 _fetchClientIdResult.value = FetchClientIdResult(
                     error = R.string.invalid_clientId
                 )
             } else {
-                Log.d("SignUpViewModel", "fetchClientId: ${result.toString()}")
                 _fetchClientIdResult.value = FetchClientIdResult(
                     error = R.string.database_error
                 )

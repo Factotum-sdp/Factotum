@@ -1,17 +1,19 @@
 package com.github.factotum_sdp.factotum.ui.maps
 
 import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
-import com.github.factotum_sdp.factotum.data.localisation.Route
 import com.github.factotum_sdp.factotum.databinding.FragmentMapsBinding
 import com.github.factotum_sdp.factotum.hasLocationPermission
+import com.github.factotum_sdp.factotum.models.Route
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
@@ -38,6 +40,7 @@ class MapsFragment : Fragment() {
     ) { isGranted ->
         if (isGranted) {
             requireContext().hasLocationPermission()
+            activateLocation(mMap)
         }
     }
 
@@ -76,7 +79,21 @@ class MapsFragment : Fragment() {
         if (!requireContext().hasLocationPermission()) {
             requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
-        googleMap.uiSettings.isMyLocationButtonEnabled = true
+        activateLocation(googleMap)
+    }
+
+    private fun activateLocation(googleMap: GoogleMap) {
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            mMap.isMyLocationEnabled = true
+            googleMap.uiSettings.isMyLocationButtonEnabled = true
+        }
     }
 
     private fun initMapUI(googleMap: GoogleMap) {

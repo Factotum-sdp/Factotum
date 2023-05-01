@@ -1,7 +1,7 @@
 package com.github.factotum_sdp.factotum.placeholder
 
-import com.github.factotum_sdp.factotum.data.DestinationRecord
-import com.github.factotum_sdp.factotum.data.DestinationRecord.Action
+import com.github.factotum_sdp.factotum.models.DestinationRecord
+import com.github.factotum_sdp.factotum.models.DestinationRecord.Action
 import java.util.*
 
 /**

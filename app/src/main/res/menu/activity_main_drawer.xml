@@ -20,6 +20,10 @@
             android:id="@+id/displayFragment"
             android:icon="@drawable/ic_menu_gallery"
             android:title="@string/menu_view_proof_picture" />
+        <item
+            android:id="@+id/settingsFragment"
+            android:icon="@drawable/settings"
+            android:title="@string/application_settings" />
     </group>
 
     <group

@@ -1,5 +1,9 @@
 package com.github.factotum_sdp.factotum.utils
 
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
 /**
  * This class contains some utility functions to format strings for Firebase
  *
@@ -40,6 +44,16 @@ class FirebaseStringFormat {
                 .replace(FIREBASE_SAFE_OPENBRACKET, "[")
                 .replace(FIREBASE_SAFE_CLOSEBRACKET, "]")
                 .replace(FIREBASE_SAFE_SLASH, "/")
+        }
+
+
+        /**
+         * This function returns the current date formatted as ddMMyyyy
+         *
+         * @return the formatted date
+         */
+        fun firebaseDateFormatted(): String {
+            return SimpleDateFormat("ddMMyyyy", Locale.getDefault()).format(Date())
         }
     }
 }

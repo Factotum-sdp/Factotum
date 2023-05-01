@@ -21,8 +21,11 @@ import androidx.test.rule.GrantPermissionRule
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
+import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeLeftTheRecordAt
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightTheRecordAt
+import com.github.factotum_sdp.factotum.utils.DeliveryLoggerUtils.Companion.checkDeliveryLog
+import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.PreferencesSetting
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -71,6 +74,8 @@ class RoadBookFragmentTest {
     fun toRoadBookFragment() {
         // Ensure "use RoadBook preferences" is disabled
         PreferencesSetting.setRoadBookPrefs(testRule)
+        val courier = UsersPlaceHolder.USER_COURIER
+        GeneralUtils.fillUserEntryAndEnterTheApp(courier.email, courier.password)
 
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
@@ -360,6 +365,33 @@ class RoadBookFragmentTest {
 
         onView(withText("X17#1")).check(matches(isDisplayed()))
         onView(withText("X17#1")).check(isCompletelyBelow(withText("More#1")))
+    }
+
+    // ============================================================================================
+    // ===================================== End Shift ============================================
+    @Test
+    fun endShiftUpdates() {
+
+        // Edit a timestamp :
+        swipeRightTheRecordAt(3)
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click())
+        onView(withText(R.string.edit_dialog_update_b))
+            .perform(click())
+        onView(withId(R.id.finish_shift)).perform(click())
+        onView(withText(R.string.end_shift_dialog_title))
+            .check(matches(isDisplayed()))
+        onView(withId(android.R.id.button1)).perform(click())
+        var recordList: DRecordList? = null
+        testRule.scenario.onActivity {
+            val fragment = it.supportFragmentManager.fragments.first() as NavHostFragment
+            fragment.let {
+                val curr =
+                    it.childFragmentManager.primaryNavigationFragment as RoadBookFragment
+                recordList = curr.getRBViewModelForTest().recordsListState.value
+                checkDeliveryLog(UsersPlaceHolder.USER_COURIER.name, recordList!!)
+            }
+        }
     }
 
     // ============================================================================================
@@ -692,7 +724,9 @@ class RoadBookFragmentTest {
             onView(withId(R.id.location_switch)).perform(click())
             onView(withId(R.id.refresh_button)).perform(click())
         }
+
     }
+
 
     // ============================================================================================
     // ===================================== Helpers ==============================================
@@ -736,5 +770,7 @@ class RoadBookFragmentTest {
             .substringBeforeLast(":")
             .substringBeforeLast(":")
     }
+
+
 
 }

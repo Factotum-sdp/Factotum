@@ -47,7 +47,7 @@ class SignUpDataSink {
 
     fun fetchClientId(clientId: String): Result<String> {
         val fetchClientIdFuture = CompletableFuture<Result<String>>()
-        dbRef.child("contacts")
+        dbRef.child("contacts-bis")
             .child(clientId)
             .get().addOnSuccessListener {
                 if (it.exists()) {

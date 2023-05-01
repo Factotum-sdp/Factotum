@@ -1,1 +1,95 @@
-{"contacts":[{"address":"123 Fake Street","details":"I am a boss","id":"0","name":"John","phone":"123456789","profile_pic_id":2131165334,"role":"Boss","surname":"Smith"},{"address":"456 Fake Street","details":"I am a courier","id":"1","name":"Jane","phone":"987654321","profile_pic_id":2131165334,"role":"Courier","surname":"Jones"},{"address":"789 Fake Street","details":"I am a client","id":"2","name":"Joe","phone":"123987456","profile_pic_id":2131165334,"role":"Client","surname":"Williams"},{"address":"123 Fake Street","details":"I am a boss","id":"3","name":"John","phone":"123456789","profile_pic_id":2131165334,"role":"Boss","surname":"Smith"},{"address":"456 Fake Street","details":"I am a courier","id":"4","name":"Jane","phone":"987654321","profile_pic_id":2131165334,"role":"Courier","surname":"Jones"}],"profile-dispatch":{"9Q9PdkiVQKwgHcuEGyshqXyXHrHT":{"email":"courier@gmail.com","name":"Courier","password":"123456","role":"COURIER"},"MjsOmqtNvvYB5RuFqbhmokvK1lxJ":{"email":"boss@gmail.com","name":"Boss","password":"123456","role":"BOSS"},"YXd0EJCPabV6Xa7DDUunomS2SNue":{"email":"client@gmail.com","name":"Client","password":"123456","role":"CLIENT"},"oO70izRfqiw4a8mXnFnfWLqk0gpa":{"email":"email@gmail.com","name":"Name","role":"COURIER"}}}
+{
+    "contacts": [
+        {
+            "address": "123 Fake Street",
+            "details": "I am a boss",
+            "id": "0",
+            "name": "John",
+            "phone": "123456789",
+            "profile_pic_id": 2131165334,
+            "role": "Boss",
+            "surname": "Smith"
+        },
+        {
+            "address": "456 Fake Street",
+            "details": "I am a courier",
+            "id": "1",
+            "name": "Jane",
+            "phone": "987654321",
+            "profile_pic_id": 2131165334,
+            "role": "Courier",
+            "surname": "Jones"
+        },
+        {
+            "address": "789 Fake Street",
+            "details": "I am a client",
+            "id": "2",
+            "name": "Joe",
+            "phone": "123987456",
+            "profile_pic_id": 2131165334,
+            "role": "Client",
+            "surname": "Williams"
+        },
+        {
+            "address": "123 Fake Street",
+            "details": "I am a boss",
+            "id": "3",
+            "name": "John",
+            "phone": "123456789",
+            "profile_pic_id": 2131165334,
+            "role": "Boss",
+            "surname": "Smith"
+        },
+        {
+            "address": "456 Fake Street",
+            "details": "I am a courier",
+            "id": "4",
+            "name": "Jane",
+            "phone": "987654321",
+            "profile_pic_id": 2131165334,
+            "role": "Courier",
+            "surname": "Jones"
+        }
+    ],
+    "contacts-bis": {
+        "clientId1": {
+            "address": "",
+            "details": "",
+            "name": "janes",
+            "phone": "",
+            "profile_pic_id": 2131165334,
+            "role": "Boss",
+            "surname": "joel",
+            "username": "joel"
+        }
+    },
+    "profile-dispatch": {
+        "9Q9PdkiVQKwgHcuEGyshqXyXHrHT": {
+            "email": "courier@gmail.com",
+            "name": "Courier",
+            "password": "123456",
+            "role": "COURIER",
+            "clientID": "clientId"
+        },
+        "MjsOmqtNvvYB5RuFqbhmokvK1lxJ": {
+            "email": "boss@gmail.com",
+            "name": "Boss",
+            "password": "123456",
+            "role": "BOSS",
+            "clientID": "courierId"
+        },
+        "YXd0EJCPabV6Xa7DDUunomS2SNue": {
+            "email": "client@gmail.com",
+            "name": "Client",
+            "password": "123456",
+            "role": "CLIENT",
+            "clientID": "courierId"
+        },
+        "oO70izRfqiw4a8mXnFnfWLqk0gpa": {
+            "email": "email@gmail.com",
+            "name": "Name",
+            "role": "COURIER",
+            "clientID": "clientId"
+        }
+    }
+}

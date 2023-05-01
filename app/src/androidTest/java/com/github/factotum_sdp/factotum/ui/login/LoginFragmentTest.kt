@@ -8,10 +8,7 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.fillUserEntryAndEnterTheApp
-import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getAuth
-import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -40,7 +37,6 @@ class LoginFragmentTest {
         @JvmStatic
         fun setUpDatabase() = runTest {
             initFirebase()
-            UsersPlaceHolder.init(getDatabase(), getAuth())
         }
 
         @AfterClass
@@ -91,11 +87,11 @@ class LoginFragmentTest {
 
     @Test
     fun userNotInProfileDispatchUserNotFoundMessage() {
-        onView(withId(R.id.email)).perform(typeText(UsersPlaceHolder.USER2.email))
+        onView(withId(R.id.email)).perform(typeText("marc.marquez@epfl.ch"))
         onView(withId(R.id.fragment_login_directors_parent)).perform(
             closeSoftKeyboard()
         )
-        onView(withId(R.id.password)).perform(typeText(UsersPlaceHolder.USER2.password))
+        onView(withId(R.id.password)).perform(typeText("123456"))
         onView(withId(R.id.fragment_login_directors_parent)).perform(
             closeSoftKeyboard()
         )

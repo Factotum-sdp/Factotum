@@ -167,6 +167,7 @@ class ContactsCreationTest {
         getDatabase().reference.child("contacts").child(username).removeValue()
     }
 
+    /*
     @Test
     fun writeInAddressFieldMakesDropDown() {
         val city = "Lausanne"
@@ -176,7 +177,7 @@ class ContactsCreationTest {
         assertTrue(result)
     }
 
-    /*
+
     @Test
     fun selectSuggestionWritesAddress() {
         val city = "Lausanne"

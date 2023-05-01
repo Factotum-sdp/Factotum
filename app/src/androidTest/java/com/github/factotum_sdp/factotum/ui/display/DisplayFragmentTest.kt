@@ -18,7 +18,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.ui.display.utils.*
-import com.github.factotum_sdp.factotum.ui.picture.utils.emptyFirebaseStorage
+import com.github.factotum_sdp.factotum.ui.picture.emptyFirebaseStorage
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.LoginMenuIdlingResource

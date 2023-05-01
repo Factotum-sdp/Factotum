@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum.ui.picture.utils
+package com.github.factotum_sdp.factotum.ui.picture
 
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click

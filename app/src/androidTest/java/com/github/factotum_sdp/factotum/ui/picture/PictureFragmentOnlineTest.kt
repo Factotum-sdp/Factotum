@@ -11,13 +11,6 @@ import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.ui.picture.*
-import com.github.factotum_sdp.factotum.ui.picture.utils.CLIENT_ID
-import com.github.factotum_sdp.factotum.ui.picture.utils.TIME_WAIT_PHOTO_DELETE
-import com.github.factotum_sdp.factotum.ui.picture.utils.emptyFirebaseStorage
-import com.github.factotum_sdp.factotum.ui.picture.utils.emptyLocalFiles
-import com.github.factotum_sdp.factotum.ui.picture.utils.goToPictureFragment
-import com.github.factotum_sdp.factotum.ui.picture.utils.triggerCancel
-import com.github.factotum_sdp.factotum.ui.picture.utils.triggerShutter
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.LoginMenuIdlingResource

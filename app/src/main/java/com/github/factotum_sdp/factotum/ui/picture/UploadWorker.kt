@@ -17,11 +17,12 @@ class UploadWorker(appContext: Context, workerParams: WorkerParameters) : Corout
 
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
-        val picturesDir = applicationContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES) ?: return@withContext Result.failure()
-        val clientDirs = picturesDir.listFiles()?.filter { it.isDirectory } ?: return@withContext Result.failure()
+        val picturesDirectory = applicationContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES) ?: return@withContext Result.failure()
+        val pictureEntries = picturesDirectory.listFiles() ?: return@withContext Result.failure()
+        val clientsDirectories = pictureEntries.filter { it.isDirectory }
 
-        for (clientDir in clientDirs) {
-            if (!uploadFile(clientDir)) {
+        clientsDirectories.forEach { clientDirectory ->
+            if (!uploadFile(clientDirectory)) {
                 return@withContext Result.failure()
             }
         }
@@ -29,22 +30,20 @@ class UploadWorker(appContext: Context, workerParams: WorkerParameters) : Corout
     }
 
     private suspend fun uploadFile(directory: File): Boolean {
-        val files = directory.listFiles()
-        if (files != null && files.isNotEmpty()) {
-            for (file in files) {
-                if (file.isFile) {
-                    val storageRef = storage.reference.child("${directory.name}/${file.name}")
-                    try {
-                        storageRef.putFile(file.toUri()).await()
-                        file.delete()
-                    } catch (e: Exception) {
-                        Log.e("UploadWorker", "Upload error", e)
-                        return false
-                    }
-                }
+        val directoryEntries = directory.listFiles() ?: return true
+        val directoryFiles = directoryEntries.filter { it.isFile }
+
+        return directoryFiles.all { file ->
+            val storageRef = storage.reference.child("${directory.name}/${file.name}")
+            try {
+                storageRef.putFile(file.toUri()).await()
+                file.delete()
+                true
+            } catch (e: Exception) {
+                Log.e("UploadWorker", "Upload error", e)
+                false
             }
         }
-        return true
     }
 }
 

@@ -1,6 +1,5 @@
 package com.github.factotum_sdp.factotum.repositories
 
-import android.util.Log
 import androidx.datastore.core.DataStore
 import com.github.factotum_sdp.factotum.data.FirebaseInstance
 import com.github.factotum_sdp.factotum.models.DestinationRecord
@@ -11,19 +10,13 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.io.IOException
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-private const val TAG = "ROADBOOK_REPOSITORY"
 
 class RoadBookRepository(remoteSource: DatabaseReference,
                          private val localSource: DataStore<DRecordList>) {
@@ -85,35 +78,6 @@ class RoadBookRepository(remoteSource: DatabaseReference,
         }
         return fetchLocalBackUp()
     }
-
-
-    private val localBackUpFlow: Flow<DRecordList> =
-        localSource.data.catch { exception ->
-            // dataStore.data throws an IOException when an error is encountered when reading data
-            if (exception is IOException) {
-                Log.e(TAG, "Error reading RoadBook local backup.", exception)
-                emit(DRecordList())
-            } else {
-                throw exception
-            }
-        }
-
-    private val networkBackUpFlow: Flow<List<DestinationRecord>> =
-        callbackFlow {
-            val listener = object: ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val records = snapshot.children.mapNotNull {
-                        it.getValue(DestinationRecord::class.java)
-                    }
-                    trySend(records)
-                }
-                override fun onCancelled(error: DatabaseError) {
-                    close(error.toException())
-                }
-            }
-            backUpRef.addValueEventListener(listener)
-            awaitClose { backUpRef.removeEventListener(listener) }
-        }
 
     private suspend fun setLocalBackUp(records: DRecordList) {
         localSource.updateData {

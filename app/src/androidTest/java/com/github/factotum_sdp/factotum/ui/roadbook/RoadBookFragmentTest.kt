@@ -46,6 +46,7 @@ import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.CompletableFuture
@@ -190,24 +191,7 @@ class RoadBookFragmentTest {
         val date = Calendar.getInstance().time
         val ref = db.reference
             .child("Sheet-shift")
-            .child(SimpleDateFormat.getDateInstance().format(date))
-
-        // Our target value to fetch
-        // is represented as a List<String> in Firebase
-        val future = CompletableFuture<List<DestinationRecord>>()
-
-        ref.addListenerForSingleValueEvent(object: ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val records = snapshot.children.mapNotNull {
-                    it.getValue(DestinationRecord::class.java)
-                }
-                future.complete(records)
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                future.completeExceptionally(error.toException())
-            }
-        })
+            .child(SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH).format(date))
 
         // Add 1 record
         newRecord()
@@ -219,6 +203,19 @@ class RoadBookFragmentTest {
         .perform(click())
         onView(withId(R.id.fragment_route_directors_parent))
         .check(matches(isDisplayed()))
+
+        // Our target value to fetch
+        // is represented as a List<String> in Firebase
+        val future = CompletableFuture<List<DestinationRecord>>()
+
+        ref.get().addOnSuccessListener { snapshot ->
+            val records = snapshot.children.mapNotNull {
+                it.getValue(DestinationRecord::class.java)
+            }
+            future.complete(records)
+        }.addOnFailureListener {
+            future.completeExceptionally(it)
+        }
 
         assert(future.get().any { it.clientID == newRecordClientID})
     }

@@ -7,6 +7,7 @@ import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
 import com.github.factotum_sdp.factotum.repositories.RoadBookRepository
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.*
 
 /**
@@ -22,7 +23,6 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : Vi
 
     private val clientOccurrences = HashMap<String, Int>()
     private lateinit var preferencesRepository: RoadBookPreferencesRepository
-    private val backUps = roadBookRepository.backUpFlow.asLiveData()
 
     init {
         addDemoRecords(DestinationRecords.RECORDS)
@@ -83,11 +83,9 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : Vi
      * back up records are no more archived.
      */
     fun fetchBackBackUps(){
-        backUps.value?.let {
-            if (currentDRecList().showArchived)
-                _recordsList.value = it.withArchived()
-            else
-                _recordsList.value = it.withoutArchived()
+        runBlocking {
+            val lastBackUp = roadBookRepository.getLastBackUp()
+            _recordsList.value = DRecordList(allRecords = lastBackUp, showArchived = currentDRecList().showArchived)
         }
     }
 
@@ -277,7 +275,11 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : Vi
      * Clear all records
      */
     fun clearAllRecords(){
-        _recordsList.value = DRecordList(emptyList())
+        _recordsList.value =
+            DRecordList(
+                allRecords = emptyList(),
+                showArchived = currentDRecList().showArchived
+            )
     }
 
     private fun currentDRecList(): DRecordList {

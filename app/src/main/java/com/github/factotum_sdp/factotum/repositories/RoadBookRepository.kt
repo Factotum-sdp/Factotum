@@ -15,8 +15,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.text.DateFormat
@@ -28,18 +27,20 @@ private const val TAG = "ROADBOOK_REPOSITORY"
 
 class RoadBookRepository(remoteSource: DatabaseReference,
                          private val localSource: DataStore<DRecordList>) {
-    private var isConnectedToRemote = false
     private var backUpRef: DatabaseReference
+    private var isConnectedToRemote = false
+    private var lastNetworkBackUp: DRecordList? = null
 
     init {
         FirebaseInstance.onConnectedStatusChanged {
             if (it) { // if Connection is changing from no connection to connected then transfer local backup to remote
                 CoroutineScope(Dispatchers.IO).launch {
-                    networkBackUp(fetchLastLocalBackUp())
+                    setNetworkBackUp(fetchLocalBackUp())
                 }
             }
             isConnectedToRemote = it
         }
+
         val date = Calendar.getInstance().time
         val dateRef = SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH).format(date)
         backUpRef = remoteSource // ref path to register all back-ups from this RoadBook
@@ -47,22 +48,44 @@ class RoadBookRepository(remoteSource: DatabaseReference,
         //.child(getTimeInstance().format(date).plus(Random.nextInt().toString()))
         // Let uncommented for testing purpose. Uncomment it for back-up uniqueness in the DB
         // Only for demo purpose :
+
+        backUpRef.addValueEventListener(object: ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val records = snapshot.children.mapNotNull {
+                    it.getValue(DestinationRecord::class.java)
+                }
+                lastNetworkBackUp = DRecordList(records)
+            }
+            override fun onCancelled(error: DatabaseError) {}
+        })
     }
 
     /**
      * Send the current recordsList data to the the remoteSource if connected or the localSource
      */
     fun setBackUp(records: DRecordList) {
-        if(records.isNotEmpty()) {
+        val allRecords = records.withArchived()
+        if(allRecords.isNotEmpty() && allRecords != lastNetworkBackUp) {
             CoroutineScope(Dispatchers.Default).launch {
                 if (isConnectedToRemote) {
-                    networkBackUp(records.withArchived())
+                    setNetworkBackUp(allRecords)
+                    setLocalBackUp(allRecords)
                 } else {
-                    localBackUp(records.withArchived())
+                    setLocalBackUp(allRecords)
                 }
             }
         }
     }
+
+    suspend fun getLastBackUp(): DRecordList {
+        if(isConnectedToRemote) {
+            lastNetworkBackUp?.let {
+                return it
+            }
+        }
+        return fetchLocalBackUp()
+    }
+
 
     private val localBackUpFlow: Flow<DRecordList> =
         localSource.data.catch { exception ->
@@ -75,50 +98,35 @@ class RoadBookRepository(remoteSource: DatabaseReference,
             }
         }
 
-    private val networkBackUpFlow: Flow<DRecordList> =
+    private val networkBackUpFlow: Flow<List<DestinationRecord>> =
         callbackFlow {
             val listener = object: ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val records = snapshot.children.mapNotNull {
                         it.getValue(DestinationRecord::class.java)
                     }
-                    trySend(DRecordList(allRecords = records))
+                    trySend(records)
                 }
                 override fun onCancelled(error: DatabaseError) {
                     close(error.toException())
                 }
             }
-            backUpRef.addListenerForSingleValueEvent(listener)
+            backUpRef.addValueEventListener(listener)
             awaitClose { backUpRef.removeEventListener(listener) }
         }
 
-    /**
-     * Get the Back up flow combined from the localSource and the remoteSource
-     */
-    val backUpFlow = networkBackUpFlow//launchBackUpFlow()
-
-    private fun launchBackUpFlow(): Flow<DRecordList> {
-        return localBackUpFlow.combine(networkBackUpFlow) { local, network ->
-            if(isConnectedToRemote) {
-                network
-            } else {
-                local
-            }
-        }
-    }
-
-    private suspend fun localBackUp(records: DRecordList) {
+    private suspend fun setLocalBackUp(records: DRecordList) {
         localSource.updateData {
             records
         }
     }
 
-    private fun networkBackUp(records: DRecordList) {
+    private fun setNetworkBackUp(records: DRecordList) {
         backUpRef.setValue(records)
     }
 
-    private suspend fun fetchLastLocalBackUp(): DRecordList {
-        return localBackUpFlow.last()
+    private suspend fun fetchLocalBackUp(): DRecordList {
+        return localSource.data.first()
     }
 
 }

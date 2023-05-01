@@ -2,11 +2,14 @@ package com.github.factotum_sdp.factotum.ui.roadbook
 
 import android.Manifest
 import android.content.Context
+import android.view.View
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
+import androidx.test.espresso.NoMatchingViewException
+import androidx.test.espresso.ViewAssertion
 import androidx.test.espresso.action.*
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.PositionAssertions.isCompletelyAbove
@@ -35,7 +38,6 @@ import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.*
@@ -53,7 +55,7 @@ import java.util.concurrent.CompletableFuture
 class RoadBookFragmentTest {
 
     @get:Rule
-    val coarseLocationrule = GrantPermissionRule.grant(Manifest.permission.ACCESS_COARSE_LOCATION)
+    val coarseLocationRule = GrantPermissionRule.grant(Manifest.permission.ACCESS_COARSE_LOCATION)
 
     @get:Rule
     val fineLocationRule = GrantPermissionRule.grant(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -86,7 +88,6 @@ class RoadBookFragmentTest {
         onView(withId(R.id.roadBookFragment))
             .perform(click())
     }
-
 
     @Test
     fun radioButtonsAreAccessible() {
@@ -182,7 +183,7 @@ class RoadBookFragmentTest {
     }
 
     // ============================================================================================
-    // ================================== Update to Database Tests ================================
+    // ================================== RoadBook Caching Tests ================================
     @Test
     fun roadBookIsBackedUpCorrectlyWhenOnline() {
         val db = FirebaseInstance.getDatabase()
@@ -288,13 +289,18 @@ class RoadBookFragmentTest {
 
         db.goOffline()
 
-        // Navigate back to RoadBook and out again
+        // Navigate back to RoadBook
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
-        onView(withId(R.id.routeFragment))
+        onView(withId(R.id.roadBookFragment))
             .perform(click())
-        onView(withId(R.id.fragment_route_directors_parent))
-            .check(matches(isDisplayed()))
+
+        // Add one more Record
+        newRecord() //Because otherwise no more caching is done as it detects it is already in the cache
+
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.routeFragment)).perform(click())
 
         var fromLocal: List<DestinationRecord>
         val context = ApplicationProvider.getApplicationContext<Context>().applicationContext
@@ -304,8 +310,91 @@ class RoadBookFragmentTest {
 
         db.goOnline() // Convention after a call to goOffline()
         val fromNetwork = future.get()
-        assert(fromLocal.zip(fromNetwork).all { pair -> pair.first.destID == pair.second.destID })
+        assert(
+            fromLocal
+                .subList(0, fromLocal.size - 1)// Need to remove the record added
+                .zip(fromNetwork)
+                .all { pair -> pair.first.destID == pair.second.destID }
+        )
     }
+
+    @Test
+    fun roadBookIsCorrectlyCleared() {
+        clearRoadBook()
+        isRecylerViewEmptyCheck()
+    }
+
+    @Test
+    fun onCancelinSettingsNothingIsCleared(){
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.settingsFragment))
+            .perform(click())
+
+        onView(withId(R.id.delete_all_roadbook)).perform(click())
+        onView(withText(R.string.negative_label_delete_all_roadbook_dialog)).perform(click())
+
+        // Back to RB
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.roadBookFragment))
+            .perform(click())
+
+        isStartingRecyclerViewCheck()
+    }
+
+    @Test
+    fun roadBookFromBackUpAfterClearedOnline() {
+        isStartingRecyclerViewCheck()
+
+        clearRoadBook()
+
+        // Go to Settings
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.settingsFragment))
+            .perform(click())
+
+        onView(withId(R.id.load_roadbook_backup)).perform(click())
+
+        // Go back RB
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.roadBookFragment))
+            .perform(click())
+
+        //Check starting records are displayed :
+        isStartingRecyclerViewCheck()
+    }
+
+    @Test
+    fun roadBookFromBackUpAfterClearedOffline() {
+        val db = FirebaseInstance.getDatabase()
+        db.goOffline()
+
+        isStartingRecyclerViewCheck()
+        clearRoadBook()
+
+        // Go to Settings
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.settingsFragment))
+            .perform(click())
+
+        onView(withId(R.id.load_roadbook_backup)).perform(click())
+
+        // Go back RB
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.roadBookFragment))
+            .perform(click())
+
+        db.goOnline()
+
+        //Check starting records are displayed :
+        isStartingRecyclerViewCheck()
+    }
+
 
     // ============================================================================================
     // ===================================== Edit Tests ===========================================
@@ -825,6 +914,36 @@ class RoadBookFragmentTest {
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
     }
 
+    private fun isRecylerViewEmptyCheck() {
+        // Find the RecyclerView by its ID
+        val recyclerView = onView(withId(R.id.list))
+        recyclerView.check(RecyclerViewItemCountAssertion(0))
+    }
+
+    private fun isStartingRecyclerViewCheck() {
+        onView(withText(DestinationRecords.RECORDS[0].destID)).check(matches(isDisplayed()))
+        onView(withText(DestinationRecords.RECORDS[1].destID)).check(matches(isDisplayed()))
+        onView(withText(DestinationRecords.RECORDS[2].destID)).check(matches(isDisplayed()))
+        onView(withText(DestinationRecords.RECORDS[3].destID)).check(matches(isDisplayed()))
+    }
+
+    private fun clearRoadBook() {
+        // Navigate to Settings
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.settingsFragment))
+            .perform(click())
+
+        onView(withId(R.id.delete_all_roadbook)).perform(click())
+        onView(withText(R.string.positive_label_delete_all_roadbook_dialog)).perform(click())
+
+        // Back to RB
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.roadBookFragment))
+            .perform(click())
+    }
+
     // As we can't set the seconds currently,
     // we use in our test the current time set by default in the time picker
     // It's enough to match until the hours in our tests as at most one timestamp written at a time
@@ -834,6 +953,22 @@ class RoadBookFragmentTest {
             .format(cal.time)
             .substringBeforeLast(":")
             .substringBeforeLast(":")
+    }
+
+
+    class RecyclerViewItemCountAssertion(private val expectedCount: Int) : ViewAssertion {
+        override fun check(view: View?, noViewFoundException: NoMatchingViewException?) {
+            if (noViewFoundException != null) {
+                throw noViewFoundException
+            }
+
+            if (view !is RecyclerView) {
+                throw IllegalStateException("The view is not a RecyclerView")
+            }
+
+            val adapter = view.adapter
+            assertThat(adapter?.itemCount ?: 0, `is`(expectedCount))
+        }
     }
 
 }

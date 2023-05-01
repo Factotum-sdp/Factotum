@@ -24,7 +24,7 @@ private fun displayedRecords(
 class DRecordList(
     private val allRecords: List<DestinationRecord> = listOf(),
     private val archived: List<DestinationRecord> = listOf(),
-    private val showArchived: Boolean = false
+    val showArchived: Boolean = false
 ) : List<DestinationRecord> by displayedRecords(allRecords, archived, showArchived) {
 
     private val archivedSet = archived.toSet() // For performance

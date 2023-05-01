@@ -1,6 +1,7 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
 import android.Manifest
+import android.content.Context
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider
@@ -21,13 +22,20 @@ import androidx.test.rule.GrantPermissionRule
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.FirebaseInstance
+import com.github.factotum_sdp.factotum.models.DestinationRecord
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
+import com.github.factotum_sdp.factotum.roadBookDataStore
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeLeftTheRecordAt
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightTheRecordAt
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.PreferencesSetting
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.*
@@ -176,11 +184,29 @@ class RoadBookFragmentTest {
     // ============================================================================================
     // ================================== Update to Database Tests ================================
     @Test
-    fun roadBookIsBackedUpCorrectly() {
+    fun roadBookIsBackedUpCorrectlyWhenOnline() {
+        val db = FirebaseInstance.getDatabase()
         val date = Calendar.getInstance().time
-        val ref = FirebaseInstance.getDatabase().reference
+        val ref = db.reference
             .child("Sheet-shift")
             .child(SimpleDateFormat.getDateInstance().format(date))
+
+        // Our target value to fetch
+        // is represented as a List<String> in Firebase
+        val future = CompletableFuture<List<DestinationRecord>>()
+
+        ref.addListenerForSingleValueEvent(object: ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val records = snapshot.children.mapNotNull {
+                    it.getValue(DestinationRecord::class.java)
+                }
+                future.complete(records)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                future.completeExceptionally(error.toException())
+            }
+        })
 
         // Add 1 record
         newRecord()
@@ -193,22 +219,92 @@ class RoadBookFragmentTest {
         onView(withId(R.id.fragment_route_directors_parent))
         .check(matches(isDisplayed()))
 
+        assert(future.get().any { it.clientID == newRecordClientID})
+    }
+
+    @Test
+    fun roadBookIsBackedUpCorrectlyWhenOffline() {
+        val db = FirebaseInstance.getDatabase()
+        db.goOffline()
+        val context = ApplicationProvider.getApplicationContext<Context>().applicationContext
+
+        // Add 1 record
+        newRecord()
+
+        // Navigate out of the RoadBookFragment
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.routeFragment))
+            .perform(click())
+        onView(withId(R.id.fragment_route_directors_parent))
+            .check(matches(isDisplayed()))
+
+        var ls = emptyList<DestinationRecord>()
+        runBlocking {
+            ls = context.roadBookDataStore.data.first()
+        }
+
+        db.goOnline()
+        assert(ls.any { it.clientID == newRecordClientID})
+    }
+
+    @Test
+    fun networkAndLocalBackUpConsistency() {
+        val db = FirebaseInstance.getDatabase()
+
+        val date = Calendar.getInstance().time
+        val ref = db.reference
+            .child("Sheet-shift")
+            .child(SimpleDateFormat.getDateInstance().format(date))
+
         // Our target value to fetch
         // is represented as a List<String> in Firebase
-        val future = CompletableFuture<List<String>>()
+        val future = CompletableFuture<List<DestinationRecord>>()
 
-        ref.get().addOnSuccessListener {
-            if (it.value == null) {
-            // Set an exception in the future if our target value is not found in Firebase
-            future.completeExceptionally(NoSuchFieldException())
-        } else { // Necessary cast to access List methods
-            val ls: List<String> = it.value as List<String>
-            future.complete(ls)
-            assert(ls.size == DestinationRecords.RECORDS.size + 1)
+        ref.addListenerForSingleValueEvent(object: ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val records = snapshot.children.mapNotNull {
+                    it.getValue(DestinationRecord::class.java)
+                }
+                future.complete(records)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                future.completeExceptionally(error.toException())
+            }
+        })
+
+        // Add 1 record
+        newRecord()
+
+        // Navigate out of the RoadBookFragment
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.roadBookFragment))
+            .perform(click())
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.routeFragment)).perform(click())
+
+        db.goOffline()
+
+        // Navigate back to RoadBook and out again
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.routeFragment))
+            .perform(click())
+        onView(withId(R.id.fragment_route_directors_parent))
+            .check(matches(isDisplayed()))
+
+        var fromLocal: List<DestinationRecord>
+        val context = ApplicationProvider.getApplicationContext<Context>().applicationContext
+        runBlocking {
+            fromLocal = context.roadBookDataStore.data.first()
         }
-        }.addOnFailureListener {
-            future.completeExceptionally(it)
-        }
+
+        db.goOnline() // Convention after a call to goOffline()
+        val fromNetwork = future.get()
+        assert(fromLocal.zip(fromNetwork).all { pair -> pair.first.destID == pair.second.destID })
     }
 
     // ============================================================================================
@@ -720,10 +816,12 @@ class RoadBookFragmentTest {
         onView(withId(R.id.roadBookFragment))
             .perform(click())
     }
+
+    private val newRecordClientID = "New"
     private fun newRecord() {
         onView(withId(R.id.fab)).perform(click())
         onView(withId(R.id.autoCompleteClientID))
-            .perform(click(), typeText("New"), closeSoftKeyboard())
+            .perform(click(), typeText(newRecordClientID), closeSoftKeyboard())
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
     }
 

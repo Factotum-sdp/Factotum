@@ -21,13 +21,13 @@ import java.util.*
  */
 @Serializable
 data class DestinationRecord(
-    val destID: String,
-    val clientID: String,
-    @Serializable(with = DateKSerializer::class) val timeStamp: Date?,
-    val waitingTime: Int,
-    val rate: Int,
-    val actions: List<Action>,
-    val notes: String
+    val destID: String = "",
+    val clientID: String = "",
+    @Serializable(with = DateKSerializer::class) val timeStamp: Date? = null,
+    val waitingTime: Int = 0,
+    val rate: Int = 0,
+    val actions: List<Action> = emptyList(),
+    val notes: String = ""
 ) {
     companion object {
 

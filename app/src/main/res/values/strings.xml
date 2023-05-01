@@ -144,4 +144,6 @@
     <string name="roadbookpreferencescheckedtextview">RoadBookPreferencesCheckedTextView</string>
     <string name="application_settings">Application Settings</string>
     <string name="save_roadbook_preferences">Save RoadBook Preferences</string>
+    <string name="load_road_book_back_up">Load RoadBook back-up</string>
+    <string name="delete_all_roadbook">Delete all RoadBook</string>
 </resources>

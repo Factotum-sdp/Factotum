@@ -22,6 +22,7 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : Vi
 
     private val clientOccurrences = HashMap<String, Int>()
     private lateinit var preferencesRepository: RoadBookPreferencesRepository
+    private val backUps = roadBookRepository.backUpFlow.asLiveData()
 
     init {
         addDemoRecords(DestinationRecords.RECORDS)
@@ -72,7 +73,22 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : Vi
      * Send the current recordsList data to the Database referenced at construction time
      */
     fun backUp() {
-        roadBookRepository.backUp(currentDRecList())
+        roadBookRepository.setBackUp(currentDRecList())
+    }
+
+    /**
+     * Replace the current displayed list by the last available back up of the RoadBookRepository
+     *
+     * Note that the the back up don't take into account the archiving state, all fetched from
+     * back up records are no more archived.
+     */
+    fun fetchBackBackUps(){
+        backUps.value?.let {
+            if (currentDRecList().showArchived)
+                _recordsList.value = it.withArchived()
+            else
+                _recordsList.value = it.withoutArchived()
+        }
     }
 
     fun timestampNextDestinationRecord(timeStamp: Date) {
@@ -255,6 +271,13 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : Vi
             )
         }
         _recordsList.value = currentDRecList().replaceDisplayedList(newList)
+    }
+
+    /**
+     * Clear all records
+     */
+    fun clearAllRecords(){
+        _recordsList.value = DRecordList(emptyList())
     }
 
     private fun currentDRecList(): DRecordList {

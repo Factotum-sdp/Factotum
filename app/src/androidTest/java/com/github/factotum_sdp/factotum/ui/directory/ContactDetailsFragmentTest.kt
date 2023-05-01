@@ -1,6 +1,7 @@
 package com.github.factotum_sdp.factotum.ui.directory
 
 import android.content.Intent
+import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
@@ -187,12 +188,15 @@ class ContactDetailsFragmentTest {
     @Test
     fun buttonShowDestination() {
         onView(withId(R.id.show_all_button)).perform(click())
-        if (LocationUtils.hasLocationPopUp()) {
-            val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-            device.findObject(UiSelector().textContains(LocationUtils.buttonTextAllow)).click()
-        }
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        if (LocationUtils.hasLocationPopUp()) {
+            device.findObject(UiSelector().textContains(LocationUtils.buttonTextAllow)).click()
+        } else {
+            Log.d("Location", "No pop up")
+        }
         val markers = device.wait(hasObject(By.descContains("Destination")), 5000L)
+        Log.d("Location", "has timed out: ${!device.hasObject(By.descContains("Destination"))}")
+        Log.d("Location", "Markers: $markers")
         assertTrue(markers)
     }
 }

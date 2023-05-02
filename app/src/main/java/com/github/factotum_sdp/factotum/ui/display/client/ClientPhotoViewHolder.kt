@@ -1,11 +1,11 @@
-package com.github.factotum_sdp.factotum.ui.display.utils
+package com.github.factotum_sdp.factotum.ui.display.client
 
 import android.net.Uri
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.databinding.DisplayItemBinding
 import com.google.firebase.storage.StorageReference
 
-class PhotoViewHolder(
+class ClientPhotoViewHolder(
     private val binding: DisplayItemBinding,
     private val onShareClick: (StorageReference) -> Unit,
     private val onCardClick: (Uri) -> Unit

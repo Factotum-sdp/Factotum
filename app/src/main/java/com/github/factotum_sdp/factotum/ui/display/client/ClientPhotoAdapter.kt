@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum.ui.display.utils
+package com.github.factotum_sdp.factotum.ui.display.client
 
 import android.net.Uri
 import android.view.LayoutInflater
@@ -8,17 +8,17 @@ import com.github.factotum_sdp.factotum.databinding.DisplayItemBinding
 import com.google.firebase.storage.StorageReference
 
 // Adapter for displaying photos in the recycler view
-class PhotoAdapter(
+class ClientPhotoAdapter(
     private val onShareClick: (StorageReference) -> Unit = {},
     private val onCardClick: (Uri) -> Unit = {}
-) : ListAdapter<StorageReference, PhotoViewHolder>(PhotoDiffCallback()) {
+) : ListAdapter<StorageReference, ClientPhotoViewHolder>(ClientPhotoDiffCallback()) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ClientPhotoViewHolder {
         val binding = DisplayItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return PhotoViewHolder(binding, onShareClick, onCardClick)
+        return ClientPhotoViewHolder(binding, onShareClick, onCardClick)
     }
 
-    override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ClientPhotoViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 }

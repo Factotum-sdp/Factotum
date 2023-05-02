@@ -18,7 +18,13 @@ import androidx.test.internal.runner.junit4.statement.UiThreadStatement
 import androidx.test.platform.app.InstrumentationRegistry
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.ui.display.utils.*
+import com.github.factotum_sdp.factotum.ui.display.client.*
+import com.github.factotum_sdp.factotum.ui.display.utils.TEST_IMAGE_PATH1
+import com.github.factotum_sdp.factotum.ui.display.utils.TEST_IMAGE_PATH2
+import com.github.factotum_sdp.factotum.ui.display.utils.TEST_IMAGE_PATH3
+import com.github.factotum_sdp.factotum.ui.display.utils.TEST_IMAGE_PATH4
+import com.github.factotum_sdp.factotum.ui.display.utils.hasItemCount
+import com.github.factotum_sdp.factotum.ui.display.utils.uploadImageToStorageEmulator
 import com.github.factotum_sdp.factotum.ui.picture.emptyFirebaseStorage
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase

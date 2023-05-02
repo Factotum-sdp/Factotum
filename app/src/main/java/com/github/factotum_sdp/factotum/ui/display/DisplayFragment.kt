@@ -15,7 +15,9 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.databinding.FragmentDisplayBinding
 import com.github.factotum_sdp.factotum.models.Role
-import com.github.factotum_sdp.factotum.ui.display.utils.PhotoAdapter
+import com.github.factotum_sdp.factotum.ui.display.client.ClientDisplayViewModel
+import com.github.factotum_sdp.factotum.ui.display.client.ClientDisplayViewModelFactory
+import com.github.factotum_sdp.factotum.ui.display.client.ClientPhotoAdapter
 import com.google.firebase.storage.StorageReference
 
 
@@ -23,7 +25,7 @@ import com.google.firebase.storage.StorageReference
 class DisplayFragment : Fragment() {
 
     // View model for this fragment
-    private val viewModel: DisplayViewModel by viewModels { DisplayViewModelFactory(userID) }
+    private val viewModel: ClientDisplayViewModel by viewModels { ClientDisplayViewModelFactory(userID) }
     private val userViewModel: UserViewModel by activityViewModels()
     private var _binding: FragmentDisplayBinding? = null
     private val binding get() = _binding!!
@@ -116,7 +118,7 @@ class DisplayFragment : Fragment() {
         }
 
         // Set up the recycler view with a photo adapter
-        val photoAdapter = PhotoAdapter(
+        val photoAdapter = ClientPhotoAdapter(
             onShareClick = { storageReference ->
                 shareImage(storageReference, PHONE_NUMBER)
             },

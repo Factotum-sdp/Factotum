@@ -64,8 +64,10 @@ class DisplayFragmentTest {
     fun setUp() {
         GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
         testRule.scenario.onActivity { activity ->
-            loginMenuIdlingResource = LoginMenuIdlingResource(activity)
-            IdlingRegistry.getInstance().register(loginMenuIdlingResource)
+            activity.runOnUiThread {
+                loginMenuIdlingResource = LoginMenuIdlingResource(activity)
+                IdlingRegistry.getInstance().register(loginMenuIdlingResource)
+            }
         }
         context = InstrumentationRegistry.getInstrumentation().context
     }

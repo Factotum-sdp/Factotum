@@ -61,8 +61,10 @@ class PictureFragmentOnlineTest {
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         GeneralUtils.fillUserEntryAndEnterTheApp("courier@gmail.com", "123456")
         testRule.scenario.onActivity { activity ->
-            loginMenuIdlingResource = LoginMenuIdlingResource(activity)
-            IdlingRegistry.getInstance().register(loginMenuIdlingResource)
+            activity.runOnUiThread {
+                loginMenuIdlingResource = LoginMenuIdlingResource(activity)
+                IdlingRegistry.getInstance().register(loginMenuIdlingResource)
+            }
         }
 
         goToPictureFragment()

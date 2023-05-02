@@ -170,7 +170,7 @@ class MainActivity : AppCompatActivity() {
         if (role == Role.COURIER) {
             CoroutineScope(Dispatchers.IO).launch {
                 val uploadWorkRequest =
-                    PeriodicWorkRequestBuilder<UploadWorker>(INTERVAL_UPLOAD_TIME, TimeUnit.MINUTES)
+                    PeriodicWorkRequestBuilder<UploadWorker>(INTERVAL_UPLOAD_TIME_MINUTE, TimeUnit.MINUTES)
                         .build()
                 WorkManager.getInstance(this@MainActivity).enqueue(uploadWorkRequest)
             }
@@ -202,7 +202,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private var database: FirebaseDatabase = Firebase.database
         private var auth: FirebaseAuth = Firebase.auth
-        const val INTERVAL_UPLOAD_TIME = 5L
+        const val INTERVAL_UPLOAD_TIME_MINUTE = 5L
 
         fun getDatabase(): FirebaseDatabase {
             return database

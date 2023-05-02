@@ -233,15 +233,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
                             R.string.shift_ended,
                             Toast.LENGTH_SHORT
                         ).show()}
-                        ?: run {
-                            Toast.makeText(
-                                requireContext(),
-                                R.string.user_not_found,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            dialog.cancel()
-                        }
-
                 }
                 .setNegativeButton("Not now") { dialog, _ ->
                     dialog.cancel()

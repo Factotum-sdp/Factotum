@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -21,7 +20,6 @@ import com.github.factotum_sdp.factotum.ui.display.utils.*
 import com.github.factotum_sdp.factotum.ui.picture.emptyFirebaseStorage
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
-import com.github.factotum_sdp.factotum.utils.LoginMenuIdlingResource
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
@@ -35,11 +33,12 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class DisplayFragmentTest {
 
+    private lateinit var context: Context
+
     @get:Rule
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
     )
-
 
     companion object {
         @JvmStatic
@@ -57,16 +56,10 @@ class DisplayFragmentTest {
         }
     }
 
-    private lateinit var context: Context
-    private lateinit var loginMenuIdlingResource: IdlingResource
 
     @Before
     fun setUp() {
         GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
-        testRule.scenario.onActivity { activity ->
-            loginMenuIdlingResource = LoginMenuIdlingResource(activity)
-            IdlingRegistry.getInstance().register(loginMenuIdlingResource)
-        }
         context = InstrumentationRegistry.getInstrumentation().context
     }
 
@@ -74,7 +67,6 @@ class DisplayFragmentTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @After
     fun tearDown() = runTest {
-        IdlingRegistry.getInstance().unregister(loginMenuIdlingResource)
         launch { emptyFirebaseStorage(FirebaseStorage.getInstance().reference) }.join()
     }
 

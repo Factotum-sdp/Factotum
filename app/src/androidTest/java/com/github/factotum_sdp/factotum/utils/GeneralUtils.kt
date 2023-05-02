@@ -64,8 +64,6 @@ class GeneralUtils {
                 closeSoftKeyboard()
             )
             onView(withId(R.id.login)).perform(click())
-
-            runBlocking { delay(WAIT_TIME_LOGIN) }
         }
     }
 }

@@ -32,6 +32,7 @@ class PictureFragmentOfflineTest {
         File(externalDir, "/Android/data/com.github.factotum_sdp.factotum/files/Pictures")
     private lateinit var loginMenuIdlingResource: IdlingResource
 
+
     @get:Rule
     val permissionsRule: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
 

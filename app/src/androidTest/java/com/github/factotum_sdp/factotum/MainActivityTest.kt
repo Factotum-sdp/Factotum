@@ -4,6 +4,8 @@ import android.view.Gravity
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.Espresso.pressBackUnconditionally
+import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -16,6 +18,7 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
+import com.github.factotum_sdp.factotum.utils.LoginMenuIdlingResource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -32,6 +35,8 @@ class MainActivityTest {
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
     )
+
+    private lateinit var loginMenuIdlingResource: IdlingResource
 
     companion object {
         @OptIn(ExperimentalCoroutinesApi::class)
@@ -129,10 +134,15 @@ class MainActivityTest {
         )
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun pressingBackOnAMenuFragmentLeadsToRBFragment() = runTest {
         // First need to login to trigger the change of navGraph's start fragment
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
+        testRule.scenario.onActivity { activity ->
+            loginMenuIdlingResource = LoginMenuIdlingResource(activity)
+            IdlingRegistry.getInstance().register(loginMenuIdlingResource)
+        }
 
         navigateToAndPressBackLeadsToRB(R.id.directoryFragment)
         navigateToAndPressBackLeadsToRB(R.id.displayFragment)
@@ -149,7 +159,11 @@ class MainActivityTest {
     @Test
     fun pressingBackOnRBFragmentLeadsOutOfTheApp() {
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
-        
+        testRule.scenario.onActivity { activity ->
+            loginMenuIdlingResource = LoginMenuIdlingResource(activity)
+            IdlingRegistry.getInstance().register(loginMenuIdlingResource)
+        }
+
         pressBackUnconditionally()
         val uiDevice = UiDevice.getInstance(getInstrumentation())
         assertFalse(uiDevice.currentPackageName == "com.github.factotum_sdp.factotum")
@@ -159,6 +173,10 @@ class MainActivityTest {
     @Test
     fun navHeaderDisplaysUserData() {
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
+        testRule.scenario.onActivity { activity ->
+            loginMenuIdlingResource = LoginMenuIdlingResource(activity)
+            IdlingRegistry.getInstance().register(loginMenuIdlingResource)
+        }
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("boss@gmail.com")).check(matches(isDisplayed()))
@@ -168,6 +186,10 @@ class MainActivityTest {
     @Test
     fun drawerMenuIsCorrectlyDisplayedForBoss() {
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
+        testRule.scenario.onActivity { activity ->
+            loginMenuIdlingResource = LoginMenuIdlingResource(activity)
+            IdlingRegistry.getInstance().register(loginMenuIdlingResource)
+        }
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
 
         // Check that the menu items are displayed
@@ -180,6 +202,10 @@ class MainActivityTest {
     @Test
     fun drawerMenuIsCorrectlyDisplayedForClient() {
         GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
+        testRule.scenario.onActivity { activity ->
+            loginMenuIdlingResource = LoginMenuIdlingResource(activity)
+            IdlingRegistry.getInstance().register(loginMenuIdlingResource)
+        }
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
 
         // Check that the menu items are displayed
@@ -193,7 +219,10 @@ class MainActivityTest {
     // The second user Helen Bates can't be found
     private fun navHeaderStillDisplaysCorrectlyAfterLogout() {
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
-
+        testRule.scenario.onActivity { activity ->
+            loginMenuIdlingResource = LoginMenuIdlingResource(activity)
+            IdlingRegistry.getInstance().register(loginMenuIdlingResource)
+        }
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("boss@gmail.com")).check(matches(isDisplayed()))
         onView(withText("Boss (BOSS)")).check(matches(isDisplayed()))

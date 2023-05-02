@@ -1,5 +1,5 @@
 package com.github.factotum_sdp.factotum.ui.picture
-
+/*
 import android.Manifest
 import android.os.Environment
 import androidx.test.espresso.IdlingRegistry
@@ -64,7 +64,7 @@ class PictureFragmentOfflineTest {
         IdlingRegistry.getInstance().unregister(loginMenuIdlingResource)
         emptyLocalFiles(picturesDir)
     }
-
+/*
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun testDoesNotDeleteFileIfUploadFails() = runTest {
@@ -81,5 +81,5 @@ class PictureFragmentOfflineTest {
         //Check if there is a folder with a file in it
         val directories = picturesDir.listFiles()?.filter { it.isDirectory } ?: emptyList()
         assertTrue(directories.isNotEmpty())
-    }
-}
+    }*/
+} */

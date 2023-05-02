@@ -69,7 +69,7 @@ fun triggerCancel(device: UiDevice) {
 
 fun goToPictureFragment() {
     // Click on one of the roadbook
-    val destID = DestinationRecords.RECORDS[2].destID
+    val destID = DestinationRecords.RECORDS[0].destID
     onView(withText(destID)).perform(click())
 
     // Go to the picture fragment

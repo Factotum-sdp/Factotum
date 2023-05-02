@@ -48,7 +48,7 @@ class ContactsUpdateTest {
     @Before
     fun setUp() {
         runTest {
-            LoginUtils.loginRoutine()
+            GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
             onView(withId(R.id.drawer_layout))
                 .perform(DrawerActions.open())
             onView(withId(R.id.directoryFragment))

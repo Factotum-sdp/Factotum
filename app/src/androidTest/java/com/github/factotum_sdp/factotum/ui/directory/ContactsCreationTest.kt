@@ -14,8 +14,8 @@ import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.Contact
+import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
-import com.github.factotum_sdp.factotum.utils.LoginUtils
 import junit.framework.TestCase.*
 import org.junit.Before
 import org.junit.BeforeClass
@@ -39,7 +39,7 @@ class ContactsCreationTest {
 
     @Before
     fun setUp() {
-        LoginUtils.loginRoutine()
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.directoryFragment))
@@ -138,31 +138,31 @@ class ContactsCreationTest {
 
      */
 
-/*
-    @Test
-    fun writeInAddressFieldMakesDropDown() {
-        val city = "Lausanne"
-        onView(withId(androidx.appcompat.R.id.search_src_text)).perform(typeText(city.dropLast(2)))
-        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        val result = device.wait(Until.hasObject(textContains(city)), 5000)
-        assertTrue(result)
-    }
+    /*
+        @Test
+        fun writeInAddressFieldMakesDropDown() {
+            val city = "Lausanne"
+            onView(withId(androidx.appcompat.R.id.search_src_text)).perform(typeText(city.dropLast(2)))
+            val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+            val result = device.wait(Until.hasObject(textContains(city)), 5000)
+            assertTrue(result)
+        }
 
 
-    @Test
-    fun selectSuggestionWritesAddress() {
-        val city = "Lausanne"
-        onView(withId(androidx.appcompat.R.id.search_src_text)).perform(typeText(city))
-        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        val lausanneResult =
-            Location.geocoderQuery(city, getApplicationContext())!![0].getAddressLine(0)
-        val address = device.findObject(text(city))
-        val result = device.wait(Until.hasObject(text(lausanneResult)), 5000)
-        assertTrue(result)
-        device.findObject(text(lausanneResult)).click()
-        val addressChanged = address.wait(Until.textMatches(lausanneResult), 5000)
-        assertTrue(addressChanged)
-    }
-    */
+        @Test
+        fun selectSuggestionWritesAddress() {
+            val city = "Lausanne"
+            onView(withId(androidx.appcompat.R.id.search_src_text)).perform(typeText(city))
+            val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+            val lausanneResult =
+                Location.geocoderQuery(city, getApplicationContext())!![0].getAddressLine(0)
+            val address = device.findObject(text(city))
+            val result = device.wait(Until.hasObject(text(lausanneResult)), 5000)
+            assertTrue(result)
+            device.findObject(text(lausanneResult)).click()
+            val addressChanged = address.wait(Until.textMatches(lausanneResult), 5000)
+            assertTrue(addressChanged)
+        }
+        */
 
 }

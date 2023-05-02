@@ -16,8 +16,8 @@ import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.utils.ContactsUtils
+import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
-import com.github.factotum_sdp.factotum.utils.LoginUtils
 import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.BeforeClass
@@ -45,7 +45,7 @@ class DirectoryFragmentTest {
 
     @Before
     fun setUp() {
-        LoginUtils.loginRoutine()
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.directoryFragment))

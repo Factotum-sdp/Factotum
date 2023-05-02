@@ -68,14 +68,13 @@ class PictureFragmentOfflineTest {
         emptyLocalFiles(picturesDir)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun testDoesNotDeleteFileIfUploadFails() = runTest {
+    fun testDoesNotDeleteFileIfUploadFails() = runBlocking {
 
         triggerShutter(device)
         triggerDone(device)
 
-        runBlocking { delay(TIME_WAIT_UPLOAD_PHOTO) }
+        delay(TIME_WAIT_UPLOAD_PHOTO)
 
         GeneralUtils.getStorage().reference.child(CLIENT_ID).listAll().addOnSuccessListener {
                 fail("Should not succeed")

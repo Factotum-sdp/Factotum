@@ -107,12 +107,10 @@ class DisplayFragmentTest {
         //Press on the refresh button
         onView(withId(R.id.refreshButton)).perform(click())
 
-
         launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
 
         //Press on the refresh button
         onView(withId(R.id.refreshButton)).perform(click())
-
 
         val recyclerView = onView(withId(R.id.recyclerView))
         recyclerView.check(matches(hasItemCount(2)))

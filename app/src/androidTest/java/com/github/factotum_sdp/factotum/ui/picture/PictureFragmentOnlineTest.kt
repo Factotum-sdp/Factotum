@@ -56,7 +56,7 @@ class PictureFragmentOnlineTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Before
-    fun setUp() = runTest{
+    fun setUp() = runTest {
         emptyLocalFiles(picturesDir)
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         GeneralUtils.fillUserEntryAndEnterTheApp("courier@gmail.com", "123456")
@@ -106,12 +106,11 @@ class PictureFragmentOnlineTest {
 //    }
 
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun testCancelPhoto() = runTest {
+    fun testCancelPhoto() = runBlocking {
         triggerCancel(device)
 
-        runBlocking { delay(TIME_WAIT_PHOTO_DELETE) }
+        delay(TIME_WAIT_PHOTO_DELETE)
 
         val localFolder = File(picturesDir, CLIENT_ID)
         assertTrue(localFolder.listFiles()?.isEmpty() == true)

@@ -14,6 +14,7 @@ import androidx.test.espresso.contrib.DrawerMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.internal.runner.junit4.statement.UiThreadStatement
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
@@ -140,7 +141,7 @@ class MainActivityTest {
         // First need to login to trigger the change of navGraph's start fragment
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         testRule.scenario.onActivity { activity ->
-            activity.runOnUiThread{
+            UiThreadStatement.runOnUiThread{
                 loginMenuIdlingResource = LoginMenuIdlingResource(activity)
                 IdlingRegistry.getInstance().register(loginMenuIdlingResource)
             }
@@ -162,7 +163,7 @@ class MainActivityTest {
     fun pressingBackOnRBFragmentLeadsOutOfTheApp() {
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         testRule.scenario.onActivity { activity ->
-            activity.runOnUiThread{
+            UiThreadStatement.runOnUiThread{
                 loginMenuIdlingResource = LoginMenuIdlingResource(activity)
                 IdlingRegistry.getInstance().register(loginMenuIdlingResource)
             }
@@ -178,7 +179,7 @@ class MainActivityTest {
     fun navHeaderDisplaysUserData() {
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         testRule.scenario.onActivity { activity ->
-            activity.runOnUiThread{
+            UiThreadStatement.runOnUiThread{
                 loginMenuIdlingResource = LoginMenuIdlingResource(activity)
                 IdlingRegistry.getInstance().register(loginMenuIdlingResource)
             }
@@ -193,7 +194,7 @@ class MainActivityTest {
     fun drawerMenuIsCorrectlyDisplayedForBoss() {
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         testRule.scenario.onActivity { activity ->
-            activity.runOnUiThread{
+            UiThreadStatement.runOnUiThread{
                 loginMenuIdlingResource = LoginMenuIdlingResource(activity)
                 IdlingRegistry.getInstance().register(loginMenuIdlingResource)
             }
@@ -211,7 +212,7 @@ class MainActivityTest {
     fun drawerMenuIsCorrectlyDisplayedForClient() {
         GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
         testRule.scenario.onActivity { activity ->
-            activity.runOnUiThread{
+            UiThreadStatement.runOnUiThread{
                 loginMenuIdlingResource = LoginMenuIdlingResource(activity)
                 IdlingRegistry.getInstance().register(loginMenuIdlingResource)
             }
@@ -230,7 +231,7 @@ class MainActivityTest {
     private fun navHeaderStillDisplaysCorrectlyAfterLogout() {
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         testRule.scenario.onActivity { activity ->
-            activity.runOnUiThread{
+            UiThreadStatement.runOnUiThread{
                 loginMenuIdlingResource = LoginMenuIdlingResource(activity)
                 IdlingRegistry.getInstance().register(loginMenuIdlingResource)
             }
@@ -243,7 +244,14 @@ class MainActivityTest {
         onView(withId(R.id.signoutButton)).perform(click())
         
         GeneralUtils.fillUserEntryAndEnterTheApp("helen.bates@gmail.com", "123456")
-        
+
+        testRule.scenario.onActivity { activity ->
+            UiThreadStatement.runOnUiThread{
+                loginMenuIdlingResource = LoginMenuIdlingResource(activity)
+                IdlingRegistry.getInstance().register(loginMenuIdlingResource)
+            }
+        }
+
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("helen.bates@gmail.com")).check(matches(isDisplayed()))
         onView(withText("Helen Bates (COURIER)")).check(matches(isDisplayed()))

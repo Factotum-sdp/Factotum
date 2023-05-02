@@ -14,6 +14,7 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.*
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.internal.runner.junit4.statement.UiThreadStatement
 import androidx.test.platform.app.InstrumentationRegistry
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
@@ -64,7 +65,7 @@ class DisplayFragmentTest {
     fun setUp() {
         GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
         testRule.scenario.onActivity { activity ->
-            activity.runOnUiThread {
+            UiThreadStatement.runOnUiThread {
                 loginMenuIdlingResource = LoginMenuIdlingResource(activity)
                 IdlingRegistry.getInstance().register(loginMenuIdlingResource)
             }

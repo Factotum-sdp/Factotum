@@ -6,6 +6,7 @@ import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.IdlingResource
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.internal.runner.junit4.statement.UiThreadStatement
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
@@ -61,7 +62,7 @@ class PictureFragmentOnlineTest {
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         GeneralUtils.fillUserEntryAndEnterTheApp("courier@gmail.com", "123456")
         testRule.scenario.onActivity { activity ->
-            activity.runOnUiThread {
+            UiThreadStatement.runOnUiThread {
                 loginMenuIdlingResource = LoginMenuIdlingResource(activity)
                 IdlingRegistry.getInstance().register(loginMenuIdlingResource)
             }

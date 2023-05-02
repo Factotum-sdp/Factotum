@@ -26,13 +26,6 @@ import java.io.File
 
 @RunWith(AndroidJUnit4::class)
 class PictureFragmentOfflineTest {
-
-    //just to keep class
-    @Test
-    fun test() {
-        assertTrue(true)
-    }
-    /*
     private lateinit var device: UiDevice
     private val externalDir = Environment.getExternalStorageDirectory()
     private val picturesDir =
@@ -89,6 +82,4 @@ class PictureFragmentOfflineTest {
         val directories = picturesDir.listFiles()?.filter { it.isDirectory } ?: emptyList()
         assertTrue(directories.isNotEmpty())
     }
-
-     */
 }

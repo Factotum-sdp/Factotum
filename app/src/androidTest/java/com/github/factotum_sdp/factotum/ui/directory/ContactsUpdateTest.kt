@@ -48,6 +48,7 @@ class ContactsUpdateTest {
     @Before
     fun setUp() {
         runTest {
+            LoginUtils.loginRoutine()
             onView(withId(R.id.drawer_layout))
                 .perform(DrawerActions.open())
             onView(withId(R.id.directoryFragment))

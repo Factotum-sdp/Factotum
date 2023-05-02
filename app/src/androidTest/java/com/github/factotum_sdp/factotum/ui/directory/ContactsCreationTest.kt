@@ -15,6 +15,7 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.Contact
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
+import com.github.factotum_sdp.factotum.utils.LoginUtils
 import junit.framework.TestCase.*
 import org.junit.Before
 import org.junit.BeforeClass
@@ -38,6 +39,7 @@ class ContactsCreationTest {
 
     @Before
     fun setUp() {
+        LoginUtils.loginRoutine()
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.directoryFragment))

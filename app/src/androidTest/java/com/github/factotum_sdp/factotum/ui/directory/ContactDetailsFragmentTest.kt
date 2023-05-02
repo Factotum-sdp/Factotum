@@ -23,6 +23,7 @@ import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
 import com.github.factotum_sdp.factotum.utils.ContactsUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.LocationUtils
+import com.github.factotum_sdp.factotum.utils.LoginUtils
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -56,6 +57,7 @@ class ContactDetailsFragmentTest {
             runBlocking {
                 ContactsUtils.populateDatabase(5)
             }
+            LoginUtils.loginRoutine()
             onView(withId(R.id.drawer_layout))
                 .perform(DrawerActions.open())
             onView(withId(R.id.directoryFragment))

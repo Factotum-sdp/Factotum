@@ -85,7 +85,7 @@ data class DestinationRecord(
         fun parseTimestamp(userEntry: String): Date? {
             if (userEntry.isEmpty())
                 return null
-            return SimpleDateFormat.getTimeInstance().parse(userEntry)
+            return SimpleDateFormat.getTimeInstance(DateFormat.DEFAULT, Locale.ENGLISH).parse(userEntry)
         }
 
         fun parseActions(actions: String): List<Action> {

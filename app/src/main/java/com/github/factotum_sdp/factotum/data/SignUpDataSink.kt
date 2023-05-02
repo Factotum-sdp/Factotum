@@ -1,6 +1,5 @@
 package com.github.factotum_sdp.factotum.data
 
-import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.data.LoginDataSource.Companion.DISPATCH_DB_PATH
 import com.github.factotum_sdp.factotum.models.User
 import java.io.IOException

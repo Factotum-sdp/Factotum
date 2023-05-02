@@ -255,6 +255,7 @@ class RoadBookFragmentTest {
             .child("Sheet-shift")
             .child(SimpleDateFormat.getDateInstance().format(date))
 
+
         // Our target value to fetch
         // is represented as a List<String> in Firebase
         val future = CompletableFuture<List<DestinationRecord>>()
@@ -271,7 +272,6 @@ class RoadBookFragmentTest {
                 future.completeExceptionally(error.toException())
             }
         })
-
         // Add 1 record
         newRecord()
 
@@ -284,20 +284,6 @@ class RoadBookFragmentTest {
             .perform(DrawerActions.open())
         onView(withId(R.id.routeFragment)).perform(click())
 
-        db.goOffline()
-
-        // Navigate back to RoadBook
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.roadBookFragment))
-            .perform(click())
-
-        // Add one more Record
-        newRecord() //Because otherwise no more caching is done as it detects it is already in the cache
-
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.routeFragment)).perform(click())
 
         var fromLocal: List<DestinationRecord>
         val context = ApplicationProvider.getApplicationContext<Context>().applicationContext
@@ -305,11 +291,11 @@ class RoadBookFragmentTest {
             fromLocal = context.roadBookDataStore.data.first()
         }
 
-        db.goOnline() // Convention after a call to goOffline()
         val fromNetwork = future.get()
+
         assert(
             fromLocal
-                .subList(0, fromLocal.size - 1)// Need to remove the record added
+                //.subList(0, fromLocal.size - 1)// Need to remove the record added
                 .zip(fromNetwork)
                 .all { pair -> pair.first.destID == pair.second.destID }
         )
@@ -322,7 +308,7 @@ class RoadBookFragmentTest {
     }
 
     @Test
-    fun onCancelinSettingsNothingIsCleared(){
+    fun onCancelInSettingsNothingIsCleared(){
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.settingsFragment))

@@ -186,7 +186,7 @@ class MainActivityTest {
 
     @Test
     fun drawerMenuIsCorrectlyDisplayedForClient() {
-        loginUser("boss@gmail.com", "123456")
+        loginUser("client@gmail.com", "123456")
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
 
         // Check that the menu items are displayed
@@ -215,15 +215,14 @@ class MainActivityTest {
     }
 
 
-    private fun loginUser(email: String, password: String) {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun loginUser(email: String, password: String) = runTest {
+        GeneralUtils.fillUserEntryAndEnterTheApp(email, password)
         testRule.scenario.onActivity { activity ->
-            UiThreadStatement.runOnUiThread {
-                GeneralUtils.fillUserEntryAndEnterTheApp(email, password)
-                loginMenuIdlingResource = LoginMenuIdlingResource(activity)
-                IdlingRegistry.getInstance().register(loginMenuIdlingResource)
-            }
-        }
+            loginMenuIdlingResource = LoginMenuIdlingResource(activity)
+            IdlingRegistry.getInstance().register(loginMenuIdlingResource) }
     }
+}
 
     /*
     @Test
@@ -265,4 +264,3 @@ class MainActivityTest {
             }
         }
     } */
-}

@@ -4,8 +4,6 @@ import android.view.Gravity
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.Espresso.pressBackUnconditionally
-import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -14,13 +12,13 @@ import androidx.test.espresso.contrib.DrawerMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.internal.runner.junit4.statement.UiThreadStatement
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
-import com.github.factotum_sdp.factotum.utils.LoginMenuIdlingResource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -37,7 +35,6 @@ class MainActivityTest {
         MainActivity::class.java
     )
 
-    private lateinit var loginMenuIdlingResource: IdlingResource
 
     companion object {
         @OptIn(ExperimentalCoroutinesApi::class)
@@ -139,12 +136,11 @@ class MainActivityTest {
     @Test
     fun pressingBackOnAMenuFragmentLeadsToRBFragment() = runTest {
         // First need to login to trigger the change of navGraph's start fragment
-       loginUser("boss@gmail.com", "123456")
+        loginUser("boss@gmail.com", "123456")
 
         navigateToAndPressBackLeadsToRB(R.id.directoryFragment)
         navigateToAndPressBackLeadsToRB(R.id.displayFragment)
         navigateToAndPressBackLeadsToRB(R.id.routeFragment)
-        IdlingRegistry.getInstance().unregister(loginMenuIdlingResource)
     }
 
 
@@ -162,7 +158,6 @@ class MainActivityTest {
         val uiDevice = UiDevice.getInstance(getInstrumentation())
         assertFalse(uiDevice.currentPackageName == "com.github.factotum_sdp.factotum")
         assertTrue(uiDevice.isScreenOn)
-        IdlingRegistry.getInstance().unregister(loginMenuIdlingResource)
     }
 
     @Test
@@ -172,7 +167,6 @@ class MainActivityTest {
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("boss@gmail.com")).check(matches(isDisplayed()))
         onView(withText("Boss (BOSS)")).check(matches(isDisplayed()))
-        IdlingRegistry.getInstance().unregister(loginMenuIdlingResource)
     }
 
     @Test
@@ -185,7 +179,6 @@ class MainActivityTest {
         onView(withText("Directory")).check(matches(isDisplayed()))
         onView(withText("Maps")).check(matches(isDisplayed()))
         onView(withText("View Proof Pictures")).check(matches(isDisplayed()))
-        IdlingRegistry.getInstance().unregister(loginMenuIdlingResource)
   }
 
     @Test
@@ -198,7 +191,6 @@ class MainActivityTest {
         onView(withText("Directory")).check(doesNotExist())
         onView(withText("Maps")).check(doesNotExist())
         onView(withText("View Proof Pictures")).check(matches(isDisplayed()))
-        IdlingRegistry.getInstance().unregister(loginMenuIdlingResource)
     }
 
     // Work when executing the scenario manually but emulators issues make it fails in the connectedCheck
@@ -217,17 +209,12 @@ class MainActivityTest {
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("helen.bates@gmail.com")).check(matches(isDisplayed()))
         onView(withText("Helen Bates (COURIER)")).check(matches(isDisplayed()))
-        IdlingRegistry.getInstance().unregister(loginMenuIdlingResource)
     }
 
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private fun loginUser(email: String, password: String) = runTest {
+    private fun loginUser(email: String, password: String) = runBlocking {
         GeneralUtils.fillUserEntryAndEnterTheApp(email, password)
-        testRule.scenario.onActivity { activity ->
-            loginMenuIdlingResource = LoginMenuIdlingResource(activity)
-            IdlingRegistry.getInstance().register(loginMenuIdlingResource) }
-
+        delay(1000)
     }
 }
 

@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -14,21 +13,13 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.*
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.internal.runner.junit4.statement.UiThreadStatement
 import androidx.test.platform.app.InstrumentationRegistry
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.ui.display.client.*
-import com.github.factotum_sdp.factotum.ui.display.utils.TEST_IMAGE_PATH1
-import com.github.factotum_sdp.factotum.ui.display.utils.TEST_IMAGE_PATH2
-import com.github.factotum_sdp.factotum.ui.display.utils.TEST_IMAGE_PATH3
-import com.github.factotum_sdp.factotum.ui.display.utils.TEST_IMAGE_PATH4
-import com.github.factotum_sdp.factotum.ui.display.utils.hasItemCount
-import com.github.factotum_sdp.factotum.ui.display.utils.uploadImageToStorageEmulator
+import com.github.factotum_sdp.factotum.ui.display.utils.*
 import com.github.factotum_sdp.factotum.ui.picture.emptyFirebaseStorage
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
-import com.github.factotum_sdp.factotum.utils.LoginMenuIdlingResource
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
@@ -42,11 +33,12 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class DisplayFragmentTest {
 
+    private lateinit var context: Context
+
     @get:Rule
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
     )
-
 
     companion object {
         @JvmStatic
@@ -64,19 +56,10 @@ class DisplayFragmentTest {
         }
     }
 
-    private lateinit var context: Context
-    private lateinit var loginMenuIdlingResource: IdlingResource
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Before
-    fun setUp() = runTest {
+    fun setUp() {
         GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
-        testRule.scenario.onActivity { activity ->
-            UiThreadStatement.runOnUiThread {
-                loginMenuIdlingResource = LoginMenuIdlingResource(activity)
-                IdlingRegistry.getInstance().register(loginMenuIdlingResource)
-            }
-        }
         context = InstrumentationRegistry.getInstrumentation().context
     }
 
@@ -84,7 +67,6 @@ class DisplayFragmentTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @After
     fun tearDown() = runTest {
-        IdlingRegistry.getInstance().unregister(loginMenuIdlingResource)
         launch { emptyFirebaseStorage(FirebaseStorage.getInstance().reference) }.join()
     }
 
@@ -115,10 +97,12 @@ class DisplayFragmentTest {
         //Press on the refresh button
         onView(withId(R.id.refreshButton)).perform(click())
 
+
         launch { uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
 
         //Press on the refresh button
         onView(withId(R.id.refreshButton)).perform(click())
+
 
         val recyclerView = onView(withId(R.id.recyclerView))
         recyclerView.check(matches(hasItemCount(2)))

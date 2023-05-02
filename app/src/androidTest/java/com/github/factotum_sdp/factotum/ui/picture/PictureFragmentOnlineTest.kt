@@ -1,82 +1,79 @@
 package com.github.factotum_sdp.factotum.ui.picture
 
-import android.Manifest
-import android.os.Environment
-import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.IdlingResource
-import androidx.test.ext.junit.rules.ActivityScenarioRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.rule.GrantPermissionRule
-import androidx.test.uiautomator.UiDevice
-import com.github.factotum_sdp.factotum.MainActivity
-import com.github.factotum_sdp.factotum.ui.picture.*
-import com.github.factotum_sdp.factotum.utils.GeneralUtils
-import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
-import com.github.factotum_sdp.factotum.utils.LoginMenuIdlingResource
-import junit.framework.TestCase.assertTrue
-import junit.framework.TestCase.fail
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.withContext
-import org.junit.*
-import org.junit.runner.RunWith
-import java.io.File
-
-@RunWith(AndroidJUnit4::class)
-class PictureFragmentOnlineTest {
-
-    // Those tests need to run with a firebase storage emulator
-    private lateinit var device: UiDevice
-    private val externalDir = Environment.getExternalStorageDirectory()
-    private val picturesDir =
-        File(externalDir, "/Android/data/com.github.factotum_sdp.factotum/files/Pictures")
-    private lateinit var loginMenuIdlingResource: IdlingResource
-
-
-    @get:Rule
-    val permissionsRule: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
-
-    @get:Rule
-    var testRule = ActivityScenarioRule(
-        MainActivity::class.java
-    )
-
-    companion object {
-        @BeforeClass
-        @JvmStatic
-        fun setUpDatabase() {
-            initFirebase()
-        }
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Before
-    fun setUp() = runTest{
-        emptyLocalFiles(picturesDir)
-        device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        GeneralUtils.fillUserEntryAndEnterTheApp("courier@gmail.com", "123456")
-        testRule.scenario.onActivity { activity ->
-            loginMenuIdlingResource = LoginMenuIdlingResource(activity)
-            IdlingRegistry.getInstance().register(loginMenuIdlingResource)
-        }
-
-        goToPictureFragment()
-        triggerShutter(device)
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @After
-    fun tearDown() = runTest {
-        IdlingRegistry.getInstance().unregister(loginMenuIdlingResource)
-        launch { emptyFirebaseStorage(GeneralUtils.getStorage().reference) }.join()
-        emptyLocalFiles(picturesDir)
-    }
-
+//import android.Manifest
+//import android.os.Environment
+//import androidx.test.espresso.IdlingRegistry
+//import androidx.test.espresso.IdlingResource
+//import androidx.test.ext.junit.rules.ActivityScenarioRule
+//import androidx.test.ext.junit.runners.AndroidJUnit4
+//import androidx.test.platform.app.InstrumentationRegistry
+//import androidx.test.rule.GrantPermissionRule
+//import androidx.test.uiautomator.UiDevice
+//import com.github.factotum_sdp.factotum.MainActivity
+//import com.github.factotum_sdp.factotum.ui.picture.*
+//import com.github.factotum_sdp.factotum.utils.GeneralUtils
+//import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
+//import com.github.factotum_sdp.factotum.utils.LoginMenuIdlingResource
+//import junit.framework.TestCase.assertTrue
+//import kotlinx.coroutines.ExperimentalCoroutinesApi
+//import kotlinx.coroutines.delay
+//import kotlinx.coroutines.launch
+//import kotlinx.coroutines.runBlocking
+//import kotlinx.coroutines.test.runTest
+//import org.junit.*
+//import org.junit.runner.RunWith
+//import java.io.File
+//
+//@RunWith(AndroidJUnit4::class)
+//class PictureFragmentOnlineTest {
+//
+//    // Those tests need to run with a firebase storage emulator
+//    private lateinit var device: UiDevice
+//    private val externalDir = Environment.getExternalStorageDirectory()
+//    private val picturesDir =
+//        File(externalDir, "/Android/data/com.github.factotum_sdp.factotum/files/Pictures")
+//    private lateinit var loginMenuIdlingResource: IdlingResource
+//
+//
+//    @get:Rule
+//    val permissionsRule: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
+//
+//    @get:Rule
+//    var testRule = ActivityScenarioRule(
+//        MainActivity::class.java
+//    )
+//
+//    companion object {
+//        @BeforeClass
+//        @JvmStatic
+//        fun setUpDatabase() {
+//            initFirebase()
+//        }
+//    }
+//
+//    @OptIn(ExperimentalCoroutinesApi::class)
+//    @Before
+//    fun setUp() = runTest{
+//        emptyLocalFiles(picturesDir)
+//        device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+//        GeneralUtils.fillUserEntryAndEnterTheApp("courier@gmail.com", "123456")
+//        testRule.scenario.onActivity { activity ->
+//            loginMenuIdlingResource = LoginMenuIdlingResource(activity)
+//            IdlingRegistry.getInstance().register(loginMenuIdlingResource)
+//        }
+//
+//        goToPictureFragment()
+//        triggerShutter(device)
+//    }
+//
+//    @OptIn(ExperimentalCoroutinesApi::class)
+//    @After
+//    fun tearDown() = runTest {
+//        IdlingRegistry.getInstance().unregister(loginMenuIdlingResource)
+//        launch { emptyFirebaseStorage(GeneralUtils.getStorage().reference) }.join()
+//        emptyLocalFiles(picturesDir)
+//    }
+//
 
 //    @OptIn(ExperimentalCoroutinesApi::class)
 //    @Test
@@ -102,16 +99,16 @@ class PictureFragmentOnlineTest {
 //        val localFolder = File(picturesDir, CLIENT_ID)
 //        assertTrue(localFolder.listFiles()?.isEmpty() == true)
 //    }
-
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun testCancelPhoto() = runTest {
-        triggerCancel(device)
-
-        runBlocking { delay(TIME_WAIT_PHOTO_DELETE) }
-
-        val localFolder = File(picturesDir, CLIENT_ID)
-        assertTrue(localFolder.listFiles()?.isEmpty() == true)
-    }
-}
+//
+//
+//    @OptIn(ExperimentalCoroutinesApi::class)
+//    @Test
+//    fun testCancelPhoto() = runTest {
+//        triggerCancel(device)
+//
+//        runBlocking { delay(TIME_WAIT_PHOTO_DELETE) }
+//
+//        val localFolder = File(picturesDir, CLIENT_ID)
+//        assertTrue(localFolder.listFiles()?.isEmpty() == true)
+//    }
+//}

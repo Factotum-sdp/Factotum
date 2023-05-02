@@ -140,8 +140,10 @@ class MainActivityTest {
         // First need to login to trigger the change of navGraph's start fragment
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         testRule.scenario.onActivity { activity ->
-            loginMenuIdlingResource = LoginMenuIdlingResource(activity)
-            IdlingRegistry.getInstance().register(loginMenuIdlingResource)
+            activity.runOnUiThread{
+                loginMenuIdlingResource = LoginMenuIdlingResource(activity)
+                IdlingRegistry.getInstance().register(loginMenuIdlingResource)
+            }
         }
 
         navigateToAndPressBackLeadsToRB(R.id.directoryFragment)
@@ -160,8 +162,10 @@ class MainActivityTest {
     fun pressingBackOnRBFragmentLeadsOutOfTheApp() {
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         testRule.scenario.onActivity { activity ->
-            loginMenuIdlingResource = LoginMenuIdlingResource(activity)
-            IdlingRegistry.getInstance().register(loginMenuIdlingResource)
+            activity.runOnUiThread{
+                loginMenuIdlingResource = LoginMenuIdlingResource(activity)
+                IdlingRegistry.getInstance().register(loginMenuIdlingResource)
+            }
         }
 
         pressBackUnconditionally()
@@ -174,8 +178,10 @@ class MainActivityTest {
     fun navHeaderDisplaysUserData() {
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         testRule.scenario.onActivity { activity ->
-            loginMenuIdlingResource = LoginMenuIdlingResource(activity)
-            IdlingRegistry.getInstance().register(loginMenuIdlingResource)
+            activity.runOnUiThread{
+                loginMenuIdlingResource = LoginMenuIdlingResource(activity)
+                IdlingRegistry.getInstance().register(loginMenuIdlingResource)
+            }
         }
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
@@ -187,8 +193,10 @@ class MainActivityTest {
     fun drawerMenuIsCorrectlyDisplayedForBoss() {
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         testRule.scenario.onActivity { activity ->
-            loginMenuIdlingResource = LoginMenuIdlingResource(activity)
-            IdlingRegistry.getInstance().register(loginMenuIdlingResource)
+            activity.runOnUiThread{
+                loginMenuIdlingResource = LoginMenuIdlingResource(activity)
+                IdlingRegistry.getInstance().register(loginMenuIdlingResource)
+            }
         }
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
 
@@ -203,8 +211,10 @@ class MainActivityTest {
     fun drawerMenuIsCorrectlyDisplayedForClient() {
         GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
         testRule.scenario.onActivity { activity ->
-            loginMenuIdlingResource = LoginMenuIdlingResource(activity)
-            IdlingRegistry.getInstance().register(loginMenuIdlingResource)
+            activity.runOnUiThread{
+                loginMenuIdlingResource = LoginMenuIdlingResource(activity)
+                IdlingRegistry.getInstance().register(loginMenuIdlingResource)
+            }
         }
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
 
@@ -220,9 +230,12 @@ class MainActivityTest {
     private fun navHeaderStillDisplaysCorrectlyAfterLogout() {
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         testRule.scenario.onActivity { activity ->
-            loginMenuIdlingResource = LoginMenuIdlingResource(activity)
-            IdlingRegistry.getInstance().register(loginMenuIdlingResource)
+            activity.runOnUiThread{
+                loginMenuIdlingResource = LoginMenuIdlingResource(activity)
+                IdlingRegistry.getInstance().register(loginMenuIdlingResource)
+            }
         }
+
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("boss@gmail.com")).check(matches(isDisplayed()))
         onView(withText("Boss (BOSS)")).check(matches(isDisplayed()))

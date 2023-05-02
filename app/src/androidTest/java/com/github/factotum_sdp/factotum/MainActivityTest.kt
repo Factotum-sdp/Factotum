@@ -144,6 +144,7 @@ class MainActivityTest {
         navigateToAndPressBackLeadsToRB(R.id.directoryFragment)
         navigateToAndPressBackLeadsToRB(R.id.displayFragment)
         navigateToAndPressBackLeadsToRB(R.id.routeFragment)
+        IdlingRegistry.getInstance().unregister(loginMenuIdlingResource)
     }
 
 
@@ -161,6 +162,7 @@ class MainActivityTest {
         val uiDevice = UiDevice.getInstance(getInstrumentation())
         assertFalse(uiDevice.currentPackageName == "com.github.factotum_sdp.factotum")
         assertTrue(uiDevice.isScreenOn)
+        IdlingRegistry.getInstance().unregister(loginMenuIdlingResource)
     }
 
     @Test
@@ -170,6 +172,7 @@ class MainActivityTest {
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("boss@gmail.com")).check(matches(isDisplayed()))
         onView(withText("Boss (BOSS)")).check(matches(isDisplayed()))
+        IdlingRegistry.getInstance().unregister(loginMenuIdlingResource)
     }
 
     @Test
@@ -182,7 +185,8 @@ class MainActivityTest {
         onView(withText("Directory")).check(matches(isDisplayed()))
         onView(withText("Maps")).check(matches(isDisplayed()))
         onView(withText("View Proof Pictures")).check(matches(isDisplayed()))
-    }
+        IdlingRegistry.getInstance().unregister(loginMenuIdlingResource)
+  }
 
     @Test
     fun drawerMenuIsCorrectlyDisplayedForClient() {
@@ -194,6 +198,7 @@ class MainActivityTest {
         onView(withText("Directory")).check(doesNotExist())
         onView(withText("Maps")).check(doesNotExist())
         onView(withText("View Proof Pictures")).check(matches(isDisplayed()))
+        IdlingRegistry.getInstance().unregister(loginMenuIdlingResource)
     }
 
     // Work when executing the scenario manually but emulators issues make it fails in the connectedCheck
@@ -212,6 +217,7 @@ class MainActivityTest {
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("helen.bates@gmail.com")).check(matches(isDisplayed()))
         onView(withText("Helen Bates (COURIER)")).check(matches(isDisplayed()))
+        IdlingRegistry.getInstance().unregister(loginMenuIdlingResource)
     }
 
 
@@ -221,6 +227,7 @@ class MainActivityTest {
         testRule.scenario.onActivity { activity ->
             loginMenuIdlingResource = LoginMenuIdlingResource(activity)
             IdlingRegistry.getInstance().register(loginMenuIdlingResource) }
+
     }
 }
 

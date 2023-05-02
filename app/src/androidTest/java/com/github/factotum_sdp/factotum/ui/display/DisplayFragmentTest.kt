@@ -61,8 +61,9 @@ class DisplayFragmentTest {
     private lateinit var context: Context
     private lateinit var loginMenuIdlingResource: IdlingResource
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Before
-    fun setUp() {
+    fun setUp() = runTest {
         GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
         testRule.scenario.onActivity { activity ->
             UiThreadStatement.runOnUiThread {

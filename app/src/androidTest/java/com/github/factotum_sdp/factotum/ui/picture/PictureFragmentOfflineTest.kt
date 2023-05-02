@@ -48,8 +48,9 @@ class PictureFragmentOfflineTest {
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Before
-    fun setUp() {
+    fun setUp() = runTest {
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         GeneralUtils.fillUserEntryAndEnterTheApp("courier@gmail.com", "123456")
         testRule.scenario.onActivity { activity ->
@@ -63,8 +64,9 @@ class PictureFragmentOfflineTest {
         goToPictureFragment()
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @After
-    fun tearDown() {
+    fun tearDown() = runTest {
         IdlingRegistry.getInstance().unregister(loginMenuIdlingResource)
         emptyLocalFiles(picturesDir)
     }

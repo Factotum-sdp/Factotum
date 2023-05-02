@@ -139,13 +139,7 @@ class MainActivityTest {
     @Test
     fun pressingBackOnAMenuFragmentLeadsToRBFragment() = runTest {
         // First need to login to trigger the change of navGraph's start fragment
-        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
-        testRule.scenario.onActivity { activity ->
-            UiThreadStatement.runOnUiThread{
-                loginMenuIdlingResource = LoginMenuIdlingResource(activity)
-                IdlingRegistry.getInstance().register(loginMenuIdlingResource)
-            }
-        }
+       loginUser("boss@gmail.com", "123456")
 
         navigateToAndPressBackLeadsToRB(R.id.directoryFragment)
         navigateToAndPressBackLeadsToRB(R.id.displayFragment)
@@ -161,13 +155,7 @@ class MainActivityTest {
 
     @Test
     fun pressingBackOnRBFragmentLeadsOutOfTheApp() {
-        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
-        testRule.scenario.onActivity { activity ->
-            UiThreadStatement.runOnUiThread{
-                loginMenuIdlingResource = LoginMenuIdlingResource(activity)
-                IdlingRegistry.getInstance().register(loginMenuIdlingResource)
-            }
-        }
+        loginUser("boss@gmail.com", "123456")
 
         pressBackUnconditionally()
         val uiDevice = UiDevice.getInstance(getInstrumentation())
@@ -177,13 +165,7 @@ class MainActivityTest {
 
     @Test
     fun navHeaderDisplaysUserData() {
-        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
-        testRule.scenario.onActivity { activity ->
-            UiThreadStatement.runOnUiThread{
-                loginMenuIdlingResource = LoginMenuIdlingResource(activity)
-                IdlingRegistry.getInstance().register(loginMenuIdlingResource)
-            }
-        }
+        loginUser("boss@gmail.com", "123456")
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("boss@gmail.com")).check(matches(isDisplayed()))
@@ -192,13 +174,7 @@ class MainActivityTest {
 
     @Test
     fun drawerMenuIsCorrectlyDisplayedForBoss() {
-        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
-        testRule.scenario.onActivity { activity ->
-            UiThreadStatement.runOnUiThread{
-                loginMenuIdlingResource = LoginMenuIdlingResource(activity)
-                IdlingRegistry.getInstance().register(loginMenuIdlingResource)
-            }
-        }
+        loginUser("boss@gmail.com", "123456")
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
 
         // Check that the menu items are displayed
@@ -210,13 +186,7 @@ class MainActivityTest {
 
     @Test
     fun drawerMenuIsCorrectlyDisplayedForClient() {
-        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
-        testRule.scenario.onActivity { activity ->
-            UiThreadStatement.runOnUiThread{
-                loginMenuIdlingResource = LoginMenuIdlingResource(activity)
-                IdlingRegistry.getInstance().register(loginMenuIdlingResource)
-            }
-        }
+        loginUser("boss@gmail.com", "123456")
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
 
         // Check that the menu items are displayed
@@ -229,13 +199,7 @@ class MainActivityTest {
     // Work when executing the scenario manually but emulators issues make it fails in the connectedCheck
     // The second user Helen Bates can't be found
     private fun navHeaderStillDisplaysCorrectlyAfterLogout() {
-        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
-        testRule.scenario.onActivity { activity ->
-            UiThreadStatement.runOnUiThread{
-                loginMenuIdlingResource = LoginMenuIdlingResource(activity)
-                IdlingRegistry.getInstance().register(loginMenuIdlingResource)
-            }
-        }
+        loginUser("boss@gmail.com", "123456")
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("boss@gmail.com")).check(matches(isDisplayed()))
@@ -243,18 +207,22 @@ class MainActivityTest {
 
         onView(withId(R.id.signoutButton)).perform(click())
         
-        GeneralUtils.fillUserEntryAndEnterTheApp("helen.bates@gmail.com", "123456")
-
-        testRule.scenario.onActivity { activity ->
-            UiThreadStatement.runOnUiThread{
-                loginMenuIdlingResource = LoginMenuIdlingResource(activity)
-                IdlingRegistry.getInstance().register(loginMenuIdlingResource)
-            }
-        }
+        loginUser("helen.bates@gmail.com", "123456")
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("helen.bates@gmail.com")).check(matches(isDisplayed()))
         onView(withText("Helen Bates (COURIER)")).check(matches(isDisplayed()))
+    }
+
+
+    private fun loginUser(email: String, password: String) {
+        testRule.scenario.onActivity { activity ->
+            UiThreadStatement.runOnUiThread {
+                GeneralUtils.fillUserEntryAndEnterTheApp(email, password)
+                loginMenuIdlingResource = LoginMenuIdlingResource(activity)
+                IdlingRegistry.getInstance().register(loginMenuIdlingResource)
+            }
+        }
     }
 
     /*

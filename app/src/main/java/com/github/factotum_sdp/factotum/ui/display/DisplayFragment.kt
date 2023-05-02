@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.databinding.FragmentDisplayBinding
+import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.ui.display.utils.PhotoAdapter
 import com.google.firebase.storage.StorageReference
 
@@ -27,6 +28,7 @@ class DisplayFragment : Fragment() {
     private var _binding: FragmentDisplayBinding? = null
     private val binding get() = _binding!!
     private val userID = MutableLiveData("Unknown")
+    private val userRole = MutableLiveData(Role.UNKNOWN)
     private val PHONE_NUMBER = "1234567890"
 
 
@@ -37,33 +39,17 @@ class DisplayFragment : Fragment() {
         // Inflate the fragment layout
         _binding = FragmentDisplayBinding.inflate(inflater, container, false)
 
-        // Set up the recycler view with a photo adapter
-        val photoAdapter = PhotoAdapter(
-            onShareClick = { storageReference ->
-                shareImage(storageReference, PHONE_NUMBER)
-            },
-            onCardClick = { uri ->
-                openImage(uri)
-            }
-        )
-
-        binding.recyclerView.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = photoAdapter
-        }
-
-        // Observe changes in the list of photo references and update the adapter
-        viewModel.photoReferences.observe(viewLifecycleOwner) { photoReferences ->
-            photoAdapter.submitList(photoReferences)
-        }
-
         userViewModel.loggedInUser.observe(viewLifecycleOwner) { user ->
             userID.value = user.name
+            userRole.value = user.role
         }
 
-        // Set up the refresh button click listener
-        binding.refreshButton.setOnClickListener {
-            userID.value?.let { viewModel.refreshImages(it) }
+        userRole.observe(viewLifecycleOwner) { role ->
+            when (role) {
+                Role.BOSS -> setupBossUI()
+                Role.CLIENT -> setupClientUI()
+                else -> setupClientUI()
+            }
         }
 
         return binding.root
@@ -113,6 +99,41 @@ class DisplayFragment : Fragment() {
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
         startActivity(intent)
+    }
+
+    private fun setupBossUI() {
+        binding.refreshButton.visibility = View.GONE
+        val inflater = LayoutInflater.from(requireContext())
+        val bossView = inflater.inflate(R.layout.fragment_display_boss, binding.root as ViewGroup, true)
+    }
+
+    private fun setupClientUI() {
+        binding.refreshButton.visibility = View.VISIBLE
+
+        // Set up the refresh button click listener for the client
+        binding.refreshButton.setOnClickListener {
+            userID.value?.let { viewModel.refreshImages(it) }
+        }
+
+        // Set up the recycler view with a photo adapter
+        val photoAdapter = PhotoAdapter(
+            onShareClick = { storageReference ->
+                shareImage(storageReference, PHONE_NUMBER)
+            },
+            onCardClick = { uri ->
+                openImage(uri)
+            }
+        )
+
+        binding.recyclerView.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = photoAdapter
+        }
+
+        // Observe changes in the list of photo references and update the adapter
+        viewModel.photoReferences.observe(viewLifecycleOwner) { photoReferences ->
+            photoAdapter.submitList(photoReferences)
+        }
     }
 
 }

@@ -17,8 +17,6 @@ import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -34,7 +32,6 @@ class MainActivityTest {
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
     )
-
 
     companion object {
         @OptIn(ExperimentalCoroutinesApi::class)
@@ -132,11 +129,10 @@ class MainActivityTest {
         )
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun pressingBackOnAMenuFragmentLeadsToRBFragment() = runTest {
         // First need to login to trigger the change of navGraph's start fragment
-        loginUser("boss@gmail.com", "123456")
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
 
         navigateToAndPressBackLeadsToRB(R.id.directoryFragment)
         navigateToAndPressBackLeadsToRB(R.id.displayFragment)
@@ -152,7 +148,7 @@ class MainActivityTest {
 
     @Test
     fun pressingBackOnRBFragmentLeadsOutOfTheApp() {
-        loginUser("boss@gmail.com", "123456")
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
 
         pressBackUnconditionally()
         val uiDevice = UiDevice.getInstance(getInstrumentation())
@@ -162,7 +158,7 @@ class MainActivityTest {
 
     @Test
     fun navHeaderDisplaysUserData() {
-        loginUser("boss@gmail.com", "123456")
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("boss@gmail.com")).check(matches(isDisplayed()))
@@ -171,7 +167,7 @@ class MainActivityTest {
 
     @Test
     fun drawerMenuIsCorrectlyDisplayedForBoss() {
-        loginUser("boss@gmail.com", "123456")
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
 
         // Check that the menu items are displayed
@@ -179,11 +175,11 @@ class MainActivityTest {
         onView(withText("Directory")).check(matches(isDisplayed()))
         onView(withText("Maps")).check(matches(isDisplayed()))
         onView(withText("View Proof Pictures")).check(matches(isDisplayed()))
-  }
+    }
 
     @Test
     fun drawerMenuIsCorrectlyDisplayedForClient() {
-        loginUser("client@gmail.com", "123456")
+        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
 
         // Check that the menu items are displayed
@@ -196,27 +192,20 @@ class MainActivityTest {
     // Work when executing the scenario manually but emulators issues make it fails in the connectedCheck
     // The second user Helen Bates can't be found
     private fun navHeaderStillDisplaysCorrectlyAfterLogout() {
-        loginUser("boss@gmail.com", "123456")
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("boss@gmail.com")).check(matches(isDisplayed()))
         onView(withText("Boss (BOSS)")).check(matches(isDisplayed()))
 
         onView(withId(R.id.signoutButton)).perform(click())
-        
-        loginUser("helen.bates@gmail.com", "123456")
+
+        GeneralUtils.fillUserEntryAndEnterTheApp("helen.bates@gmail.com", "123456")
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("helen.bates@gmail.com")).check(matches(isDisplayed()))
         onView(withText("Helen Bates (COURIER)")).check(matches(isDisplayed()))
     }
-
-
-    private fun loginUser(email: String, password: String) = runBlocking {
-        GeneralUtils.fillUserEntryAndEnterTheApp(email, password)
-        delay(1000)
-    }
-}
 
     /*
     @Test
@@ -258,3 +247,4 @@ class MainActivityTest {
             }
         }
     } */
+}

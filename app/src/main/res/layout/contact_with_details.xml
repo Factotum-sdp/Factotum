@@ -21,8 +21,8 @@
 
     <LinearLayout
         android:id="@+id/name_role_layout"
-        android:layout_width="197dp"
-        android:layout_height="93dp"
+        android:layout_width="199dp"
+        android:layout_height="107dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="@id/contact_image"
         app:layout_constraintEnd_toEndOf="parent"
@@ -45,6 +45,14 @@
             android:text="@string/contact_surname"
             android:textSize="15sp"
             android:textStyle="italic" />
+
+        <TextView
+            android:id="@+id/contact_username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/contact_details_username"
+            android:textSize="12sp"
+            android:textStyle="italic"/>
 
         <TextView
             android:id="@+id/contact_role"

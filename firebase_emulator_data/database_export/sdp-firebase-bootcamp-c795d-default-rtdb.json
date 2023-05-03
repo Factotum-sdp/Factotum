@@ -5,27 +5,27 @@
             "name": "Courier",
             "password": "123456",
             "role": "COURIER",
-            "clientID": "clientId"
+            "username": "courier"
         },
         "MjsOmqtNvvYB5RuFqbhmokvK1lxJ": {
             "email": "boss@gmail.com",
             "name": "Boss",
             "password": "123456",
             "role": "BOSS",
-            "clientID": "courierId"
+            "username": "boss"
         },
         "YXd0EJCPabV6Xa7DDUunomS2SNue": {
             "email": "client@gmail.com",
             "name": "Client",
             "password": "123456",
             "role": "CLIENT",
-            "clientID": "courierId"
+            "username": "client"
         },
         "oO70izRfqiw4a8mXnFnfWLqk0gpa": {
             "email": "email@gmail.com",
             "name": "Name",
             "role": "COURIER",
-            "clientID": "clientId"
+            "username": "name"
         }
     },
     "contacts": {
@@ -70,6 +70,26 @@
             "surname": "Brown"
         },
         "04": {
+            "address": "456 Fake Street",
+            "details": "I am a courier",
+            "username": "04",
+            "name": "Jill",
+            "phone": "987654321",
+            "profile_pic_id": 2131165334,
+            "role": "Courier",
+            "surname": "Taylor"
+        },
+        "joel": {
+            "address": "456 Fake Street",
+            "details": "I am a courier",
+            "username": "04",
+            "name": "Jill",
+            "phone": "987654321",
+            "profile_pic_id": 2131165334,
+            "role": "Courier",
+            "surname": "Taylor"
+        },
+        "dfa": {
             "address": "456 Fake Street",
             "details": "I am a courier",
             "username": "04",

@@ -219,7 +219,7 @@ class MainActivityTest {
         onView(withId(R.id.fragment_signup_directors_parent)).perform(
             closeSoftKeyboard()
         )
-        onView(withId(R.id.email)).perform(typeText("email@gmail.com"))
+        onView(withId(R.id.email)).perform(typeText("email2@gmail.com"))
         onView(withId(R.id.fragment_signup_directors_parent)).perform(
             closeSoftKeyboard()
         )
@@ -232,7 +232,6 @@ class MainActivityTest {
             .perform(click())
         onView(withId(R.id.username)).perform(typeText("dfa"))
         onView(withId(R.id.signup)).perform(click())
-        pressBack()
         FirebaseAuth.AuthStateListener {
             onView(withId(R.id.fragment_login_directors_parent)).check(
                 matches(
@@ -240,11 +239,11 @@ class MainActivityTest {
                 )
             )
         }
-        GeneralUtils.fillUserEntryAndEnterTheApp("email@gmail.com", "123456")
+        GeneralUtils.fillUserEntryAndEnterTheApp("email2@gmail.com", "123456")
 
         FirebaseAuth.AuthStateListener { firebaseAuth ->
             if (firebaseAuth.currentUser != null) {
-                onView(withId(R.id.fragment_login_directors_parent)).check(
+                onView(withId(R.id.fragment_roadbook_directors_parent)).check(
                     matches(
                         isDisplayed()
                     )

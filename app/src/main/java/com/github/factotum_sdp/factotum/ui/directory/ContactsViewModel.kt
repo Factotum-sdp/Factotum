@@ -11,7 +11,7 @@ import com.google.firebase.database.FirebaseDatabase
 class ContactsViewModel(application: Application) : AndroidViewModel(application) {
 
     private val sharedPreferences =
-        application.getSharedPreferences("contacts-daniel", Context.MODE_PRIVATE)
+        application.getSharedPreferences("contacts", Context.MODE_PRIVATE)
     private val repository = ContactsRepository(sharedPreferences)
 
     fun setDatabase(database: FirebaseDatabase) {

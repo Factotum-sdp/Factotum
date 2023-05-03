@@ -26,6 +26,7 @@ import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.resetConta
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.LocationUtils
 import org.hamcrest.CoreMatchers
+import org.hamcrest.Matchers.equalToIgnoringCase
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.BeforeClass
@@ -106,7 +107,7 @@ class ContactDetailsFragmentTest {
         onView(withId(R.id.contact_phone))
             .check(matches(withText(currContact.phone)))
         onView(withId(R.id.contact_role))
-            .check(matches(withText(currContact.role)))
+            .check(matches(withText(equalToIgnoringCase(currContact.role))))
         onView(withId(R.id.contact_address))
             .check(matches(withText(currContact.addressName)))
         if (currContact.details != null) {

@@ -26,7 +26,7 @@ class Location {
     constructor(query: String, context: Context){
         val address = geocoderQuery(query, context)?.get(0)
         coordinates = address?.let { LatLng(it.latitude, it.longitude) }
-        addressName = address?.getAddressLine(0)
+        addressName = address?.getAddressLine(0) ?: query
     }
 
     constructor(){
@@ -47,12 +47,12 @@ class Location {
          *
          * @param query : String. Location to add
          * @param context : Context. Context in which this method is called
-         * @return returns the location that has been added to the file, or null if no address was found
+         * @return returns the location that has been added to the file. If no address was found, returns a Location with null coordinates
          */
         fun createAndStore(query: String, context: Context): Location? {
             val location = Location(query, context)
             if (location.coordinates == null) {
-                return null
+                return location
             }
             val cacheFile = File(context.cacheDir, CACHE_FILE_NAME)
             cacheFile.deleteOnExit()
@@ -84,6 +84,7 @@ class Location {
         fun geocoderQuery(query: String, context: Context): List<Address>? {
             // must handle differently depending on SDK.
             // getLocationFromName(String, int) deprecated in SDK 33
+            if(query.length < 2) return null
             val geocoder = Geocoder(context)
             return if (Build.VERSION.SDK_INT >= TIRAMISU) {
                 tiramisuResultHandler(query, geocoder)

@@ -42,7 +42,7 @@ class LocationTest {
         val addressName = "dfjsdk"
         val location = Location(addressName, getApplicationContext())
         assertEquals(location.coordinates, null)
-        assertEquals(location.addressName, null)
+        assertEquals(location.addressName, addressName)
     }
 
     @Test

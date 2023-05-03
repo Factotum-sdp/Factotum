@@ -19,10 +19,10 @@ class ContactsRepository(
 ) {
 
     private val database = Firebase.database
-    private var firebaseContactsRef: DatabaseReference = database.reference.child("contacts-daniel")
+    private var firebaseContactsRef: DatabaseReference = database.reference.child("contacts")
 
     fun setDatabase(database: FirebaseDatabase) {
-        firebaseContactsRef = database.reference.child("contacts-daniel")
+        firebaseContactsRef = database.reference.child("contacts")
     }
 
     fun saveContactToSharedPreferences(contact: Contact) =

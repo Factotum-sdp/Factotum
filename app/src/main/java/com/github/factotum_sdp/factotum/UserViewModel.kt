@@ -15,6 +15,6 @@ class UserViewModel : ViewModel() {
     val loggedInUser: LiveData<User> = _loggedInUser
 
     fun setLoggedInUser(loggedInUser: User) {
-        _loggedInUser.postValue(loggedInUser)
+        _loggedInUser.value = loggedInUser
     }
 }

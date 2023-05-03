@@ -72,11 +72,12 @@ class RoadBookFragmentTest {
     fun toRoadBookFragment() {
         // Ensure "use RoadBook preferences" is disabled
         PreferencesSetting.setRoadBookPrefs(testRule)
-        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))
             .perform(click())
+
+        GeneralUtils.injectBossAsLoggedInUser(testRule)
     }
 
 

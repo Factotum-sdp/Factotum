@@ -10,7 +10,6 @@ import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.*
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.github.factotum_sdp.factotum.models.Role
@@ -27,7 +26,6 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
@@ -35,6 +33,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private val auth: FirebaseAuth = getAuth()
+    private lateinit var user: UserViewModel
     private lateinit var settings: SettingsViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,6 +85,10 @@ class MainActivity : AppCompatActivity() {
         return settings
     }
 
+    fun applicationUser(): UserViewModel {
+        return user
+    }
+
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
@@ -99,7 +102,7 @@ class MainActivity : AppCompatActivity() {
         val email = headerView.findViewById<TextView>(R.id.textView)
 
         // Instantiate the current user
-        val user = ViewModelProvider(this)[UserViewModel::class.java]
+        user = ViewModelProvider(this)[UserViewModel::class.java]
         binding.navView.findViewTreeLifecycleOwner()?.let { lco ->
             user.loggedInUser.observe(lco) {
                 val format = "${it.name} (${it.role})"

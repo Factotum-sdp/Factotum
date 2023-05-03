@@ -70,7 +70,7 @@ class DRecordDetailsFragment : Fragment() {
 
         val detailsFragment = ContactDetailsFragment::class.java.newInstance()
         detailsFragment.arguments = Bundle().apply {
-            putInt("id", 1)
+            putString("username", rec.clientID)
         }
 
         adapter.addFragment(DRecordInfoFragment(rec))

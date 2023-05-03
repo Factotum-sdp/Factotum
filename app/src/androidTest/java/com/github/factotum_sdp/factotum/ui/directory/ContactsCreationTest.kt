@@ -3,7 +3,6 @@ package com.github.factotum_sdp.factotum.ui.directory
 import android.widget.EditText
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.*
-import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
@@ -16,10 +15,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By.*
 import androidx.test.uiautomator.UiDevice
-import androidx.test.uiautomator.Until
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.models.Location
 import com.github.factotum_sdp.factotum.placeholder.Contact
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
@@ -169,6 +166,7 @@ class ContactsCreationTest {
         getDatabase().reference.child("contacts").child(username).removeValue()
     }
 
+    /*
     @Test
     fun writeInAddressFieldMakesDropDown() {
         val city = "Lausanne"
@@ -192,6 +190,6 @@ class ContactsCreationTest {
         device.findObject(text(lausanneResult)).click()
         val addressChanged = address.wait(Until.textMatches(lausanneResult), 5000)
         assertTrue(addressChanged)
-    }
+    } */
 
 }

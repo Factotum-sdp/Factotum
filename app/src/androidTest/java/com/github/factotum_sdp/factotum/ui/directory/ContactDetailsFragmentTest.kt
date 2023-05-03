@@ -6,25 +6,27 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
-import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
+import androidx.test.uiautomator.Until.hasObject
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.placeholder.Contact
 import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
-import com.github.factotum_sdp.factotum.utils.ContactsUtils
+import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.createRandomContacts
+import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.randomContacts
+import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.resetContact
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.LocationUtils
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -37,34 +39,25 @@ class ContactDetailsFragmentTest {
     var activityRule = ActivityScenarioRule(MainActivity::class.java)
 
     companion object {
+        private lateinit var currContact: Contact
+
         @BeforeClass
         @JvmStatic
         fun setUp() {
             initFirebase()
+            createRandomContacts(1)
+            currContact = randomContacts[0]
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Before
-    fun goToContactDetails()  {
-        ContactsUtils.emptyFirebaseDatabase()
-
-        runTest {
-            runBlocking {
-                ContactsUtils.populateDatabase(5)
-            }
-            onView(withId(R.id.drawer_layout))
-                .perform(DrawerActions.open())
-            onView(withId(R.id.directoryFragment))
-                .perform(click())
-            onView(withId(R.id.contacts_recycler_view))
-                .perform(
-                    RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
-                        0,
-                        click()
-                    )
-                )
-        }
+    fun goToContactDetails() {
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.directoryFragment))
+            .perform(click())
+        onView(withText("@" + currContact.username))
+            .perform(click())
     }
 
     @Test
@@ -101,23 +94,24 @@ class ContactDetailsFragmentTest {
     fun deleteButtonIsClickable() {
         onView(withId(R.id.button_delete_contact))
             .perform(click())
+        resetContact(currContact)
     }
 
     @Test
     fun correctInfoIsDisplayed() {
         onView(withId(R.id.contact_name))
-            .check(matches(withText(ContactsUtils.getContacts()[0].name)))
+            .check(matches(withText(currContact.name)))
         onView(withId(R.id.contact_surname))
-            .check(matches(withText(ContactsUtils.getContacts()[0].surname)))
+            .check(matches(withText(currContact.surname)))
         onView(withId(R.id.contact_phone))
-            .check(matches(withText(ContactsUtils.getContacts()[0].phone)))
+            .check(matches(withText(currContact.phone)))
         onView(withId(R.id.contact_role))
-            .check(matches(withText(ContactsUtils.getContacts()[0].role)))
+            .check(matches(withText(currContact.role)))
         onView(withId(R.id.contact_address))
-            .check(matches(withText(ContactsUtils.getContacts()[0].addressName)))
-        if (ContactsUtils.getContacts()[0].details != null) {
+            .check(matches(withText(currContact.addressName)))
+        if (currContact.details != null) {
             onView(withId(R.id.contact_details))
-                .check(matches(withText(ContactsUtils.getContacts()[0].details)))
+                .check(matches(withText(currContact.details)))
         }
     }
 
@@ -149,6 +143,7 @@ class ContactDetailsFragmentTest {
             .perform(click())
         onView(withId(R.id.contacts_recycler_view))
             .check(matches(isDisplayed()))
+        resetContact(currContact)
     }
 
     @Test
@@ -168,6 +163,7 @@ class ContactDetailsFragmentTest {
                 val adapter = recyclerView.adapter
                 assert(adapter?.itemCount == 4)
             }
+        resetContact(currContact)
     }
 
     @Test
@@ -187,16 +183,15 @@ class ContactDetailsFragmentTest {
         Intents.release()
     }
 
-    /*
+
     @Test
     fun buttonShowDestination() {
         onView(withId(R.id.show_all_button)).perform(click())
+        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         if (LocationUtils.hasLocationPopUp()) {
-            val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
             device.findObject(UiSelector().textContains(LocationUtils.buttonTextAllow)).click()
         }
-        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         val markers = device.wait(hasObject(By.descContains("Destination")), 5000L)
         assertTrue(markers)
-    } */
+    }
 }

@@ -11,7 +11,7 @@ import com.google.firebase.database.FirebaseDatabase
 class ContactsViewModel(application: Application) : AndroidViewModel(application) {
 
     private val sharedPreferences =
-        application.getSharedPreferences("contacts", Context.MODE_PRIVATE)
+        application.getSharedPreferences("contacts-daniel", Context.MODE_PRIVATE)
     private val repository = ContactsRepository(sharedPreferences)
 
     fun setDatabase(database: FirebaseDatabase) {
@@ -20,21 +20,11 @@ class ContactsViewModel(application: Application) : AndroidViewModel(application
 
     val contacts: LiveData<List<Contact>> = repository.getContacts().asLiveData()
 
-    fun saveNewIDContact(
-        role: String,
-        name: String,
-        surname: String,
-        image: Int,
-        addressName: String?,
-        latitude: Double?,
-        longitude: Double?,
-        phone: String,
-        details: String = ""
-    ) {
-        repository.saveNewIDContact(role, name, surname, image, addressName ,latitude, longitude, phone, details)
+    fun getSavedContacts(): List<Contact> {
+        return repository.getCachedContacts()
     }
 
-    fun updateContact(contact: Contact) {
+    fun saveContact(contact: Contact) {
         repository.saveContact(contact)
     }
 

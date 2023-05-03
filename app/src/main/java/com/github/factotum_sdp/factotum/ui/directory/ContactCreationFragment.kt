@@ -13,6 +13,7 @@ import android.widget.Button
 import android.widget.CursorAdapter
 import android.widget.EditText
 import android.widget.Spinner
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.cursoradapter.widget.SimpleCursorAdapter
 import androidx.fragment.app.Fragment
@@ -47,6 +48,7 @@ class ContactCreationFragment : Fragment() {
 
     private lateinit var name: EditText
     private lateinit var surname: EditText
+    private lateinit var username: EditText
     private lateinit var phoneNumber: EditText
     private lateinit var details: EditText
 
@@ -92,6 +94,7 @@ class ContactCreationFragment : Fragment() {
     private fun setContactFields(view: View, contact: Contact?) {
         name = view.findViewById(R.id.editTextName)
         surname = view.findViewById(R.id.editTextSurname)
+        username = view.findViewById(R.id.editTextUsername)
         phoneNumber = view.findViewById(R.id.contactCreationPhoneNumber)
         details = view.findViewById(R.id.contactCreationNotes)
 
@@ -99,6 +102,7 @@ class ContactCreationFragment : Fragment() {
             spinner.setSelection(roles.indexOf(contact.role))
             name.setText(contact.name)
             surname.setText(contact.surname)
+            username.setText(contact.username)
             binding.contactCreationAddress.setQuery(contact.addressName, false)
             phoneNumber.setText(contact.phone)
             details.setText(contact.details)
@@ -181,14 +185,22 @@ class ContactCreationFragment : Fragment() {
 
 
     private fun initialiseApproveFormButton(view: View) {
-        val approveFormButton = view.findViewById<Button>(R.id.create_contact)
-        if (isUpdate) {
-            approveFormButton.text = getString(R.string.form_button_update)
-            approveFormButton.setOnClickListener {
+        val approveFormButton = view.findViewById<Button>(R.id.confirm_form)
+        approveFormButton.text =
+            if (isUpdate) getString(R.string.form_button_update) else getString(R.string.form_button_create)
+        approveFormButton.setOnClickListener {
+            if (username.text.toString().isEmpty()) {
+                showErrorToast(R.string.empty_username)
+                return@setOnClickListener
+            } else if (!isUsernameUnique(username.text.toString()) && currentContact?.username != username.text.toString()) {
+                showErrorToast(R.string.username_not_unique)
+                return@setOnClickListener
+            } else {
+                if (currentContact != null) viewModel.deleteContact(currentContact!!)
                 val address = validateLocation()
-                viewModel.updateContact(
+                viewModel.saveContact(
                     Contact(
-                        id = currentContact!!.id,
+                        username = username.text.toString(),
                         role = spinner.selectedItem.toString(),
                         name = name.text.toString(),
                         surname = surname.text.toString(),
@@ -202,28 +214,23 @@ class ContactCreationFragment : Fragment() {
                 )
                 it.findNavController().navigate(R.id.action_contactCreation_to_directoryFragment)
             }
-        } else {
-            approveFormButton.text = getString(R.string.form_button_create)
-            approveFormButton.setOnClickListener {
-                val address = validateLocation()
-                viewModel.saveNewIDContact(
-                    role = spinner.selectedItem.toString(),
-                    name = name.text.toString(),
-                    surname = surname.text.toString(),
-                    image = R.drawable.contact_image,
-                    addressName = address?.addressName,
-                    latitude = address?.coordinates?.latitude,
-                    longitude = address?.coordinates?.longitude,
-                    phone = phoneNumber.text.toString(),
-                    details = details.text.toString()
-                )
-                it.findNavController().navigate(R.id.action_contactCreation_to_directoryFragment)
-            }
         }
+    }
+
+    private fun isUsernameUnique(username: String): Boolean {
+        return viewModel.contacts.value?.find { it.username == username } == null
     }
 
     private fun validateLocation(): Location? {
         val addressName = binding.contactCreationAddress.query.toString()
         return Location.createAndStore(addressName, requireContext())
+    }
+
+    private fun showErrorToast(resId: Int) {
+        Toast.makeText(
+            requireContext(),
+            getString(resId),
+            Toast.LENGTH_SHORT
+        ).show()
     }
 }

@@ -7,54 +7,32 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import java.util.UUID
 
 class ContactsRepository(
     private val sharedPreferences: SharedPreferences
 ) {
 
-    private lateinit var firebaseContactsRef: DatabaseReference
+    private val database = Firebase.database
+    private var firebaseContactsRef: DatabaseReference = database.reference.child("contacts-daniel")
 
     fun setDatabase(database: FirebaseDatabase) {
-        firebaseContactsRef = database.reference.child("contacts")
+        firebaseContactsRef = database.reference.child("contacts-daniel")
     }
 
     fun saveContactToSharedPreferences(contact: Contact) =
-        sharedPreferences.edit().putString(contact.id, Gson().toJson(contact)).apply()
+        sharedPreferences.edit().putString(contact.username, Gson().toJson(contact)).apply()
+
+    fun clearSharedPreferences() = sharedPreferences.edit().clear().apply()
 
     fun saveContact(contact: Contact) {
         saveContactToSharedPreferences(contact)
-        firebaseContactsRef.child(contact.id).setValue(contact)
-    }
-
-    fun saveNewIDContact(
-        role: String,
-        name: String,
-        surname: String,
-        image: Int,
-        addressName: String?,
-        latitude: Double?,
-        longitude: Double?,
-        phone: String,
-        details: String = ""
-    ) {
-        val contact = Contact(
-            UUID.randomUUID().toString(),
-            role,
-            name,
-            surname,
-            image,
-            addressName,
-            latitude,
-            longitude,
-            phone,
-            details
-        )
-        saveContact(contact)
+        firebaseContactsRef.child(contact.username).setValue(contact)
     }
 
     fun setContacts(contacts: List<Contact>) {
@@ -75,36 +53,49 @@ class ContactsRepository(
     }
 
     fun deleteContact(contact: Contact) {
-        sharedPreferences.edit().remove(contact.id).apply()
-        firebaseContactsRef.child(contact.id).removeValue()
+        sharedPreferences.edit().remove(contact.username).apply()
+        firebaseContactsRef.child(contact.username).removeValue()
     }
 
     fun getContacts(): Flow<List<Contact>> {
         return callbackFlow {
-            val valueEventListener = object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val contactsList = mutableListOf<Contact>()
-                    for (contactSnapshot in snapshot.children) {
-                            val contact = contactSnapshot.getValue(Contact::class.java)
-                        contact?.let {
-                            contactsList.add(it)
-                            saveContactToSharedPreferences(it)
-                        }
-                    }
-                    trySend(contactsList).isSuccess
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    close(error.toException())
-                }
+            val sharedPrefsContacts =
+                getCachedContacts() // Get the contacts from the shared preferences
+            if (sharedPrefsContacts.isNotEmpty()) {
+                trySend(sharedPrefsContacts).isSuccess
             }
 
-            firebaseContactsRef.addValueEventListener(valueEventListener)
+            val valueEventListener =
+                object : ValueEventListener { // Get the contacts from the database
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        clearSharedPreferences() // Reset the shared preferences
+                        val contactsList = mutableListOf<Contact>()
+                        for (contactSnapshot in snapshot.children) {
+                            val contact = contactSnapshot.getValue(Contact::class.java)
+                            contact?.let {
+                                contactsList.add(it)
+                                saveContactToSharedPreferences(it)
+                            }
+                        }
 
-            awaitClose { firebaseContactsRef.removeEventListener(valueEventListener) }
+                        // Update the list with data from the database
+                        trySend(contactsList).isSuccess
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        close(error.toException())
+                    }
+                }
+
+            firebaseContactsRef.addValueEventListener(valueEventListener) // Listen for changes in the database
+            awaitClose { firebaseContactsRef.removeEventListener(valueEventListener) } // Stop listening for changes in the database
         }
     }
 
+
+    /**
+     * Get the contacts from shared preferences
+     */
     fun getCachedContacts(): List<Contact> {
         val contactsList = mutableListOf<Contact>()
         for (contactId in sharedPreferences.all.keys) {

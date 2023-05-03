@@ -1,5 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.directory
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -38,7 +39,7 @@ class ContactDetailsFragment : Fragment() {
             ViewModelProvider(requireActivity())[ContactsViewModel::class.java]
 
         currentContact =
-            contactsViewModel.contacts.value?.get(arguments?.getInt("id")!!) ?: Contact()
+            contactsViewModel.contacts.value?.find { it.username == arguments?.getString("username") } ?: Contact()
 
         setContactDetails(view, currentContact) //set contact details
 
@@ -46,7 +47,9 @@ class ContactDetailsFragment : Fragment() {
     }
 
     // links contact details to the layout
+    @SuppressLint("SetTextI18n")
     private fun setContactDetails(view: View, contact: Contact) {
+        val contactUsername = view.findViewById<TextView>(R.id.contact_username)
         val contactName = view.findViewById<TextView>(R.id.contact_name)
         val contactSurname = view.findViewById<TextView>(R.id.contact_surname)
         val contactRole = view.findViewById<TextView>(R.id.contact_role)
@@ -55,6 +58,7 @@ class ContactDetailsFragment : Fragment() {
         val contactAddress = view.findViewById<TextView>(R.id.contact_address)
         val contactDetails = view.findViewById<TextView>(R.id.contact_details)
 
+        contactUsername.text = "@" + contact.username
         contactName.text = contact.name
         contactSurname.text = contact.surname
         contactRole.text = contact.role

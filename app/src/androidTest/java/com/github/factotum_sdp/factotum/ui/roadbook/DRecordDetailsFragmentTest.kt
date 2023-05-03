@@ -7,6 +7,7 @@ import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
+import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -25,6 +26,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
+
 @RunWith(AndroidJUnit4::class)
 class DRecordDetailsFragmentTest {
 
@@ -55,6 +57,16 @@ class DRecordDetailsFragmentTest {
         PreferencesSetting.enableTouchClick()
         val destID = DestinationRecords.RECORDS[2].destID
         onView(withText(destID)).perform(click())
+    }
+
+    private fun toLastFragment() {
+        onView(withId(R.id.list)).perform(
+            click(),
+            RecyclerViewActions.scrollToLastPosition<RoadBookViewAdapter.RecordViewHolder>(),
+        )
+        Thread.sleep(1000)
+        PreferencesSetting.enableTouchClick()
+        onView(withText("01#1")).perform(click())
     }
 
     @Test
@@ -108,6 +120,15 @@ class DRecordDetailsFragmentTest {
         onView(withId(R.id.viewPager)).perform(swipeLeft())
         onView(withId(R.id.viewPager)).perform(swipeLeft())
         onView(withId(R.id.contact_details_fragment)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun createDRecordWithCorrespondingUsernameDisplaysCorrectContactDetails() {
+        RoadBookFragmentTest().newRecordWithId("01")
+        toLastFragment()
+        onView(withId(R.id.viewPager)).perform(swipeLeft())
+        onView(withId(R.id.viewPager)).perform(swipeLeft())
+        onView(withId(R.id.contact_username)).check(matches(withText("@01")))
     }
 
     // I think block in the CI due to the camera authorizations however it begins to be @Jules part,

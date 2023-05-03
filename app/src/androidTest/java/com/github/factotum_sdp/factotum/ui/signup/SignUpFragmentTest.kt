@@ -36,16 +36,8 @@ class SignUpFragmentTest {
     companion object {
         @BeforeClass
         @JvmStatic
-        fun setUpAuth() {
+        fun setUpDb() {
             initFirebase()
-        }
-
-        @BeforeClass
-        @JvmStatic
-        fun setUpDatabase() {
-            runBlocking {
-                ContactsUtils.populateDatabase()
-            }
         }
     }
 

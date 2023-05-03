@@ -94,6 +94,7 @@
     <string name="database_error">"Connection to database impossible"</string>
     <string name="username_not_found">Username not found</string>
     <string name="empty_username_error">You need a username</string>
+    <string name="username_has_spaces_error">Username should not have spaces</string>
     <string name="update_users_failed">"Updating users failed"</string>
 
 

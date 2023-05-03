@@ -1,6 +1,7 @@
 package com.github.factotum_sdp.factotum
 
 import android.view.Gravity
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.Espresso.pressBackUnconditionally
@@ -9,6 +10,7 @@ import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.DrawerMatchers
+import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -16,8 +18,10 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.hamcrest.Matchers
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.BeforeClass
@@ -88,6 +92,7 @@ class MainActivityTest {
 
     @Test
     fun clickOnRoadBookMenuItemStaysToCorrectFragment() {
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         clickOnAMenuItemLeadsCorrectly(
             R.id.roadBookFragment,
             R.id.fragment_roadbook_directors_parent
@@ -207,7 +212,6 @@ class MainActivityTest {
         onView(withText("Helen Bates (COURIER)")).check(matches(isDisplayed()))
     }
 
-    /*
     @Test
     fun signUpFormWithAllFieldsAndClickAndLogin() {
         onView(withId(R.id.signup)).perform(click())
@@ -247,5 +251,5 @@ class MainActivityTest {
                 )
             }
         }
-    } */
+    }
 }

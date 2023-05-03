@@ -109,12 +109,24 @@ class SignUpViewModel(
             _signupForm.value = SignUpFormState(passwordError = R.string.invalid_password)
         } else if (role.isBlank()) {
             //
-        } else if (username.isBlank()) {
-            _signupForm.value = SignUpFormState(usernameError = R.string.empty_username_error)
+        } else if (!isUserameValid(username)) {
+            //
         } else {
             _signupForm.value = SignUpFormState(isDataValid = true)
         }
     }
+
+    private fun isUserameValid(username: String): Boolean {
+        if(username.isBlank()) {
+            _signupForm.value = SignUpFormState(usernameError = R.string.empty_username_error)
+            return false
+        } else if(username.contains("\\s".toRegex())){
+            _signupForm.value = SignUpFormState(usernameError = R.string.username_has_spaces_error)
+            return false
+        }
+        return true
+    }
+
 
     // A placeholder username validation check
     private fun isNameValid(username: String): Boolean {

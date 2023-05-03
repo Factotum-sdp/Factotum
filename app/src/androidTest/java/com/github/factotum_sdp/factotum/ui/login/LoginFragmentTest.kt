@@ -32,22 +32,11 @@ class LoginFragmentTest {
 
     companion object {
 
-        @OptIn(ExperimentalCoroutinesApi::class)
         @BeforeClass
         @JvmStatic
-        fun setUpDatabase() = runTest {
+        fun setUpDb() {
             initFirebase()
         }
-
-        @AfterClass
-        @JvmStatic
-        fun stopAuthEmulator() {
-            val auth = Firebase.auth
-            auth.signOut()
-            MainActivity.setAuth(auth)
-        }
-
-
     }
 
     @Test

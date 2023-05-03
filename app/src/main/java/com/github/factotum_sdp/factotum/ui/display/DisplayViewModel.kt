@@ -3,7 +3,6 @@ package com.github.factotum_sdp.factotum.ui.display
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.github.factotum_sdp.factotum.MainActivity
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.CoroutineScope
@@ -11,7 +10,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 // ViewModel for managing the display of images from Firebase Storage
 class DisplayViewModel(userID: MutableLiveData<String>) : ViewModel() {

@@ -36,12 +36,19 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@android:drawable/ic_input_add" />
+
+        <TextView
+            android:id="@+id/empty_contacts_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:text="@string/no_contacts_found"
+            android:textAlignment="center"
+            android:textStyle="italic"
+            android:textSize="20sp"
+            android:visibility="gone" />
     </FrameLayout>
 
-    <TextView
-        android:id="@+id/empty_contacts_message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/no_contacts_found"
-        android:visibility="gone" />
 </LinearLayout>

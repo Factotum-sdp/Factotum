@@ -114,7 +114,7 @@
     <string name="edit_confirmed_snap_label">Record edited</string>
     <string name="rb_label_touch_click">Touch click</string>
     <string name="share">Share</string>
-    <string name="no_contacts_found">No contacts found</string>
+    <string name="no_contacts_found">No contacts found. Please check your search criteria and try again.</string>
     <string name="add_contacts_floating_button">add Contacts floating button</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -122,7 +122,7 @@
     <string name="surname">Surname</string>
     <string name="address">Address</string>
     <string name="phone_number">Phone number</string>
-    <string name="create_contact">Create contact</string>
+    <string name="create_contact_text">Create contact</string>
     <string name="notes">Notes</string>
     <string name="drecord_notes_mi_title">DRecord notes</string>
     <string name="textvlabel_destination_id">Destination ID</string>
@@ -145,6 +145,11 @@
     <string name="finish_shift_alert_question">"Are you sure you want to end your shift?"</string>
     <string name="shift_ended">Shift ended</string>
     <string name="end_shift_dialog_title">End shift</string>
+    <string name="textUsername">Username</string>
+    <string name="contact_details_username">\@username</string>
+    <string name="Single_contact_username">\@username</string>
+    <string name="username_not_unique">Sorry, that username is already taken. Please choose a different username.</string>
+    <string name="empty_username">Please enter username to add user.</string>
     <string name="roadbookpreferencescheckedtextview">RoadBookPreferencesCheckedTextView</string>
     <string name="application_settings">Application Settings</string>
     <string name="save_roadbook_preferences">Save RoadBook Preferences</string>

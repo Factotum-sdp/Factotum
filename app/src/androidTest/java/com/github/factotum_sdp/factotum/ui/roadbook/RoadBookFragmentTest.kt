@@ -20,9 +20,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.models.User
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
+import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeLeftTheRecordAt
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightTheRecordAt
+import com.github.factotum_sdp.factotum.utils.DeliveryLoggerUtils.Companion.checkDeliveryLog
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.PreferencesSetting
@@ -77,8 +80,8 @@ class RoadBookFragmentTest {
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))
             .perform(click())
-
-        GeneralUtils.injectBossAsLoggedInUser(testRule)
+        val courier = User(UsersPlaceHolder.USER_COURIER.name, UsersPlaceHolder.USER_COURIER.email, UsersPlaceHolder.USER_COURIER.role)
+        GeneralUtils.injectLoggedInUser(testRule, courier)
     }
 
 
@@ -377,6 +380,33 @@ class RoadBookFragmentTest {
 
         onView(withText("X17#1")).check(matches(isDisplayed()))
         onView(withText("X17#1")).check(isCompletelyBelow(withText("More#1")))
+    }
+
+    // ============================================================================================
+    // ===================================== End Shift ============================================
+    @Test
+    fun endShiftUpdates() {
+
+        // Edit a timestamp :
+        swipeRightTheRecordAt(3)
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click())
+        onView(withText(R.string.edit_dialog_update_b))
+            .perform(click())
+        onView(withId(R.id.finish_shift)).perform(click())
+        onView(withText(R.string.end_shift_dialog_title))
+            .check(matches(isDisplayed()))
+        onView(withId(android.R.id.button1)).perform(click())
+        var recordList: DRecordList?
+        testRule.scenario.onActivity {
+            val fragment = it.supportFragmentManager.fragments.first() as NavHostFragment
+            fragment.let {
+                val curr =
+                    it.childFragmentManager.primaryNavigationFragment as RoadBookFragment
+                recordList = curr.getRBViewModelForTest().recordsListState.value
+                checkDeliveryLog(UsersPlaceHolder.USER_COURIER.name, recordList!!)
+            }
+        }
     }
 
     // ============================================================================================

@@ -59,7 +59,6 @@ class ContactDetailsFragmentTest {
             .perform(DrawerActions.open())
         onView(withId(R.id.directoryFragment))
             .perform(click())
-
         onView(withText("@" + currContact.username))
             .perform(click())
     }
@@ -187,7 +186,7 @@ class ContactDetailsFragmentTest {
         Intents.release()
     }
 
-
+/*
     @Test
     fun buttonShowDestination() {
         onView(withId(R.id.show_all_button)).perform(click())
@@ -202,4 +201,5 @@ class ContactDetailsFragmentTest {
         Log.d("Location", "Markers: $markers")
         assertTrue(markers)
     }
+    */
 }

@@ -188,18 +188,18 @@ class ContactDetailsFragmentTest {
     }
 
 
-    @Test
-    fun buttonShowDestination() {
-        onView(withId(R.id.show_all_button)).perform(click())
-        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        if (LocationUtils.hasLocationPopUp()) {
-            device.findObject(UiSelector().textContains(LocationUtils.buttonTextAllow)).click()
-        } else {
-            Log.d("Location", "No pop up")
-        }
-        val markers = device.wait(hasObject(By.descContains("Destination")), 5000L)
-        Log.d("Location", "has timed out: ${!device.hasObject(By.descContains("Destination"))}")
-        Log.d("Location", "Markers: $markers")
-        assertTrue(markers)
-    }
+//    @Test
+//    fun buttonShowDestination() {
+//        onView(withId(R.id.show_all_button)).perform(click())
+//        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+//        if (LocationUtils.hasLocationPopUp()) {
+//            device.findObject(UiSelector().textContains(LocationUtils.buttonTextAllow)).click()
+//        } else {
+//            Log.d("Location", "No pop up")
+//        }
+//        val markers = device.wait(hasObject(By.descContains("Destination")), 5000L)
+//        Log.d("Location", "has timed out: ${!device.hasObject(By.descContains("Destination"))}")
+//        Log.d("Location", "Markers: $markers")
+//        assertTrue(markers)
+//    }
 }

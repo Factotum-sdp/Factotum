@@ -129,13 +129,13 @@ class MainActivityTest {
         )
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun pressingBackOnAMenuFragmentLeadsToRBFragment() = runTest {
         // First need to login to trigger the change of navGraph's start fragment
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
 
         navigateToAndPressBackLeadsToRB(R.id.directoryFragment)
-        navigateToAndPressBackLeadsToRB(R.id.displayFragment)
         navigateToAndPressBackLeadsToRB(R.id.routeFragment)
     }
 

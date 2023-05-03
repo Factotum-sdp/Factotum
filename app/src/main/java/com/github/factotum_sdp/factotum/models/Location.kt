@@ -9,7 +9,6 @@ import androidx.annotation.RequiresApi
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.database.FirebaseDatabase
 import java.io.File
-import java.util.concurrent.CountDownLatch
 
 /**
  * Class that models a Location that has a name and an address
@@ -95,13 +94,9 @@ class Location {
         @RequiresApi(TIRAMISU)
         private fun tiramisuResultHandler(query: String, geocoder: Geocoder): List<Address>? {
             var result: List<Address>? = listOf()
-            val latch = CountDownLatch(1)
-            // blocking
             geocoder.getFromLocationName(query, MAX_RESULT) { addresses ->
                 result = if (addresses.size > 0) addresses else null
-                latch.countDown()
             }
-            latch.await()
             return result
         }
 

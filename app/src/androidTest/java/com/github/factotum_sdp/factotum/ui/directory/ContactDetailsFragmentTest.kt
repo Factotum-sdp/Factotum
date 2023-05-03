@@ -21,7 +21,7 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.Contact
 import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
-import com.github.factotum_sdp.factotum.utils.GeneralUtils
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.fillUserEntryAndEnterTheApp
 import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.createRandomContacts
 import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.randomContacts
 import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.resetContact
@@ -54,7 +54,7 @@ class ContactDetailsFragmentTest {
 
     @Before
     fun goToContactDetails() {
-        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
+        fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.directoryFragment))

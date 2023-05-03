@@ -136,6 +136,7 @@ class MainActivityTest {
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
 
         navigateToAndPressBackLeadsToRB(R.id.directoryFragment)
+        navigateToAndPressBackLeadsToRB(R.id.displayFragment)
         navigateToAndPressBackLeadsToRB(R.id.routeFragment)
     }
 

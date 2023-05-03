@@ -51,12 +51,10 @@ class DisplayFragment : Fragment() {
         }
 
         userRole.observe(viewLifecycleOwner) { role ->
+            userFolder.value = userID.value
             when (role) {
                 Role.BOSS -> setupBossUI()
-                Role.CLIENT -> {
-                    userFolder.value = userID.value
-                    setupClientUI()
-                }
+                Role.CLIENT -> setupClientUI()
                 else -> setupClientUI()
             }
         }

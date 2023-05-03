@@ -148,6 +148,27 @@ class SignUpFragmentTest {
         onView(withId(R.id.signup)).check(matches(not(isEnabled())))
     }
 
+    @Test
+    fun signUpFormWithInvalidUsername() {
+        onView(withId(R.id.name)).perform(typeText("Jane Doe"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.email)).perform(typeText("jane.doe@gmail.com"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.password)).perform(typeText("123456"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.role)).perform(click())
+        onData(anything()).inRoot(isPlatformPopup()).atPosition(1).perform(click())
+        onView(withId(R.id.username)).perform(typeText("user name"))
+        onView(withId(R.id.signup)).check(matches(not(isEnabled())))
+    }
+
+    @Test
     fun signUpFormWithNonExistingUsername() {
         onView(withId(R.id.name)).perform(typeText("Jane Doe"))
         onView(withId(R.id.fragment_signup_directors_parent)).perform(

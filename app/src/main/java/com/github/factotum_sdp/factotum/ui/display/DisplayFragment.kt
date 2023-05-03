@@ -23,11 +23,8 @@ import com.github.factotum_sdp.factotum.ui.display.client.ClientDisplayViewModel
 import com.github.factotum_sdp.factotum.ui.display.client.ClientPhotoAdapter
 import com.google.firebase.storage.StorageReference
 
-
-// Fragment responsible for displaying a list of images from Firebase Storage
 class DisplayFragment : Fragment() {
 
-    // View model for this fragment
     private val clientViewModel: ClientDisplayViewModel by viewModels { ClientDisplayViewModelFactory(userFolder) }
     private val bossViewModel: BossDisplayViewModel by viewModels()
     private val userViewModel: UserViewModel by activityViewModels()
@@ -42,27 +39,12 @@ class DisplayFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Inflate the fragment layout
         _binding = FragmentDisplayBinding.inflate(inflater, container, false)
-
-        userViewModel.loggedInUser.observe(viewLifecycleOwner) { user ->
-            userID.value = user.name
-            userRole.value = user.role
-        }
-
-        userRole.observe(viewLifecycleOwner) { role ->
-            userFolder.value = userID.value
-            when (role) {
-                Role.BOSS -> setupBossUI()
-                Role.CLIENT -> setupClientUI()
-                else -> setupClientUI()
-            }
-        }
-
+        setupObservers()
         return binding.root
     }
 
-    override  fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
@@ -74,6 +56,31 @@ class DisplayFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun setupObservers() {
+        userViewModel.loggedInUser.observe(viewLifecycleOwner) { user ->
+            userID.value = user.name
+            userRole.value = user.role
+        }
+
+        userRole.observe(viewLifecycleOwner) { role ->
+            userFolder.value = userID.value
+            when (role) {
+                Role.BOSS -> {
+                    setupBossUI()
+                    observeBossFolders()
+                }
+                Role.CLIENT -> {
+                    setupClientUI()
+                    observeClientPhotos()
+                }
+                else -> {
+                    setupClientUI()
+                    observeClientPhotos()
+                }
+            }
+        }
     }
 
     private fun shareImage(storageReference: StorageReference, phoneNumber: String) {
@@ -116,6 +123,7 @@ class DisplayFragment : Fragment() {
         startActivity(intent)
     }
 
+
     private fun setupBossUI() {
         binding.refreshButton.setOnClickListener {
             bossViewModel.refreshFolders()
@@ -125,6 +133,7 @@ class DisplayFragment : Fragment() {
             onCardClick = { clientFolder ->
                 userFolder.value = clientFolder.value
                 setupClientUI()
+                observeClientPhotos()
             }
         )
 
@@ -132,20 +141,19 @@ class DisplayFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
             adapter = bossFolderAdapter
         }
+    }
 
+    private fun observeBossFolders() {
         bossViewModel.folderReferences.observe(viewLifecycleOwner) { folderReferences ->
-            bossFolderAdapter.submitList(folderReferences)
+            (binding.recyclerView.adapter as? BossFolderAdapter)?.submitList(folderReferences)
         }
-
     }
 
     private fun setupClientUI() {
-        // Set up the refresh button click listener for the client
         binding.refreshButton.setOnClickListener {
-            userFolder.value?.let { clientViewModel.refreshImages(userFolder.value!!) }
+            clientViewModel.refreshImages(userFolder.value!!)
         }
 
-        // Set up the recycler view with a photo adapter
         val clientPhotoAdapter = ClientPhotoAdapter(
             onShareClick = { storageReference ->
                 shareImage(storageReference, PHONE_NUMBER)
@@ -159,10 +167,11 @@ class DisplayFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
             adapter = clientPhotoAdapter
         }
+    }
 
-        // Observe changes in the list of photo references and update the adapter
+    private fun observeClientPhotos() {
         clientViewModel.photoReferences.observe(viewLifecycleOwner) { photoReferences ->
-            clientPhotoAdapter.submitList(photoReferences)
+            (binding.recyclerView.adapter as? ClientPhotoAdapter)?.submitList(photoReferences)
         }
     }
 
@@ -171,6 +180,7 @@ class DisplayFragment : Fragment() {
             if (userRole.value == Role.BOSS && userFolder.value != userID.value) {
                 userFolder.value = userID.value
                 setupBossUI()
+                observeBossFolders()
             } else {
                 isEnabled = false
                 requireActivity().onBackPressedDispatcher.onBackPressed()

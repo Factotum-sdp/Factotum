@@ -3,9 +3,9 @@ package com.github.factotum_sdp.factotum.ui.display.client
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.ParseException
@@ -13,61 +13,47 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-// ViewModel for managing the display of images from Firebase Storage
-class ClientDisplayViewModel(userID: MutableLiveData<String>) : ViewModel() {
-    // LiveData to store the list of storage references for the images
+
+class ClientDisplayViewModel(private val _folderName: MutableLiveData<String>) : ViewModel() {
+    private val dateFormat = SimpleDateFormat("dd-MM-yyyy_HH-mm-ss", Locale.getDefault())
     private val _photoReferences = MutableLiveData<List<StorageReference>>()
-    val photoReferences: LiveData<List<StorageReference>>
-        get() = _photoReferences
-
-    // Reference to the Firebase Storage instance
     private val storage = FirebaseStorage.getInstance()
+    val photoReferences: LiveData<List<StorageReference>> = _photoReferences
 
-    init {
-        // Fetch the photo references when the ViewModel is initialized
-        userID.observeForever {
-            updateImages(it)
-        }
+    private val folderNameObserver = { folderName: String -> updateImages(folderName) }
+
+    private var cachedPhotoReferences = listOf<StorageReference>()
+
+    init { _folderName.observeForever(folderNameObserver) }
+
+    override fun onCleared() {
+        super.onCleared()
+        _folderName.removeObserver(folderNameObserver)
     }
 
-    // Refresh the list of images from Firebase Storage
-    fun refreshImages(userID: String) {
-        updateImages(userID)
+    fun refreshImages(folderName: String) {
+        updateImages(folderName)
     }
 
-    // Update the list of images from Firebase Storage
-    private fun updateImages(userID : String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val storageRef = storage.reference.child(userID) // Point to the client's folder
+    private fun updateImages(folderName: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val storageRef = storage.reference.child(folderName)
             storageRef.listAll().addOnSuccessListener { listResult ->
-                val photoRefs = listResult.items.sortedWith { ref1, ref2 -> sortByDate(ref1, ref2) }
-                val photoList = _photoReferences.value?.toMutableList() ?: mutableListOf()
-
-                photoList.clear()
-                photoList.addAll(photoRefs)
-                _photoReferences.postValue(photoList)
+                val photoRefs = listResult.items.sortedByDescending { getDateFromRef(it) }
+                if (photoRefs != cachedPhotoReferences) {
+                    cachedPhotoReferences = photoRefs
+                    _photoReferences.postValue(photoRefs)
+                }
             }
         }
     }
 
-
-    // Sort the list of images by date in descending order
-    private fun sortByDate(ref1: StorageReference, ref2: StorageReference): Int {
-        val dateFormat = SimpleDateFormat("dd-MM-yyyy_HH-mm-ss", Locale.getDefault())
-        val dateString1 = ref1.name.substringAfterLast("_").substringBeforeLast(".")
-        val dateString2 = ref2.name.substringAfterLast("_").substringBeforeLast(".")
-
-        val date1 = try {
-            dateFormat.parse(dateString1)
+    private fun getDateFromRef(ref: StorageReference): Date {
+        val dateString = ref.name.substringAfterLast("_").substringBeforeLast(".")
+        return try {
+            dateFormat.parse(dateString) as Date
         } catch (e: ParseException) {
-            Date(0) // Set to Unix epoch time (January 1, 1970) if the date format is not as expected
+            Date(0)
         }
-
-        val date2 = try {
-            dateFormat.parse(dateString2)
-        } catch (e: ParseException) {
-            Date(0) // Set to Unix epoch time (January 1, 1970) if the date format is not as expected
-        }
-        return date2.compareTo(date1)
     }
 }

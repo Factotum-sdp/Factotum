@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum.data
+package com.github.factotum_sdp.factotum.firebase
 
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
@@ -31,11 +31,11 @@ object FirebaseInstance {
     }
 
     fun setDatabase(database: FirebaseDatabase) {
-        this.database = database
+        FirebaseInstance.database = database
     }
 
     fun setAuth(auth: FirebaseAuth) {
-        this.auth = auth
+        FirebaseInstance.auth = auth
     }
 
     fun onConnectedStatusChanged(onConnectionChange: (Boolean) -> Unit) {

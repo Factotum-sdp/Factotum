@@ -9,7 +9,7 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import com.github.factotum_sdp.factotum.data.FirebaseInstance.getAuth
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getAuth
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
@@ -17,7 +17,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.github.factotum_sdp.factotum.data.FirebaseInstance.getDatabase
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getDatabase
 import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
 import com.github.factotum_sdp.factotum.repositories.SettingsRepository

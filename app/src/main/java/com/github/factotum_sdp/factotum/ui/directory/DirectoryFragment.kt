@@ -13,7 +13,6 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.data.FirebaseInstance
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class DirectoryFragment : Fragment() {

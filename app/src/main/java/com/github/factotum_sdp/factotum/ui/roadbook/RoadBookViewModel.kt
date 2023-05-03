@@ -3,6 +3,7 @@ package com.github.factotum_sdp.factotum.ui.roadbook
 import androidx.lifecycle.*
 import com.github.factotum_sdp.factotum.models.DestinationRecord
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
+import com.github.factotum_sdp.factotum.models.User
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
 import com.github.factotum_sdp.factotum.repositories.RoadBookRepository
@@ -77,6 +78,16 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : Vi
     }
 
     /**
+     * Create the final shift Log according to the current records state
+     * of this RoadBookViewModel
+     *
+     * @param loggedInUser: User
+     */
+    fun makeShiftLog(loggedInUser: User) {
+        roadBookRepository.makeShiftLog(currentDRecList(), loggedInUser)
+    }
+
+    /**
      * Replace the current displayed list by the last available back up of the RoadBookRepository
      *
      * Note that the the back up don't take into account the archiving state, all fetched from
@@ -88,8 +99,6 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : Vi
             _recordsList.value = DRecordList(allRecords = lastBackUp, showArchived = currentDRecList().showArchived)
         }
     }
-
-
 
     fun timestampNextDestinationRecord(timeStamp: Date) {
         try {

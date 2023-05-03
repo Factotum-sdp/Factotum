@@ -21,7 +21,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.data.FirebaseInstance.getDatabase
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getDatabase
 import com.github.factotum_sdp.factotum.models.Location
 import com.github.factotum_sdp.factotum.databinding.FragmentContactCreationBinding
 import com.github.factotum_sdp.factotum.placeholder.Contact

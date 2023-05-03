@@ -14,10 +14,9 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.data.FirebaseInstance
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.preferencesDataStore
 import com.github.factotum_sdp.factotum.UserViewModel
-import com.github.factotum_sdp.factotum.data.DeliveryLogger
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
 import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
@@ -53,7 +52,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
     private var usePreferences = false
     private val locationTrackingHandler: LocationTrackingHandler = LocationTrackingHandler()
-    private val deliveryLogger: DeliveryLogger = DeliveryLogger()
     private val userViewModel: UserViewModel by activityViewModels()
 
     private val contactsViewModel : ContactsViewModel by activityViewModels()
@@ -234,12 +232,14 @@ class RoadBookFragment : Fragment(), MenuProvider {
             val dialogBuilder = AlertDialog.Builder(requireContext())
             dialogBuilder.setMessage(R.string.finish_shift_alert_question)
                 .setPositiveButton(R.string.end_shift) { dialog, _ ->
-                    rbViewModel.recordsListState.value?.let { deliveryLogger.logDeliveries(it, userViewModel.loggedInUser.value!!.name)
+                    rbViewModel.recordsListState.let {
+                        rbViewModel.makeShiftLog(userViewModel.loggedInUser.value!!)
                         Toast.makeText(
                             requireContext(),
                             R.string.shift_ended,
                             Toast.LENGTH_SHORT
-                        ).show()}
+                        ).show()
+                    }
                 }
                 .setNegativeButton("Not now") { dialog, _ ->
                     dialog.cancel()

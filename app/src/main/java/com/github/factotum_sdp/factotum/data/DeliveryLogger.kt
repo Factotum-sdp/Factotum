@@ -1,10 +1,10 @@
 package com.github.factotum_sdp.factotum.data
 
 import android.util.Log
-import com.github.factotum_sdp.factotum.MainActivity
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.ui.roadbook.DRecordList
-import com.github.factotum_sdp.factotum.utils.FirebaseStringFormat.firebaseDateFormatted
-import com.github.factotum_sdp.factotum.utils.FirebaseStringFormat.firebaseSafeString
+import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseDateFormatted
+import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseSafeString
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.ktx.Firebase
@@ -35,6 +35,4 @@ class DeliveryLogger {
             }
         }
     }
-
-
 }

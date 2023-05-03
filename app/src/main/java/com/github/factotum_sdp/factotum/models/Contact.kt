@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum.placeholder
+package com.github.factotum_sdp.factotum.models
 
 data class Contact(
     val username: String = "",

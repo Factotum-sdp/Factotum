@@ -87,27 +87,31 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         dbRef.setValue(_recordsList.value)
     }
 
+    /**
+     * Get the next destination to deliver
+     *
+     * The result is null if there is no nextDestination for the actual records state
+     * @return DestinationRecord?
+     */
+    fun nextDestination(): DestinationRecord? {
+       return currentDRecList().getNextDestinationRecord()
+    }
 
+    fun timeStampARecord(timeStamp: Date, record: DestinationRecord) {
+        val newRec = DestinationRecord(
+            record.destID,
+            record.clientID,
+            timeStamp,
+            record.waitingTime,
+            record.rate,
+            record.actions,
+            record.notes
+        )
+        val ls = arrayListOf<DestinationRecord>()
+        ls.addAll(_recordsList.value as Collection<DestinationRecord>)
+        ls[currentDRecList().getIndexOf(record.destID)] = newRec
 
-    fun timestampNextDestinationRecord(timeStamp: Date) {
-        try {
-            val record = currentDRecList().getNextDestinationRecord()
-            val newRec = DestinationRecord(
-                record.destID,
-                record.clientID,
-                timeStamp,
-                record.waitingTime,
-                record.rate,
-                record.actions,
-                record.notes
-            )
-            val ls = arrayListOf<DestinationRecord>()
-            ls.addAll(_recordsList.value as Collection<DestinationRecord>)
-            ls[currentDRecList().getNextDestinationIndex()] = newRec
-
-            _recordsList.postValue(currentDRecList().replaceDisplayedList(ls))
-        } catch (_: NoSuchElementException) {
-        }
+        _recordsList.postValue(currentDRecList().replaceDisplayedList(ls))
     }
 
     /**

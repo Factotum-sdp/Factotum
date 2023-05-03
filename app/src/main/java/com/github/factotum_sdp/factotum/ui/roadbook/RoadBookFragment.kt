@@ -2,6 +2,7 @@ package com.github.factotum_sdp.factotum.ui.roadbook
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.location.Location
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
@@ -20,6 +21,7 @@ import com.github.factotum_sdp.factotum.data.DeliveryLogger
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.dataStore
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
+import com.github.factotum_sdp.factotum.placeholder.LocationsPlaceHolder.ROLEX_CENTER
 import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
 import com.github.factotum_sdp.factotum.ui.settings.SettingsViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -75,14 +77,36 @@ class RoadBookFragment : Fragment(), MenuProvider {
         rbRecyclerView.layoutManager = LinearLayoutManager(context)
         rbRecyclerView.adapter = adapter
 
-        locationTrackingHandler.setOnLocationUpdate {
-            val cal = Calendar.getInstance()
-            rbViewModel.timestampNextDestinationRecord(cal.time)
-        }
+
+        setLiveLocationEvent()
 
         return view
     }
 
+    // Temp. implementation
+    //============================================================================================
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun setLiveLocationEvent() {
+        locationTrackingHandler.setOnLocationUpdate { currentLocation ->
+            rbViewModel.nextDestination()?.let {
+                if(onDestinationPlace(currentLocation, clientLocation(it.clientID))) {
+                    val cal = Calendar.getInstance()
+                    rbViewModel.timeStampARecord(cal.time, it)
+                }
+            }
+        }
+    }
+
+    private fun clientLocation(clientID: String): Location {
+        return ROLEX_CENTER
+    }
+    private fun onDestinationPlace(current: Location, destination: Location): Boolean {
+        val distance = current.distanceTo(destination)
+        return distance <= 15.0 // Remove constant
+    }
+
+    //============================================================================================
     override fun onPause() {
         rbViewModel.backUp()
         saveButtonStates()

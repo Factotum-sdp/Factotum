@@ -24,7 +24,7 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.models.Location
 import com.github.factotum_sdp.factotum.databinding.FragmentContactCreationBinding
-import com.github.factotum_sdp.factotum.placeholder.Contact
+import com.github.factotum_sdp.factotum.models.Contact
 import kotlinx.coroutines.launch
 
 /**

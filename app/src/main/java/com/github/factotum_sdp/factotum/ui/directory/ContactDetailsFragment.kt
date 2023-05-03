@@ -15,7 +15,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.placeholder.Contact
+import com.github.factotum_sdp.factotum.models.Contact
 import com.github.factotum_sdp.factotum.placeholder.RouteRecords.DUMMY_ROUTE
 import com.github.factotum_sdp.factotum.ui.maps.MapsViewModel
 import com.github.factotum_sdp.factotum.ui.maps.RouteFragment

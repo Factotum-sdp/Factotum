@@ -82,6 +82,7 @@ class MainActivity : AppCompatActivity() {
         listenLogoutButton()
     }
 
+
     fun applicationSettingsViewModel(): SettingsViewModel {
         return settings
     }

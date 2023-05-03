@@ -25,32 +25,24 @@ class ClientDisplayViewModel(userID: MutableLiveData<String>) : ViewModel() {
     init {
         // Fetch the photo references when the ViewModel is initialized
         userID.observeForever {
-            fetchPhotoReferences(it)
+            updateImages(it)
         }
-    }
-
-    // Fetch photo references from Firebase Storage
-    private fun fetchPhotoReferences(userID: String) {
-        updateImages(userID, false)
     }
 
     // Refresh the list of images from Firebase Storage
     fun refreshImages(userID: String) {
-        updateImages(userID, true)
+        updateImages(userID)
     }
 
     // Update the list of images from Firebase Storage
-    private fun updateImages(userID : String, refresh : Boolean) {
+    private fun updateImages(userID : String) {
         CoroutineScope(Dispatchers.IO).launch {
             val storageRef = storage.reference.child(userID) // Point to the client's folder
             storageRef.listAll().addOnSuccessListener { listResult ->
                 val photoRefs = listResult.items.sortedWith { ref1, ref2 -> sortByDate(ref1, ref2) }
                 val photoList = _photoReferences.value?.toMutableList() ?: mutableListOf()
 
-                if (refresh) {
-                    photoList.clear()
-                }
-
+                photoList.clear()
                 photoList.addAll(photoRefs)
                 _photoReferences.postValue(photoList)
             }

@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -28,15 +28,15 @@ import com.google.firebase.storage.StorageReference
 class DisplayFragment : Fragment() {
 
     // View model for this fragment
-    private val clientViewModel: ClientDisplayViewModel by viewModels { ClientDisplayViewModelFactory(userID) }
+    private val clientViewModel: ClientDisplayViewModel by viewModels { ClientDisplayViewModelFactory(userFolder) }
     private val bossViewModel: BossDisplayViewModel by viewModels()
     private val userViewModel: UserViewModel by activityViewModels()
     private var _binding: FragmentDisplayBinding? = null
     private val binding get() = _binding!!
     private val userID = MutableLiveData("Unknown")
     private val userRole = MutableLiveData(Role.UNKNOWN)
+    private val userFolder = MutableLiveData("Unknown")
     private val PHONE_NUMBER = "1234567890"
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,12 +53,23 @@ class DisplayFragment : Fragment() {
         userRole.observe(viewLifecycleOwner) { role ->
             when (role) {
                 Role.BOSS -> setupBossUI()
-                Role.CLIENT -> setupClientUI()
+                Role.CLIENT -> {
+                    userFolder.value = userID.value
+                    setupClientUI()
+                }
                 else -> setupClientUI()
             }
         }
 
         return binding.root
+    }
+
+    override  fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            onBackPressedCallback
+        )
     }
 
     // Clean up binding when the view is destroyed
@@ -113,8 +124,9 @@ class DisplayFragment : Fragment() {
         }
 
         val bossFolderAdapter = BossFolderAdapter(
-            onCardClick = { folderReference ->
-                //
+            onCardClick = { clientFolder ->
+                userFolder.value = clientFolder.value
+                setupClientUI()
             }
         )
 
@@ -132,7 +144,7 @@ class DisplayFragment : Fragment() {
     private fun setupClientUI() {
         // Set up the refresh button click listener for the client
         binding.refreshButton.setOnClickListener {
-            userID.value?.let { clientViewModel.refreshImages(it) }
+            userFolder.value?.let { clientViewModel.refreshImages(userFolder.value!!) }
         }
 
         // Set up the recycler view with a photo adapter
@@ -156,4 +168,15 @@ class DisplayFragment : Fragment() {
         }
     }
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (userRole.value == Role.BOSS && userFolder.value != userID.value) {
+                userFolder.value = userID.value
+                setupBossUI()
+            } else {
+                isEnabled = false
+                requireActivity().onBackPressedDispatcher.onBackPressed()
+            }
+        }
+    }
 }

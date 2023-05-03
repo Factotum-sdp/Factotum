@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -15,6 +16,8 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.databinding.FragmentDisplayBinding
 import com.github.factotum_sdp.factotum.models.Role
+import com.github.factotum_sdp.factotum.ui.display.boss.BossDisplayViewModel
+import com.github.factotum_sdp.factotum.ui.display.boss.BossFolderAdapter
 import com.github.factotum_sdp.factotum.ui.display.client.ClientDisplayViewModel
 import com.github.factotum_sdp.factotum.ui.display.client.ClientDisplayViewModelFactory
 import com.github.factotum_sdp.factotum.ui.display.client.ClientPhotoAdapter
@@ -25,7 +28,8 @@ import com.google.firebase.storage.StorageReference
 class DisplayFragment : Fragment() {
 
     // View model for this fragment
-    private val viewModel: ClientDisplayViewModel by viewModels { ClientDisplayViewModelFactory(userID) }
+    private val clientViewModel: ClientDisplayViewModel by viewModels { ClientDisplayViewModelFactory(userID) }
+    private val bossViewModel: BossDisplayViewModel by viewModels()
     private val userViewModel: UserViewModel by activityViewModels()
     private var _binding: FragmentDisplayBinding? = null
     private val binding get() = _binding!!
@@ -104,21 +108,35 @@ class DisplayFragment : Fragment() {
     }
 
     private fun setupBossUI() {
-        binding.refreshButton.visibility = View.GONE
-        val inflater = LayoutInflater.from(requireContext())
-        val bossView = inflater.inflate(R.layout.fragment_display_boss, binding.root as ViewGroup, true)
+        binding.refreshButton.setOnClickListener {
+            bossViewModel.refreshFolders()
+        }
+
+        val bossFolderAdapter = BossFolderAdapter(
+            onCardClick = { folderReference ->
+                //
+            }
+        )
+
+        binding.recyclerView.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = bossFolderAdapter
+        }
+
+        bossViewModel.folderReferences.observe(viewLifecycleOwner) { folderReferences ->
+            bossFolderAdapter.submitList(folderReferences)
+        }
+
     }
 
     private fun setupClientUI() {
-        binding.refreshButton.visibility = View.VISIBLE
-
         // Set up the refresh button click listener for the client
         binding.refreshButton.setOnClickListener {
-            userID.value?.let { viewModel.refreshImages(it) }
+            userID.value?.let { clientViewModel.refreshImages(it) }
         }
 
         // Set up the recycler view with a photo adapter
-        val photoAdapter = ClientPhotoAdapter(
+        val clientPhotoAdapter = ClientPhotoAdapter(
             onShareClick = { storageReference ->
                 shareImage(storageReference, PHONE_NUMBER)
             },
@@ -129,16 +147,13 @@ class DisplayFragment : Fragment() {
 
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = photoAdapter
+            adapter = clientPhotoAdapter
         }
 
         // Observe changes in the list of photo references and update the adapter
-        viewModel.photoReferences.observe(viewLifecycleOwner) { photoReferences ->
-            photoAdapter.submitList(photoReferences)
+        clientViewModel.photoReferences.observe(viewLifecycleOwner) { photoReferences ->
+            clientPhotoAdapter.submitList(photoReferences)
         }
     }
 
 }
-
-
-

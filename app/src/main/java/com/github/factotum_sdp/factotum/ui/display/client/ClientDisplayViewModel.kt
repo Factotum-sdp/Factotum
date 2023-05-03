@@ -57,6 +57,7 @@ class ClientDisplayViewModel(userID: MutableLiveData<String>) : ViewModel() {
         }
     }
 
+
     // Sort the list of images by date in descending order
     private fun sortByDate(ref1: StorageReference, ref2: StorageReference): Int {
         val dateFormat = SimpleDateFormat("dd-MM-yyyy_HH-mm-ss", Locale.getDefault())

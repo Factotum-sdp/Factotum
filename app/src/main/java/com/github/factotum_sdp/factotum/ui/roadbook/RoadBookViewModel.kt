@@ -27,6 +27,7 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
 
     val recordsListState: LiveData<DRecordList> = _recordsList
 
+
     init {
         val date = Calendar.getInstance().time
         val dateRef = getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH).format(date)
@@ -85,6 +86,8 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
     fun backUp() {
         dbRef.setValue(_recordsList.value)
     }
+
+
 
     fun timestampNextDestinationRecord(timeStamp: Date) {
         try {
@@ -246,7 +249,6 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
     fun hideArchivedRecords() {
         _recordsList.value = currentDRecList().withoutArchived()
     }
-
 
     //Needed to update the destIDOccurrences cache
     private fun addDemoRecords(ls: List<DestinationRecord>) {

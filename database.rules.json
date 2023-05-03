@@ -11,6 +11,10 @@
     "contacts": {
       ".read": true,
       ".write": true
+    },
+    "Delivery-Log": {
+      ".read": true,
+      ".write": true
     }
   }
 }

@@ -21,10 +21,10 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.Contact
 import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
-import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.fillUserEntryAndEnterTheApp
 import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.createRandomContacts
 import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.randomContacts
 import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.resetContact
+import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.LocationUtils
 import org.hamcrest.CoreMatchers
@@ -54,11 +54,12 @@ class ContactDetailsFragmentTest {
 
     @Before
     fun goToContactDetails() {
-        fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
+        GeneralUtils.injectBossAsLoggedInUser(activityRule)
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.directoryFragment))
             .perform(click())
+
         onView(withText("@" + currContact.username))
             .perform(click())
     }

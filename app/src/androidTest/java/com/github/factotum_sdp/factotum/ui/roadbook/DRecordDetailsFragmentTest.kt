@@ -7,6 +7,7 @@ import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
+import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -14,7 +15,7 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightTheRecordAt
-import com.github.factotum_sdp.factotum.utils.GeneralUtils
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.fillUserEntryAndEnterTheApp
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.PreferencesSetting
 import kotlinx.coroutines.delay
@@ -26,6 +27,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
+
 @RunWith(AndroidJUnit4::class)
 class DRecordDetailsFragmentTest {
 
@@ -46,7 +48,7 @@ class DRecordDetailsFragmentTest {
     fun toRoadBookFragment() {
         // Ensure "use RoadBook preferences" is disabled
         PreferencesSetting.setRoadBookPrefs(testRule)
-        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
+        fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))
@@ -57,6 +59,16 @@ class DRecordDetailsFragmentTest {
         PreferencesSetting.enableTouchClick()
         val destID = DestinationRecords.RECORDS[2].destID
         onView(withText(destID)).perform(click())
+    }
+
+    private fun toLastFragment() {
+        onView(withId(R.id.list)).perform(
+            click(),
+            RecyclerViewActions.scrollToLastPosition<RoadBookViewAdapter.RecordViewHolder>(),
+        )
+        Thread.sleep(1000)
+        PreferencesSetting.enableTouchClick()
+        onView(withText("01#1")).perform(click())
     }
 
     @Test
@@ -110,6 +122,15 @@ class DRecordDetailsFragmentTest {
         onView(withId(R.id.viewPager)).perform(swipeLeft())
         onView(withId(R.id.viewPager)).perform(swipeLeft())
         onView(withId(R.id.contact_details_fragment)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun createDRecordWithCorrespondingUsernameDisplaysCorrectContactDetails() {
+        RoadBookFragmentTest().newRecordWithId("01")
+        toLastFragment()
+        onView(withId(R.id.viewPager)).perform(swipeLeft())
+        onView(withId(R.id.viewPager)).perform(swipeLeft())
+        onView(withId(R.id.contact_username)).check(matches(withText("@01")))
     }
 
     // I think block in the CI due to the camera authorizations however it begins to be @Jules part,

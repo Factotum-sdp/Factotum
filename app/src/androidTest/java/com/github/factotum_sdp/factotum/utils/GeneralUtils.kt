@@ -22,27 +22,27 @@ import kotlinx.coroutines.runBlocking
 
 class GeneralUtils {
     companion object {
-        private lateinit var database: FirebaseDatabase
-        private lateinit var auth: FirebaseAuth
-        private lateinit var storage: FirebaseStorage
+        private var database: FirebaseDatabase = Firebase.database
+        private var auth: FirebaseAuth = Firebase.auth
+        private var storage: FirebaseStorage = Firebase.storage
+        private var emulatorSet = false
         private const val WAIT_TIME_LOGIN = 1500L
         private val BOSS_USER = User(UsersPlaceHolder.USER_BOSS.name,
                                      UsersPlaceHolder.USER_BOSS.email,
                                      UsersPlaceHolder.USER_BOSS.role)
 
         fun initFirebase(online : Boolean = true) {
-            database = Firebase.database
-            auth = Firebase.auth
-            storage = Firebase.storage
 
-            database.useEmulator("10.0.2.2", 9000)
-            auth.useEmulator("10.0.2.2", 9099)
+            if (!emulatorSet) {
+                database.useEmulator("10.0.2.2", 9000)
+                auth.useEmulator("10.0.2.2", 9099)
+                emulatorSet = true
+            }
             if (online) {
                 storage.useEmulator("10.0.2.2", 9199)
             } else {
                 storage.useEmulator("10.0.2.2", 9198)
             }
-
             MainActivity.setDatabase(database)
             MainActivity.setAuth(auth)
         }

@@ -8,6 +8,7 @@ import com.github.factotum_sdp.factotum.placeholder.Contact
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.runner.RunWith
@@ -66,13 +67,12 @@ class ContactsRepositoryTest {
         Assert.assertEquals(contact, cachedContacts[0])
     }
 
-    /* // Do not empty the database for one test fill it back after
-    //  Moreover get the actual size of contacts, not hcecking by hardcoded value
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun savesContactOnline() = runTest {
+
         val contact = Contact(
-            "1",
+            "john_doe",
             "Manager",
             "John",
             "Doe",
@@ -80,27 +80,23 @@ class ContactsRepositoryTest {
             "123 Main St",
             "555-555-1234"
         )
-        val latch = CountDownLatch(1)
 
+        val initialContacts = repository.getContacts().first()
+        assert(initialContacts.findLast { it.username == contact.username } == null)
+        val contactsInitialSize = initialContacts.size
         runBlocking {
             repository.saveContact(contact)
         }
 
         val contacts = repository.getContacts().first()
-
         if (contacts.isNotEmpty()) {
-            Assert.assertEquals(1, contacts.size)
-            Assert.assertEquals(contact, contacts[0])
-            latch.countDown()
+            Assert.assertEquals(contactsInitialSize + 1, contacts.size)
+            Assert.assertEquals(contact, contacts.findLast { it.username == contact.username })
         }
 
-        if (!withContext(Dispatchers.IO) {
-                latch.await(5, TimeUnit.SECONDS)
-            }) {
-            Assert.fail("Timeout waiting for contacts to update")
-        }
+        runBlocking { repository.deleteContact(contact) }
+        val contactsAfterDelete = repository.getContacts().first()
+        Assert.assertEquals(contactsInitialSize, contactsAfterDelete.size)
     }
-
-     */
 
 }

@@ -5,6 +5,7 @@ import android.location.Address
 import android.location.Geocoder
 import android.os.Build
 import android.os.Build.VERSION_CODES.TIRAMISU
+import android.util.Log
 import androidx.annotation.RequiresApi
 import java.io.File
 import java.util.concurrent.CountDownLatch
@@ -71,8 +72,10 @@ class Location(query: String, context: Context) {
             // getLocationFromName(String, int) deprecated in SDK 33
             val geocoder = Geocoder(context)
             return if (Build.VERSION.SDK_INT >= TIRAMISU) {
+                Log.d("test", "tiramisu")
                 tiramisuResultHandler(query, geocoder)
             } else {
+                Log.d("test", "not tiramisu")
                 resultHandler(query, geocoder)
             }
         }
@@ -81,10 +84,14 @@ class Location(query: String, context: Context) {
         private fun tiramisuResultHandler(query: String, geocoder: Geocoder): List<Address>? {
             var result: List<Address>? = listOf()
             val latch = CountDownLatch(1)
+            Log.d("test", "countdown latch${latch.count}")
             // blocking
+            Log.d("test", "before blocking string query $query")
             geocoder.getFromLocationName(query, MAX_RESULT) { addresses ->
                 result = if (addresses.size > 0) addresses else null
+                Log.d("test", "countdown latch${latch.count}")
                 latch.countDown()
+                Log.d("test", "countdown latch${latch.count}")
             }
             latch.await()
             return result

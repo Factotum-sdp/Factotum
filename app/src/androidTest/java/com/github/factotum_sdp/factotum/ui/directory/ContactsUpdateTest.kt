@@ -6,11 +6,16 @@ import androidx.test.espresso.Espresso.closeSoftKeyboard
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.clearText
+import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
-import androidx.test.espresso.contrib.RecyclerViewActions
-import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.espresso.matcher.ViewMatchers.Visibility
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withSpinnerText
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
@@ -18,49 +23,56 @@ import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.Contact
-import com.github.factotum_sdp.factotum.utils.ContactsUtils
+import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.createRandomContacts
+import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.randomContacts
+import com.github.factotum_sdp.factotum.utils.GeneralUtils
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import junit.framework.TestCase.assertEquals
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runTest
+import junit.framework.TestCase.fail
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 
 class ContactsUpdateTest {
-    /*
+
     @get:Rule
     var activityRule = ActivityScenarioRule(MainActivity::class.java)
 
     companion object {
-        private const val nbContacts = 5
+        private var nbContacts = 5
+        private lateinit var currContact: Contact
 
         @BeforeClass
         @JvmStatic
         fun setUpFirebase() {
             initFirebase()
+            createRandomContacts(1)
+            currContact = randomContacts[0]
+            nbContacts = getDatabase().reference.child("contacts").get().run {
+                addOnSuccessListener {
+                    nbContacts = it.childrenCount.toInt()
+                }
+                addOnFailureListener {
+                    fail("Could not get the number of contacts in the database")
+                }
+                nbContacts
+            }
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+
     @Before
     fun setUp() {
-        runTest {
-            onView(withId(R.id.drawer_layout))
-                .perform(DrawerActions.open())
-            onView(withId(R.id.directoryFragment))
-                .perform(ViewActions.click())
-            onView(withId(R.id.contacts_recycler_view))
-                .perform(
-                    RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
-                        0,
-                        ViewActions.click()
-                    )
-                )
-            onView(withId(R.id.button_modify_contact)).perform(ViewActions.click())
-        }
+        GeneralUtils.injectBossAsLoggedInUser(activityRule)
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.directoryFragment))
+            .perform(click())
+        onView(withText("@" + currContact.username))
+            .perform(click())
+        onView(withId(R.id.button_modify_contact)).perform(click())
     }
 
     @Test
@@ -76,7 +88,7 @@ class ContactsUpdateTest {
 
     @Test
     fun buttonTextIsCorrect() {
-        onView(withId(R.id.create_contact))
+        onView(withId(R.id.confirm_form))
             .check(matches(withText("Update Contact")))
     }
 
@@ -94,8 +106,7 @@ class ContactsUpdateTest {
 
     @Test
     fun updateDoesntAddOrRemoveContact() {
-        onView(withId(R.id.create_contact)).perform(ViewActions.click())
-        //check if recycle view in contacts has 6 items
+        onView(withId(R.id.confirm_form)).perform(click())
         onView(withId(R.id.contacts_recycler_view))
             .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
             .check { view, noViewFoundException ->
@@ -112,23 +123,23 @@ class ContactsUpdateTest {
     @Test
     fun fieldsContainContactValues() {
         val nameEditText = onView(withId(R.id.editTextName))
-        nameEditText.check(matches(withText(ContactsUtils.getContacts()[0].name)))
+        nameEditText.check(matches(withText(currContact.name)))
 
         val surnameEditText = onView(withId(R.id.editTextSurname))
-        surnameEditText.check(matches(withText(ContactsUtils.getContacts()[0].surname)))
+        surnameEditText.check(matches(withText(currContact.surname)))
 
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        val addressEditText = device.findObject(By.text(ContactsUtils.getContacts()[0].address))
+        val addressEditText = device.findObject(By.text(currContact.address))
         assert(addressEditText != null)
 
         val phoneEditText = onView(withId(R.id.contactCreationPhoneNumber))
-        phoneEditText.check(matches(withText(ContactsUtils.getContacts()[0].phone)))
+        phoneEditText.check(matches(withText(currContact.phone)))
 
         val notesEditText = onView(withId(R.id.contactCreationNotes))
-        notesEditText.check(matches(withText(ContactsUtils.getContacts()[0].details)))
+        notesEditText.check(matches(withText(currContact.details)))
 
         val roleSpinner = onView(withId(R.id.roles_spinner))
-        roleSpinner.check(matches(withSpinnerText(ContactsUtils.getContacts()[0].role)))
+        roleSpinner.check(matches(withSpinnerText(currContact.role)))
     }
 
     @Test
@@ -139,9 +150,12 @@ class ContactsUpdateTest {
         val surnameEditText = onView(withId(R.id.editTextSurname))
         surnameEditText.perform(ViewActions.replaceText("Doe"))
 
+        val usernameEditText = onView(withId(R.id.editTextUsername))
+        usernameEditText.perform(ViewActions.replaceText("johndoe"))
+
         onView(withId(androidx.appcompat.R.id.search_src_text)).perform(
             clearText(),
-            typeText("123 Main St")
+            typeText("123 Main St\n")
         )
         closeSoftKeyboard()
 
@@ -151,26 +165,26 @@ class ContactsUpdateTest {
         val notesEditText = onView(withId(R.id.contactCreationNotes))
         notesEditText.perform(ViewActions.replaceText("This is a test note."))
 
-        onView(withId(R.id.create_contact)).perform(ViewActions.click())
-        onView(withId(R.id.contacts_recycler_view))
-            .perform(
-                RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
-                    0,
-                    ViewActions.click()
-                )
-            )
+        onView(withId(R.id.confirm_form)).perform(click())
+
+        onView(withText("@johndoe")).perform(click())
+
+        Thread.sleep(1000)
 
         onView(withId(R.id.contact_name))
             .check(matches(withText("John")))
         onView(withId(R.id.contact_surname))
             .check(matches(withText("Doe")))
+        onView(withId(R.id.contact_username))
+            .check(matches(withText("@johndoe")))
         onView(withId(R.id.contact_address))
             .check(matches(withText("123 Main St")))
         onView(withId(R.id.contact_phone))
             .check(matches(withText("555-555-1234")))
         onView(withId(R.id.contact_details))
             .check(matches(withText("This is a test note.")))
+        //reset the original contact value
+        getDatabase().reference.child("contacts").child("johndoe").removeValue()
+        getDatabase().reference.child("contacts").child(currContact.username).setValue(currContact)
     }
-
-     */
 }

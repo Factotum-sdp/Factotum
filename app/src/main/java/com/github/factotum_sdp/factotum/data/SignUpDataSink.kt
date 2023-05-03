@@ -45,19 +45,19 @@ class SignUpDataSink {
         return updateUserResultFuture.get()
     }
 
-    fun fetchClientId(clientId: String): Result<String> {
-        val fetchClientIdFuture = CompletableFuture<Result<String>>()
-        dbRef.child("contacts-bis")
-            .child(clientId)
+    fun fetchUsername(username: String): Result<String> {
+        val fetchUsernameFuture = CompletableFuture<Result<String>>()
+        dbRef.child("contacts")
+            .child(username)
             .get().addOnSuccessListener {
-                if (it.exists()) {
-                    fetchClientIdFuture.complete(Result.Error(IOException("Client ID already exists")))
+                if (!it.exists()) {
+                    fetchUsernameFuture.complete(Result.Error(IOException("Username doesn't exist")))
                 }else{
-                    fetchClientIdFuture.complete(Result.Success(clientId))
+                    fetchUsernameFuture.complete(Result.Success(username))
                 }
             }.addOnFailureListener {
-                fetchClientIdFuture.complete(Result.Error(IOException("Connection to database impossible")))
+                fetchUsernameFuture.complete(Result.Error(IOException("Connection to database impossible")))
             }
-        return fetchClientIdFuture.get()
+        return fetchUsernameFuture.get()
     }
 }

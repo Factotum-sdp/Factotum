@@ -211,7 +211,7 @@ class MainActivityTest {
     @Test
     fun signUpFormWithAllFieldsAndClickAndLogin() {
         onView(withId(R.id.signup)).perform(click())
-        onView(withId(R.id.username)).perform(typeText("Name"))
+        onView(withId(R.id.name)).perform(typeText("Name"))
         onView(withId(R.id.fragment_signup_directors_parent)).perform(
             closeSoftKeyboard()
         )
@@ -226,7 +226,7 @@ class MainActivityTest {
         onView(withId(R.id.role)).perform(click())
         Espresso.onData(Matchers.anything()).inRoot(RootMatchers.isPlatformPopup()).atPosition(1)
             .perform(click())
-        onView(withId(R.id.clientId)).perform(typeText("clientId"))
+        onView(withId(R.id.username)).perform(typeText("dfa"))
         onView(withId(R.id.signup)).perform(click())
         pressBack()
         FirebaseAuth.AuthStateListener {

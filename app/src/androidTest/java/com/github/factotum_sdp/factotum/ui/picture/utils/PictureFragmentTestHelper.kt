@@ -8,8 +8,6 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
-import com.github.factotum_sdp.factotum.utils.GeneralUtils
-import com.github.factotum_sdp.factotum.utils.PreferencesSetting
 import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -71,7 +69,7 @@ fun triggerCancel(device: UiDevice) {
 
 fun goToPictureFragment() {
     // Click on one of the roadbook
-    val destID = DestinationRecords.RECORDS[2].destID
+    val destID = DestinationRecords.RECORDS[0].destID
     onView(withText(destID)).perform(click())
 
     // Go to the picture fragment

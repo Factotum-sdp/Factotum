@@ -28,7 +28,7 @@
             android:text="@string/full_name_text" />
 
         <EditText
-            android:id="@+id/username"
+            android:id="@+id/name"
             android:layout_width="337dp"
             android:layout_height="50dp"
             android:layout_marginBottom="10dp"
@@ -92,15 +92,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:text="@string/clientid_text" />
+            android:text="@string/username_text" />
 
         <EditText
-            android:id="@+id/clientId"
+            android:id="@+id/username"
             android:layout_width="337dp"
             android:layout_height="50dp"
             android:layout_marginBottom="16dp"
             android:autofillHints=""
-            android:hint="@string/clientid_text"
+            android:hint="@string/username_text"
             android:inputType="text"
             android:selectAllOnFocus="true" />
 

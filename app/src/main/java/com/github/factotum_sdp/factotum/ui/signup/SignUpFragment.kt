@@ -50,37 +50,37 @@ class SignUpFragment : Fragment() {
         viewModel =
             ViewModelProvider(this, SignUpViewModelFactory())[SignUpViewModel::class.java]
 
-        val usernameEditText = binding.username
+        val nameEditText = binding.name
         val emailEditText = binding.email
         val passwordEditText = binding.password
         val roleAutoCompleteTextView = binding.role
-        val clientIdEditText = binding.clientId
+        val usernameEditText = binding.username
         val loadingProgressBar = binding.loading
         val signUpButton = binding.signup
 
         observeSignUpFormState(
             signUpButton,
-            usernameEditText,
+            nameEditText,
             emailEditText,
             passwordEditText,
-            clientIdEditText
+            usernameEditText
         )
 
         val afterTextChangedListener = createTextWatcher(
             viewModel,
-            usernameEditText,
+            nameEditText,
             emailEditText,
             passwordEditText,
             roleAutoCompleteTextView,
-            clientIdEditText
+            usernameEditText
         )
 
         addListeners(
-            usernameEditText,
+            nameEditText,
             emailEditText,
             passwordEditText,
             roleAutoCompleteTextView,
-            clientIdEditText,
+            usernameEditText,
             afterTextChangedListener,
         )
 
@@ -98,10 +98,10 @@ class SignUpFragment : Fragment() {
 
     private fun observeSignUpFormState(
         signupButton: Button,
-        usernameEditText: EditText,
+        nameEditText: EditText,
         emailEditText: EditText,
         passwordEditText: EditText,
-        clientIdEditText: EditText
+        usernameEditText: EditText
     ) {
         viewModel.signupFormState.observe(viewLifecycleOwner,
             Observer { signupFormState ->
@@ -109,8 +109,8 @@ class SignUpFragment : Fragment() {
                     return@Observer
                 }
                 signupButton.isEnabled = signupFormState.isDataValid
-                signupFormState.usernameError?.let {
-                    usernameEditText.error = getString(it)
+                signupFormState.nameError?.let {
+                    nameEditText.error = getString(it)
                 }
                 signupFormState.emailError?.let {
                     emailEditText.error = getString(it)
@@ -118,19 +118,19 @@ class SignUpFragment : Fragment() {
                 signupFormState.passwordError?.let {
                     passwordEditText.error = getString(it)
                 }
-                signupFormState.clientIdError?.let {
-                    clientIdEditText.error = getString(it)
+                signupFormState.usernameError?.let {
+                    usernameEditText.error = getString(it)
                 }
             })
     }
 
     private fun createTextWatcher(
         viewModel: SignUpViewModel,
-        usernameEditText: EditText,
+        nameEditText: EditText,
         emailEditText: EditText,
         passwordEditText: EditText,
         roleAutoCompleteTextView: EditText,
-        clientIdEditText: EditText
+        usernameEditText: EditText
     ): TextWatcher {
         return object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -139,28 +139,28 @@ class SignUpFragment : Fragment() {
 
             override fun afterTextChanged(s: Editable) {
                 viewModel.signUpDataChanged(
-                    usernameEditText.text.toString(),
+                    nameEditText.text.toString(),
                     emailEditText.text.toString(),
                     passwordEditText.text.toString(),
                     roleAutoCompleteTextView.text.toString(),
-                    clientIdEditText.text.toString()
+                    usernameEditText.text.toString()
                 )
             }
         }
     }
 
     private fun addListeners(
-        usernameEditText: EditText,
+        nameEditText: EditText,
         emailEditText: EditText,
         passwordEditText: EditText,
         roleAutoCompleteTextView: EditText,
-        clientIdEditText: EditText,
+        usernameEditText: EditText,
         afterTextChangedListener: TextWatcher
     ) {
-        usernameEditText.addTextChangedListener(afterTextChangedListener)
+        nameEditText.addTextChangedListener(afterTextChangedListener)
         emailEditText.addTextChangedListener(afterTextChangedListener)
         passwordEditText.addTextChangedListener(afterTextChangedListener)
-        clientIdEditText.addTextChangedListener(afterTextChangedListener)
+        usernameEditText.addTextChangedListener(afterTextChangedListener)
         roleAutoCompleteTextView.addTextChangedListener(afterTextChangedListener)
     }
 
@@ -170,20 +170,20 @@ class SignUpFragment : Fragment() {
     ) {
         authButton.setOnClickListener {
             loadingProgressBar.visibility = View.VISIBLE
-            viewModel.fetchClientId(binding.clientId.text.toString())
+            viewModel.fetchUsername(binding.username.text.toString())
         }
     }
 
     private fun observeAuthResult(loadingProgressBar: View) {
 
-        viewModel.fetchClientIdResult.observe(viewLifecycleOwner,
-            Observer { fetchClientIdResult ->
-                fetchClientIdResult ?: return@Observer
+        viewModel.fetchUsernameResult.observe(viewLifecycleOwner,
+            Observer { fetchUsernameResult ->
+                fetchUsernameResult ?: return@Observer
                 loadingProgressBar.visibility = View.GONE
-                fetchClientIdResult.error?.let {
+                fetchUsernameResult.error?.let {
                     showSignUpFailed(it)
                 }
-                fetchClientIdResult.success?.let {
+                fetchUsernameResult.success?.let {
                     viewModel.auth(
                         binding.email.text.toString(),
                         binding.password.text.toString()
@@ -200,10 +200,10 @@ class SignUpFragment : Fragment() {
                 }
                 authResult.success?.let {
                     val newUser = User(
-                        binding.username.text.toString(),
+                        binding.name.text.toString(),
                         binding.email.text.toString(),
                         Role.valueOf(binding.role.text.toString()),
-                        binding.clientId.text.toString()
+                        binding.username.text.toString()
                     )
                     val newUserUID = MainActivity.getAuth().currentUser?.uid ?: "no uid"
                     viewModel.updateUser(newUserUID, newUser)

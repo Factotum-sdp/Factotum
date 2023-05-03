@@ -29,8 +29,8 @@ class SignUpViewModel(
     private val _updateUserResult = MutableLiveData<UpdateUsersResult>()
     val updateUserResult: LiveData<UpdateUsersResult> = _updateUserResult
 
-    private val _fetchClientIdResult = MutableLiveData<FetchClientIdResult>()
-    val fetchClientIdResult: LiveData<FetchClientIdResult> = _fetchClientIdResult
+    private val _fetchUsernameResult = MutableLiveData<FetchUsernameResult>()
+    val fetchUsernameResult: LiveData<FetchUsernameResult> = _fetchUsernameResult
 
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 
@@ -70,23 +70,23 @@ class SignUpViewModel(
         }
     }
 
-    fun fetchClientId(clientId: String) {
+    fun fetchUsername(username: String) {
         // launch in a separate asynchronous job
         viewModelScope.launch {
-            val result = withContext(dispatcher) { signUpDataSink.fetchClientId(clientId) }
+            val result = withContext(dispatcher) { signUpDataSink.fetchUsername(username) }
             if (result is Result.Success) {
-                _fetchClientIdResult.value = FetchClientIdResult(
+                _fetchUsernameResult.value = FetchUsernameResult(
                     success = result.data
                 )
             } else if (result is Result.Error &&
                 result.exception is IOException &&
-                result.exception.message == "Client ID already exists"
+                result.exception.message == "Username doesn't exist"
             ) {
-                _fetchClientIdResult.value = FetchClientIdResult(
-                    error = R.string.invalid_clientId
+                _fetchUsernameResult.value = FetchUsernameResult(
+                    error = R.string.user_not_found
                 )
             } else {
-                _fetchClientIdResult.value = FetchClientIdResult(
+                _fetchUsernameResult.value = FetchUsernameResult(
                     error = R.string.database_error
                 )
             }
@@ -95,36 +95,36 @@ class SignUpViewModel(
     }
 
     fun signUpDataChanged(
-        username: String,
+        name: String,
         email: String,
         password: String,
         role: String,
-        clientId: String
+        username: String
     ) {
-        if (!isUserNameValid(username)) {
-            _signupForm.value = SignUpFormState(usernameError = R.string.invalid_username)
+        if (!isNameValid(name)) {
+            _signupForm.value = SignUpFormState(nameError = R.string.invalid_name)
         } else if (!BaseAuthState.isEmailValid(email)) {
             _signupForm.value = SignUpFormState(emailError = R.string.invalid_email)
         } else if (!BaseAuthState.isPasswordValid(password)) {
             _signupForm.value = SignUpFormState(passwordError = R.string.invalid_password)
         } else if (role.isBlank()) {
             //
-        } else if (clientId.isBlank()) {
-            _signupForm.value = SignUpFormState(clientIdError = R.string.empty_clientId_error)
+        } else if (username.isBlank()) {
+            _signupForm.value = SignUpFormState(usernameError = R.string.empty_username_error)
         } else {
             _signupForm.value = SignUpFormState(isDataValid = true)
         }
     }
 
     // A placeholder username validation check
-    private fun isUserNameValid(username: String): Boolean {
+    private fun isNameValid(username: String): Boolean {
         return username.isNotBlank()
     }
 
     /**
      * Fetch client ID result : success or error message.
      */
-    data class FetchClientIdResult(
+    data class FetchUsernameResult(
         val success: String? = null,
         val error: Int? = null
     )

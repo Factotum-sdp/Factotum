@@ -24,9 +24,9 @@ class LoginDataSourceTest {
     private val userEmail = "jane.doe@gmail.com"
     private val userRole = Role.BOSS
     private val validPassword = "123456"
-    private val clientID = "123456789"
+    private val username = "123456789"
     private val invalidPassword = "123456789"
-    private val user = User(userName, userEmail, userRole, clientID)
+    private val user = User(userName, userEmail, userRole, username)
 
     @Test
     fun `login with correct credentials returns a LoggedInUser`() {

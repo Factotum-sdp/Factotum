@@ -1,7 +1,7 @@
 package com.github.factotum_sdp.factotum.placeholder
 
 data class Contact(
-    val id: String = "",
+    val username: String = "",
     val role: String = "",
     val name: String = "",
     val surname: String = "",

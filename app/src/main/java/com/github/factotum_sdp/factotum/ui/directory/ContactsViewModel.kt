@@ -20,19 +20,11 @@ class ContactsViewModel(application: Application) : AndroidViewModel(application
 
     val contacts: LiveData<List<Contact>> = repository.getContacts().asLiveData()
 
-    fun saveNewIDContact(
-        role: String,
-        name: String,
-        surname: String,
-        image: Int,
-        address: String,
-        phone: String,
-        details: String = ""
-    ) {
-        repository.saveNewIDContact(role, name, surname, image, address, phone, details)
+    fun getSavedContacts(): List<Contact> {
+        return repository.getCachedContacts()
     }
 
-    fun updateContact(contact: Contact) {
+    fun saveContact(contact: Contact) {
         repository.saveContact(contact)
     }
 

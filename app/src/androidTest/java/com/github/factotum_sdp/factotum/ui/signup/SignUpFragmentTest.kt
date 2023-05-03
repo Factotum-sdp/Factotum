@@ -56,17 +56,17 @@ class SignUpFragmentTest {
 
     @Test
     fun signUpFormInitialStateIsEmpty() {
-        onView(withId(R.id.username)).check(matches(withText("")))
+        onView(withId(R.id.name)).check(matches(withText("")))
         onView(withId(R.id.email)).check(matches(withText("")))
         onView(withId(R.id.password)).check(matches(withText("")))
         onView(withId(R.id.role)).check(matches(withText("")))
-        onView(withId(R.id.clientId)).check(matches(withText("")))
+        onView(withId(R.id.username)).check(matches(withText("")))
         onView(withId(R.id.signup)).check(matches(not(isEnabled())))
     }
 
     @Test
-    fun signUpFormWithoutClientId() {
-        onView(withId(R.id.username)).perform(typeText("Jane Doe"))
+    fun signUpFormWithoutUsername() {
+        onView(withId(R.id.name)).perform(typeText("Jane Doe"))
         onView(withId(R.id.fragment_signup_directors_parent)).perform(
             closeSoftKeyboard()
         )
@@ -86,7 +86,7 @@ class SignUpFragmentTest {
 
     @Test
     fun signUpFormWithoutRole() {
-        onView(withId(R.id.username)).perform(typeText("Jane Doe"))
+        onView(withId(R.id.name)).perform(typeText("Jane Doe"))
         onView(withId(R.id.fragment_signup_directors_parent)).perform(
             closeSoftKeyboard()
         )
@@ -98,13 +98,13 @@ class SignUpFragmentTest {
         onView(withId(R.id.fragment_signup_directors_parent)).perform(
             closeSoftKeyboard()
         )
-        onView(withId(R.id.clientId)).perform(typeText("clientId"))
+        onView(withId(R.id.username)).perform(typeText("username"))
         onView(withId(R.id.signup)).check(matches(not(isEnabled())))
     }
 
     @Test
     fun signUpFormWithoutPassword() {
-        onView(withId(R.id.username)).perform(typeText("Jane Doe"))
+        onView(withId(R.id.name)).perform(typeText("Jane Doe"))
         onView(withId(R.id.fragment_signup_directors_parent)).perform(
             closeSoftKeyboard()
         )
@@ -117,13 +117,13 @@ class SignUpFragmentTest {
         )
         onView(withId(R.id.role)).perform(click())
         onData(anything()).inRoot(isPlatformPopup()).atPosition(1).perform(click())
-        onView(withId(R.id.clientId)).perform(typeText("clientId"))
+        onView(withId(R.id.username)).perform(typeText("username"))
         onView(withId(R.id.signup)).check(matches(not(isEnabled())))
     }
 
     @Test
     fun signUpFormWithoutEmail() {
-        onView(withId(R.id.username)).perform(typeText("Jane Doe"))
+        onView(withId(R.id.name)).perform(typeText("Jane Doe"))
         onView(withId(R.id.fragment_signup_directors_parent)).perform(
             closeSoftKeyboard()
         )
@@ -136,12 +136,12 @@ class SignUpFragmentTest {
         )
         onView(withId(R.id.role)).perform(click())
         onData(anything()).inRoot(isPlatformPopup()).atPosition(1).perform(click())
-        onView(withId(R.id.clientId)).perform(typeText("clientId"))
+        onView(withId(R.id.username)).perform(typeText("username"))
         onView(withId(R.id.signup)).check(matches(not(isEnabled())))
     }
 
     @Test
-    fun signUpFormWithoutUsername() {
+    fun signUpFormWithoutName() {
         onView(withId(R.id.email)).perform(typeText("jane.doe@gmail.com"))
         onView(withId(R.id.fragment_signup_directors_parent)).perform(
             closeSoftKeyboard()
@@ -152,12 +152,12 @@ class SignUpFragmentTest {
         )
         onView(withId(R.id.role)).perform(click())
         onData(anything()).inRoot(isPlatformPopup()).atPosition(1).perform(click())
-        onView(withId(R.id.clientId)).perform(typeText("clientId"))
+        onView(withId(R.id.username)).perform(typeText("username"))
         onView(withId(R.id.signup)).check(matches(not(isEnabled())))
     }
 
-    fun signUpFormWithTakenClientId() {
-        onView(withId(R.id.username)).perform(typeText("Jane Doe"))
+    fun signUpFormWithNonExistingUsername() {
+        onView(withId(R.id.name)).perform(typeText("Jane Doe"))
         onView(withId(R.id.fragment_signup_directors_parent)).perform(
             closeSoftKeyboard()
         )
@@ -171,7 +171,7 @@ class SignUpFragmentTest {
         )
         onView(withId(R.id.role)).perform(click())
         onData(anything()).inRoot(isPlatformPopup()).atPosition(1).perform(click())
-        onView(withId(R.id.clientId)).perform(typeText("clientId1"))
+        onView(withId(R.id.username)).perform(typeText("username"))
         onView(withId(R.id.signup)).perform(click())
         FirebaseAuth.AuthStateListener {
             onView(withId(R.id.fragment_signup_directors_parent)).check(
@@ -184,7 +184,7 @@ class SignUpFragmentTest {
 
     @Test
     fun signUpFormWithAllFields() {
-        onView(withId(R.id.username)).perform(typeText("Jane Doe"))
+        onView(withId(R.id.name)).perform(typeText("Jane Doe"))
         onView(withId(R.id.fragment_signup_directors_parent)).perform(
             closeSoftKeyboard()
         )
@@ -198,13 +198,13 @@ class SignUpFragmentTest {
         )
         onView(withId(R.id.role)).perform(click())
         onData(anything()).inRoot(isPlatformPopup()).atPosition(1).perform(click())
-        onView(withId(R.id.clientId)).perform(typeText("clientId"))
+        onView(withId(R.id.username)).perform(typeText("username"))
         onView(withId(R.id.signup)).check(matches(isEnabled()))
     }
 
     @Test
     fun signUpFormWithAllFieldsAndClick() {
-        onView(withId(R.id.username)).perform(typeText("Jane Doe"))
+        onView(withId(R.id.name)).perform(typeText("Jane Doe"))
         onView(withId(R.id.fragment_signup_directors_parent)).perform(
             closeSoftKeyboard()
         )
@@ -218,7 +218,7 @@ class SignUpFragmentTest {
         )
         onView(withId(R.id.role)).perform(click())
         onData(anything()).inRoot(isPlatformPopup()).atPosition(1).perform(click())
-        onView(withId(R.id.clientId)).perform(typeText("clientId"))
+        onView(withId(R.id.username)).perform(typeText("joel"))
         onView(withId(R.id.signup)).perform(click())
         FirebaseAuth.AuthStateListener {
             onView(withId(R.id.fragment_login_directors_parent)).check(

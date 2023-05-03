@@ -14,29 +14,31 @@ class ContactsUtils {
 
     companion object {
         //fake data --> to be replaced with connection to database
-        private val randomContacts = mutableListOf<Contact>()
-        private val randomNames = listOf("John", "Jane", "Joe")
-        private var randomSurnames = listOf("Smith", "Jones", "Williams")
+        val randomContacts = mutableListOf<Contact>()
+        private val randomNames = listOf("John", "Jane", "Joe", "Jack", "Jill")
+        private var randomSurnames = listOf("Smith", "Jones", "Williams", "Brown", "Taylor")
         private val roles = listOf("Boss", "Courier", "Client")
         private val randomAddresses =
-            listOf("123 Fake Street", "456 Fake Street", "789 Fake Street")
-        private val randomPhones = listOf("123456789", "987654321", "123987456")
+            listOf("123 Fake Street", "456 Fake Street", "789 Fake Street", "123 Fake Avenue")
+        private val randomPhones = listOf("123456789", "987654321", "123987456", "456789123")
         private val randomDetails = listOf("I am a boss", "I am a courier", "I am a client")
 
         private const val image = R.drawable.contact_image
 
         private fun createContact(position: Int): Contact {
             return Contact(
-                position.toString(),
-                roles[position % roles.size], randomNames[position % randomNames.size],
-                randomSurnames[position % randomSurnames.size], image,
-                randomAddresses[position % randomAddresses.size],
-                randomPhones[position % randomPhones.size],
-                randomDetails[position % randomDetails.size]
+                username = "0$position",
+                role = roles[position % roles.size],
+                name = randomNames[position % randomNames.size],
+                surname = randomSurnames[position % randomSurnames.size],
+                profile_pic_id = image,
+                address = randomAddresses[position % randomAddresses.size],
+                phone = randomPhones[position % randomPhones.size],
+                details = randomDetails[position % randomDetails.size]
             )
         }
 
-        private fun createRandomContacts(count: Int) {
+        fun createRandomContacts(count: Int) {
             randomContacts.clear()
             for (i in randomContacts.size until count) {
                 randomContacts.add(createContact(i))
@@ -56,7 +58,7 @@ class ContactsUtils {
             createRandomContacts(count)
 
             for (contact in randomContacts) {
-                getDatabase().getReference("contacts").child(contact.id).setValue(contact)
+                getDatabase().getReference("contacts").child(contact.username).setValue(contact)
                     .addOnSuccessListener {
                         deferred.complete(Unit)
                     }
@@ -70,6 +72,11 @@ class ContactsUtils {
 
         fun emptyFirebaseDatabase() {
             getDatabase().reference.child("contacts").removeValue()
+        }
+
+        fun resetContact(contact: Contact) {
+            getDatabase().getReference("contacts").child(contact.username).removeValue()
+            getDatabase().getReference("contacts").child(contact.username).setValue(contact)
         }
 
         fun withHolderContactName(name: String): Matcher<RecyclerView.ViewHolder> {

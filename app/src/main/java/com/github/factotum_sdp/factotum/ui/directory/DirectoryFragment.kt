@@ -8,26 +8,18 @@ import android.view.ViewGroup
 import android.widget.SearchView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.firebase.database.FirebaseDatabase
 
 class DirectoryFragment : Fragment() {
 
-    private lateinit var db: FirebaseDatabase
     private lateinit var adapter: ContactsRecyclerAdapter
-    private lateinit var viewModel: ContactsViewModel
+    private val viewModel : ContactsViewModel by activityViewModels()
     private lateinit var emptyContactsMessage: TextView
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        db = MainActivity.getDatabase()
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,8 +33,7 @@ class DirectoryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = ViewModelProvider(requireActivity())[ContactsViewModel::class.java]
-        viewModel.setDatabase(db)
+
         adapter = ContactsRecyclerAdapter()
         adapter.updateContacts(viewModel.contacts.value ?: emptyList())
 
@@ -60,13 +51,21 @@ class DirectoryFragment : Fragment() {
             view.findViewById<RecyclerView>(R.id.contacts_recycler_view) // connect the recycler view to the layout
         val searchView =
             view.findViewById<SearchView>(R.id.contacts_search_view) // connect the search view to the layout
-        emptyContactsMessage = view.findViewById(R.id.empty_contacts_message)
 
         //the recycler is just the way we chose to represent the list of contacts
         recycler.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = this@DirectoryFragment.adapter
         }
+
+        emptyContactsMessage = view.findViewById(R.id.empty_contacts_message)
+
+        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onChanged() {
+                super.onChanged()
+                emptyContactsMessage.visibility = if (adapter.itemCount == 0) View.VISIBLE else View.GONE
+            }
+        })
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {

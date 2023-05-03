@@ -186,11 +186,11 @@ class RoadBookFragmentTest {
 
         // Navigate out of the RoadBookFragment
         onView(withId(R.id.drawer_layout))
-        .perform(DrawerActions.open())
+            .perform(DrawerActions.open())
         onView(withId(R.id.routeFragment))
-        .perform(click())
+            .perform(click())
         onView(withId(R.id.fragment_route_directors_parent))
-        .check(matches(isDisplayed()))
+            .check(matches(isDisplayed()))
 
         // Our target value to fetch
         // is represented as a List<String> in Firebase
@@ -198,13 +198,13 @@ class RoadBookFragmentTest {
 
         ref.get().addOnSuccessListener {
             if (it.value == null) {
-            // Set an exception in the future if our target value is not found in Firebase
-            future.completeExceptionally(NoSuchFieldException())
-        } else { // Necessary cast to access List methods
-            val ls: List<String> = it.value as List<String>
-            future.complete(ls)
-            assert(ls.size == DestinationRecords.RECORDS.size + 1)
-        }
+                // Set an exception in the future if our target value is not found in Firebase
+                future.completeExceptionally(NoSuchFieldException())
+            } else { // Necessary cast to access List methods
+                val ls: List<String> = it.value as List<String>
+                future.complete(ls)
+                assert(ls.size == DestinationRecords.RECORDS.size + 1)
+            }
         }.addOnFailureListener {
             future.completeExceptionally(it)
         }
@@ -234,7 +234,10 @@ class RoadBookFragmentTest {
         val clientID = DestinationRecords.RECORDS[2].clientID
         runBlocking {
             swipeRightTheRecordAt(3) // edit one record displayed below which has another clientID
-            onView(withId(R.id.autoCompleteClientID)).perform(clearText(), typeText(clientID)) // set for the same client that different record
+            onView(withId(R.id.autoCompleteClientID)).perform(
+                clearText(),
+                typeText(clientID)
+            ) // set for the same client that different record
             onView(withText(R.string.edit_dialog_update_b)).perform(click())
             delay(WORST_REFRESH_TIME)
         }
@@ -268,14 +271,16 @@ class RoadBookFragmentTest {
         eraseFirstRecTimestamp()
         swipeRightTheRecordAt(2)
         onView(withId(R.id.autoCompleteClientID))
-            .perform(click(), clearText(),  typeText("New "), closeSoftKeyboard())
+            .perform(click(), clearText(), typeText("New "), closeSoftKeyboard())
 
         val cal: Calendar = Calendar.getInstance()
         onView(withId(R.id.editTextTimestamp)).perform(click())
         onView(withText(timePickerCancelBLabel)).perform(click())
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
 
-        onView(withText(startsWith("arrival : ${timestampUntilHourFormat(cal)}"))).check(doesNotExist())
+        onView(withText(startsWith("arrival : ${timestampUntilHourFormat(cal)}"))).check(
+            doesNotExist()
+        )
     }
 
     @Test
@@ -285,7 +290,7 @@ class RoadBookFragmentTest {
 
         // Edit all fields :
         onView(withId(R.id.autoCompleteClientID))
-            .perform(click(), clearText(),  typeText("NewEvery "), closeSoftKeyboard())
+            .perform(click(), clearText(), typeText("NewEvery "), closeSoftKeyboard())
 
         val cal: Calendar = Calendar.getInstance()
         onView(withId(R.id.editTextTimestamp)).perform(click())
@@ -295,9 +300,14 @@ class RoadBookFragmentTest {
         onView(withId(R.id.editTextRate))
             .perform(click(), clearText(), typeText("7"), closeSoftKeyboard())
         onView(withId(R.id.multiAutoCompleteActions))
-            .perform(click(), clearText(), typeText("deliver, pick, pick, contact"), closeSoftKeyboard())
+            .perform(
+                click(),
+                clearText(),
+                typeText("deliver, pick, pick, contact"),
+                closeSoftKeyboard()
+            )
         onView(withId(R.id.editTextNotes))
-            .perform(click(),  typeText("Some notes about how SDP is fun"), closeSoftKeyboard())
+            .perform(click(), typeText("Some notes about how SDP is fun"), closeSoftKeyboard())
 
         // Confirm edition :
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
@@ -306,7 +316,11 @@ class RoadBookFragmentTest {
         onView(withText("NewEvery#1")).check(matches(isDisplayed()))
 
         eraseFirstRecTimestamp() // For having no ambiguity btw Timestamp on screen
-        onView(withText(startsWith("arrival : ${timestampUntilHourFormat(cal)}"))).check(matches(isDisplayed()))
+        onView(withText(startsWith("arrival : ${timestampUntilHourFormat(cal)}"))).check(
+            matches(
+                isDisplayed()
+            )
+        )
         onView(withText("wait : 5'")).check(matches(isDisplayed()))
         onView(withText("rate : 7")).check(matches(isDisplayed()))
         onView(withText("actions : (pick x2| deliver| contact)")).check(matches(isDisplayed()))
@@ -338,25 +352,25 @@ class RoadBookFragmentTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun dragAndDropByInjectionIsWorking() = runTest {
-            // Not possible for the moment in to cover the onMove() of the ItemtTouchHelper Callback,
-            // However here, I simulate its behavior to triggers the ViewModel change.
-            runBlocking {
-                onView(withText("X17#1")).check(isCompletelyAbove(withText("More#1")))
-                testRule.scenario.onActivity {
-                    val fragment = it.supportFragmentManager.fragments.first() as NavHostFragment
+        // Not possible for the moment in to cover the onMove() of the ItemtTouchHelper Callback,
+        // However here, I simulate its behavior to triggers the ViewModel change.
+        runBlocking {
+            onView(withText("X17#1")).check(isCompletelyAbove(withText("More#1")))
+            testRule.scenario.onActivity {
+                val fragment = it.supportFragmentManager.fragments.first() as NavHostFragment
 
-                    fragment.let {
-                        val curr =
-                            it.childFragmentManager.primaryNavigationFragment as RoadBookFragment
-                        val recyclerView = curr.view!!.findViewById<RecyclerView>(R.id.list)
-                        recyclerView.adapter?.notifyItemMoved(2, 3)
-                        curr.getRBViewModelForTest().moveRecord(2, 2)
-                        recyclerView.adapter?.notifyItemMoved(3, 4)
-                        curr.getRBViewModelForTest().moveRecord(3, 3)
-                    }
+                fragment.let {
+                    val curr =
+                        it.childFragmentManager.primaryNavigationFragment as RoadBookFragment
+                    val recyclerView = curr.view!!.findViewById<RecyclerView>(R.id.list)
+                    recyclerView.adapter?.notifyItemMoved(2, 3)
+                    curr.getRBViewModelForTest().moveRecord(2, 2)
+                    recyclerView.adapter?.notifyItemMoved(3, 4)
+                    curr.getRBViewModelForTest().moveRecord(3, 3)
                 }
-                delay(WORST_REFRESH_TIME)
             }
+            delay(WORST_REFRESH_TIME)
+        }
 
         onView(withText("X17#1")).check(matches(isDisplayed()))
         onView(withText("X17#1")).check(isCompletelyBelow(withText("More#1")))
@@ -417,6 +431,7 @@ class RoadBookFragmentTest {
         swipeLeftTheRecordAt(2)
         onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
     }
+
     @Test
     fun rbSwipeREnabledAgainWorks() {
         openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
@@ -431,6 +446,7 @@ class RoadBookFragmentTest {
         onView(withText(R.string.edit_dialog_update_b)).check(matches(isDisplayed()))
         onView(withText(R.string.edit_dialog_cancel_b)).check(matches(isDisplayed()))
     }
+
     @Test
     fun rbDragNDropEnabledAgainWorks() { // Still can't test the drag & drop touch action
         openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
@@ -719,10 +735,15 @@ class RoadBookFragmentTest {
         onView(withId(R.id.roadBookFragment))
             .perform(click())
     }
+
     private fun newRecord() {
+        newRecordWithId("New")
+    }
+
+    fun newRecordWithId(id: String) {
         onView(withId(R.id.fab)).perform(click())
         onView(withId(R.id.autoCompleteClientID))
-            .perform(click(), typeText("New"), closeSoftKeyboard())
+            .perform(click(), typeText(id), closeSoftKeyboard())
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
     }
 

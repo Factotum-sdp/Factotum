@@ -52,7 +52,7 @@ class DisplayFragmentTest {
         @AfterClass
         fun tearDownClass() {
             Intents.release()
-            runBlocking{emptyFirebaseStorage(Firebase.storage.reference)}
+            runBlocking{ emptyFirebaseStorage(Firebase.storage.reference) }
         }
     }
 

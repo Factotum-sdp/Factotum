@@ -10,7 +10,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 // ViewModel for managing the display of images from Firebase Storage
 class ClientDisplayViewModel(userID: MutableLiveData<String>) : ViewModel() {

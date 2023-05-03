@@ -76,6 +76,10 @@ class RoadBookFragmentTest {
         PreferencesSetting.setRoadBookPrefs(testRule)
         val courier = UsersPlaceHolder.USER_COURIER
         GeneralUtils.fillUserEntryAndEnterTheApp(courier.email, courier.password)
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.roadBookFragment))
+            .perform(click())
     }
 
 

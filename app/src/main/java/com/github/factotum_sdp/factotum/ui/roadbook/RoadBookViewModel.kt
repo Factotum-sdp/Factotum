@@ -89,6 +89,8 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : Vi
         }
     }
 
+
+
     fun timestampNextDestinationRecord(timeStamp: Date) {
         try {
             val record = currentDRecList().getNextDestinationRecord()
@@ -249,7 +251,6 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : Vi
     fun hideArchivedRecords() {
         _recordsList.value = currentDRecList().withoutArchived()
     }
-
 
     //Needed to update the destIDOccurrences cache
     private fun addDemoRecords(ls: List<DestinationRecord>) {

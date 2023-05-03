@@ -9,22 +9,38 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.*
 import com.github.factotum_sdp.factotum.data.FirebaseInstance.getAuth
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.NavigationUI
+import androidx.navigation.ui.navigateUp
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.github.factotum_sdp.factotum.data.FirebaseInstance.getDatabase
 import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
 import com.github.factotum_sdp.factotum.repositories.SettingsRepository
+import com.github.factotum_sdp.factotum.ui.picture.UploadWorker
+import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.ui.settings.SettingsViewModel
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
+
+private const val INTERVAL_UPLOAD_TIME_MINUTE = 5L
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private val auth: FirebaseAuth = getAuth()
+    private lateinit var user: UserViewModel
     private lateinit var settings: SettingsViewModel
-
+    private lateinit var contactsViewModel: ContactsViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +51,9 @@ class MainActivity : AppCompatActivity() {
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
+
+        contactsViewModel = ViewModelProvider(this)[ContactsViewModel::class.java]
+        contactsViewModel.setDatabase(getDatabase())
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
@@ -75,6 +94,10 @@ class MainActivity : AppCompatActivity() {
         return settings
     }
 
+    fun applicationUser(): UserViewModel {
+        return user
+    }
+
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
@@ -88,7 +111,7 @@ class MainActivity : AppCompatActivity() {
         val email = headerView.findViewById<TextView>(R.id.textView)
 
         // Instantiate the current user
-        val user = ViewModelProvider(this)[UserViewModel::class.java]
+        user = ViewModelProvider(this)[UserViewModel::class.java]
         binding.navView.findViewTreeLifecycleOwner()?.let { lco ->
             user.loggedInUser.observe(lco) {
                 val format = "${it.name} (${it.role})"
@@ -99,6 +122,7 @@ class MainActivity : AppCompatActivity() {
                 // according to the user role
                 updateMenuItems(it.role)
                 navigateToFragment(it.role)
+                scheduleUpload(it.role)
             }
         }
     }
@@ -153,6 +177,17 @@ class MainActivity : AppCompatActivity() {
         navController.navigate(destinationFragmentId, null, navOptions)
     }
 
+    // Schedule the upload of the database every INTERVAL_UPLOAD_TIME minutes
+    private fun scheduleUpload(role: Role) {
+        if (role == Role.COURIER) {
+            CoroutineScope(Dispatchers.IO).launch {
+                val uploadWorkRequest =
+                    PeriodicWorkRequestBuilder<UploadWorker>(INTERVAL_UPLOAD_TIME_MINUTE, TimeUnit.MINUTES)
+                        .build()
+                WorkManager.getInstance(this@MainActivity).enqueue(uploadWorkRequest)
+            }
+        }
+    }
 
     // Set the OnNavigationItemSelectedListener for the NavigationView
     private val onNavigationItemSelectedListener =
@@ -174,10 +209,4 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-
-
-    companion object {
-
-    }
-
 }

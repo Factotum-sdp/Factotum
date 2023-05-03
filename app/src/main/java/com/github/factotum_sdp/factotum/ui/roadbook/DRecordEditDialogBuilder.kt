@@ -18,10 +18,10 @@ import com.github.factotum_sdp.factotum.models.DestinationRecord
 import com.github.factotum_sdp.factotum.models.DestinationRecord.Companion.parseActions
 import com.github.factotum_sdp.factotum.models.DestinationRecord.Companion.parseTimestamp
 import com.github.factotum_sdp.factotum.models.DestinationRecord.Companion.parseWaitTimeOrRate
-import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
+import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
 
 /**
  * That Class represent a DialogBuilder specifically designed to build a custom
@@ -45,7 +45,8 @@ class DRecordEditDialogBuilder(
     context: Context?,
     private val host: Fragment,
     private val rbViewModel: RoadBookViewModel,
-    private val rbRecyclerView: RecyclerView
+    private val rbRecyclerView: RecyclerView,
+    private val contactsViewModel: ContactsViewModel
 ) :
     AlertDialog.Builder(ContextThemeWrapper(context, android.R.style.Theme_Holo_Dialog)) {
 
@@ -175,15 +176,16 @@ class DRecordEditDialogBuilder(
     // Here we will need to get the clients IDs through a ViewModel instance
     // initiated in the mainActivity and representing all the clients
     private fun setClientIDsAdapter() {
-        var lsClientIDs = DestinationRecords.RECORDS.map { it.clientID }.toSet()
-        lsClientIDs = lsClientIDs.plus(DestinationRecords.RECORD_TO_ADD.clientID)
-        val clientIDsAdapter = ArrayAdapter(
-            host.requireContext(),
-            R.layout.pop_auto_complete_client_id,
-            lsClientIDs.toList()
-        )
-        clientIDView.setAdapter(clientIDsAdapter)
+
         clientIDView.threshold = 1
+        contactsViewModel.contacts.observe(host.viewLifecycleOwner) { it ->
+            val clientIDsAdapter = ArrayAdapter(
+                host.requireContext(),
+                R.layout.pop_auto_complete_client_id,
+                it.map { it.username }
+            )
+            clientIDView.setAdapter(clientIDsAdapter)
+        }
     }
 
     // A TimePicker Dialog to set the timestamp EditText field

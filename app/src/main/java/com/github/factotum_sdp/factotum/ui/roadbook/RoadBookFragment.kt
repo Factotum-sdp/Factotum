@@ -1,8 +1,10 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -14,6 +16,9 @@ import androidx.recyclerview.widget.ItemTouchHelper.*
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.FirebaseInstance
 import com.github.factotum_sdp.factotum.preferencesDataStore
+import com.github.factotum_sdp.factotum.UserViewModel
+import com.github.factotum_sdp.factotum.data.DeliveryLogger
+import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
 import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
 import com.github.factotum_sdp.factotum.repositories.RoadBookRepository
@@ -48,6 +53,10 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
     private var usePreferences = false
     private val locationTrackingHandler: LocationTrackingHandler = LocationTrackingHandler()
+    private val deliveryLogger: DeliveryLogger = DeliveryLogger()
+    private val userViewModel: UserViewModel by activityViewModels()
+
+    private val contactsViewModel : ContactsViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -106,7 +115,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         view.findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
             DRecordEditDialogBuilder(
                 context, requireParentFragment(),
-                rbViewModel, rbRecyclerView
+                rbViewModel, rbRecyclerView, contactsViewModel
             )
                 .forNewRecordEdition()
                 .show()
@@ -151,6 +160,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         }
         setLiveLocationSwitch(fragMenu)
         setRefreshButtonListener(fragMenu)
+        setEndShiftButtonListener(fragMenu)
 
         // Only at menu initialization
         val itemTouchHelper = ItemTouchHelper(newItemTHCallBack())
@@ -218,6 +228,29 @@ class RoadBookFragment : Fragment(), MenuProvider {
         }
     }
 
+    private fun setEndShiftButtonListener(fragMenu: Menu) {
+        val endShiftButton = fragMenu.findItem(R.id.finish_shift)
+        endShiftButton.setOnMenuItemClickListener {
+            val dialogBuilder = AlertDialog.Builder(requireContext())
+            dialogBuilder.setMessage(R.string.finish_shift_alert_question)
+                .setPositiveButton(R.string.end_shift) { dialog, _ ->
+                    rbViewModel.recordsListState.value?.let { deliveryLogger.logDeliveries(it, userViewModel.loggedInUser.value!!.name)
+                        Toast.makeText(
+                            requireContext(),
+                            R.string.shift_ended,
+                            Toast.LENGTH_SHORT
+                        ).show()}
+                }
+                .setNegativeButton("Not now") { dialog, _ ->
+                    dialog.cancel()
+                }
+            val alert = dialogBuilder.create()
+            alert.setTitle(R.string.end_shift_dialog_title)
+            alert.show()
+            true
+        }
+    }
+
     private fun newItemTHCallBack(): Callback {
 
         // Overriding the getDragDirs and getSwipeDirs() to
@@ -233,6 +266,10 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
             override fun getRecyclerView(): RecyclerView {
                 return rbRecyclerView
+            }
+
+            override fun getContactsViewModel(): ContactsViewModel {
+                return contactsViewModel
             }
 
             override fun getDragDirs(

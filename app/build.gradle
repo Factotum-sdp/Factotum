@@ -65,6 +65,7 @@ android {
 }
 
 dependencies {
+    implementation 'androidx.core:core-ktx:1.10.0'
     androidTestImplementation 'androidx.arch.core:core-testing:2.2.0'
     debugImplementation "androidx.fragment:fragment-testing:1.5.7"
     implementation 'androidx.core:core-ktx:1.10.0'
@@ -95,6 +96,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth-ktx'
     implementation 'com.google.firebase:firebase-database-ktx:20.2.0'
     implementation 'com.google.firebase:firebase-storage-ktx:20.1.0'
+    implementation 'androidx.work:work-runtime-ktx:2.8.1'
     implementation platform('com.google.firebase:firebase-bom:31.5.0') // Firebase BOM
 
     testImplementation 'junit:junit:4.13.2'

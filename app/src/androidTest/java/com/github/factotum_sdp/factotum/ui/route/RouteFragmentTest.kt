@@ -129,7 +129,7 @@ class RouteFragmentTest {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             geocoder.getFromLocationName(city, 1) { addresses ->
                 val bestAddress = addresses[0]
-                result = bestAddress.toString()
+                result = bestAddress.getAddressLine(0).toString()
                 onView(withId(com.google.android.material.R.id.snackbar_text)).check(
                     matches(
                         withText(result)

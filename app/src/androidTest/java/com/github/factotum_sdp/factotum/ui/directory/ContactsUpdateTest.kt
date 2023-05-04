@@ -2,6 +2,7 @@ package com.github.factotum_sdp.factotum.ui.directory
 
 import android.widget.EditText
 import androidx.recyclerview.widget.RecyclerView
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.closeSoftKeyboard
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
@@ -22,6 +23,7 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.models.Location
 import com.github.factotum_sdp.factotum.placeholder.Contact
 import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.createRandomContacts
 import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.randomContacts
@@ -30,6 +32,7 @@ import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.fail
+import org.hamcrest.Matchers.equalToIgnoringCase
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -129,7 +132,7 @@ class ContactsUpdateTest {
         surnameEditText.check(matches(withText(currContact.surname)))
 
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        val addressEditText = device.findObject(By.text(currContact.address))
+        val addressEditText = device.findObject(By.text(currContact.addressName.toString()))
         assert(addressEditText != null)
 
         val phoneEditText = onView(withId(R.id.contactCreationPhoneNumber))
@@ -139,7 +142,7 @@ class ContactsUpdateTest {
         notesEditText.check(matches(withText(currContact.details)))
 
         val roleSpinner = onView(withId(R.id.roles_spinner))
-        roleSpinner.check(matches(withSpinnerText(currContact.role)))
+        roleSpinner.check(matches(withSpinnerText(equalToIgnoringCase(currContact.role))))
     }
 
     @Test
@@ -177,8 +180,9 @@ class ContactsUpdateTest {
             .check(matches(withText("Doe")))
         onView(withId(R.id.contact_username))
             .check(matches(withText("@johndoe")))
+        val address = Location.createAndStore("123 Main St", getApplicationContext())
         onView(withId(R.id.contact_address))
-            .check(matches(withText("123 Main St")))
+            .check(matches(withText(address?.addressName)))
         onView(withId(R.id.contact_phone))
             .check(matches(withText("555-555-1234")))
         onView(withId(R.id.contact_details))

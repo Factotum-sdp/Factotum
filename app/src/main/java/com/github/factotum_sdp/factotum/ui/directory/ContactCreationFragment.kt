@@ -25,16 +25,17 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getDatabase
 import com.github.factotum_sdp.factotum.models.Location
 import com.github.factotum_sdp.factotum.databinding.FragmentContactCreationBinding
+import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.placeholder.Contact
 import kotlinx.coroutines.launch
 
 /**
  * A simple ContactCreation fragment.
  */
-class ContactCreation : Fragment() {
+class ContactCreationFragment : Fragment() {
 
     // Should not stay like that and instead roles should use roles from future ENUM
-    private val roles = listOf("Boss", "Courier", "Client")
+    private val roles = Role.values().map { it.name }
     private var currentContact: Contact? = null
     private val isUpdate: Boolean
         get() = currentContact != null
@@ -104,7 +105,7 @@ class ContactCreation : Fragment() {
             surname.setText(contact.surname)
             username.setText(contact.username)
             managingClientUsername.setText(contact.super_client)
-            binding.contactCreationAddress.setQuery(contact.address, false)
+            binding.contactCreationAddress.setQuery(contact.addressName, false)
             phoneNumber.setText(contact.phone)
             details.setText(contact.details)
         }
@@ -217,6 +218,7 @@ class ContactCreation : Fragment() {
                 return@setOnClickListener
             } else {
                 if (currentContact != null) viewModel.deleteContact(currentContact!!)
+                val address = validateLocation()
                 viewModel.saveContact(
                     Contact(
                         username = username.text.toString(),
@@ -224,7 +226,9 @@ class ContactCreation : Fragment() {
                         name = name.text.toString(),
                         surname = surname.text.toString(),
                         profile_pic_id = R.drawable.contact_image,
-                        address = binding.contactCreationAddress.query.toString(),
+                        addressName = address?.addressName,
+                        latitude = address?.coordinates?.latitude,
+                        longitude = address?.coordinates?.longitude,
                         super_client =  if (spinner.selectedItem.toString() == "Client")
                             managingClientUsername.text.toString() else null,
                         phone = phoneNumber.text.toString(),
@@ -238,6 +242,11 @@ class ContactCreation : Fragment() {
 
     private fun isUsernameUnique(username: String): Boolean {
         return viewModel.contacts.value?.find { it.username == username } == null
+    }
+
+    private fun validateLocation(): Location? {
+        val addressName = binding.contactCreationAddress.query.toString()
+        return Location.createAndStore(addressName, requireContext())
     }
 
     private fun showErrorToast(resId: Int) {

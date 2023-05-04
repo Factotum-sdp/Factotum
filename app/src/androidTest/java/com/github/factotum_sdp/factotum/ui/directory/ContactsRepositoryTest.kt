@@ -54,7 +54,10 @@ class ContactsRepositoryTest {
             "John",
             "Doe",
             R.drawable.contact_image,
+            null,
             "123 Main St",
+            25.0,
+            45.0,
             "555-555-1234"
         )
 
@@ -77,7 +80,10 @@ class ContactsRepositoryTest {
             "John",
             "Doe",
             R.drawable.contact_image,
+            null,
             "123 Main St",
+            25.0,
+            45.0,
             "555-555-1234"
         )
 

@@ -1,10 +1,10 @@
 package com.github.factotum_sdp.factotum.ui.directory
 
 import android.content.Intent
-import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.intent.Intents
@@ -13,13 +13,13 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
-import androidx.test.uiautomator.Until.hasObject
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.models.User
 import com.github.factotum_sdp.factotum.placeholder.Contact
+import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
 import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.createRandomContacts
 import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.randomContacts
@@ -28,7 +28,6 @@ import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.LocationUtils
 import org.hamcrest.CoreMatchers
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -76,9 +75,27 @@ class ContactDetailsFragmentTest {
     }
 
     @Test
-    fun deleteButtonIsDisplayed() {
+    fun deleteButtonIsDisplayedForABoss() {
         onView(withId(R.id.button_delete_contact))
             .check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun deleteButtonIsNotDisplayedForACourier() {
+        val user = UsersPlaceHolder.USER_COURIER
+        val loggedInUser = User(user.name, user.email, user.role)
+        GeneralUtils.injectLoggedInUser(activityRule, loggedInUser)
+        onView(withId(R.id.button_delete_contact))
+            .check(doesNotExist())
+    }
+
+    @Test
+    fun deleteButtonIsNotDisplayedForAClient() {
+        val user = UsersPlaceHolder.USER_CLIENT
+        val loggedInUser = User(user.name, user.email, user.role)
+        GeneralUtils.injectLoggedInUser(activityRule, loggedInUser)
+        onView(withId(R.id.button_delete_contact))
+            .check(doesNotExist())
     }
 
     @Test

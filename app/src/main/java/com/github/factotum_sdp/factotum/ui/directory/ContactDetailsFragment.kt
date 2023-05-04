@@ -111,6 +111,7 @@ class ContactDetailsFragment : Fragment() {
             routeViewModel.addRoute(DUMMY_ROUTE[0]) //remove when merged with contact creation and use real route
             it.findNavController().navigate(R.id.action_contactDetailsFragment2_to_MapsFragment)
         }
-
     }
+
+
 }

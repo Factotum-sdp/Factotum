@@ -22,6 +22,9 @@ import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import junit.framework.TestCase.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -133,7 +136,8 @@ class ContactsCreationTest {
     }
 
     @Test
-    fun createdContactHasCorrectValue() {
+    fun createdContactHasCorrectValue() = runTest {
+
         val username = "johnabby" + Random().nextInt(3000).toString()
         val usernameEditText = onView(withId(R.id.editTextUsername))
         usernameEditText.perform(replaceText(username))
@@ -156,7 +160,9 @@ class ContactsCreationTest {
         notesEditText.perform(replaceText("This is a test note."))
 
         onView(withId(R.id.confirm_form)).perform(click())
-        Thread.sleep(3000)
+        runBlocking {
+            delay(4000)
+        }
         onView(withText("@$username")).perform(click())
 
         onView(withId(R.id.contact_username)).check(matches(withText("@$username")))

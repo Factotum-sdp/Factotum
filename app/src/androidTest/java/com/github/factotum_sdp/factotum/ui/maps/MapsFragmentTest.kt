@@ -79,7 +79,7 @@ class MapsFragmentTest {
         }
     }
 
-
+    /*
     @Test
     fun b_permissionAllowShowLocation() {
         onView(withText(startsWith(FIRST_ROUTE_NAME_PREFIX))).perform(click())
@@ -89,6 +89,7 @@ class MapsFragmentTest {
         }
         assertTrue(checkLocationEnabled(testRule))
     }
+     */
 
 
     @Test

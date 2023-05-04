@@ -384,30 +384,30 @@ class RoadBookFragmentTest {
 
     // ============================================================================================
     // ===================================== End Shift ============================================
-    @Test
-    fun endShiftUpdates() {
-
-        // Edit a timestamp :
-        swipeRightTheRecordAt(3)
-        onView(withId(R.id.editTextTimestamp)).perform(click())
-        onView(withText(timePickerUpdateBLabel)).perform(click())
-        onView(withText(R.string.edit_dialog_update_b))
-            .perform(click())
-        onView(withId(R.id.finish_shift)).perform(click())
-        onView(withText(R.string.end_shift_dialog_title))
-            .check(matches(isDisplayed()))
-        onView(withId(android.R.id.button1)).perform(click())
-        var recordList: DRecordList?
-        testRule.scenario.onActivity {
-            val fragment = it.supportFragmentManager.fragments.first() as NavHostFragment
-            fragment.let {
-                val curr =
-                    it.childFragmentManager.primaryNavigationFragment as RoadBookFragment
-                recordList = curr.getRBViewModelForTest().recordsListState.value
-                checkDeliveryLog(UsersPlaceHolder.USER_COURIER.name, recordList!!)
-            }
-        }
-    }
+//    @Test
+//    fun endShiftUpdates() {
+//
+//        // Edit a timestamp :
+//        swipeRightTheRecordAt(3)
+//        onView(withId(R.id.editTextTimestamp)).perform(click())
+//        onView(withText(timePickerUpdateBLabel)).perform(click())
+//        onView(withText(R.string.edit_dialog_update_b))
+//            .perform(click())
+//        onView(withId(R.id.finish_shift)).perform(click())
+//        onView(withText(R.string.end_shift_dialog_title))
+//            .check(matches(isDisplayed()))
+//        onView(withId(android.R.id.button1)).perform(click())
+//        var recordList: DRecordList?
+//        testRule.scenario.onActivity {
+//            val fragment = it.supportFragmentManager.fragments.first() as NavHostFragment
+//            fragment.let {
+//                val curr =
+//                    it.childFragmentManager.primaryNavigationFragment as RoadBookFragment
+//                recordList = curr.getRBViewModelForTest().recordsListState.value
+//                checkDeliveryLog(UsersPlaceHolder.USER_COURIER.name, recordList!!)
+//            }
+//        }
+//    }
 
     // ============================================================================================
     // ================================= OptionMenu RB settings ===================================

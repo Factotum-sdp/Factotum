@@ -28,6 +28,7 @@ import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.LocationUtils
 import org.hamcrest.CoreMatchers
+import org.hamcrest.Matchers.equalToIgnoringCase
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -126,9 +127,9 @@ class ContactDetailsFragmentTest {
         onView(withId(R.id.contact_phone))
             .check(matches(withText(currContact.phone)))
         onView(withId(R.id.contact_role))
-            .check(matches(withText(currContact.role)))
+            .check(matches(withText(equalToIgnoringCase(currContact.role))))
         onView(withId(R.id.contact_address))
-            .check(matches(withText(currContact.address)))
+            .check(matches(withText(currContact.addressName)))
         if (currContact.details != null) {
             onView(withId(R.id.contact_details))
                 .check(matches(withText(currContact.details)))
@@ -210,12 +211,8 @@ class ContactDetailsFragmentTest {
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         if (LocationUtils.hasLocationPopUp()) {
             device.findObject(UiSelector().textContains(LocationUtils.buttonTextAllow)).click()
-        } else {
-            Log.d("Location", "No pop up")
         }
         val markers = device.wait(hasObject(By.descContains("Destination")), 5000L)
-        Log.d("Location", "has timed out: ${!device.hasObject(By.descContains("Destination"))}")
-        Log.d("Location", "Markers: $markers")
         assertTrue(markers)
     }
     */

@@ -22,6 +22,8 @@ class ContactsUtils {
             listOf("123 Fake Street", "456 Fake Street", "789 Fake Street", "123 Fake Avenue")
         private val randomPhones = listOf("123456789", "987654321", "123987456", "456789123")
         private val randomDetails = listOf("I am a boss", "I am a courier", "I am a client")
+        const val FAKE_LATITUDE = 51.5074
+        const val FAKE_LONGITUDE = 0.1278
 
         private const val image = R.drawable.contact_image
 
@@ -32,7 +34,9 @@ class ContactsUtils {
                 name = randomNames[position % randomNames.size],
                 surname = randomSurnames[position % randomSurnames.size],
                 profile_pic_id = image,
-                address = randomAddresses[position % randomAddresses.size],
+                addressName = randomAddresses[position % randomAddresses.size],
+                latitude = FAKE_LATITUDE,
+                longitude = FAKE_LONGITUDE,
                 phone = randomPhones[position % randomPhones.size],
                 details = randomDetails[position % randomDetails.size]
             )

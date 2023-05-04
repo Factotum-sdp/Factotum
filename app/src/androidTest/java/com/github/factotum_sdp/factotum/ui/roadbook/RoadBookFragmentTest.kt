@@ -720,17 +720,45 @@ class RoadBookFragmentTest {
 
     // ============================================================================================
     // ================================Automatic Timestamp ========================================
+    private val updateTimeMockLocationClient = 10000L
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun automaticTimestampIsWorkingOnRBFragment() = runTest {
+    fun noAutomaticTimestampIsDoneOutOfDestinationPlace() = runTest {
         // Non timestamped record, hence swipe left shows deletion dialog
         swipeLeftTheRecordAt(1)
         onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
         onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
 
         onView(withId(R.id.location_switch)).perform(click())
+
         runBlocking {
-            delay(8000L)
+            // After only one update the courier is still not arrived
+            delay(updateTimeMockLocationClient)
+
+            // Still not archived
+            swipeLeftTheRecordAt(1)
+            onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
+            onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
+
+            // Disable location
+            onView(withId(R.id.location_switch)).perform(click())
+            onView(withId(R.id.refresh_button)).perform(click())
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun automaticTimestampIsDoneOnDestinationPlacePerimeter() = runTest {
+        // Non timestamped record, hence swipe left shows deletion dialog
+        swipeLeftTheRecordAt(1)
+        onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
+        onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
+
+        onView(withId(R.id.location_switch)).perform(click())
+
+        runBlocking {
+            // After 4 updates the courier is arrived near the destination (< 15m)
+            delay(4 * updateTimeMockLocationClient)
 
             // Now swipe left archive the record
             swipeLeftTheRecordAt(1)
@@ -742,6 +770,35 @@ class RoadBookFragmentTest {
             onView(withId(R.id.refresh_button)).perform(click())
         }
     }
+
+    /* // Change the next record with one having his location on the exact same courier's arrival place
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun automaticTimestampIsDoneOnExactDestinationPlace() = runTest {
+        // Non timestamped record, hence swipe left shows deletion dialog
+        swipeLeftTheRecordAt(1)
+        onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
+        onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
+
+        onView(withId(R.id.location_switch)).perform(click())
+
+        runBlocking {
+            // After 4 updates the courier is arrived exactly at the destination (same coordinates)
+            delay(4 * updateTimeMockLocationClient)
+
+            // Now swipe left archive the record
+            swipeLeftTheRecordAt(1)
+            onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
+            onView(withText(DestinationRecords.RECORDS[1].destID)).check(doesNotExist())
+
+            // Disable location
+            onView(withId(R.id.location_switch)).perform(click())
+            onView(withId(R.id.refresh_button)).perform(click())
+        }
+    }*/
+
+    // Test with another record on top the timestamp is never done
+
 
     // ============================================================================================
     // ===================================== Helpers ==============================================

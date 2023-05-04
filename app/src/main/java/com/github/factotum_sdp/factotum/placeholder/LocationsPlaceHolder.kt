@@ -5,20 +5,6 @@ import java.util.Calendar
 
 object LocationsPlaceHolder {
 
-    val EPFL = Location("fake").apply {
-        latitude =  46.5191
-        longitude = 6.5661
-        time = Calendar.getInstance().timeInMillis
-        accuracy = 10.0f
-    }
-
-    val GENEVA = Location("fake").apply {
-        latitude = 46.2044
-        longitude = 6.1432
-        time = Calendar.getInstance().timeInMillis
-        accuracy = 10.0f
-    }
-
     val ROLEX_CENTER = Location("fake").apply {
         latitude = 46.517733
         longitude = 6.569090
@@ -32,6 +18,28 @@ object LocationsPlaceHolder {
         time = Calendar.getInstance().timeInMillis
         accuracy = 10.0f
     }
+
+    val PELICAN_TO_ROLEX_1 = Location("fake").apply {
+        latitude = 46.514899
+        longitude = 6.571756
+        time = Calendar.getInstance().timeInMillis
+        accuracy = 10.0f
+    }
+
+    val PELICAN_TO_ROLEX_2 = Location("fake").apply {
+        latitude = 46.51659708501517
+        longitude = 6.570479266144693
+        time = Calendar.getInstance().timeInMillis
+        accuracy = 10.0f
+    }
+
+    val FRONT_OF_ROLEX = Location("fake").apply {
+        latitude = 46.517719 //Dist to ROLEX < 15m
+        longitude = 6.569090
+        time = Calendar.getInstance().timeInMillis
+        accuracy = 10.0f
+    }
+
 }
 
 

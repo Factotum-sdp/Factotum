@@ -57,6 +57,7 @@ class DisplayFragment : Fragment() {
         _binding = null
     }
 
+
     private fun setupObservers() {
         userViewModel.loggedInUser.observe(viewLifecycleOwner) { user ->
             userID.value = user.name
@@ -80,7 +81,23 @@ class DisplayFragment : Fragment() {
                 }
             }
         }
+
+        // Add this observer
+        userFolder.observe(viewLifecycleOwner) {
+            when (userRole.value) {
+                Role.BOSS -> {
+                    observeBossFolders()
+                }
+                Role.CLIENT -> {
+                    observeClientPhotos()
+                }
+                else -> {
+                    observeClientPhotos()
+                }
+            }
+        }
     }
+
 
     private fun shareImage(storageReference: StorageReference, phoneNumber: String) {
         storageReference.downloadUrl.addOnSuccessListener { uri ->

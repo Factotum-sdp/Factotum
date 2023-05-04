@@ -9,7 +9,6 @@ import kotlinx.coroutines.CompletableDeferred
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.TypeSafeMatcher
-import kotlin.random.Random
 
 class ContactsUtils {
 
@@ -23,6 +22,8 @@ class ContactsUtils {
             listOf("123 Fake Street", "456 Fake Street", "789 Fake Street", "123 Fake Avenue")
         private val randomPhones = listOf("123456789", "987654321", "123987456", "456789123")
         private val randomDetails = listOf("I am a boss", "I am a courier", "I am a client")
+        const val FAKE_LATITUDE = 51.5074
+        const val FAKE_LONGITUDE = 0.1278
 
         private const val image = R.drawable.contact_image
 
@@ -34,8 +35,8 @@ class ContactsUtils {
                 surname = randomSurnames[position % randomSurnames.size],
                 profile_pic_id = image,
                 addressName = randomAddresses[position % randomAddresses.size],
-                latitude = Random.nextDouble(25.0),
-                longitude = Random.nextDouble(25.0),
+                latitude = FAKE_LATITUDE,
+                longitude = FAKE_LONGITUDE,
                 phone = randomPhones[position % randomPhones.size],
                 details = randomDetails[position % randomDetails.size]
             )

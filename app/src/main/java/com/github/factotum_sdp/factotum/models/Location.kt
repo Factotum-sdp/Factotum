@@ -101,7 +101,7 @@ class Location {
                 result = if (addresses.size > 0) addresses else null
                 latch.countDown()
             }
-            latch.await()
+            latch.await(500L, java.util.concurrent.TimeUnit.MILLISECONDS)
             return result
         }
 

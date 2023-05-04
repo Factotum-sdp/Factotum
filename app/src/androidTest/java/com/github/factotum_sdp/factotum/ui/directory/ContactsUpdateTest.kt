@@ -176,7 +176,7 @@ class ContactsUpdateTest {
             .check(matches(withText("John")))
         onView(withId(R.id.contact_surname))
             .check(matches(withText("Doe")))
-        val check = onView(withId(R.id.contact_username))
+        onView(withId(R.id.contact_username))
             .check(matches(withText("@johndoe")))
         val address = Location.createAndStore("123 Main St", getApplicationContext())
         onView(withId(R.id.contact_address))

@@ -1,6 +1,6 @@
 package com.github.factotum_sdp.factotum.placeholder
 
-import com.github.factotum_sdp.factotum.MainActivity
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.data.LoginDataSource
 import com.github.factotum_sdp.factotum.models.Role
 import com.google.firebase.auth.FirebaseAuth
@@ -66,7 +66,7 @@ object UsersPlaceHolder {
      */
     suspend fun addUserToDb(user: UserWithPassword) = suspendCoroutine { continuation ->
         dataSource.getReference(LoginDataSource.DISPATCH_DB_PATH)
-            .child(MainActivity.getAuth().currentUser?.uid ?: "")
+            .child(FirebaseInstance.getAuth().currentUser?.uid ?: "")
             .setValue(user)
             .addOnSuccessListener {
                 continuation.resume(Unit)

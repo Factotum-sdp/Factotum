@@ -20,20 +20,21 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
-import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getDatabase
 import com.github.factotum_sdp.factotum.models.Location
 import com.github.factotum_sdp.factotum.databinding.FragmentContactCreationBinding
 import com.github.factotum_sdp.factotum.models.Contact
+import com.github.factotum_sdp.factotum.models.Role
 import kotlinx.coroutines.launch
 
 /**
  * A simple ContactCreation fragment.
  */
-class ContactCreation : Fragment() {
+class ContactCreationFragment : Fragment() {
 
     // Should not stay like that and instead roles should use roles from future ENUM
-    private val roles = listOf("Boss", "Courier", "Client")
+    private val roles = Role.values().map { it.name }
     private var currentContact: Contact? = null
     private val isUpdate: Boolean
         get() = currentContact != null
@@ -72,18 +73,16 @@ class ContactCreation : Fragment() {
         setAddressSearchTextListener(cursor)
         setAddressSearchSuggestions()
 
-        initaliseRolesSpinner(view)
+        initialiseRolesSpinner(view)
 
         setContactFields(view, currentContact)
 
         initialiseApproveFormButton(view)
-
-
     }
 
     private fun retrievePossibleArguments() {
         viewModel = ViewModelProvider(requireActivity())[ContactsViewModel::class.java]
-        viewModel.setDatabase(MainActivity.getDatabase())
+        viewModel.setDatabase(getDatabase())
 
         if (arguments?.getInt("id") != null) {
             currentContact = viewModel.contacts.value?.get(arguments?.getInt("id")!!)
@@ -102,13 +101,13 @@ class ContactCreation : Fragment() {
             name.setText(contact.name)
             surname.setText(contact.surname)
             username.setText(contact.username)
-            binding.contactCreationAddress.setQuery(contact.address, false)
+            binding.contactCreationAddress.setQuery(contact.addressName, false)
             phoneNumber.setText(contact.phone)
             details.setText(contact.details)
         }
     }
 
-    private fun initaliseRolesSpinner(view: View) {
+    private fun initialiseRolesSpinner(view: View) {
         spinner = view.findViewById(R.id.roles_spinner)
         // Initializes the spinner for the roles
         ArrayAdapter(
@@ -196,6 +195,7 @@ class ContactCreation : Fragment() {
                 return@setOnClickListener
             } else {
                 if (currentContact != null) viewModel.deleteContact(currentContact!!)
+                val address = validateLocation()
                 viewModel.saveContact(
                     Contact(
                         username = username.text.toString(),
@@ -203,7 +203,9 @@ class ContactCreation : Fragment() {
                         name = name.text.toString(),
                         surname = surname.text.toString(),
                         profile_pic_id = R.drawable.contact_image,
-                        address = binding.contactCreationAddress.query.toString(),
+                        addressName = address?.addressName,
+                        latitude = address?.coordinates?.latitude,
+                        longitude = address?.coordinates?.longitude,
                         phone = phoneNumber.text.toString(),
                         details = details.text.toString()
                     )
@@ -215,6 +217,11 @@ class ContactCreation : Fragment() {
 
     private fun isUsernameUnique(username: String): Boolean {
         return viewModel.contacts.value?.find { it.username == username } == null
+    }
+
+    private fun validateLocation(): Location? {
+        val addressName = binding.contactCreationAddress.query.toString()
+        return Location.createAndStore(addressName, requireContext())
     }
 
     private fun showErrorToast(resId: Int) {

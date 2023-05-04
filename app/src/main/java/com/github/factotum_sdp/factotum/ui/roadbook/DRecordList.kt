@@ -1,7 +1,7 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
-
 import com.github.factotum_sdp.factotum.models.DestinationRecord
 import java.lang.IllegalArgumentException
+import kotlinx.serialization.Serializable
 
 
 /**
@@ -20,10 +20,11 @@ private fun displayedRecords(
     return allRecords.minus(archived.toSet())
 }
 
+@Serializable
 class DRecordList(
     private val allRecords: List<DestinationRecord> = listOf(),
     private val archived: List<DestinationRecord> = listOf(),
-    private val showArchived: Boolean = false
+    val showArchived: Boolean = false
 ) : List<DestinationRecord> by displayedRecords(allRecords, archived, showArchived) {
 
     private val archivedSet = archived.toSet() // For performance

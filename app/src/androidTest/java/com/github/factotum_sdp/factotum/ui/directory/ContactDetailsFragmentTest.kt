@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.intent.Intents
@@ -17,6 +18,8 @@ import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.models.Contact
+import com.github.factotum_sdp.factotum.models.User
+import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
 import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.createRandomContacts
 import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.randomContacts
@@ -25,6 +28,7 @@ import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.LocationUtils
 import org.hamcrest.CoreMatchers
+import org.hamcrest.Matchers.equalToIgnoringCase
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -72,9 +76,27 @@ class ContactDetailsFragmentTest {
     }
 
     @Test
-    fun deleteButtonIsDisplayed() {
+    fun deleteButtonIsDisplayedForABoss() {
         onView(withId(R.id.button_delete_contact))
             .check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun deleteButtonIsNotDisplayedForACourier() {
+        val user = UsersPlaceHolder.USER_COURIER
+        val loggedInUser = User(user.name, user.email, user.role)
+        GeneralUtils.injectLoggedInUser(activityRule, loggedInUser)
+        onView(withId(R.id.button_delete_contact))
+            .check(doesNotExist())
+    }
+
+    @Test
+    fun deleteButtonIsNotDisplayedForAClient() {
+        val user = UsersPlaceHolder.USER_CLIENT
+        val loggedInUser = User(user.name, user.email, user.role)
+        GeneralUtils.injectLoggedInUser(activityRule, loggedInUser)
+        onView(withId(R.id.button_delete_contact))
+            .check(doesNotExist())
     }
 
     @Test
@@ -105,9 +127,9 @@ class ContactDetailsFragmentTest {
         onView(withId(R.id.contact_phone))
             .check(matches(withText(currContact.phone)))
         onView(withId(R.id.contact_role))
-            .check(matches(withText(currContact.role)))
+            .check(matches(withText(equalToIgnoringCase(currContact.role))))
         onView(withId(R.id.contact_address))
-            .check(matches(withText(currContact.address)))
+            .check(matches(withText(currContact.addressName)))
         if (currContact.details != null) {
             onView(withId(R.id.contact_details))
                 .check(matches(withText(currContact.details)))
@@ -189,12 +211,8 @@ class ContactDetailsFragmentTest {
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         if (LocationUtils.hasLocationPopUp()) {
             device.findObject(UiSelector().textContains(LocationUtils.buttonTextAllow)).click()
-        } else {
-            Log.d("Location", "No pop up")
         }
         val markers = device.wait(hasObject(By.descContains("Destination")), 5000L)
-        Log.d("Location", "has timed out: ${!device.hasObject(By.descContains("Destination"))}")
-        Log.d("Location", "Markers: $markers")
         assertTrue(markers)
     }
     */

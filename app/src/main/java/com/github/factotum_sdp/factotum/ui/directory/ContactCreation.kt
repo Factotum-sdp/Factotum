@@ -72,13 +72,11 @@ class ContactCreation : Fragment() {
         setAddressSearchTextListener(cursor)
         setAddressSearchSuggestions()
 
-        initaliseRolesSpinner(view)
+        initialiseRolesSpinner(view)
 
         setContactFields(view, currentContact)
 
         initialiseApproveFormButton(view)
-
-
     }
 
     private fun retrievePossibleArguments() {
@@ -108,7 +106,7 @@ class ContactCreation : Fragment() {
         }
     }
 
-    private fun initaliseRolesSpinner(view: View) {
+    private fun initialiseRolesSpinner(view: View) {
         spinner = view.findViewById(R.id.roles_spinner)
         // Initializes the spinner for the roles
         ArrayAdapter(

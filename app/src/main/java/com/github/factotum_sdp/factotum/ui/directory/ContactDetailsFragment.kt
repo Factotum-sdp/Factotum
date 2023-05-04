@@ -14,6 +14,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.UserViewModel
+import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.placeholder.Contact
 import com.github.factotum_sdp.factotum.placeholder.RouteRecords.DUMMY_ROUTE
 import com.github.factotum_sdp.factotum.ui.maps.MapsViewModel
@@ -25,6 +27,7 @@ class ContactDetailsFragment : Fragment() {
 
     private val routeViewModel: MapsViewModel by activityViewModels()
     private val contactsViewModel: ContactsViewModel by activityViewModels()
+    private val userViewModel: UserViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -106,6 +109,9 @@ class ContactDetailsFragment : Fragment() {
             it.findNavController()
                 .navigate(R.id.action_contactDetailsFragment2_to_directoryFragment)
         }
+        if (userViewModel.loggedInUser.value?.role != Role.BOSS) {
+            deleteContactButton.visibility = View.GONE
+        }
 
         if (isSubFragment) {
             updateContactButton.visibility = View.GONE
@@ -129,6 +135,5 @@ class ContactDetailsFragment : Fragment() {
                 it.findNavController().navigate(R.id.action_contactDetailsFragment2_to_MapsFragment)
             }
         }
-
     }
 }

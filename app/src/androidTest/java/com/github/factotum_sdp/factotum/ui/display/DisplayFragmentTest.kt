@@ -71,7 +71,7 @@ class DisplayFragmentTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentDisplayOnlyOnePhotoIfSame() = runTest {
+    fun displayOnlyOnePhotoIfSame() = runTest {
         GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
 
@@ -91,7 +91,7 @@ class DisplayFragmentTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentDisplayTwoDifferentPhotosWorks() = runTest {
+    fun displayTwoDifferentPhotosWorks() = runTest {
         GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
 
@@ -112,7 +112,7 @@ class DisplayFragmentTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentDisplayOneBadFormatPhotosWorks() = runTest {
+    fun displayOneBadFormatPhotosWorks() = runTest {
         GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH3, TEST_IMAGE_PATH3) }.join()
 
@@ -125,7 +125,7 @@ class DisplayFragmentTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentDisplayTwoBadFormatPhotosWorks() = runTest {
+    fun displayTwoBadFormatPhotosWorks() = runTest {
         GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH3, TEST_IMAGE_PATH3) }.join()
 
@@ -139,7 +139,7 @@ class DisplayFragmentTest {
     }
 
     @Test
-    fun displayFragmentDisplayNoPhotosIfEmpty() {
+    fun displayNoPhotosIfEmpty() {
         GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
         val recyclerView = onView(withId(R.id.recyclerView))
         recyclerView.check(matches(hasItemCount(0)))
@@ -152,7 +152,7 @@ class DisplayFragmentTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentClickingOnPhotosFireCorrectIntents() = runTest {
+    fun clickingOnPhotosFireCorrectIntents() = runTest {
         GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
 
@@ -173,7 +173,7 @@ class DisplayFragmentTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentSharingPhotoWorks() = runTest {
+    fun sharingPhotoWorks() = runTest {
         GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
 
@@ -188,7 +188,7 @@ class DisplayFragmentTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentBossCanSeeFolders() = runTest {
+    fun bossCanSeeFolders() = runTest {
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
         launch { uploadImageToStorageEmulator(context, "Boss", TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
@@ -201,7 +201,7 @@ class DisplayFragmentTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentBossCanClickOnFolderAndSeePhotos() = runTest {
+    fun bossCanClickOnFolderAndSeePhotos() = runTest {
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
@@ -222,7 +222,7 @@ class DisplayFragmentTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentBossCanStillSeePhotos() = runTest {
+    fun bossCanStillSeePhotos() = runTest {
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
 
@@ -251,7 +251,7 @@ class DisplayFragmentTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentBossCanGoBackFromClientFolder() = runTest {
+    fun bossCanGoBackFromClientFolder() = runTest {
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
@@ -275,7 +275,7 @@ class DisplayFragmentTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentRefreshWorksOnFolders() = runTest {
+    fun refreshWorksOnFolders() = runTest {
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
 

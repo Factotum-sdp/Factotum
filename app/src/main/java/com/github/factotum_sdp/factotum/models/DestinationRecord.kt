@@ -1,6 +1,8 @@
 package com.github.factotum_sdp.factotum.models
 
 import com.github.factotum_sdp.factotum.models.DestinationRecord.Action
+import com.github.factotum_sdp.factotum.serializers.DateKSerializer
+import kotlinx.serialization.Serializable
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -17,14 +19,15 @@ import java.util.*
  *
  * @See Action
  */
+@Serializable
 data class DestinationRecord(
-    val destID: String,
-    val clientID: String,
-    val timeStamp: Date?,
-    val waitingTime: Int,
-    val rate: Int,
-    val actions: List<Action>,
-    val notes: String
+    val destID: String = "",
+    val clientID: String = "",
+    @Serializable(with = DateKSerializer::class) val timeStamp: Date? = null,
+    val waitingTime: Int = 0,
+    val rate: Int = 0,
+    val actions: List<Action> = emptyList(),
+    val notes: String = ""
 ) {
     companion object {
 
@@ -71,6 +74,25 @@ data class DestinationRecord(
                     "${it.key} x${it.value}"
             }
             return actionsFormatList.joinToString("| ", "(", ")")
+        }
+
+        fun parseWaitTimeOrRate(userEntry: String): Int {
+            if (userEntry.isEmpty())
+                return 0
+            return userEntry.toInt()
+        }
+
+        fun parseTimestamp(userEntry: String): Date? {
+            if (userEntry.isEmpty())
+                return null
+            return SimpleDateFormat.getTimeInstance(DateFormat.DEFAULT, Locale.ENGLISH).parse(userEntry)
+        }
+
+        fun parseActions(actions: String): List<Action> {
+            return actions
+                .split(",")
+                .map { Action.fromString(it.trim().lowercase()) }
+                .filter { it != DestinationRecord.Action.UNKNOWN }
         }
     }
 

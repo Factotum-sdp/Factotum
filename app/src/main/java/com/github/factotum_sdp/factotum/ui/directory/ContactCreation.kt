@@ -20,8 +20,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
-import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getDatabase
 import com.github.factotum_sdp.factotum.models.Location
 import com.github.factotum_sdp.factotum.databinding.FragmentContactCreationBinding
 import com.github.factotum_sdp.factotum.placeholder.Contact
@@ -83,7 +83,7 @@ class ContactCreation : Fragment() {
 
     private fun retrievePossibleArguments() {
         viewModel = ViewModelProvider(requireActivity())[ContactsViewModel::class.java]
-        viewModel.setDatabase(MainActivity.getDatabase())
+        viewModel.setDatabase(getDatabase())
 
         if (arguments?.getInt("id") != null) {
             currentContact = viewModel.contacts.value?.get(arguments?.getInt("id")!!)

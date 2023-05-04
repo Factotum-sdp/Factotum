@@ -13,14 +13,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.ItemTouchHelper.*
-import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
+import com.github.factotum_sdp.factotum.preferencesDataStore
 import com.github.factotum_sdp.factotum.UserViewModel
-import com.github.factotum_sdp.factotum.data.DeliveryLogger
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
-import com.github.factotum_sdp.factotum.dataStore
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
 import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
+import com.github.factotum_sdp.factotum.repositories.RoadBookRepository
+import com.github.factotum_sdp.factotum.roadBookDataStore
 import com.github.factotum_sdp.factotum.ui.settings.SettingsViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.*
@@ -34,7 +35,10 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private val settings: SettingsViewModel by activityViewModels()
     private val rbViewModel: RoadBookViewModel by activityViewModels {
         RoadBookViewModel.RoadBookViewModelFactory(
-            MainActivity.getDatabase().reference.child(ROADBOOK_DB_PATH)
+            RoadBookRepository(
+                FirebaseInstance.getDatabase().reference.child(ROADBOOK_DB_PATH),
+                requireContext().roadBookDataStore
+            )
         )
     }
 
@@ -48,7 +52,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
     private var usePreferences = false
     private val locationTrackingHandler: LocationTrackingHandler = LocationTrackingHandler()
-    private val deliveryLogger: DeliveryLogger = DeliveryLogger()
     private val userViewModel: UserViewModel by activityViewModels()
 
     private val contactsViewModel : ContactsViewModel by activityViewModels()
@@ -132,7 +135,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         touchClickButton = menu.findItem(R.id.rbTouchClick)
         showArchivedButton = menu.findItem(R.id.showArchived)
 
-        val dataStore = requireContext().dataStore
+        val dataStore = requireContext().preferencesDataStore
         rbViewModel.setPreferencesRepository(RoadBookPreferencesRepository(dataStore))
         loadDefaultPreferencesButtonState()
 
@@ -229,12 +232,14 @@ class RoadBookFragment : Fragment(), MenuProvider {
             val dialogBuilder = AlertDialog.Builder(requireContext())
             dialogBuilder.setMessage(R.string.finish_shift_alert_question)
                 .setPositiveButton(R.string.end_shift) { dialog, _ ->
-                    rbViewModel.recordsListState.value?.let { deliveryLogger.logDeliveries(it, userViewModel.loggedInUser.value!!.name)
+                    rbViewModel.recordsListState.let {
+                        rbViewModel.makeShiftLog(userViewModel.loggedInUser.value!!)
                         Toast.makeText(
                             requireContext(),
                             R.string.shift_ended,
                             Toast.LENGTH_SHORT
-                        ).show()}
+                        ).show()
+                    }
                 }
                 .setNegativeButton("Not now") { dialog, _ ->
                     dialog.cancel()

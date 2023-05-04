@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum.utils
+package com.github.factotum_sdp.factotum.firebase
 
 import java.text.SimpleDateFormat
 import java.util.Date

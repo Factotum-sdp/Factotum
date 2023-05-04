@@ -15,7 +15,6 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
-import androidx.core.os.bundleOf
 import androidx.cursoradapter.widget.SimpleCursorAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -212,15 +211,7 @@ class ContactCreation : Fragment() {
                         details = details.text.toString()
                     )
                 )
-                if (isUpdate) {
-                    it.findNavController().navigate(
-                        R.id.action_contactCreationFragment_to_contactDetailsFragment2,
-                        bundleOf("username" to username.text.toString())
-                    )
-                } else {
-                    it.findNavController()
-                        .navigate(R.id.action_contactCreation_to_directoryFragment)
-                }
+                it.findNavController().navigate(R.id.action_contactCreation_to_directoryFragment)
             }
         }
     }

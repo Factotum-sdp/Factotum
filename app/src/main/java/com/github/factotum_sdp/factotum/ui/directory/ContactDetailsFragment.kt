@@ -20,7 +20,7 @@ import com.github.factotum_sdp.factotum.ui.maps.MapsViewModel
 import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
 
 class ContactDetailsFragment : Fragment() {
-    private lateinit var currentContact: Contact
+    private var currentContact: Contact? = null
     private var isSubFragment = false
 
     private val routeViewModel: MapsViewModel by activityViewModels()
@@ -38,16 +38,28 @@ class ContactDetailsFragment : Fragment() {
 
         currentContact =
             contactsViewModel.contacts.value?.find { it.username == arguments?.getString("username") }
-                ?: Contact()
 
         isSubFragment = arguments?.getBoolean("isSubFragment") ?: false
 
 
-
-        setContactDetails(view, currentContact) //set contact details
-
-        initialiseAllButtons(view, contactsViewModel)
+        if (currentContact == null) {
+            hideAllViews(view)
+        } else {
+            setContactDetails(view, currentContact!!) //set contact details
+            initialiseAllButtons(view, contactsViewModel)
+        }
     }
+
+    private fun hideAllViews(view: View) {
+        view.findViewById<ViewGroup>(R.id.contact_details_fragment)?.apply {
+            for (i in 0 until childCount) {
+                val child = getChildAt(i)
+                child.visibility = View.GONE
+            }
+        }
+        view.findViewById<TextView>(R.id.contact_not_found_text).visibility = View.VISIBLE
+    }
+
 
     // links contact details to the layout
     @SuppressLint("SetTextI18n")
@@ -76,7 +88,7 @@ class ContactDetailsFragment : Fragment() {
         val updateContactButton = view.findViewById<Button>(R.id.button_modify_contact)
         updateContactButton.setOnClickListener {
             val bundle = Bundle()
-            bundle.putString("username", currentContact.username)
+            bundle.putString("username", currentContact!!.username)
             if (isSubFragment)
                 it.findNavController()
                     .navigate(R.id.action_dRecordDetailsFragment_to_contactCreationFragment, bundle)
@@ -90,7 +102,7 @@ class ContactDetailsFragment : Fragment() {
 
         val deleteContactButton = view.findViewById<Button>(R.id.button_delete_contact)
         deleteContactButton.setOnClickListener {
-            contactsViewModel.deleteContact(currentContact)
+            contactsViewModel.deleteContact(currentContact!!)
             it.findNavController()
                 .navigate(R.id.action_contactDetailsFragment2_to_directoryFragment)
         }

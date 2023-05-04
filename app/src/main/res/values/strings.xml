@@ -37,7 +37,7 @@
     <string name="snap_text_on_rec_unarchive">Record unarchived</string>
 
     <string name="menu_maps">Maps</string>
-    <string name="run">Run</string>
+    <string name="run">Go To dst</string>
     <string name="rate_text_view">rate</string>
     <string name="wait_text_view">wait</string>
     <string name="arrival_text_view">arrival</string>
@@ -160,4 +160,5 @@
     <string name="negative_label_delete_all_roadbook_dialog">No !</string>
     <string name="snap_delete_all_roadbook">All Roadbook records have been deleted</string>
     <string name="snap_load_roadbook_backup">The last backup has been loaded</string>
+    <string name="contact_not_found">Contact not found</string>
 </resources>

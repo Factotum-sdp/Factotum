@@ -72,6 +72,7 @@ class ContactsCreationTest {
         onView(withId(R.id.roles_spinner)).check(matches(isDisplayed()))
         onView(withId(R.id.editTextName)).check(matches(isDisplayed()))
         onView(withId(R.id.editTextSurname)).check(matches(isDisplayed()))
+        onView(withId(R.id.editTextUsername)).check(matches(isDisplayed()))
         onView(withId(R.id.contactCreationPhoneNumber)).check(matches(isDisplayed()))
         onView(withId(R.id.contactCreationNotes)).check(matches(isDisplayed()))
     }

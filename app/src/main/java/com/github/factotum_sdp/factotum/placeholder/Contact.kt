@@ -6,6 +6,7 @@ data class Contact(
     val name: String = "",
     val surname: String = "",
     val profile_pic_id: Int = 0,
+    val super_client: String? = null,
     val address: String = "",
     val phone: String = "",
     val details: String? = null

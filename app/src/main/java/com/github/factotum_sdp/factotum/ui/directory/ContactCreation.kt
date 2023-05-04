@@ -8,6 +8,7 @@ import android.provider.BaseColumns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.CursorAdapter
@@ -48,6 +49,7 @@ class ContactCreation : Fragment() {
     private lateinit var name: EditText
     private lateinit var surname: EditText
     private lateinit var username: EditText
+    private lateinit var managingClientUsername: EditText
     private lateinit var phoneNumber: EditText
     private lateinit var details: EditText
 
@@ -83,8 +85,8 @@ class ContactCreation : Fragment() {
         viewModel = ViewModelProvider(requireActivity())[ContactsViewModel::class.java]
         viewModel.setDatabase(getDatabase())
 
-        if (arguments?.getInt("id") != null) {
-            currentContact = viewModel.contacts.value?.get(arguments?.getInt("id")!!)
+        if (arguments?.getString("username") != null) {
+            currentContact = viewModel.contacts.value?.find { it.username == arguments?.getString("username") }
         }
     }
 
@@ -92,6 +94,7 @@ class ContactCreation : Fragment() {
         name = view.findViewById(R.id.editTextName)
         surname = view.findViewById(R.id.editTextSurname)
         username = view.findViewById(R.id.editTextUsername)
+        managingClientUsername = view.findViewById(R.id.editTextSuperClientUsername)
         phoneNumber = view.findViewById(R.id.contactCreationPhoneNumber)
         details = view.findViewById(R.id.contactCreationNotes)
 
@@ -100,6 +103,7 @@ class ContactCreation : Fragment() {
             name.setText(contact.name)
             surname.setText(contact.surname)
             username.setText(contact.username)
+            managingClientUsername.setText(contact.super_client)
             binding.contactCreationAddress.setQuery(contact.address, false)
             phoneNumber.setText(contact.phone)
             details.setText(contact.details)
@@ -119,6 +123,22 @@ class ContactCreation : Fragment() {
             // Apply the adapter to the spinner
             spinner.adapter = adapter
         }
+
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val selectedItem = parent?.getItemAtPosition(position).toString()
+                if (selectedItem == "Client") {
+                    managingClientUsername.visibility = View.VISIBLE
+                } else {
+                    managingClientUsername.visibility = View.GONE
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                // Do nothing
+            }
+        }
+
     }
 
     private fun setAddressSearchTextListener(cursorAdapter: SimpleCursorAdapter) {
@@ -192,6 +212,9 @@ class ContactCreation : Fragment() {
             } else if (!isUsernameUnique(username.text.toString()) && currentContact?.username != username.text.toString()) {
                 showErrorToast(R.string.username_not_unique)
                 return@setOnClickListener
+            } else if (managingClientUsername.text.toString().isNotEmpty() && isUsernameUnique(managingClientUsername.text.toString())) {
+                showErrorToast(R.string.super_client_id_not_valid)
+                return@setOnClickListener
             } else {
                 if (currentContact != null) viewModel.deleteContact(currentContact!!)
                 viewModel.saveContact(
@@ -202,6 +225,8 @@ class ContactCreation : Fragment() {
                         surname = surname.text.toString(),
                         profile_pic_id = R.drawable.contact_image,
                         address = binding.contactCreationAddress.query.toString(),
+                        super_client =  if (spinner.selectedItem.toString() == "Client")
+                            managingClientUsername.text.toString() else null,
                         phone = phoneNumber.text.toString(),
                         details = details.text.toString()
                     )

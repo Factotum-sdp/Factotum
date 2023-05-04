@@ -15,15 +15,17 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
+import androidx.core.os.bundleOf
 import androidx.cursoradapter.widget.SimpleCursorAdapter
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.databinding.FragmentContactCreationBinding
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getDatabase
 import com.github.factotum_sdp.factotum.models.Location
-import com.github.factotum_sdp.factotum.databinding.FragmentContactCreationBinding
 import com.github.factotum_sdp.factotum.placeholder.Contact
 import kotlinx.coroutines.launch
 
@@ -43,6 +45,8 @@ class ContactCreation : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
+    private val contactsViewModel: ContactsViewModel by activityViewModels()
 
 
     private lateinit var name: EditText
@@ -85,9 +89,9 @@ class ContactCreation : Fragment() {
         viewModel = ViewModelProvider(requireActivity())[ContactsViewModel::class.java]
         viewModel.setDatabase(getDatabase())
 
-        if (arguments?.getInt("id") != null) {
-            currentContact = viewModel.contacts.value?.get(arguments?.getInt("id")!!)
-        }
+        currentContact =
+            contactsViewModel.contacts.value?.find { it.username == arguments?.getString("username") }
+
     }
 
     private fun setContactFields(view: View, contact: Contact?) {
@@ -208,7 +212,15 @@ class ContactCreation : Fragment() {
                         details = details.text.toString()
                     )
                 )
-                it.findNavController().navigate(R.id.action_contactCreation_to_directoryFragment)
+                if (isUpdate) {
+                    it.findNavController().navigate(
+                        R.id.action_contactCreationFragment_to_contactDetailsFragment2,
+                        bundleOf("username" to username.text.toString())
+                    )
+                } else {
+                    it.findNavController()
+                        .navigate(R.id.action_contactCreation_to_directoryFragment)
+                }
             }
         }
     }
@@ -224,4 +236,5 @@ class ContactCreation : Fragment() {
             Toast.LENGTH_SHORT
         ).show()
     }
+
 }

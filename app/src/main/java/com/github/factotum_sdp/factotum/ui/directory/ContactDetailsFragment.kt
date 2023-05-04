@@ -12,7 +12,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.Contact
@@ -22,8 +21,10 @@ import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
 
 class ContactDetailsFragment : Fragment() {
     private lateinit var currentContact: Contact
+    private var isSubFragment = false
 
     private val routeViewModel: MapsViewModel by activityViewModels()
+    private val contactsViewModel: ContactsViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,11 +36,13 @@ class ContactDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val contactsViewModel = //retrieve list of contacts
-            ViewModelProvider(requireActivity())[ContactsViewModel::class.java]
-
         currentContact =
-            contactsViewModel.contacts.value?.find { it.username == arguments?.getString("username") } ?: Contact()
+            contactsViewModel.contacts.value?.find { it.username == arguments?.getString("username") }
+                ?: Contact()
+
+        isSubFragment = arguments?.getBoolean("isSubFragment") ?: false
+
+
 
         setContactDetails(view, currentContact) //set contact details
 
@@ -70,19 +73,19 @@ class ContactDetailsFragment : Fragment() {
 
     private fun initialiseAllButtons(view: View, contactsViewModel: ContactsViewModel) {
 
-        val returnToContactsButton =
-            view.findViewById<Button>(R.id.button) // connect the button to the layout
-        returnToContactsButton.setOnClickListener {
-            it.findNavController()
-                .navigate(R.id.action_contactDetailsFragment2_to_directoryFragment)
-        } // go back to the list of contacts when the button is clicked
-
         val updateContactButton = view.findViewById<Button>(R.id.button_modify_contact)
         updateContactButton.setOnClickListener {
             val bundle = Bundle()
-            bundle.putInt("id", arguments?.getInt("id")!!)
-            it.findNavController()
-                .navigate(R.id.action_contactDetailsFragment2_to_contactCreationFragment, bundle)
+            bundle.putString("username", currentContact.username)
+            if (isSubFragment)
+                it.findNavController()
+                    .navigate(R.id.action_dRecordDetailsFragment_to_contactCreationFragment, bundle)
+            else
+                it.findNavController()
+                    .navigate(
+                        R.id.action_contactDetailsFragment2_to_contactCreationFragment,
+                        bundle
+                    )
         }
 
         val deleteContactButton = view.findViewById<Button>(R.id.button_delete_contact)
@@ -90,6 +93,11 @@ class ContactDetailsFragment : Fragment() {
             contactsViewModel.deleteContact(currentContact)
             it.findNavController()
                 .navigate(R.id.action_contactDetailsFragment2_to_directoryFragment)
+        }
+
+        if (isSubFragment) {
+            updateContactButton.visibility = View.GONE
+            deleteContactButton.visibility = View.GONE
         }
 
         view.findViewById<Button>(R.id.run_button).setOnClickListener {
@@ -103,7 +111,11 @@ class ContactDetailsFragment : Fragment() {
 
         view.findViewById<Button>(R.id.show_all_button).setOnClickListener {
             routeViewModel.addRoute(DUMMY_ROUTE[0]) //remove when merged with contact creation and use real route
-            it.findNavController().navigate(R.id.action_contactDetailsFragment2_to_MapsFragment)
+            if (isSubFragment) {
+                it.findNavController().navigate(R.id.action_dRecordDetailsFragment_to_MapsFragment)
+            } else {
+                it.findNavController().navigate(R.id.action_contactDetailsFragment2_to_MapsFragment)
+            }
         }
 
     }

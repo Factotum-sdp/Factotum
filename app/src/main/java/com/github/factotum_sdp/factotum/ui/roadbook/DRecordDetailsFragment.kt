@@ -71,6 +71,7 @@ class DRecordDetailsFragment : Fragment() {
         val detailsFragment = ContactDetailsFragment::class.java.newInstance()
         detailsFragment.arguments = Bundle().apply {
             putString("username", rec.clientID)
+            putBoolean("isSubFragment", true)
         }
 
         adapter.addFragment(DRecordInfoFragment(rec))

@@ -1,6 +1,5 @@
 package com.github.factotum_sdp.factotum.ui.display.boss
 
-import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.databinding.DisplayItemFolderBinding

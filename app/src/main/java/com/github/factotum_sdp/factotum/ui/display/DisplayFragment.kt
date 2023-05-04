@@ -33,7 +33,6 @@ class DisplayFragment : Fragment() {
     private val userID = MutableLiveData("Unknown")
     private val userRole = MutableLiveData(Role.UNKNOWN)
     private val userFolder = MutableLiveData("Unknown")
-    private val PHONE_NUMBER = "1234567890"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -186,5 +185,9 @@ class DisplayFragment : Fragment() {
                 requireActivity().onBackPressedDispatcher.onBackPressed()
             }
         }
+    }
+
+    companion object{
+        const val PHONE_NUMBER = "1234567890"
     }
 }

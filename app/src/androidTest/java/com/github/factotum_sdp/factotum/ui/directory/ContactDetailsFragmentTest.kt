@@ -75,7 +75,7 @@ class ContactDetailsFragmentTest {
     }
 
     @Test
-    fun deleteButtonIsDisplayedABoss() {
+    fun deleteButtonIsDisplayedForABoss() {
         onView(withId(R.id.button_delete_contact))
             .check(matches(isDisplayed()))
     }

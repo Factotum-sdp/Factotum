@@ -1,8 +1,10 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -11,12 +13,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.ItemTouchHelper.*
-import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
+import com.github.factotum_sdp.factotum.preferencesDataStore
+import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
-import com.github.factotum_sdp.factotum.dataStore
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
 import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
+import com.github.factotum_sdp.factotum.repositories.RoadBookRepository
+import com.github.factotum_sdp.factotum.roadBookDataStore
 import com.github.factotum_sdp.factotum.ui.settings.SettingsViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.*
@@ -30,7 +35,10 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private val settings: SettingsViewModel by activityViewModels()
     private val rbViewModel: RoadBookViewModel by activityViewModels {
         RoadBookViewModel.RoadBookViewModelFactory(
-            MainActivity.getDatabase().reference.child(ROADBOOK_DB_PATH)
+            RoadBookRepository(
+                FirebaseInstance.getDatabase().reference.child(ROADBOOK_DB_PATH),
+                requireContext().roadBookDataStore
+            )
         )
     }
 
@@ -44,6 +52,8 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
     private var usePreferences = false
     private val locationTrackingHandler: LocationTrackingHandler = LocationTrackingHandler()
+    private val userViewModel: UserViewModel by activityViewModels()
+
     private val contactsViewModel : ContactsViewModel by activityViewModels()
 
     override fun onCreateView(
@@ -125,7 +135,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         touchClickButton = menu.findItem(R.id.rbTouchClick)
         showArchivedButton = menu.findItem(R.id.showArchived)
 
-        val dataStore = requireContext().dataStore
+        val dataStore = requireContext().preferencesDataStore
         rbViewModel.setPreferencesRepository(RoadBookPreferencesRepository(dataStore))
         loadDefaultPreferencesButtonState()
 
@@ -148,6 +158,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         }
         setLiveLocationSwitch(fragMenu)
         setRefreshButtonListener(fragMenu)
+        setEndShiftButtonListener(fragMenu)
 
         // Only at menu initialization
         val itemTouchHelper = ItemTouchHelper(newItemTHCallBack())
@@ -211,6 +222,31 @@ class RoadBookFragment : Fragment(), MenuProvider {
         val refreshButton = menu.findItem(R.id.refresh_button)
         refreshButton.setOnMenuItemClickListener {
             rbRecyclerView.adapter?.notifyDataSetChanged()
+            true
+        }
+    }
+
+    private fun setEndShiftButtonListener(fragMenu: Menu) {
+        val endShiftButton = fragMenu.findItem(R.id.finish_shift)
+        endShiftButton.setOnMenuItemClickListener {
+            val dialogBuilder = AlertDialog.Builder(requireContext())
+            dialogBuilder.setMessage(R.string.finish_shift_alert_question)
+                .setPositiveButton(R.string.end_shift) { dialog, _ ->
+                    rbViewModel.recordsListState.let {
+                        rbViewModel.makeShiftLog(userViewModel.loggedInUser.value!!)
+                        Toast.makeText(
+                            requireContext(),
+                            R.string.shift_ended,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+                .setNegativeButton("Not now") { dialog, _ ->
+                    dialog.cancel()
+                }
+            val alert = dialogBuilder.create()
+            alert.setTitle(R.string.end_shift_dialog_title)
+            alert.show()
             true
         }
     }

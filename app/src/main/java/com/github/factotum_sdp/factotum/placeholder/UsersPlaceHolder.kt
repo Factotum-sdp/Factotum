@@ -1,6 +1,6 @@
 package com.github.factotum_sdp.factotum.placeholder
 
-import com.github.factotum_sdp.factotum.MainActivity
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.data.LoginDataSource
 import com.github.factotum_sdp.factotum.models.Role
 import com.google.firebase.auth.FirebaseAuth
@@ -19,37 +19,37 @@ object UsersPlaceHolder {
     private lateinit var auth: FirebaseAuth
 
     private const val password = "123456"
-    val USER1 = User(
+    val USER1 = UserWithPassword(
         "Valentino Rossi",
         "valentino.rossi@epfl.ch",
         Role.BOSS,
         password
     )
-    val USER2 = User(
+    val USER2 = UserWithPassword(
         "Marc Marquez",
         "marc.marquez@epfl.ch",
         Role.BOSS,
         password
     )
-    val USER3 = User(
+    val USER3 = UserWithPassword(
         "Jane Doe",
         "jane.doe@gmail.com",
         Role.BOSS,
         password
     )
-    val USER_BOSS = User(
+    val USER_BOSS = UserWithPassword(
         "Boss",
         "boss@gmail.com",
         Role.BOSS,
         password
     )
-    val USER_COURIER = User(
+    val USER_COURIER = UserWithPassword(
         "Courier",
         "courier@gmail.com",
         Role.COURIER,
         password
     )
-    val USER_CLIENT = User(
+    val USER_CLIENT = UserWithPassword(
         "Client",
         "client@gmail.com",
         Role.CLIENT,
@@ -64,9 +64,9 @@ object UsersPlaceHolder {
     /**
      * Populates the database with user.
      */
-    suspend fun addUserToDb(user: User) = suspendCoroutine { continuation ->
+    suspend fun addUserToDb(user: UserWithPassword) = suspendCoroutine { continuation ->
         dataSource.getReference(LoginDataSource.DISPATCH_DB_PATH)
-            .child(MainActivity.getAuth().currentUser?.uid ?: "")
+            .child(FirebaseInstance.getAuth().currentUser?.uid ?: "")
             .setValue(user)
             .addOnSuccessListener {
                 continuation.resume(Unit)
@@ -78,7 +78,7 @@ object UsersPlaceHolder {
         auth.signOut()
     }
 
-    suspend fun addAuthUser(user: User) = suspendCoroutine { continuation ->
+    suspend fun addAuthUser(user: UserWithPassword) = suspendCoroutine { continuation ->
         auth.createUserWithEmailAndPassword(user.email, password)
             .addOnSuccessListener {
                 continuation.resume(Unit)
@@ -88,7 +88,7 @@ object UsersPlaceHolder {
             }
     }
 
-    data class User(
+    data class UserWithPassword(
         val name: String,
         val email: String,
         val role: Role,

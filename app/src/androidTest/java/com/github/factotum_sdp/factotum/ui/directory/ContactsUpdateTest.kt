@@ -27,6 +27,7 @@ import com.github.factotum_sdp.factotum.models.Location
 import com.github.factotum_sdp.factotum.placeholder.Contact
 import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.createRandomContacts
 import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.randomContacts
+import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import junit.framework.TestCase.assertEquals
@@ -67,6 +68,7 @@ class ContactsUpdateTest {
 
     @Before
     fun setUp() {
+        GeneralUtils.injectBossAsLoggedInUser(activityRule)
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.directoryFragment))

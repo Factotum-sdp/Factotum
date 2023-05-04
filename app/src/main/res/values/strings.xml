@@ -141,6 +141,10 @@
     <string name="search_contacts">Search contacts …</string>
     <string name="loc_service_notification_message">Location service for Factotum is working</string>
     <string name="loc_service_notification_title">Tracking location</string>
+    <string name="end_shift">end shift</string>
+    <string name="finish_shift_alert_question">"Are you sure you want to end your shift?"</string>
+    <string name="shift_ended">Shift ended</string>
+    <string name="end_shift_dialog_title">End shift</string>
     <string name="textUsername">Username</string>
     <string name="contact_details_username">\@username</string>
     <string name="Single_contact_username">\@username</string>
@@ -149,4 +153,11 @@
     <string name="roadbookpreferencescheckedtextview">RoadBookPreferencesCheckedTextView</string>
     <string name="application_settings">Application Settings</string>
     <string name="save_roadbook_preferences">Save RoadBook Preferences</string>
+    <string name="load_road_book_back_up">Load RoadBook back-up</string>
+    <string name="delete_all_roadbook">Delete all RoadBook</string>
+    <string name="delete_all_roadbook_dialog_title">Delete all the current RoadBook records ?</string>
+    <string name="positive_label_delete_all_roadbook_dialog">Confirm</string>
+    <string name="negative_label_delete_all_roadbook_dialog">No !</string>
+    <string name="snap_delete_all_roadbook">All Roadbook records have been deleted</string>
+    <string name="snap_load_roadbook_backup">The last backup has been loaded</string>
 </resources>

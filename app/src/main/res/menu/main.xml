@@ -29,6 +29,10 @@
             android:title="Switch"
             app:actionLayout="@layout/switch_item"
             app:showAsAction="always" />
+        <item
+            android:id="@+id/finish_shift"
+            android:title="@string/end_shift"
+            app:showAsAction="always" />
     </group>
 </menu>
 

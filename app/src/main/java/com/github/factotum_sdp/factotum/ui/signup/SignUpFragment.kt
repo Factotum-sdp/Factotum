@@ -15,9 +15,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.*
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getAuth
 import com.github.factotum_sdp.factotum.databinding.FragmentSignupBinding
 import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.models.User
@@ -186,7 +186,7 @@ class SignUpFragment : Fragment() {
             binding.email.text.toString(),
             Role.valueOf(binding.role.text.toString())
         )
-        val newUserUID = MainActivity.getAuth().currentUser?.uid ?: "no uid"
+        val newUserUID = getAuth().currentUser?.uid ?: "no uid"
         viewModel.updateUser(newUserUID, newUser)
     }
 

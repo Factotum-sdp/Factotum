@@ -57,10 +57,10 @@ class PictureFragment(clientID: String) : Fragment() {
             if (result) {
                 // Upload photo to Firebase Storage
                 val photoRef = storageRef.child("$folderName/$photoName")
-                //val uploadTask = photoRef.putFile(photoUri)
+                val uploadTask = photoRef.putFile(photoUri)
 
                 // Register observers to listen for when the upload is done or if it fails
-                //uploadTask.addOnSuccessListener { photoFile.delete() }
+                uploadTask.addOnSuccessListener { photoFile.delete() }
             } else {
                 photoFile.delete()
             }

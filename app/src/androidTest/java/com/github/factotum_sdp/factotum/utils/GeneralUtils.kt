@@ -5,8 +5,12 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
+import com.github.factotum_sdp.factotum.models.User
+import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
@@ -24,6 +28,9 @@ class GeneralUtils {
         private var storage: FirebaseStorage = Firebase.storage
         private var emulatorSet = false
         private const val WAIT_TIME_LOGIN = 1500L
+        private val BOSS_USER = User(UsersPlaceHolder.USER_BOSS.name,
+                                     UsersPlaceHolder.USER_BOSS.email,
+                                     UsersPlaceHolder.USER_BOSS.role)
 
         fun initFirebase(online : Boolean = true) {
 
@@ -37,8 +44,9 @@ class GeneralUtils {
             } else {
                 storage.useEmulator("10.0.2.2", 9198)
             }
-            MainActivity.setDatabase(database)
-            MainActivity.setAuth(auth)
+
+            FirebaseInstance.setDatabase(database)
+            FirebaseInstance.setAuth(auth)
         }
 
         fun getDatabase(): FirebaseDatabase {
@@ -64,8 +72,17 @@ class GeneralUtils {
                 closeSoftKeyboard()
             )
             onView(withId(R.id.login)).perform(click())
+        }
 
-            runBlocking { delay(WAIT_TIME_LOGIN) }
+        fun injectBossAsLoggedInUser(testRule: ActivityScenarioRule<MainActivity>) {
+           injectLoggedInUser(testRule, BOSS_USER)
+        }
+
+        fun injectLoggedInUser(testRule: ActivityScenarioRule<MainActivity>, loggedInUser: User) {
+            testRule.scenario.onActivity {
+                val user = it.applicationUser()
+                user.setLoggedInUser(loggedInUser)
+            }
         }
     }
 }

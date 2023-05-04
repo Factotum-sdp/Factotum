@@ -1,6 +1,6 @@
 package com.github.factotum_sdp.factotum
 
-import com.github.factotum_sdp.factotum.utils.FirebaseStringFormat
+import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 

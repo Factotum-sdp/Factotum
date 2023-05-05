@@ -25,8 +25,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 
-private const val CHANNEL_ID = "location_service"
-private const val CHANNEL_NAME = "My Location Service"
+private const val CHANNEL_ID = "factotum_location_service"
+private const val CHANNEL_NAME = "Factotum Live Location Service"
 private const val SERVICE_ID = 101
 private const val UPDATE_INTERVAL = 1000L
 

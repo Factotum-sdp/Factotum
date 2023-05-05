@@ -8,6 +8,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.models.User
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.google.firebase.auth.FirebaseAuth
@@ -44,8 +45,9 @@ class GeneralUtils {
             } else {
                 storage.useEmulator("10.0.2.2", 9198)
             }
-            MainActivity.setDatabase(database)
-            MainActivity.setAuth(auth)
+
+            FirebaseInstance.setDatabase(database)
+            FirebaseInstance.setAuth(auth)
         }
 
         fun getDatabase(): FirebaseDatabase {
@@ -71,8 +73,6 @@ class GeneralUtils {
                 closeSoftKeyboard()
             )
             onView(withId(R.id.login)).perform(click())
-
-            runBlocking { delay(WAIT_TIME_LOGIN) }
         }
 
         fun injectBossAsLoggedInUser(testRule: ActivityScenarioRule<MainActivity>) {

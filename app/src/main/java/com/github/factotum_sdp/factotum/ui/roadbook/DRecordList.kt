@@ -1,6 +1,7 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
-
 import com.github.factotum_sdp.factotum.models.DestinationRecord
+import java.lang.IllegalArgumentException
+import kotlinx.serialization.Serializable
 
 
 /**
@@ -19,10 +20,11 @@ private fun displayedRecords(
     return allRecords.minus(archived.toSet())
 }
 
+@Serializable
 class DRecordList(
     private val allRecords: List<DestinationRecord> = listOf(),
     private val archived: List<DestinationRecord> = listOf(),
-    private val showArchived: Boolean = false
+    val showArchived: Boolean = false
 ) : List<DestinationRecord> by displayedRecords(allRecords, archived, showArchived) {
 
     private val archivedSet = archived.toSet() // For performance
@@ -37,12 +39,32 @@ class DRecordList(
         return archivedSet.contains(this[index])
     }
 
-    fun getNextDestinationIndex(): Int {
-        return this.indexOfFirst { dRec -> dRec.timeStamp == null }
+    /**
+     * Retrieve the index of the DestinationRecord with id "destID"
+     *
+     * @param destID: String
+     * @return The destination index
+     * @throws IllegalArgumentException when "destID" is not contained in the current main List
+     */
+    fun getIndexOf(destID: String): Int {
+        try {
+            return this.indexOfFirst { dRec -> dRec.destID == destID }
+        } catch (e: NoSuchElementException) {
+            throw IllegalArgumentException()
+        }
     }
 
-    fun getNextDestinationRecord(): DestinationRecord {
-        return this.first { dRec -> dRec.timeStamp == null }
+    /**
+     * Get the next destination to deliver
+     *
+     * @return DestinationRecord or null when all Destination are already visited
+     */
+    fun getNextDestinationRecord(): DestinationRecord? {
+        return try {
+            this.first { dRec -> dRec.timeStamp == null }
+        } catch (e: NoSuchElementException) {
+            null
+        }
     }
 
     /**

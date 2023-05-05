@@ -79,20 +79,24 @@
             "role": "Courier",
             "surname": "Taylor"
         },
-        "joel": {
-            "address": "456 Fake Street",
-            "details": "I am a courier",
-            "username": "04",
-            "name": "Jill",
-            "phone": "987654321",
+        "Buhagiat": {
+            "address": "123 Fake Street",
+            "details": "I am a boss",
+            "latitude": 46.517719,
+            "longitude": 6.569090,
+            "username": "Buhagiat",
+            "name": "Jack",
+            "phone": "123456789",
             "profile_pic_id": 2131165334,
-            "role": "Courier",
-            "surname": "Taylor"
+            "role": "Boss",
+            "surname": "Brown"
         },
-        "dfa": {
+        "X17": {
             "address": "456 Fake Street",
             "details": "I am a courier",
-            "username": "04",
+            "latitude": 46.517733,
+            "longitude": 6.569090,
+            "username": "X17",
             "name": "Jill",
             "phone": "987654321",
             "profile_pic_id": 2131165334,

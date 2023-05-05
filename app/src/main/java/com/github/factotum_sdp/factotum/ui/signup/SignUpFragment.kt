@@ -19,7 +19,9 @@ import androidx.navigation.fragment.findNavController
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.*
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getAuth
 import com.github.factotum_sdp.factotum.databinding.FragmentSignupBinding
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.models.User
 import com.google.android.material.snackbar.Snackbar
@@ -205,7 +207,7 @@ class SignUpFragment : Fragment() {
                         Role.valueOf(binding.role.text.toString()),
                         binding.username.text.toString()
                     )
-                    val newUserUID = MainActivity.getAuth().currentUser?.uid ?: "no uid"
+                    val newUserUID = getAuth().currentUser?.uid ?: "no uid"
                     viewModel.updateUser(newUserUID, newUser)
                 }
             })

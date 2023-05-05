@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum.placeholder
+package com.github.factotum_sdp.factotum.models
 
 data class Contact(
     val username: String = "",
@@ -6,7 +6,9 @@ data class Contact(
     val name: String = "",
     val surname: String = "",
     val profile_pic_id: Int = 0,
-    val address: String = "",
+    val addressName: String? = null,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
     val phone: String = "",
     val details: String? = null
 )

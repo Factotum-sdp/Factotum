@@ -134,6 +134,7 @@ class MainActivityTest {
         )
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun pressingBackOnAMenuFragmentLeadsToRBFragment() = runTest {
         // First need to login to trigger the change of navGraph's start fragment
@@ -154,7 +155,7 @@ class MainActivityTest {
     @Test
     fun pressingBackOnRBFragmentLeadsOutOfTheApp() {
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
-        
+
         pressBackUnconditionally()
         val uiDevice = UiDevice.getInstance(getInstrumentation())
         assertFalse(uiDevice.currentPackageName == "com.github.factotum_sdp.factotum")
@@ -204,9 +205,9 @@ class MainActivityTest {
         onView(withText("Boss (BOSS)")).check(matches(isDisplayed()))
 
         onView(withId(R.id.signoutButton)).perform(click())
-        
+
         GeneralUtils.fillUserEntryAndEnterTheApp("helen.bates@gmail.com", "123456")
-        
+
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText("helen.bates@gmail.com")).check(matches(isDisplayed()))
         onView(withText("Helen Bates (COURIER)")).check(matches(isDisplayed()))
@@ -230,7 +231,7 @@ class MainActivityTest {
         onView(withId(R.id.role)).perform(click())
         Espresso.onData(Matchers.anything()).inRoot(RootMatchers.isPlatformPopup()).atPosition(1)
             .perform(click())
-        onView(withId(R.id.username)).perform(typeText("dfa"))
+        onView(withId(R.id.username)).perform(typeText("X17"))
         onView(withId(R.id.signup)).perform(click())
         FirebaseAuth.AuthStateListener {
             onView(withId(R.id.fragment_login_directors_parent)).check(

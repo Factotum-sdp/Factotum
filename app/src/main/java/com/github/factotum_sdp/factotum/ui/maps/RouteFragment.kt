@@ -14,8 +14,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.models.Location
 import com.github.factotum_sdp.factotum.databinding.FragmentRoutesBinding
+import com.github.factotum_sdp.factotum.models.Location
 import com.github.factotum_sdp.factotum.placeholder.RouteRecords.DUMMY_COURSE
 import com.github.factotum_sdp.factotum.placeholder.RouteRecords.DUMMY_ROUTE
 import com.google.android.material.snackbar.Snackbar
@@ -111,7 +111,7 @@ class RouteFragment : Fragment() {
                 if (query != null) {
                     val location = Location.createAndStore(query, requireContext())
                     if (location != null) viewModel.setLocation(location)
-                    val toShow = viewModel.location.value?.address?.toString() ?: NO_RESULT
+                    val toShow = viewModel.location.value?.addressName ?: NO_RESULT
                     Snackbar.make(requireView(), toShow, Snackbar.LENGTH_LONG).show()
                 }
                 return true

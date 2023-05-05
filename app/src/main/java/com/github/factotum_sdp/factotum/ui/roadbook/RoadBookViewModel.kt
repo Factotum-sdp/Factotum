@@ -3,12 +3,12 @@ package com.github.factotum_sdp.factotum.ui.roadbook
 import androidx.lifecycle.*
 import com.github.factotum_sdp.factotum.models.DestinationRecord
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
+import com.github.factotum_sdp.factotum.models.User
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
-import com.google.firebase.database.DatabaseReference
+import com.github.factotum_sdp.factotum.repositories.RoadBookRepository
 import kotlinx.coroutines.launch
-import java.text.DateFormat
-import java.text.SimpleDateFormat.getDateInstance
+import kotlinx.coroutines.runBlocking
 import java.util.*
 
 /**
@@ -17,25 +17,15 @@ import java.util.*
  *
  * @param _dbRef The database root reference to register RoadBook data
  */
-class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
+class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : ViewModel() {
 
-    private val _recordsList: MutableLiveData<DRecordList> =
-        MutableLiveData(DRecordList())
-    private var dbRef: DatabaseReference
+    private val _recordsList: MutableLiveData<DRecordList> = MutableLiveData(DRecordList())
+    val recordsListState: LiveData<DRecordList> = _recordsList
+
     private val clientOccurrences = HashMap<String, Int>()
     private lateinit var preferencesRepository: RoadBookPreferencesRepository
 
-    val recordsListState: LiveData<DRecordList> = _recordsList
-
-
     init {
-        val date = Calendar.getInstance().time
-        val dateRef = getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH).format(date)
-        dbRef = _dbRef // ref path to register all back-ups from this RoadBook
-            .child(dateRef)
-        //.child(getTimeInstance().format(date).plus(Random.nextInt().toString()))
-        // Let uncommented for testing purpose. Uncomment it for back-up uniqueness in the DB
-        // Only for demo purpose :
         addDemoRecords(DestinationRecords.RECORDS)
     }
 
@@ -84,29 +74,61 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
      * Send the current recordsList data to the Database referenced at construction time
      */
     fun backUp() {
-        dbRef.setValue(_recordsList.value)
+        roadBookRepository.setBackUp(currentDRecList())
     }
 
+    /**
+     * Get the next destination to deliver
+     *
+     * The result is null if there is no nextDestination for the actual records state
+     * @return DestinationRecord?
+     */
+    fun nextDestination(): DestinationRecord? {
+       return currentDRecList().getNextDestinationRecord()
+    }
 
+    /**
+     * Time stamp the given DestinationRecord
+     *
+     * @param timeStamp: Date
+     * @param record: DestinationRecord
+     */
+    fun timeStampARecord(timeStamp: Date, record: DestinationRecord) {
+        val newRec = DestinationRecord(
+            record.destID,
+            record.clientID,
+            timeStamp,
+            record.waitingTime,
+            record.rate,
+            record.actions,
+            record.notes
+        )
+        val ls = arrayListOf<DestinationRecord>()
+        ls.addAll(_recordsList.value as Collection<DestinationRecord>)
+        ls[currentDRecList().getIndexOf(record.destID)] = newRec
 
-    fun timestampNextDestinationRecord(timeStamp: Date) {
-        try {
-            val record = currentDRecList().getNextDestinationRecord()
-            val newRec = DestinationRecord(
-                record.destID,
-                record.clientID,
-                timeStamp,
-                record.waitingTime,
-                record.rate,
-                record.actions,
-                record.notes
-            )
-            val ls = arrayListOf<DestinationRecord>()
-            ls.addAll(_recordsList.value as Collection<DestinationRecord>)
-            ls[currentDRecList().getNextDestinationIndex()] = newRec
+        _recordsList.postValue(currentDRecList().replaceDisplayedList(ls))
+    }
+    /**
+     * Create the final shift Log according to the current records state
+     * of this RoadBookViewModel
+     *
+     * @param loggedInUser: User
+     */
+    fun makeShiftLog(loggedInUser: User) {
+        roadBookRepository.makeShiftLog(currentDRecList(), loggedInUser)
+    }
 
-            _recordsList.postValue(currentDRecList().replaceDisplayedList(ls))
-        } catch (_: NoSuchElementException) {
+    /**
+     * Replace the current displayed list by the last available back up of the RoadBookRepository
+     *
+     * Note that the the back up don't take into account the archiving state, all fetched from
+     * back up records are no more archived.
+     */
+    fun fetchBackBackUps(){
+        runBlocking {
+            val lastBackUp = roadBookRepository.getLastBackUp()
+            _recordsList.value = DRecordList(allRecords = lastBackUp, showArchived = currentDRecList().showArchived)
         }
     }
 
@@ -270,6 +292,17 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         _recordsList.value = currentDRecList().replaceDisplayedList(newList)
     }
 
+    /**
+     * Clear all records
+     */
+    fun clearAllRecords(){
+        _recordsList.value =
+            DRecordList(
+                allRecords = emptyList(),
+                showArchived = currentDRecList().showArchived
+            )
+    }
+
     private fun currentDRecList(): DRecordList {
         return _recordsList.value!!
     }
@@ -283,12 +316,12 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
     }
 
     // Factory needed to assign a value at construction time to the class attribute
-    class RoadBookViewModelFactory(private val _dbRef: DatabaseReference) :
+    class RoadBookViewModelFactory(private val repository: RoadBookRepository) :
         ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return modelClass
-                .getConstructor(DatabaseReference::class.java)
-                .newInstance(_dbRef)
+                .getConstructor(RoadBookRepository::class.java)
+                .newInstance(repository)
         }
     }
 }

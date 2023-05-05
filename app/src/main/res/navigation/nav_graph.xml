@@ -38,7 +38,11 @@
         android:id="@+id/dRecordDetailsFragment"
         android:name="com.github.factotum_sdp.factotum.ui.roadbook.DRecordDetailsFragment"
         android:label="Record details"
-        tools:layout="@layout/fragment_drecord_details" />
+        tools:layout="@layout/fragment_drecord_details" >
+        <action
+            android:id="@+id/action_dRecordDetailsFragment_to_MapsFragment"
+            app:destination="@id/MapsFragment" />
+    </fragment>
     <fragment
         android:id="@+id/directoryFragment"
         android:name="com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment"

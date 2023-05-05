@@ -7,6 +7,7 @@ import com.github.factotum_sdp.factotum.models.User
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
 import com.github.factotum_sdp.factotum.repositories.RoadBookRepository
+import com.github.factotum_sdp.factotum.repositories.ShiftRepository
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.*
@@ -24,6 +25,8 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : Vi
 
     private val clientOccurrences = HashMap<String, Int>()
     private lateinit var preferencesRepository: RoadBookPreferencesRepository
+
+    private var _shiftRepository : ShiftRepository? = null
 
     init {
         addDemoRecords(DestinationRecords.RECORDS)
@@ -68,6 +71,19 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : Vi
                 preferencesRepository.updateShowArchived(showArchived)
             }
         }
+    }
+
+    /**
+     * Sets the current shiftRepository
+     *
+     * @param shiftRepository
+     */
+    fun setShiftRepository(shiftRepository: ShiftRepository){
+        _shiftRepository = shiftRepository
+    }
+
+    fun logDeliveries(){
+        _shiftRepository?.logShift(currentDRecList())
     }
 
     /**

@@ -14,10 +14,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.models.Location
 import com.github.factotum_sdp.factotum.databinding.FragmentRoutesBinding
+import com.github.factotum_sdp.factotum.models.Location
 import com.github.factotum_sdp.factotum.placeholder.RouteRecords.DUMMY_COURSE
 import com.github.factotum_sdp.factotum.placeholder.RouteRecords.DUMMY_ROUTE
+import com.github.factotum_sdp.factotum.ui.roadbook.DRecordDetailsFragment
 import com.google.android.material.snackbar.Snackbar
 
 
@@ -82,7 +83,8 @@ class RouteFragment : Fragment() {
 
     private fun setListenerButtons() {
         binding.buttonNext.setOnClickListener {
-            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+            if (parentFragment is RouteFragment) findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+            if (parentFragment is DRecordDetailsFragment) findNavController().navigate(R.id.action_dRecordDetailsFragment_to_MapsFragment)
         }
         binding.buttonAll.setOnClickListener {
             viewModel.addAll(DUMMY_ROUTE)

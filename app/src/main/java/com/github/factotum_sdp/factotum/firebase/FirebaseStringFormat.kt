@@ -51,7 +51,7 @@ object FirebaseStringFormat {
      *
      * @return the formatted date
      */
-    fun firebaseDateFormatted(): String {
-        return SimpleDateFormat("ddMMyyyy", Locale.getDefault()).format(Date())
+    fun firebaseDateFormatted(date: Date): String {
+        return SimpleDateFormat("ddMMyyyy", Locale.getDefault()).format(date)
     }
 }

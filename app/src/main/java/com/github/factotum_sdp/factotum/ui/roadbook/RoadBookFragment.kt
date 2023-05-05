@@ -14,14 +14,18 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
-import com.github.factotum_sdp.factotum.preferencesDataStore
 import com.github.factotum_sdp.factotum.UserViewModel
-import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
+import com.github.factotum_sdp.factotum.data.DeliveryLogger.Companion.DELIVERY_LOG_DB_PATH
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
+import com.github.factotum_sdp.factotum.models.Shift
+import com.github.factotum_sdp.factotum.preferencesDataStore
 import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
 import com.github.factotum_sdp.factotum.repositories.RoadBookRepository
+import com.github.factotum_sdp.factotum.repositories.ShiftRepository
 import com.github.factotum_sdp.factotum.roadBookDataStore
+import com.github.factotum_sdp.factotum.shiftDataStore
+import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.ui.settings.SettingsViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.*
@@ -82,7 +86,14 @@ class RoadBookFragment : Fragment(), MenuProvider {
             val cal = Calendar.getInstance()
             rbViewModel.timestampNextDestinationRecord(cal.time)
         }
-
+        if (userViewModel.loggedInUser.value != null){
+            val currentShift = Shift(Date(), userViewModel.loggedInUser.value!!)
+            rbViewModel.setShiftRepository(
+                ShiftRepository(
+                    FirebaseInstance.getDatabase().reference.child(DELIVERY_LOG_DB_PATH),
+                requireContext().shiftDataStore,
+                currentShift))
+        }
         return view
     }
 
@@ -233,7 +244,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
             dialogBuilder.setMessage(R.string.finish_shift_alert_question)
                 .setPositiveButton(R.string.end_shift) { dialog, _ ->
                     rbViewModel.recordsListState.let {
-                        rbViewModel.makeShiftLog(userViewModel.loggedInUser.value!!)
+                        rbViewModel.logDeliveries()
                         Toast.makeText(
                             requireContext(),
                             R.string.shift_ended,

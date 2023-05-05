@@ -135,7 +135,6 @@ class ContactsCreationTest {
         getDatabase().reference.child("contacts").child("JohnDoe").removeValue()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun createdContactHasCorrectValue() {
 

@@ -87,6 +87,12 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : Vi
        return currentDRecList().getNextDestinationRecord()
     }
 
+    /**
+     * Time stamp the given DestinationRecord
+     *
+     * @param timeStamp: Date
+     * @param record: DestinationRecord
+     */
     fun timeStampARecord(timeStamp: Date, record: DestinationRecord) {
         val newRec = DestinationRecord(
             record.destID,
@@ -100,6 +106,8 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : Vi
         val ls = arrayListOf<DestinationRecord>()
         ls.addAll(_recordsList.value as Collection<DestinationRecord>)
         ls[currentDRecList().getIndexOf(record.destID)] = newRec
+
+        _recordsList.postValue(currentDRecList().replaceDisplayedList(ls))
     }
     /**
      * Create the final shift Log according to the current records state

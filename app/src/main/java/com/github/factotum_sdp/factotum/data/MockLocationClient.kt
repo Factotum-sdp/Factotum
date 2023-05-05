@@ -15,7 +15,7 @@ class MockLocationClient: LocationClient {
 
     @SuppressLint("MissingPermission")
     override fun getLocationUpdates(interval: Long): Flow<Location> {
-        val longerInterval = interval * 10
+        val longerInterval = interval * 4
         return flow {
             for(i in 0 until TIMES_WITHOUT_MOVING) {
                 emit(PELICAN)

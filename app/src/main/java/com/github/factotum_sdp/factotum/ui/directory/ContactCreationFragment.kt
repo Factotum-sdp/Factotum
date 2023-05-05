@@ -18,13 +18,14 @@ import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.cursoradapter.widget.SimpleCursorAdapter
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.databinding.FragmentContactCreationBinding
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getDatabase
 import com.github.factotum_sdp.factotum.models.Location
-import com.github.factotum_sdp.factotum.databinding.FragmentContactCreationBinding
 import com.github.factotum_sdp.factotum.models.Contact
 import com.github.factotum_sdp.factotum.models.Role
 import kotlinx.coroutines.launch
@@ -45,6 +46,8 @@ class ContactCreationFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
+    private val contactsViewModel: ContactsViewModel by activityViewModels()
 
 
     private lateinit var name: EditText
@@ -86,9 +89,9 @@ class ContactCreationFragment : Fragment() {
         viewModel = ViewModelProvider(requireActivity())[ContactsViewModel::class.java]
         viewModel.setDatabase(getDatabase())
 
-        if (arguments?.getString("username") != null) {
-            currentContact = viewModel.contacts.value?.find { it.username == arguments?.getString("username") }
-        }
+        currentContact =
+            contactsViewModel.contacts.value?.find { it.username == arguments?.getString("username") }
+
     }
 
     private fun setContactFields(view: View, contact: Contact?) {
@@ -260,4 +263,5 @@ class ContactCreationFragment : Fragment() {
             Toast.LENGTH_SHORT
         ).show()
     }
+
 }

@@ -13,7 +13,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.models.Contact
@@ -24,9 +23,11 @@ import com.github.factotum_sdp.factotum.ui.maps.MapsViewModel
 import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
 
 class ContactDetailsFragment : Fragment() {
-    private lateinit var currentContact: Contact
+    private var currentContact: Contact? = null
+    private var isSubFragment = false
 
     private val routeViewModel: MapsViewModel by activityViewModels()
+    private val contactsViewModel: ContactsViewModel by activityViewModels()
     private val userViewModel: UserViewModel by activityViewModels()
 
     override fun onCreateView(
@@ -39,16 +40,30 @@ class ContactDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val contactsViewModel = //retrieve list of contacts
-            ViewModelProvider(requireActivity())[ContactsViewModel::class.java]
-
         currentContact =
-            contactsViewModel.contacts.value?.find { it.username == arguments?.getString("username") } ?: Contact()
+            contactsViewModel.contacts.value?.find { it.username == arguments?.getString("username") }
 
-        setContactDetails(view, currentContact) //set contact details
+        isSubFragment = arguments?.getBoolean("isSubFragment") ?: false
 
-        initialiseAllButtons(view, contactsViewModel)
+
+        if (currentContact == null) {
+            hideAllViews(view)
+        } else {
+            setContactDetails(view, currentContact!!) //set contact details
+            initialiseAllButtons(view, contactsViewModel)
+        }
     }
+
+    private fun hideAllViews(view: View) {
+        view.findViewById<ViewGroup>(R.id.contact_details_fragment)?.apply {
+            for (i in 0 until childCount) {
+                val child = getChildAt(i)
+                child.visibility = View.GONE
+            }
+        }
+        view.findViewById<TextView>(R.id.contact_not_found_text).visibility = View.VISIBLE
+    }
+
 
     // links contact details to the layout
     @SuppressLint("SetTextI18n")
@@ -80,28 +95,33 @@ class ContactDetailsFragment : Fragment() {
 
     private fun initialiseAllButtons(view: View, contactsViewModel: ContactsViewModel) {
 
-        val returnToContactsButton =
-            view.findViewById<Button>(R.id.button) // connect the button to the layout
-        returnToContactsButton.setOnClickListener {
-            it.findNavController()
-                .navigate(R.id.action_contactDetailsFragment2_to_directoryFragment)
-        } // go back to the list of contacts when the button is clicked
-
         val updateContactButton = view.findViewById<Button>(R.id.button_modify_contact)
         updateContactButton.setOnClickListener {
             val bundle = Bundle()
-            bundle.putString("username", currentContact.username)
-            it.findNavController()
-                .navigate(R.id.action_contactDetailsFragment2_to_contactCreationFragment, bundle)
+            bundle.putString("username", currentContact!!.username)
+            if (isSubFragment)
+                it.findNavController()
+                    .navigate(R.id.action_dRecordDetailsFragment_to_contactCreationFragment, bundle)
+            else
+                it.findNavController()
+                    .navigate(
+                        R.id.action_contactDetailsFragment2_to_contactCreationFragment,
+                        bundle
+                    )
         }
 
         val deleteContactButton = view.findViewById<Button>(R.id.button_delete_contact)
         deleteContactButton.setOnClickListener {
-            contactsViewModel.deleteContact(currentContact)
+            contactsViewModel.deleteContact(currentContact!!)
             it.findNavController()
                 .navigate(R.id.action_contactDetailsFragment2_to_directoryFragment)
         }
         if (userViewModel.loggedInUser.value?.role != Role.BOSS) {
+            deleteContactButton.visibility = View.GONE
+        }
+
+        if (isSubFragment) {
+            updateContactButton.visibility = View.GONE
             deleteContactButton.visibility = View.GONE
         }
 
@@ -116,9 +136,11 @@ class ContactDetailsFragment : Fragment() {
 
         view.findViewById<Button>(R.id.show_all_button).setOnClickListener {
             routeViewModel.addRoute(DUMMY_ROUTE[0]) //remove when merged with contact creation and use real route
-            it.findNavController().navigate(R.id.action_contactDetailsFragment2_to_MapsFragment)
+            if (isSubFragment) {
+                it.findNavController().navigate(R.id.action_dRecordDetailsFragment_to_MapsFragment)
+            } else {
+                it.findNavController().navigate(R.id.action_contactDetailsFragment2_to_MapsFragment)
+            }
         }
     }
-
-
 }

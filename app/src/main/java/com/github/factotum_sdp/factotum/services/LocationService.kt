@@ -30,6 +30,15 @@ private const val CHANNEL_NAME = "Factotum Live Location Service"
 private const val SERVICE_ID = 101
 private const val UPDATE_INTERVAL = 1000L
 
+/**
+ * The LocationService class
+ *
+ * It extends the android.app.Service abstract class,
+ * in order to provide our own Factotum Location service.
+ *
+ * A service is needed to keep a high location update rate whenever
+ * the app is in the background.
+ */
 class LocationService : Service() {
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -59,22 +68,32 @@ class LocationService : Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
+    /**
+     * Set an event for each Location update
+     *
+     * @param onLocationUpdate: (Location) -> Unit
+     */
     fun setEventOnLocationUpdate(onLocationUpdate: ((location: Location) -> Unit)) {
         onLocationUpdateEvent = onLocationUpdate
     }
 
     private fun start() {
         startForegroundJob(UPDATE_INTERVAL) { service, notification ->
-            val updatedNotification = notification.setContentText(
-                getString(R.string.loc_service_notification_message)
-            ).setChannelId(CHANNEL_ID)
+            val updatedNotification =
+                notification
+                    .setContentText(getString(R.string.loc_service_notification_message))
+                    .setChannelId(CHANNEL_ID)
             service.notify(SERVICE_ID, updatedNotification.build())
         }
     }
 
+    private fun stop() {
+        stopSelf()
+    }
+
     private fun startForegroundJob(
         interval: Long,
-        onLocationChanges: (
+        onFirstLocationChange: ( // Only called the very first time the service is launched
             service: NotificationManager,
             notification: NotificationCompat.Builder
         ) -> Unit
@@ -89,17 +108,19 @@ class LocationService : Service() {
                 ""
             }
 
-        val notification = NotificationCompat.Builder(this, channelId)
-            .setContentTitle(getString(R.string.loc_service_notification_title))
-            .setContentText("Location: null")
-            .setCategory(Notification.CATEGORY_SERVICE)
-            .setSmallIcon(R.drawable.location)
-            .setOngoing(true)
+        val notification =
+            NotificationCompat
+                .Builder(this, channelId)
+                .setContentTitle(getString(R.string.loc_service_notification_title))
+                .setCategory(Notification.CATEGORY_SERVICE)
+                .setSmallIcon(R.drawable.location)
+                .setOngoing(true)
+                .setContentText(getString(R.string.loc_service_notification_message))
 
         locationClient
             .getLocationUpdates(interval)
             .catch { e -> e.printStackTrace() }
-            .onStart { onLocationChanges(service, notification) }
+            .onStart { onFirstLocationChange(service, notification) }
             .onEach { location ->
                 onLocationUpdateEvent?.let { it(location) }
             }
@@ -118,10 +139,6 @@ class LocationService : Service() {
         chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
         service.createNotificationChannel(chan)
         return channelId
-    }
-
-    private fun stop() {
-        stopSelf()
     }
 
     override fun onDestroy() {

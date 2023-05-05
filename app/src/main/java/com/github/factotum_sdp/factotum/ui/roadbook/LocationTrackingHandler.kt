@@ -9,12 +9,23 @@ import android.os.IBinder
 import androidx.activity.ComponentActivity
 import com.github.factotum_sdp.factotum.services.LocationService
 
+/**
+ * The LocationTrackingHandler class
+ *
+ * Manage a LocationService instance, to provide
+ * a simpler API for the UI part
+ */
 class LocationTrackingHandler {
 
     private lateinit var locationService: LocationService
     private var onLocationUpdate: ((location: Location) -> Unit)? = null
     private var isTrackingEnabled = false
 
+    /**
+     * Start the location service
+     * @param applicationContext: Context
+     * @param componentActivity: ComponentActivity
+     */
     fun startLocationService(applicationContext: Context, componentActivity: ComponentActivity) {
         Intent(applicationContext, LocationService::class.java).apply {
             action = LocationService.ACTION_START
@@ -23,6 +34,11 @@ class LocationTrackingHandler {
         }
     }
 
+    /**
+     * Stop the location service
+     * @param applicationContext: Context
+     * @param componentActivity: ComponentActivity
+     */
     fun stopLocationService(applicationContext: Context, componentActivity: ComponentActivity) {
         if (isTrackingEnabled) {
             Intent(applicationContext, LocationService::class.java).apply {
@@ -33,15 +49,23 @@ class LocationTrackingHandler {
         } // else the service is already disabled
     }
 
+    /**
+     * Whether the location tracking service is enabled or not
+     * @return Boolean
+     */
     fun isTrackingEnabled(): Boolean {
         return isTrackingEnabled
     }
 
+    /**
+     * Set the event on each location update
+     * @param onLocationUpdate: (Location) -> Unit
+     */
     fun setOnLocationUpdate(onLocationUpdate: ((location: Location) -> Unit)) {
         this.onLocationUpdate = onLocationUpdate
     }
 
-    /** Defines callbacks for service binding, passed to bindService().  */
+    // Defines callbacks for service binding, passed to bindService().
     private val connection = object : ServiceConnection {
 
         override fun onServiceConnected(className: ComponentName, service: IBinder) {

@@ -143,6 +143,14 @@ class ContactDetailsFragmentTest {
     }
 
     @Test
+    fun superClientIsntDisplayedWithBossContact() {
+        onView(withId(R.id.contact_role))
+            .check(matches(withText("Boss")))
+        onView(withId(R.id.managing_client_shown))
+            .check(matches(withEffectiveVisibility(Visibility.GONE)))
+    }
+
+    @Test
     fun buttonReturnsToContacts() {
         onView(withId(R.id.button))
             .perform(click())

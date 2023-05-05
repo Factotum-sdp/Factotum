@@ -128,7 +128,7 @@ class ContactCreationFragment : Fragment() {
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 val selectedItem = parent?.getItemAtPosition(position).toString()
-                if (selectedItem == "Client") {
+                if (selectedItem == Role.CLIENT.name) {
                     managingClientUsername.visibility = View.VISIBLE
                 } else {
                     managingClientUsername.visibility = View.GONE
@@ -213,7 +213,7 @@ class ContactCreationFragment : Fragment() {
             } else if (!isUsernameUnique(username.text.toString()) && currentContact?.username != username.text.toString()) {
                 showErrorToast(R.string.username_not_unique)
                 return@setOnClickListener
-            } else if (managingClientUsername.text.toString().isNotEmpty() && isUsernameUnique(managingClientUsername.text.toString())) {
+            } else if (managingClientUsername.text.toString().isNotEmpty() && !isUsernameExisitingContact(managingClientUsername.text.toString())) {
                 showErrorToast(R.string.super_client_id_not_valid)
                 return@setOnClickListener
             } else {
@@ -229,7 +229,7 @@ class ContactCreationFragment : Fragment() {
                         addressName = address?.addressName,
                         latitude = address?.coordinates?.latitude,
                         longitude = address?.coordinates?.longitude,
-                        super_client =  if (spinner.selectedItem.toString() == "Client")
+                        super_client =  if (spinner.selectedItem.toString() == Role.CLIENT.name)
                             managingClientUsername.text.toString() else null,
                         phone = phoneNumber.text.toString(),
                         details = details.text.toString()
@@ -242,6 +242,10 @@ class ContactCreationFragment : Fragment() {
 
     private fun isUsernameUnique(username: String): Boolean {
         return viewModel.contacts.value?.find { it.username == username } == null
+    }
+
+    private fun isUsernameExisitingContact(username: String): Boolean {
+        return viewModel.contacts.value?.find { it.username == username && it.role == Role.CLIENT.name } != null
     }
 
     private fun validateLocation(): Location? {

@@ -63,9 +63,9 @@ class ContactDetailsFragment : Fragment() {
         val contactAddress = view.findViewById<TextView>(R.id.contact_address)
         val contactDetails = view.findViewById<TextView>(R.id.contact_details)
 
-        if (contact.role == "Client" && !contact.super_client.isNullOrEmpty()) {
-            contactSuperClient.text = "@" + contact.super_client
+        if (contact.role == Role.CLIENT.name && !contact.super_client.isNullOrEmpty()) {
             view.findViewById<LinearLayout>(R.id.managing_client_shown).visibility = View.VISIBLE
+            contactSuperClient.text = "@" + contact.super_client
         }
 
         contactUsername.text = "@" + contact.username

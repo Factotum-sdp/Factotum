@@ -80,20 +80,6 @@ class DisplayFragment : Fragment() {
                 }
             }
         }
-
-        userFolder.observe(viewLifecycleOwner) {
-            when (userRole.value) {
-                Role.BOSS -> {
-                    observeBossFolders()
-                }
-                Role.CLIENT -> {
-                    observeClientPhotos()
-                }
-                else -> {
-                    observeClientPhotos()
-                }
-            }
-        }
     }
 
 

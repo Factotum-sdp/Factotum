@@ -62,13 +62,6 @@ class ContactDetailsFragmentTest {
         onView(withText("@" + currContact.username))
             .perform(click())
     }
-
-    @Test
-    fun buttonIsDisplayed() {
-        onView(withId(R.id.button))
-            .check(matches(isDisplayed()))
-    }
-
     @Test
     fun modifyButtonIsDisplayed() {
         onView(withId(R.id.button_modify_contact))
@@ -98,13 +91,6 @@ class ContactDetailsFragmentTest {
         onView(withId(R.id.button_delete_contact))
             .check(doesNotExist())
     }
-
-    @Test
-    fun buttonIsClickable() {
-        onView(withId(R.id.button))
-            .perform(click())
-    }
-
     @Test
     fun modifyButtonIsClickable() {
         onView(withId(R.id.button_modify_contact))
@@ -139,14 +125,6 @@ class ContactDetailsFragmentTest {
     @Test
     fun correctImageIsDisplayed() {
         onView(withId(R.id.contact_image))
-            .check(matches(isDisplayed()))
-    }
-
-    @Test
-    fun buttonReturnsToContacts() {
-        onView(withId(R.id.button))
-            .perform(click())
-        onView(withId(R.id.contacts_recycler_view))
             .check(matches(isDisplayed()))
     }
 

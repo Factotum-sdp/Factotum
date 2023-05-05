@@ -51,7 +51,6 @@ class DisplayFragment : Fragment() {
         )
     }
 
-    // Clean up binding when the view is destroyed
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -82,7 +81,6 @@ class DisplayFragment : Fragment() {
             }
         }
 
-        // Add this observer
         userFolder.observe(viewLifecycleOwner) {
             when (userRole.value) {
                 Role.BOSS -> {
@@ -103,25 +101,21 @@ class DisplayFragment : Fragment() {
         storageReference.downloadUrl.addOnSuccessListener { uri ->
             val shareText = "Here is your delivery: $uri"
 
-            // General sharing intent
             val generalShareIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
                 putExtra(Intent.EXTRA_TEXT, shareText)
             }
 
-            // Intent for SMS sharing
             val smsIntent = Intent(Intent.ACTION_SENDTO).apply {
                 data = Uri.parse("smsto:$phoneNumber")
                 putExtra("sms_body", shareText)
             }
 
-            // Intent for WhatsApp sharing
             val whatsappIntent = Intent(Intent.ACTION_VIEW).apply {
                 data = Uri.parse("https://api.whatsapp.com/send?phone=$phoneNumber&text=$shareText")
                 setPackage("com.whatsapp")
             }
 
-            // Create a chooser intent with the option to share via general sharing options and WhatsApp
             val chooserIntent =
                 Intent.createChooser(generalShareIntent, getString(R.string.share)).apply {
                     putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(whatsappIntent, smsIntent))
@@ -148,8 +142,8 @@ class DisplayFragment : Fragment() {
         val bossFolderAdapter = BossFolderAdapter(
             onCardClick = { clientFolder ->
                 userFolder.value = clientFolder.value
-                setupClientUI()
                 observeClientPhotos()
+                setupClientUI()
             }
         )
 

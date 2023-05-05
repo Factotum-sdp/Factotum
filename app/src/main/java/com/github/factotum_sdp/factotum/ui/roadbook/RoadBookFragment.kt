@@ -91,9 +91,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
         return view
     }
 
-    // Temp. implementation
-    //============================================================================================
-
     @SuppressLint("NotifyDataSetChanged")
     private fun setLiveLocationEvent() {
         locationTrackingHandler.setOnLocationUpdate { currentLocation ->

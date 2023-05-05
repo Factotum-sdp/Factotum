@@ -945,6 +945,31 @@ class RoadBookFragmentTest {
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun automaticTimestampIsDoneOnDestinationPlacePerimeter() = runTest {
+        // Delete Buhagiat and let the X17 which is at the Rolex center (< 15m of where the courier arrive)
+        swipeLeftTheRecordAt(1)
+        onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
+        onView(withText(R.string.swipeleft_confirm_button_label)).perform(click())
+
+        onView(withId(R.id.location_switch)).perform(click())
+
+        runBlocking {
+            // After 4 updates the courier is arrived near the destination (< 15m)
+            delay(4 * updateTimeMockLocationClient)
+
+            // Now swipe left archive the record
+            swipeLeftTheRecordAt(1)
+            onView(withText(R.string.delete_dialog_title)).check(doesNotExist()) // Also X17 does not exist more
+            onView(withText(DestinationRecords.RECORDS[2].destID)).check(doesNotExist())
+
+            // Disable location
+            onView(withId(R.id.location_switch)).perform(click())
+            onView(withId(R.id.refresh_button)).perform(click())
+        }
+    }
+
     // Test with another record on top the timestamp is never done
 
 

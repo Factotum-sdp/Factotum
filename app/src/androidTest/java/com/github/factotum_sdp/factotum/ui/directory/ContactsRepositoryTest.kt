@@ -4,7 +4,8 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.placeholder.Contact
+import com.github.factotum_sdp.factotum.models.Contact
+import com.github.factotum_sdp.factotum.repositories.ContactsRepository
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import kotlinx.coroutines.*
@@ -55,6 +56,8 @@ class ContactsRepositoryTest {
             "Doe",
             R.drawable.contact_image,
             "123 Main St",
+            25.0,
+            45.0,
             "555-555-1234"
         )
 
@@ -78,6 +81,8 @@ class ContactsRepositoryTest {
             "Doe",
             R.drawable.contact_image,
             "123 Main St",
+            25.0,
+            45.0,
             "555-555-1234"
         )
 

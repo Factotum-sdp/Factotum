@@ -231,7 +231,7 @@ class SignUpFragmentTest {
         )
         onView(withId(R.id.role)).perform(click())
         onData(anything()).inRoot(isPlatformPopup()).atPosition(1).perform(click())
-        onView(withId(R.id.username)).perform(typeText("joel"))
+        onView(withId(R.id.username)).perform(typeText("Buhagiat"))
         onView(withId(R.id.signup)).perform(click())
         FirebaseAuth.AuthStateListener {
             onView(withId(R.id.fragment_login_directors_parent)).check(

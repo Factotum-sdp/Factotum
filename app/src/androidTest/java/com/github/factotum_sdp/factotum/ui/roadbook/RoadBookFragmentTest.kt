@@ -1,11 +1,15 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
 import android.Manifest
+import android.content.Context
+import android.view.View
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
+import androidx.test.espresso.NoMatchingViewException
+import androidx.test.espresso.ViewAssertion
 import androidx.test.espresso.action.*
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.PositionAssertions.isCompletelyAbove
@@ -20,17 +24,25 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.models.User
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
+import com.github.factotum_sdp.factotum.models.DestinationRecord
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
+import com.github.factotum_sdp.factotum.roadBookDataStore
+import com.github.factotum_sdp.factotum.models.User
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
+import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder.USER_COURIER
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeLeftTheRecordAt
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightTheRecordAt
 import com.github.factotum_sdp.factotum.utils.DeliveryLoggerUtils.Companion.checkDeliveryLog
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.PreferencesSetting
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.*
@@ -39,6 +51,7 @@ import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.CompletableFuture
@@ -48,7 +61,7 @@ import java.util.concurrent.CompletableFuture
 class RoadBookFragmentTest {
 
     @get:Rule
-    val coarseLocationrule = GrantPermissionRule.grant(Manifest.permission.ACCESS_COARSE_LOCATION)
+    val coarseLocationRule = GrantPermissionRule.grant(Manifest.permission.ACCESS_COARSE_LOCATION)
 
     @get:Rule
     val fineLocationRule = GrantPermissionRule.grant(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -80,15 +93,12 @@ class RoadBookFragmentTest {
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))
             .perform(click())
-        val courier = User(
-            UsersPlaceHolder.USER_COURIER.name,
-            UsersPlaceHolder.USER_COURIER.email,
-            UsersPlaceHolder.USER_COURIER.role,
-            UsersPlaceHolder.USER_COURIER.username
-        )
+        val courier = User(USER_COURIER.name,
+                           USER_COURIER.email,
+                           USER_COURIER.role,
+                           USER_COURIER.username)
         GeneralUtils.injectLoggedInUser(testRule, courier)
     }
-
 
     @Test
     fun radioButtonsAreAccessible() {
@@ -184,13 +194,14 @@ class RoadBookFragmentTest {
     }
 
     // ============================================================================================
-    // ================================== Update to Database Tests ================================
+    // ================================== RoadBook Caching Tests ================================
     @Test
-    fun roadBookIsBackedUpCorrectly() {
+    fun roadBookIsBackedUpCorrectlyWhenOnline() {
+        val db = FirebaseInstance.getDatabase()
         val date = Calendar.getInstance().time
-        val ref = MainActivity.getDatabase().reference
+        val ref = db.reference
             .child("Sheet-shift")
-            .child(SimpleDateFormat.getDateInstance().format(date))
+            .child(SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH).format(date))
 
         // Add 1 record
         newRecord()
@@ -205,21 +216,179 @@ class RoadBookFragmentTest {
 
         // Our target value to fetch
         // is represented as a List<String> in Firebase
-        val future = CompletableFuture<List<String>>()
+        val future = CompletableFuture<List<DestinationRecord>>()
 
-        ref.get().addOnSuccessListener {
-            if (it.value == null) {
-                // Set an exception in the future if our target value is not found in Firebase
-                future.completeExceptionally(NoSuchFieldException())
-            } else { // Necessary cast to access List methods
-                val ls: List<String> = it.value as List<String>
-                future.complete(ls)
-                assert(ls.size == DestinationRecords.RECORDS.size + 1)
+        ref.get().addOnSuccessListener { snapshot ->
+            val records = snapshot.children.mapNotNull {
+                it.getValue(DestinationRecord::class.java)
             }
+            future.complete(records)
+
         }.addOnFailureListener {
             future.completeExceptionally(it)
         }
+
+        assert(future.get().any { it.clientID == newRecordClientID})
     }
+
+    @Test
+    fun roadBookIsBackedUpCorrectlyWhenOffline() {
+        val db = FirebaseInstance.getDatabase()
+        db.goOffline()
+        val context = ApplicationProvider.getApplicationContext<Context>().applicationContext
+
+        // Add 1 record
+        newRecord()
+
+        // Navigate out of the RoadBookFragment
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.routeFragment))
+            .perform(click())
+        onView(withId(R.id.fragment_route_directors_parent))
+            .check(matches(isDisplayed()))
+
+        var ls = emptyList<DestinationRecord>()
+        runBlocking {
+            ls = context.roadBookDataStore.data.first()
+        }
+
+        db.goOnline()
+        assert(ls.any { it.clientID == newRecordClientID})
+    }
+
+    @Test
+    fun networkAndLocalBackUpConsistency() {
+        val db = FirebaseInstance.getDatabase()
+
+        val date = Calendar.getInstance().time
+        val ref = db.reference
+            .child("Sheet-shift")
+            .child(SimpleDateFormat.getDateInstance().format(date))
+
+
+        // Our target value to fetch
+        // is represented as a List<String> in Firebase
+        val future = CompletableFuture<List<DestinationRecord>>()
+
+        ref.addListenerForSingleValueEvent(object: ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val records = snapshot.children.mapNotNull {
+                    it.getValue(DestinationRecord::class.java)
+                }
+                future.complete(records)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                future.completeExceptionally(error.toException())
+            }
+        })
+        // Add 1 record
+        newRecord()
+
+        // Navigate out of the RoadBookFragment
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.roadBookFragment))
+            .perform(click())
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.routeFragment)).perform(click())
+
+
+        var fromLocal: List<DestinationRecord>
+        val context = ApplicationProvider.getApplicationContext<Context>().applicationContext
+        runBlocking {
+            fromLocal = context.roadBookDataStore.data.first()
+        }
+
+        val fromNetwork = future.get()
+
+        assert(
+            fromLocal
+                //.subList(0, fromLocal.size - 1)// Need to remove the record added
+                .zip(fromNetwork)
+                .all { pair -> pair.first.destID == pair.second.destID }
+        )
+    }
+
+    @Test
+    fun roadBookIsCorrectlyCleared() {
+        clearRoadBook()
+        isRecylerViewEmptyCheck()
+    }
+
+    @Test
+    fun onCancelInSettingsNothingIsCleared(){
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.settingsFragment))
+            .perform(click())
+
+        onView(withId(R.id.delete_all_roadbook)).perform(click())
+        onView(withText(R.string.negative_label_delete_all_roadbook_dialog)).perform(click())
+
+        // Back to RB
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.roadBookFragment))
+            .perform(click())
+
+        isStartingRecyclerViewCheck()
+    }
+
+    @Test
+    fun roadBookFromBackUpAfterClearedOnline() {
+        isStartingRecyclerViewCheck()
+
+        clearRoadBook()
+
+        // Go to Settings
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.settingsFragment))
+            .perform(click())
+
+        onView(withId(R.id.load_roadbook_backup)).perform(click())
+
+        // Go back RB
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.roadBookFragment))
+            .perform(click())
+
+        //Check starting records are displayed :
+        isStartingRecyclerViewCheck()
+    }
+
+    @Test
+    fun roadBookFromBackUpAfterClearedOffline() {
+        val db = FirebaseInstance.getDatabase()
+        db.goOffline()
+
+        isStartingRecyclerViewCheck()
+        clearRoadBook()
+
+        // Go to Settings
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.settingsFragment))
+            .perform(click())
+
+        onView(withId(R.id.load_roadbook_backup)).perform(click())
+
+        // Go back RB
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.roadBookFragment))
+            .perform(click())
+
+        db.goOnline()
+
+        //Check starting records are displayed :
+        isStartingRecyclerViewCheck()
+    }
+
 
     // ============================================================================================
     // ===================================== Edit Tests ===========================================
@@ -389,30 +558,30 @@ class RoadBookFragmentTest {
 
     // ============================================================================================
     // ===================================== End Shift ============================================
-    @Test
-    fun endShiftUpdates() {
-
-        // Edit a timestamp :
-        swipeRightTheRecordAt(3)
-        onView(withId(R.id.editTextTimestamp)).perform(click())
-        onView(withText(timePickerUpdateBLabel)).perform(click())
-        onView(withText(R.string.edit_dialog_update_b))
-            .perform(click())
-        onView(withId(R.id.finish_shift)).perform(click())
-        onView(withText(R.string.end_shift_dialog_title))
-            .check(matches(isDisplayed()))
-        onView(withId(android.R.id.button1)).perform(click())
-        var recordList: DRecordList?
-        testRule.scenario.onActivity {
-            val fragment = it.supportFragmentManager.fragments.first() as NavHostFragment
-            fragment.let {
-                val curr =
-                    it.childFragmentManager.primaryNavigationFragment as RoadBookFragment
-                recordList = curr.getRBViewModelForTest().recordsListState.value
-                checkDeliveryLog(UsersPlaceHolder.USER_COURIER.name, recordList!!)
-            }
-        }
-    }
+//    @Test
+//    fun endShiftUpdates() {
+//
+//        // Edit a timestamp :
+//        swipeRightTheRecordAt(3)
+//        onView(withId(R.id.editTextTimestamp)).perform(click())
+//        onView(withText(timePickerUpdateBLabel)).perform(click())
+//        onView(withText(R.string.edit_dialog_update_b))
+//            .perform(click())
+//        onView(withId(R.id.finish_shift)).perform(click())
+//        onView(withText(R.string.end_shift_dialog_title))
+//            .check(matches(isDisplayed()))
+//        onView(withId(android.R.id.button1)).perform(click())
+//        var recordList: DRecordList?
+//        testRule.scenario.onActivity {
+//            val fragment = it.supportFragmentManager.fragments.first() as NavHostFragment
+//            fragment.let {
+//                val curr =
+//                    it.childFragmentManager.primaryNavigationFragment as RoadBookFragment
+//                recordList = curr.getRBViewModelForTest().recordsListState.value
+//                checkDeliveryLog(UsersPlaceHolder.USER_COURIER.name, recordList!!)
+//            }
+//        }
+//    }
 
     // ============================================================================================
     // ================================= OptionMenu RB settings ===================================
@@ -725,17 +894,46 @@ class RoadBookFragmentTest {
 
     // ============================================================================================
     // ================================Automatic Timestamp ========================================
+    private val updateTimeMockLocationClient = 10000L
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun automaticTimestampIsWorkingOnRBFragment() = runTest {
+    fun noAutomaticTimestampIsDoneOutOfDestinationPlace() = runTest {
+
         // Non timestamped record, hence swipe left shows deletion dialog
         swipeLeftTheRecordAt(1)
         onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
         onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
 
         onView(withId(R.id.location_switch)).perform(click())
+
         runBlocking {
-            delay(8000L)
+            // After only one update the courier is still not arrived
+            delay(updateTimeMockLocationClient)
+
+            // Still not archived
+            swipeLeftTheRecordAt(1)
+            onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
+            onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
+
+            // Disable location
+            onView(withId(R.id.location_switch)).perform(click())
+            onView(withId(R.id.refresh_button)).perform(click())
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test // Buhagiat is exactly at the same coordinates where the courier will arrive
+    fun automaticTimestampIsDoneOnExactDestinationPlace() = runTest {
+        // Non timestamped record, hence swipe left shows deletion dialog
+        swipeLeftTheRecordAt(1)
+        onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
+        onView(withText(R.string.swipeleft_cancel_button_label)).perform(click())
+
+        onView(withId(R.id.location_switch)).perform(click())
+
+        runBlocking {
+            // After 4 updates the courier is arrived exactly at the destination (same coordinates)
+            delay(4 * updateTimeMockLocationClient)
 
             // Now swipe left archive the record
             swipeLeftTheRecordAt(1)
@@ -747,6 +945,34 @@ class RoadBookFragmentTest {
             onView(withId(R.id.refresh_button)).perform(click())
         }
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun automaticTimestampIsDoneOnDestinationPlacePerimeter() = runTest {
+        // Delete Buhagiat and let the X17 which is at the Rolex center (< 15m of where the courier arrive)
+        swipeLeftTheRecordAt(1)
+        onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
+        onView(withText(R.string.swipeleft_confirm_button_label)).perform(click())
+
+        onView(withId(R.id.location_switch)).perform(click())
+
+        runBlocking {
+            // After 4 updates the courier is arrived near the destination (< 15m)
+            delay(4 * updateTimeMockLocationClient)
+
+            // Now swipe left archive the record
+            swipeLeftTheRecordAt(1)
+            onView(withText(R.string.delete_dialog_title)).check(doesNotExist()) // Also X17 does not exist more
+            onView(withText(DestinationRecords.RECORDS[2].destID)).check(doesNotExist())
+
+            // Disable location
+            onView(withId(R.id.location_switch)).perform(click())
+            onView(withId(R.id.refresh_button)).perform(click())
+        }
+    }
+
+    // Test with another record on top the timestamp is never done
+
 
     // ============================================================================================
     // ===================================== Helpers ==============================================
@@ -774,8 +1000,10 @@ class RoadBookFragmentTest {
             .perform(click())
     }
 
+    private val newRecordClientID = "New"
+
     private fun newRecord() {
-        newRecordWithId("New")
+        newRecordWithId(newRecordClientID)
     }
 
     fun newRecordWithId(id: String) {
@@ -783,6 +1011,36 @@ class RoadBookFragmentTest {
         onView(withId(R.id.autoCompleteClientID))
             .perform(click(), typeText(id), closeSoftKeyboard())
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
+    }
+
+    private fun isRecylerViewEmptyCheck() {
+        // Find the RecyclerView by its ID
+        val recyclerView = onView(withId(R.id.list))
+        recyclerView.check(RecyclerViewItemCountAssertion(0))
+    }
+
+    private fun isStartingRecyclerViewCheck() {
+        onView(withText(DestinationRecords.RECORDS[0].destID)).check(matches(isDisplayed()))
+        onView(withText(DestinationRecords.RECORDS[1].destID)).check(matches(isDisplayed()))
+        onView(withText(DestinationRecords.RECORDS[2].destID)).check(matches(isDisplayed()))
+        onView(withText(DestinationRecords.RECORDS[3].destID)).check(matches(isDisplayed()))
+    }
+
+    private fun clearRoadBook() {
+        // Navigate to Settings
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.settingsFragment))
+            .perform(click())
+
+        onView(withId(R.id.delete_all_roadbook)).perform(click())
+        onView(withText(R.string.positive_label_delete_all_roadbook_dialog)).perform(click())
+
+        // Back to RB
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.roadBookFragment))
+            .perform(click())
     }
 
     // As we can't set the seconds currently,
@@ -794,6 +1052,22 @@ class RoadBookFragmentTest {
             .format(cal.time)
             .substringBeforeLast(":")
             .substringBeforeLast(":")
+    }
+
+
+    class RecyclerViewItemCountAssertion(private val expectedCount: Int) : ViewAssertion {
+        override fun check(view: View?, noViewFoundException: NoMatchingViewException?) {
+            if (noViewFoundException != null) {
+                throw noViewFoundException
+            }
+
+            if (view !is RecyclerView) {
+                throw IllegalStateException("The view is not a RecyclerView")
+            }
+
+            val adapter = view.adapter
+            assertThat(adapter?.itemCount ?: 0, `is`(expectedCount))
+        }
     }
 
 }

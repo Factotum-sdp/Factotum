@@ -158,4 +158,11 @@
     <string name="roadbookpreferencescheckedtextview">RoadBookPreferencesCheckedTextView</string>
     <string name="application_settings">Application Settings</string>
     <string name="save_roadbook_preferences">Save RoadBook Preferences</string>
+    <string name="load_road_book_back_up">Load RoadBook back-up</string>
+    <string name="delete_all_roadbook">Delete all RoadBook</string>
+    <string name="delete_all_roadbook_dialog_title">Delete all the current RoadBook records ?</string>
+    <string name="positive_label_delete_all_roadbook_dialog">Confirm</string>
+    <string name="negative_label_delete_all_roadbook_dialog">No !</string>
+    <string name="snap_delete_all_roadbook">All Roadbook records have been deleted</string>
+    <string name="snap_load_roadbook_backup">The last backup has been loaded</string>
 </resources>

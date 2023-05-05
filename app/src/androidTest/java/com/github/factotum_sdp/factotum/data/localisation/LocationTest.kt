@@ -32,8 +32,8 @@ class LocationTest {
         } else {
             result = geocoder.getFromLocationName(addressName, 1)?.get(0)
         }
-        assertEquals(location.address!!.latitude, result!!.latitude)
-        assertEquals(location.address!!.longitude, result!!.longitude)
+        assertEquals(location.coordinates!!.latitude, result!!.latitude)
+        assertEquals(location.coordinates!!.longitude, result!!.longitude)
 
     }
 
@@ -41,8 +41,8 @@ class LocationTest {
     fun wrongLocationCreatesNull() {
         val addressName = "dfjsdk"
         val location = Location(addressName, getApplicationContext())
-        assertEquals(location.address, null)
-        assertEquals(location.addressName, null)
+        assertEquals(location.coordinates, null)
+        assertEquals(location.addressName, addressName)
     }
 
     @Test
@@ -60,10 +60,10 @@ class LocationTest {
             if (line.contains(location.addressName.toString())) {
                 containsAddress = true
             }
-            if (line.contains(location.address!!.latitude.toString())) {
+            if (line.contains(location.coordinates!!.latitude.toString())) {
                 containsLat = true
             }
-            if (line.contains(location.address!!.longitude.toString())) {
+            if (line.contains(location.coordinates!!.longitude.toString())) {
                 containsLng = true
             }
         }

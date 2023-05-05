@@ -6,69 +6,49 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.databinding.FragmentDisplayBinding
-import com.github.factotum_sdp.factotum.ui.display.utils.PhotoAdapter
+import com.github.factotum_sdp.factotum.models.Role
+import com.github.factotum_sdp.factotum.ui.display.boss.BossDisplayViewModel
+import com.github.factotum_sdp.factotum.ui.display.boss.BossFolderAdapter
+import com.github.factotum_sdp.factotum.ui.display.client.ClientDisplayViewModel
+import com.github.factotum_sdp.factotum.ui.display.client.ClientDisplayViewModelFactory
+import com.github.factotum_sdp.factotum.ui.display.client.ClientPhotoAdapter
 import com.google.firebase.storage.StorageReference
 
-const val PHONE_NUMBER = "1234567890"
-
-// Fragment responsible for displaying a list of images from Firebase Storage
 class DisplayFragment : Fragment() {
 
-    // View model for this fragment
-    private val viewModel: DisplayViewModel by viewModels { DisplayViewModelFactory(userID) }
+    private val clientViewModel: ClientDisplayViewModel by viewModels { ClientDisplayViewModelFactory(userFolder) }
+    private val bossViewModel: BossDisplayViewModel by viewModels()
     private val userViewModel: UserViewModel by activityViewModels()
     private var _binding: FragmentDisplayBinding? = null
     private val binding get() = _binding!!
     private val userID = MutableLiveData("Unknown")
-
+    private val userRole = MutableLiveData(Role.UNKNOWN)
+    private val userFolder = MutableLiveData("Unknown")
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Inflate the fragment layout
         _binding = FragmentDisplayBinding.inflate(inflater, container, false)
-
-        // Set up the recycler view with a photo adapter
-        val photoAdapter = PhotoAdapter(
-            onShareClick = { storageReference ->
-                shareImage(storageReference, PHONE_NUMBER)
-            },
-            onCardClick = { uri ->
-                openImage(uri)
-            }
-        )
-
-        binding.recyclerView.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = photoAdapter
-        }
-
-        // Observe changes in the list of photo references and update the adapter
-        viewModel.photoReferences.observe(viewLifecycleOwner) { photoReferences ->
-            photoAdapter.submitList(photoReferences)
-        }
-
-        userViewModel.loggedInUser.observe(viewLifecycleOwner) { user ->
-            userID.value = user.name
-        }
-
-        // Set up the refresh button click listener
-        binding.refreshButton.setOnClickListener {
-            userID.value?.let { viewModel.refreshImages(it) }
-        }
-
+        setupObservers()
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            onBackPressedCallback
+        )
     }
 
     // Clean up binding when the view is destroyed
@@ -76,6 +56,48 @@ class DisplayFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
+
+    private fun setupObservers() {
+        userViewModel.loggedInUser.observe(viewLifecycleOwner) { user ->
+            userID.value = user.name
+            userRole.value = user.role
+        }
+
+        userRole.observe(viewLifecycleOwner) { role ->
+            userFolder.value = userID.value
+            when (role) {
+                Role.BOSS -> {
+                    setupBossUI()
+                    observeBossFolders()
+                }
+                Role.CLIENT -> {
+                    setupClientUI()
+                    observeClientPhotos()
+                }
+                else -> {
+                    setupClientUI()
+                    observeClientPhotos()
+                }
+            }
+        }
+
+        // Add this observer
+        userFolder.observe(viewLifecycleOwner) {
+            when (userRole.value) {
+                Role.BOSS -> {
+                    observeBossFolders()
+                }
+                Role.CLIENT -> {
+                    observeClientPhotos()
+                }
+                else -> {
+                    observeClientPhotos()
+                }
+            }
+        }
+    }
+
 
     private fun shareImage(storageReference: StorageReference, phoneNumber: String) {
         storageReference.downloadUrl.addOnSuccessListener { uri ->
@@ -117,16 +139,72 @@ class DisplayFragment : Fragment() {
         startActivity(intent)
     }
 
-}
 
-class DisplayViewModelFactory(private val userName: MutableLiveData<String>) : ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(DisplayViewModel::class.java)) {
-            return DisplayViewModel(userName) as T
+    private fun setupBossUI() {
+        binding.refreshButton.setOnClickListener {
+            bossViewModel.refreshFolders()
         }
-        throw IllegalArgumentException("Unknown ViewModel class")
+
+        val bossFolderAdapter = BossFolderAdapter(
+            onCardClick = { clientFolder ->
+                userFolder.value = clientFolder.value
+                setupClientUI()
+                observeClientPhotos()
+            }
+        )
+
+        binding.recyclerView.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = bossFolderAdapter
+        }
+    }
+
+    private fun observeBossFolders() {
+        bossViewModel.folderReferences.observe(viewLifecycleOwner) { folderReferences ->
+            (binding.recyclerView.adapter as? BossFolderAdapter)?.submitList(folderReferences)
+        }
+    }
+
+    private fun setupClientUI() {
+        binding.refreshButton.setOnClickListener {
+            clientViewModel.refreshImages(userFolder.value!!)
+        }
+
+        val clientPhotoAdapter = ClientPhotoAdapter(
+            onShareClick = { storageReference ->
+                shareImage(storageReference, PHONE_NUMBER)
+            },
+            onCardClick = { uri ->
+                openImage(uri)
+            }
+        )
+
+        binding.recyclerView.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = clientPhotoAdapter
+        }
+    }
+
+    private fun observeClientPhotos() {
+        clientViewModel.photoReferences.observe(viewLifecycleOwner) { photoReferences ->
+            (binding.recyclerView.adapter as? ClientPhotoAdapter)?.submitList(photoReferences)
+        }
+    }
+
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (userRole.value == Role.BOSS && userFolder.value != userID.value) {
+                userFolder.value = userID.value
+                setupBossUI()
+                observeBossFolders()
+            } else {
+                isEnabled = false
+                requireActivity().onBackPressedDispatcher.onBackPressed()
+            }
+        }
+    }
+
+    companion object{
+        const val PHONE_NUMBER = "1234567890"
     }
 }
-
-

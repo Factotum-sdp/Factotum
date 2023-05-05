@@ -1,6 +1,6 @@
 package com.github.factotum_sdp.factotum.data
 
-import com.github.factotum_sdp.factotum.MainActivity
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.models.User
 import com.google.firebase.auth.UserProfileChangeRequest
@@ -11,8 +11,8 @@ import java.util.concurrent.CompletableFuture
  * Class that handles authentication w/ login credentials and retrieves user information.
  */
 class LoginDataSource {
-    private val auth = MainActivity.getAuth()
-    private val dbRef = MainActivity.getDatabase().reference
+    private val auth = FirebaseInstance.getAuth()
+    private val dbRef = FirebaseInstance.getDatabase().reference
 
     fun login(userEmail: String, password: String): Result<String> {
         val authResultFuture = CompletableFuture<Result<String>>()

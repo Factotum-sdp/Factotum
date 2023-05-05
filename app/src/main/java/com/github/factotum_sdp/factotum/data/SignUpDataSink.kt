@@ -1,14 +1,14 @@
 package com.github.factotum_sdp.factotum.data
 
-import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.data.LoginDataSource.Companion.DISPATCH_DB_PATH
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.models.User
 import java.io.IOException
 import java.util.concurrent.CompletableFuture
 
 class SignUpDataSink {
-    private val auth = MainActivity.getAuth()
-    private val dbRef = MainActivity.getDatabase().reference
+    private val auth = FirebaseInstance.getAuth()
+    private val dbRef = FirebaseInstance.getDatabase().reference
 
     fun signUp(email: String, password: String): Result<String> {
         val authResultFuture = CompletableFuture<Result<String>>()

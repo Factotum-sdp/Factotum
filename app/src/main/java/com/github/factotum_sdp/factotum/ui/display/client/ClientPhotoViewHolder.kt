@@ -1,34 +1,37 @@
-package com.github.factotum_sdp.factotum.ui.display.utils
+package com.github.factotum_sdp.factotum.ui.display.client
 
 import android.net.Uri
 import androidx.recyclerview.widget.RecyclerView
-import com.github.factotum_sdp.factotum.databinding.DisplayItemBinding
+import com.github.factotum_sdp.factotum.databinding.DisplayItemPictureBinding
 import com.google.firebase.storage.StorageReference
 
-class PhotoViewHolder(
-    private val binding: DisplayItemBinding,
+
+class ClientPhotoViewHolder(
+    private val binding: DisplayItemPictureBinding,
     private val onShareClick: (StorageReference) -> Unit,
     private val onCardClick: (Uri) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(storageReference: StorageReference) {
-        // Extract the date, hour, and minute from the photo name
-        val dateTime = extractNewName(storageReference.name)
-        // Set the text of the TextView to the photo date, hour, and minute
-        binding.displayItemView.text = dateTime
+    private var storageReference: StorageReference? = null
 
+    init {
         binding.shareButton.setOnClickListener {
-            onShareClick(storageReference)
+            storageReference?.let { onShareClick(it) }
         }
 
         binding.cardView.setOnClickListener {
-            storageReference.downloadUrl.addOnSuccessListener { uri ->
+            storageReference?.downloadUrl?.addOnSuccessListener { uri ->
                 onCardClick(uri)
             }
         }
     }
 
-    // Extract the date, hour, and minute from the photo name
+    fun bind(storageReference: StorageReference) {
+        this.storageReference = storageReference
+        val dateTime = extractNewName(storageReference.name)
+        binding.displayItemView.text = dateTime
+    }
+
     private fun extractNewName(name: String): String {
         val regex = Regex("""\d{2}-\d{2}-\d{4}_\d{2}-\d{2}""")
         val match = regex.find(name)

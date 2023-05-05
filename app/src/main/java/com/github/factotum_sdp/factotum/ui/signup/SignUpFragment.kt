@@ -19,6 +19,7 @@ import androidx.navigation.fragment.findNavController
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.*
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getAuth
 import com.github.factotum_sdp.factotum.databinding.FragmentSignupBinding
 import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.models.User

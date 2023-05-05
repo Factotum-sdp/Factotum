@@ -74,7 +74,6 @@ class DRecordDetailsFragmentTest {
             click(),
             RecyclerViewActions.scrollToLastPosition<RoadBookViewAdapter.RecordViewHolder>(),
         )
-        Thread.sleep(1000)
         PreferencesSetting.enableTouchClick()
         onView(withText("01#1")).perform(click())
     }

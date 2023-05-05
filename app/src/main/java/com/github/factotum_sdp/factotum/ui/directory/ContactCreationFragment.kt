@@ -227,7 +227,7 @@ class ContactCreationFragment : Fragment() {
                 showErrorToast(R.string.username_not_unique)
                 return@setOnClickListener
             } else if (managingClientUsername.text.toString()
-                    .isNotEmpty() && !isUsernameExisitingContact(managingClientUsername.text.toString())
+                    .isNotEmpty() && !isUsernameExistingContact(managingClientUsername.text.toString())
             ) {
                 showErrorToast(R.string.super_client_id_not_valid)
                 return@setOnClickListener
@@ -259,7 +259,7 @@ class ContactCreationFragment : Fragment() {
         return viewModel.contacts.value?.find { it.username == username } == null
     }
 
-    private fun isUsernameExisitingContact(username: String): Boolean {
+    private fun isUsernameExistingContact(username: String): Boolean {
         return viewModel.contacts.value?.find { it.username == username && it.role == Role.CLIENT.name } != null
     }
 

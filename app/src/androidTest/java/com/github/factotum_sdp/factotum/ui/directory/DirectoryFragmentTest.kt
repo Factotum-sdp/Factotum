@@ -137,7 +137,7 @@ class DirectoryFragmentTest {
 
     @Test
     fun mapsDoesntRunFromContactDetailsWithContactWithNoLocation() {
-        onView(withText("@no_location_contact"))
+        onView(withText("@01"))
             .perform(click())
         onView(withId(R.id.contact_details_fragment)).check(matches(isDisplayed()))
         onView(withId(R.id.run_button)).perform(click())

@@ -26,14 +26,12 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.models.DestinationRecord
-import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
-import com.github.factotum_sdp.factotum.roadBookDataStore
 import com.github.factotum_sdp.factotum.models.User
-import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
+import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder.USER_COURIER
+import com.github.factotum_sdp.factotum.roadBookDataStore
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeLeftTheRecordAt
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightTheRecordAt
-import com.github.factotum_sdp.factotum.utils.DeliveryLoggerUtils.Companion.checkDeliveryLog
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.PreferencesSetting

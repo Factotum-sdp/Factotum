@@ -96,7 +96,7 @@
 
     <string name="rb_label_swiper_edition">Swipe R. Editon</string>
     <string name="rb_label_dragdrop"><![CDATA[Drag & Drop]]></string>
-    <string name="edit_dialog_cancel_b">cancel</string>
+    <string name="edit_dialog_cancel_b">Cancel</string>
     <string name="edit_dialog_update_b">update</string>
     <string name="menu_view_proof_picture">View Proof Pictures</string>
     <string name="refresh">Refresh</string>

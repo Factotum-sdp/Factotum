@@ -62,6 +62,7 @@ class ContactDetailsFragmentTest {
         onView(withText("@" + currContact.username))
             .perform(click())
     }
+
     @Test
     fun modifyButtonIsDisplayed() {
         onView(withId(R.id.button_modify_contact))
@@ -91,6 +92,7 @@ class ContactDetailsFragmentTest {
         onView(withId(R.id.button_delete_contact))
             .check(doesNotExist())
     }
+
     @Test
     fun modifyButtonIsClickable() {
         onView(withId(R.id.button_modify_contact))
@@ -190,16 +192,16 @@ class ContactDetailsFragmentTest {
         Intents.release()
     }
 
-/*
-    @Test
-    fun buttonShowDestination() {
-        onView(withId(R.id.show_all_button)).perform(click())
-        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        if (LocationUtils.hasLocationPopUp()) {
-            device.findObject(UiSelector().textContains(LocationUtils.buttonTextAllow)).click()
+    /*
+        @Test
+        fun buttonShowDestination() {
+            onView(withId(R.id.show_all_button)).perform(click())
+            val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+            if (LocationUtils.hasLocationPopUp()) {
+                device.findObject(UiSelector().textContains(LocationUtils.buttonTextAllow)).click()
+            }
+            val markers = device.wait(hasObject(By.descContains("Destination")), 5000L)
+            assertTrue(markers)
         }
-        val markers = device.wait(hasObject(By.descContains("Destination")), 5000L)
-        assertTrue(markers)
-    }
-    */
+        */
 }

@@ -12,4 +12,8 @@ data class Contact(
     val longitude: Double? = null,
     val phone: String = "",
     val details: String? = null
-)
+) {
+    fun hasCoordinates(): Boolean {
+        return latitude != null && longitude != null
+    }
+}

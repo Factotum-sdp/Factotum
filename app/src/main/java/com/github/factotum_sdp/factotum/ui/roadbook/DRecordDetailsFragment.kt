@@ -1,6 +1,7 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,8 +12,13 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.models.DestinationRecord
+import com.github.factotum_sdp.factotum.models.Route
 import com.github.factotum_sdp.factotum.ui.directory.ContactDetailsFragment
-import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
+import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
+import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment.Companion.IS_SUB_FRAGMENT_NAV_KEY
+import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment.Companion.USERNAME_NAV_KEY
+import com.github.factotum_sdp.factotum.ui.maps.MapsFragment
+import com.github.factotum_sdp.factotum.ui.maps.MapsViewModel
 import com.github.factotum_sdp.factotum.ui.picture.PictureFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -25,6 +31,8 @@ import com.google.android.material.tabs.TabLayoutMediator
 class DRecordDetailsFragment : Fragment() {
 
     private val rbViewModel: RoadBookViewModel by activityViewModels()
+    private val mapsViewModel: MapsViewModel by activityViewModels()
+    private val contactsViewModel: ContactsViewModel by activityViewModels()
     private lateinit var rec: DestinationRecord
     private lateinit var viewPager: ViewPager2
     override fun onCreateView(
@@ -70,12 +78,31 @@ class DRecordDetailsFragment : Fragment() {
 
         val detailsFragment = ContactDetailsFragment::class.java.newInstance()
         detailsFragment.arguments = Bundle().apply {
-            putString("username", rec.clientID)
-            putBoolean("isSubFragment", true)
+            putString(USERNAME_NAV_KEY, rec.clientID)
+            putBoolean(IS_SUB_FRAGMENT_NAV_KEY, true)
+        }
+
+        contactsViewModel.contacts.value?.apply {
+            try {
+                val currentContact = first { c -> c.username == rec.clientID }
+                if (currentContact.hasCoordinates()) {
+                    mapsViewModel.addRoute(
+                        Route(
+                            0.0, //Should be the current location
+                            0.0,
+                            currentContact.latitude ?: 0.0,
+                            currentContact.longitude ?: 0.0
+                        )
+                    )
+                }
+            } catch (e: NoSuchElementException) {
+                // Handle the exception here
+                Log.e("Error", "Could not find contact with ID ${rec.clientID}")
+            }
         }
 
         adapter.addFragment(DRecordInfoFragment(rec))
-        adapter.addFragment(RouteFragment())
+        adapter.addFragment(MapsFragment())
         adapter.addFragment(detailsFragment)
         adapter.addFragment(PictureFragment(rec.clientID))
 

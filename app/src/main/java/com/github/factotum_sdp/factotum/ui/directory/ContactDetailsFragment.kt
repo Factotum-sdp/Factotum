@@ -11,23 +11,26 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.models.Contact
 import com.github.factotum_sdp.factotum.UserViewModel
+import com.github.factotum_sdp.factotum.models.Contact
 import com.github.factotum_sdp.factotum.models.Role
-import com.github.factotum_sdp.factotum.placeholder.RouteRecords.DUMMY_ROUTE
+import com.github.factotum_sdp.factotum.models.Route
+import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment.Companion.IS_SUB_FRAGMENT_NAV_KEY
+import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment.Companion.USERNAME_NAV_KEY
 import com.github.factotum_sdp.factotum.ui.maps.MapsViewModel
 import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
 
 class ContactDetailsFragment : Fragment() {
-    private var currentContact: Contact? = null
+    private lateinit var currentContact: Contact
     private var isSubFragment = false
 
-    private val routeViewModel: MapsViewModel by activityViewModels()
     private val contactsViewModel: ContactsViewModel by activityViewModels()
+    private val mapsViewModel: MapsViewModel by activityViewModels()
     private val userViewModel: UserViewModel by activityViewModels()
 
     override fun onCreateView(
@@ -40,16 +43,24 @@ class ContactDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        currentContact =
-            contactsViewModel.contacts.value?.find { it.username == arguments?.getString("username") }
+        isSubFragment = arguments?.getBoolean(IS_SUB_FRAGMENT_NAV_KEY) ?: false
+        initialiseDetails(view, retrieveContact())
+    }
 
-        isSubFragment = arguments?.getBoolean("isSubFragment") ?: false
+    private fun retrieveContact(): Contact? {
+        return contactsViewModel.contacts.value?.find {
+            it.username == arguments?.getString(
+                USERNAME_NAV_KEY
+            )
+        }
+    }
 
-
-        if (currentContact == null) {
+    private fun initialiseDetails(view: View, contact: Contact?) {
+        if (contact == null) {
             hideAllViews(view)
         } else {
-            setContactDetails(view, currentContact!!) //set contact details
+            currentContact = contact
+            setContactDetails(view, currentContact) //set contact details
             initialiseAllButtons(view, contactsViewModel)
         }
     }
@@ -98,7 +109,7 @@ class ContactDetailsFragment : Fragment() {
         val updateContactButton = view.findViewById<Button>(R.id.button_modify_contact)
         updateContactButton.setOnClickListener {
             val bundle = Bundle()
-            bundle.putString("username", currentContact!!.username)
+            bundle.putString(USERNAME_NAV_KEY, currentContact.username)
             if (isSubFragment)
                 it.findNavController()
                     .navigate(R.id.action_dRecordDetailsFragment_to_contactCreationFragment, bundle)
@@ -112,7 +123,7 @@ class ContactDetailsFragment : Fragment() {
 
         val deleteContactButton = view.findViewById<Button>(R.id.button_delete_contact)
         deleteContactButton.setOnClickListener {
-            contactsViewModel.deleteContact(currentContact!!)
+            contactsViewModel.deleteContact(currentContact)
             it.findNavController()
                 .navigate(R.id.action_contactDetailsFragment2_to_directoryFragment)
         }
@@ -126,21 +137,45 @@ class ContactDetailsFragment : Fragment() {
         }
 
         view.findViewById<Button>(R.id.run_button).setOnClickListener {
-            val route = DUMMY_ROUTE[0] //remove when merged with contact creation and use real route
-            val uri =
-                Uri.parse("google.navigation:q=${route.dst.latitude},${route.dst.longitude}&mode=b")
-            val intent = Intent(Intent.ACTION_VIEW, uri)
-            intent.setPackage(RouteFragment.MAPS_PKG)
-            requireContext().startActivity(intent)
+            if (currentContact.hasCoordinates()) {
+                val uri =
+                    Uri.parse("google.navigation:q=${currentContact.latitude},${currentContact.longitude}&mode=b")
+                val intent = Intent(Intent.ACTION_VIEW, uri)
+                intent.setPackage(RouteFragment.MAPS_PKG)
+                requireContext().startActivity(intent)
+            } else {
+                coordinatesError()
+            }
         }
 
         view.findViewById<Button>(R.id.show_all_button).setOnClickListener {
-            routeViewModel.addRoute(DUMMY_ROUTE[0]) //remove when merged with contact creation and use real route
-            if (isSubFragment) {
-                it.findNavController().navigate(R.id.action_dRecordDetailsFragment_to_MapsFragment)
+            if (currentContact.hasCoordinates()) {
+                mapsViewModel.addRoute(
+                    Route(
+                        0.0,
+                        0.0,
+                        currentContact.latitude!!,
+                        currentContact.longitude!!
+                    )
+                )
+                if (isSubFragment) {
+                    it.findNavController()
+                        .navigate(R.id.action_dRecordDetailsFragment_to_MapsFragment)
+                } else {
+                    it.findNavController()
+                        .navigate(R.id.action_contactDetailsFragment2_to_MapsFragment)
+                }
             } else {
-                it.findNavController().navigate(R.id.action_contactDetailsFragment2_to_MapsFragment)
+                coordinatesError()
             }
         }
+    }
+
+    private fun coordinatesError() {
+        Toast.makeText(
+            requireContext(),
+            "Contact does not have coordinates",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 }

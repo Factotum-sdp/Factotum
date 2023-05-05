@@ -83,14 +83,26 @@ class ContactsCreationTest {
     fun managingClientIsNotDisplayedWithBossRole() {
         onView(withId(R.id.roles_spinner)).perform(click())
         onView(withText("BOSS")).perform(click())
-        onView(withId(R.id.editTextSuperClientUsername)).check(matches(withEffectiveVisibility(Visibility.GONE)))
+        onView(withId(R.id.editTextSuperClientUsername)).check(
+            matches(
+                withEffectiveVisibility(
+                    Visibility.GONE
+                )
+            )
+        )
     }
 
     @Test
     fun managingClientIsDisplayedWithClientRole() {
         onView(withId(R.id.roles_spinner)).perform(click())
         onView(withText("CLIENT")).perform(click())
-        onView(withId(R.id.editTextSuperClientUsername)).check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
+        onView(withId(R.id.editTextSuperClientUsername)).check(
+            matches(
+                withEffectiveVisibility(
+                    Visibility.VISIBLE
+                )
+            )
+        )
     }
 
     @Test

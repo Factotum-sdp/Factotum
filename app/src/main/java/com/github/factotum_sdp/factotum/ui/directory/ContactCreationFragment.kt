@@ -25,8 +25,8 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.databinding.FragmentContactCreationBinding
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getDatabase
 import com.github.factotum_sdp.factotum.models.Location
+import com.github.factotum_sdp.factotum.models.Contact
 import com.github.factotum_sdp.factotum.models.Role
-import com.github.factotum_sdp.factotum.placeholder.Contact
 import kotlinx.coroutines.launch
 
 /**

@@ -1,6 +1,7 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.models.DestinationRecord
 import com.github.factotum_sdp.factotum.models.Route
+import com.github.factotum_sdp.factotum.placeholder.Contact
 import com.github.factotum_sdp.factotum.ui.directory.ContactDetailsFragment
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.ui.maps.MapsFragment
@@ -78,7 +80,14 @@ class DRecordDetailsFragment : Fragment() {
             putString("username", rec.clientID)
         }
 
-        val currentContact = contactsViewModel.contacts.value?.first { c -> c.username == rec.clientID }
+        var currentContact: Contact? = null
+        try {
+            currentContact = contactsViewModel.contacts.value?.first { c -> c.username == rec.clientID }
+        } catch (e: NoSuchElementException) {
+            // Handle the exception here
+            Log.e("Error", "Could not find contact with ID ${rec.clientID}")
+        }
+
         if (currentContact != null) {
             mapsViewModel.addRoute(
                 Route(

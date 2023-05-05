@@ -11,13 +11,19 @@ import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightTheRecordAt
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
+import com.github.factotum_sdp.factotum.utils.LocationUtils
+import com.github.factotum_sdp.factotum.utils.LocationUtils.Companion.buttonTextAllow
 import com.github.factotum_sdp.factotum.utils.PreferencesSetting
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -30,6 +36,8 @@ import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 class DRecordDetailsFragmentTest {
+
+    val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
     @get:Rule
     var testRule = ActivityScenarioRule(
@@ -110,9 +118,10 @@ class DRecordDetailsFragmentTest {
     @Test
     fun swipeLeftOneTimeDisplaysMaps() {
         toFragment()
-        onView(withId(R.id.fragment_route_directors_parent)).check(doesNotExist())
+        onView(withId(R.id.fragment_maps_directors_parent)).check(doesNotExist())
         onView(withId(R.id.viewPager)).perform(swipeLeft())
-        onView(withId(R.id.fragment_route_directors_parent)).check(matches(isDisplayed()))
+        enableLocation()
+        onView(withId(R.id.fragment_maps_directors_parent)).check(matches(isDisplayed()))
     }
 
     @Test
@@ -120,6 +129,7 @@ class DRecordDetailsFragmentTest {
         toFragment()
         onView(withId(R.id.contact_details_fragment)).check(doesNotExist())
         onView(withId(R.id.viewPager)).perform(swipeLeft())
+        enableLocation()
         onView(withId(R.id.viewPager)).perform(swipeLeft())
         onView(withId(R.id.contact_details_fragment)).check(matches(isDisplayed()))
     }
@@ -129,6 +139,7 @@ class DRecordDetailsFragmentTest {
         RoadBookFragmentTest().newRecordWithId("01")
         toLastFragment()
         onView(withId(R.id.viewPager)).perform(swipeLeft())
+        enableLocation()
         onView(withId(R.id.viewPager)).perform(swipeLeft())
         onView(withId(R.id.contact_username)).check(matches(withText("@01")))
     }
@@ -144,6 +155,7 @@ class DRecordDetailsFragmentTest {
         onView(withId(R.id.fragment_picture_directors_parent)).check(matches(isDisplayed()))
     }*/
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun swipeRightAfterSwipeLeftDisplaysInfo() = runTest {
         runBlocking {
@@ -151,11 +163,18 @@ class DRecordDetailsFragmentTest {
             onView(withId(R.id.viewPager)).perform(click())
             onView(withId(R.id.fragment_drecord_info_directors_parent)).check(matches(isDisplayed()))
             onView(withId(R.id.viewPager)).perform(swipeLeft())
+            enableLocation()
             delay(500L)
         }
         onView(withId(R.id.fragment_drecord_info_directors_parent)).check(doesNotExist())
         onView(withId(R.id.viewPager)).perform(swipeRight())
         onView(withId(R.id.fragment_drecord_info_directors_parent)).check(matches(isDisplayed()))
+    }
+
+    fun enableLocation() {
+        if (LocationUtils.hasLocationPopUp()) {
+            device.findObject(UiSelector().textContains(buttonTextAllow)).click()
+        }
     }
 }
 

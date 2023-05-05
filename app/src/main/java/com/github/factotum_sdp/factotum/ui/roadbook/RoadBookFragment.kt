@@ -2,6 +2,7 @@ package com.github.factotum_sdp.factotum.ui.roadbook
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.location.Location
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
@@ -17,6 +18,7 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.preferencesDataStore
 import com.github.factotum_sdp.factotum.UserViewModel
+import com.github.factotum_sdp.factotum.models.Contact
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
 import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
@@ -25,6 +27,8 @@ import com.github.factotum_sdp.factotum.roadBookDataStore
 import com.github.factotum_sdp.factotum.ui.settings.SettingsViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.*
+
+private const val ON_DESTINATION_RADIUS = 15.0
 
 /**
  * A fragment representing a RoadBook which is a list of DestinationRecord
@@ -53,8 +57,9 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private var usePreferences = false
     private val locationTrackingHandler: LocationTrackingHandler = LocationTrackingHandler()
     private val userViewModel: UserViewModel by activityViewModels()
-
     private val contactsViewModel : ContactsViewModel by activityViewModels()
+
+    private lateinit var currentContacts: List<Contact>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -77,15 +82,49 @@ class RoadBookFragment : Fragment(), MenuProvider {
         rbRecyclerView = view.findViewById(R.id.list)
         rbRecyclerView.layoutManager = LinearLayoutManager(context)
         rbRecyclerView.adapter = adapter
-
-        locationTrackingHandler.setOnLocationUpdate {
-            val cal = Calendar.getInstance()
-            rbViewModel.timestampNextDestinationRecord(cal.time)
+        contactsViewModel.contacts.observe(viewLifecycleOwner) {
+            currentContacts = it
         }
+
+        setLiveLocationEvent()
 
         return view
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    private fun setLiveLocationEvent() {
+        locationTrackingHandler.setOnLocationUpdate { currentLocation ->
+            rbViewModel.nextDestination()?.let {
+                val destination = clientLocation(it.clientID)
+                destination?.let { dest ->
+                    if(onDestinationPlace(currentLocation, dest)) {
+                        val cal = Calendar.getInstance()
+                        rbViewModel.timeStampARecord(cal.time, it)
+                    }
+                }
+
+            }
+        }
+    }
+
+    private fun clientLocation(clientID: String): Location? {
+        val contact = currentContacts.firstOrNull {
+            it.username == clientID
+        } ?: return null
+        val location = Location("factotum")
+        contact.longitude?.let {
+            location.longitude = it
+            location.latitude = contact.latitude!!
+        } ?: return null
+        return location
+    }
+
+    private fun onDestinationPlace(current: Location, destination: Location): Boolean {
+        val distance = current.distanceTo(destination)
+        return distance <= ON_DESTINATION_RADIUS // Remove constant
+    }
+
+    //============================================================================================
     override fun onPause() {
         rbViewModel.backUp()
         saveButtonStates()

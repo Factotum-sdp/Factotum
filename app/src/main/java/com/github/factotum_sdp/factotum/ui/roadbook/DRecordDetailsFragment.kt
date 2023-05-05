@@ -11,9 +11,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.models.Contact
 import com.github.factotum_sdp.factotum.models.DestinationRecord
 import com.github.factotum_sdp.factotum.models.Route
-import com.github.factotum_sdp.factotum.placeholder.Contact
 import com.github.factotum_sdp.factotum.ui.directory.ContactDetailsFragment
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.ui.maps.MapsFragment
@@ -78,6 +78,7 @@ class DRecordDetailsFragment : Fragment() {
         val detailsFragment = ContactDetailsFragment::class.java.newInstance()
         detailsFragment.arguments = Bundle().apply {
             putString("username", rec.clientID)
+            putBoolean("isSubFragment", true)
         }
 
         var currentContact: Contact? = null

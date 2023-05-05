@@ -13,12 +13,15 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.UserViewModel
+import com.github.factotum_sdp.factotum.models.Role
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class DirectoryFragment : Fragment() {
 
     private lateinit var adapter: ContactsRecyclerAdapter
     private val viewModel : ContactsViewModel by activityViewModels()
+    private val userViewModel: UserViewModel by activityViewModels()
     private lateinit var emptyContactsMessage: TextView
 
     override fun onCreateView(
@@ -42,6 +45,9 @@ class DirectoryFragment : Fragment() {
         }
 
         val createContactButton = view.findViewById<FloatingActionButton>(R.id.add_contact_button)
+        if (userViewModel.loggedInUser.value?.role == Role.COURIER) {
+            createContactButton.visibility = View.GONE
+        }
         createContactButton.setOnClickListener {
             it.findNavController()
                 .navigate(R.id.action_directoryFragment_to_contactCreationFragment)

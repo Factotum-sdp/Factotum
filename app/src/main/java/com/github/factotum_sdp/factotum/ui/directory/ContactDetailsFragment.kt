@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -70,11 +71,17 @@ class ContactDetailsFragment : Fragment() {
         val contactUsername = view.findViewById<TextView>(R.id.contact_username)
         val contactName = view.findViewById<TextView>(R.id.contact_name)
         val contactSurname = view.findViewById<TextView>(R.id.contact_surname)
+        val contactSuperClient = view.findViewById<TextView>(R.id.managing_client_value)
         val contactRole = view.findViewById<TextView>(R.id.contact_role)
         val contactImage = view.findViewById<ImageView>(R.id.contact_image)
         val contactPhone = view.findViewById<TextView>(R.id.contact_phone)
         val contactAddress = view.findViewById<TextView>(R.id.contact_address)
         val contactDetails = view.findViewById<TextView>(R.id.contact_details)
+
+        if (contact.role == Role.CLIENT.name && !contact.super_client.isNullOrEmpty()) {
+            view.findViewById<LinearLayout>(R.id.managing_client_shown).visibility = View.VISIBLE
+            contactSuperClient.text = "@" + contact.super_client
+        }
 
         contactUsername.text = "@" + contact.username
         contactName.text = contact.name

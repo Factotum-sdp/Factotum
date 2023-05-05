@@ -20,6 +20,7 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.models.Contact
 import com.github.factotum_sdp.factotum.models.Location
+import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
@@ -73,8 +74,23 @@ class ContactsCreationTest {
         onView(withId(R.id.roles_spinner)).check(matches(isDisplayed()))
         onView(withId(R.id.editTextName)).check(matches(isDisplayed()))
         onView(withId(R.id.editTextSurname)).check(matches(isDisplayed()))
+        onView(withId(R.id.editTextUsername)).check(matches(isDisplayed()))
         onView(withId(R.id.contactCreationPhoneNumber)).check(matches(isDisplayed()))
         onView(withId(R.id.contactCreationNotes)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun managingClientIsNotDisplayedWithBossRole() {
+        onView(withId(R.id.roles_spinner)).perform(click())
+        onView(withText("BOSS")).perform(click())
+        onView(withId(R.id.editTextSuperClientUsername)).check(matches(withEffectiveVisibility(Visibility.GONE)))
+    }
+
+    @Test
+    fun managingClientIsDisplayedWithClientRole() {
+        onView(withId(R.id.roles_spinner)).perform(click())
+        onView(withText("CLIENT")).perform(click())
+        onView(withId(R.id.editTextSuperClientUsername)).check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
     }
 
     @Test
@@ -168,6 +184,83 @@ class ContactsCreationTest {
         onView(withId(R.id.contact_address)).check(matches(withText(address?.addressName)))
         onView(withId(R.id.contact_phone)).check(matches(withText("555-555-1234")))
         onView(withId(R.id.contact_details)).check(matches(withText("This is a test note.")))
+        getDatabase().reference.child("contacts").child(username).removeValue()
+    }
+
+    @Test
+    fun cannotCreateClientWithInvalidSuperClientUsername() {
+        val username = "johnabby" + Random().nextInt(3000).toString()
+        val usernameEditText = onView(withId(R.id.editTextUsername))
+        usernameEditText.perform(replaceText(username))
+
+        onView(withId(R.id.roles_spinner)).perform(click())
+        onView(withText(Role.CLIENT.name)).perform(click())
+
+        val superClientEditText = onView(withId(R.id.editTextSuperClientUsername))
+        superClientEditText.perform(replaceText("daInvalidUsername"))
+
+        onView(withId(R.id.confirm_form)).perform(click())
+        onView(withId(R.id.contacts_recycler_view)).check(doesNotExist())
+    }
+
+    @Test
+    fun cannotCreateClientWithBossUsername() {
+        val username = "johnabby" + Random().nextInt(3000).toString()
+        val usernameEditText = onView(withId(R.id.editTextUsername))
+        usernameEditText.perform(replaceText(username))
+
+        onView(withId(R.id.roles_spinner)).perform(click())
+        onView(withText(Role.CLIENT.name)).perform(click())
+
+        val superClientEditText = onView(withId(R.id.editTextSuperClientUsername))
+        superClientEditText.perform(replaceText("00"))
+
+        onView(withId(R.id.confirm_form)).perform(click())
+        onView(withId(R.id.contacts_recycler_view)).check(doesNotExist())
+    }
+
+    @Test
+    fun createdClientWithSuperClientIsCorrectlyCreated() {
+        val username = "johnabby" + Random().nextInt(3000).toString()
+        val usernameEditText = onView(withId(R.id.editTextUsername))
+        usernameEditText.perform(replaceText(username))
+
+        val nameEditText = onView(withId(R.id.editTextName))
+        nameEditText.perform(replaceText("John"))
+
+        val surnameEditText = onView(withId(R.id.editTextSurname))
+        surnameEditText.perform(replaceText("Abby"))
+
+        onView(withId(androidx.appcompat.R.id.search_src_text)).perform(
+            typeText("123 Main St\n")
+        )
+        closeSoftKeyboard()
+
+        val phoneEditText = onView(withId(R.id.contactCreationPhoneNumber))
+        phoneEditText.perform(replaceText("555-555-1234"))
+
+        val notesEditText = onView(withId(R.id.contactCreationNotes))
+        notesEditText.perform(replaceText("This is a test note."))
+
+        onView(withId(R.id.roles_spinner)).perform(click())
+        onView(withText(Role.CLIENT.name)).perform(click())
+
+        val superClientEditText = onView(withId(R.id.editTextSuperClientUsername))
+        superClientEditText.perform(replaceText("02"))
+
+        onView(withId(R.id.confirm_form)).perform(click())
+        onView(withId(R.id.contacts_recycler_view)).check(matches(isDisplayed()))
+
+        onView(withText("@$username")).perform(click())
+
+        onView(withId(R.id.contact_username)).check(matches(withText("@$username")))
+        onView(withId(R.id.contact_name)).check(matches(withText("John")))
+        onView(withId(R.id.contact_surname)).check(matches(withText("Abby")))
+        val address = Location.createAndStore("123 Main St", getApplicationContext())
+        onView(withId(R.id.contact_address)).check(matches(withText(address?.addressName)))
+        onView(withId(R.id.contact_phone)).check(matches(withText("555-555-1234")))
+        onView(withId(R.id.contact_details)).check(matches(withText("This is a test note.")))
+        onView(withId(R.id.managing_client_value)).check(matches(withText("@02")))
         getDatabase().reference.child("contacts").child(username).removeValue()
     }
 

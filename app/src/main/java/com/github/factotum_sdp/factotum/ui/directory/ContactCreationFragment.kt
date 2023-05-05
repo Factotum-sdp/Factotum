@@ -25,9 +25,10 @@ import androidx.navigation.findNavController
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.databinding.FragmentContactCreationBinding
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getDatabase
-import com.github.factotum_sdp.factotum.models.Location
 import com.github.factotum_sdp.factotum.models.Contact
+import com.github.factotum_sdp.factotum.models.Location
 import com.github.factotum_sdp.factotum.models.Role
+import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment.Companion.USERNAME_NAV_KEY
 import kotlinx.coroutines.launch
 
 /**
@@ -90,7 +91,11 @@ class ContactCreationFragment : Fragment() {
         viewModel.setDatabase(getDatabase())
 
         currentContact =
-            contactsViewModel.contacts.value?.find { it.username == arguments?.getString("username") }
+            contactsViewModel.contacts.value?.find {
+                it.username == arguments?.getString(
+                    USERNAME_NAV_KEY
+                )
+            }
 
     }
 
@@ -129,7 +134,12 @@ class ContactCreationFragment : Fragment() {
         }
 
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
                 val selectedItem = parent?.getItemAtPosition(position).toString()
                 if (selectedItem == Role.CLIENT.name) {
                     managingClientUsername.visibility = View.VISIBLE
@@ -216,7 +226,9 @@ class ContactCreationFragment : Fragment() {
             } else if (!isUsernameUnique(username.text.toString()) && currentContact?.username != username.text.toString()) {
                 showErrorToast(R.string.username_not_unique)
                 return@setOnClickListener
-            } else if (managingClientUsername.text.toString().isNotEmpty() && !isUsernameExisitingContact(managingClientUsername.text.toString())) {
+            } else if (managingClientUsername.text.toString()
+                    .isNotEmpty() && !isUsernameExisitingContact(managingClientUsername.text.toString())
+            ) {
                 showErrorToast(R.string.super_client_id_not_valid)
                 return@setOnClickListener
             } else {
@@ -232,7 +244,7 @@ class ContactCreationFragment : Fragment() {
                         addressName = address?.addressName,
                         latitude = address?.coordinates?.latitude,
                         longitude = address?.coordinates?.longitude,
-                        super_client =  if (spinner.selectedItem.toString() == Role.CLIENT.name)
+                        super_client = if (spinner.selectedItem.toString() == Role.CLIENT.name)
                             managingClientUsername.text.toString() else null,
                         phone = phoneNumber.text.toString(),
                         details = details.text.toString()

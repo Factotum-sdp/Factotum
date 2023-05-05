@@ -20,9 +20,14 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 class DirectoryFragment : Fragment() {
 
     private lateinit var adapter: ContactsRecyclerAdapter
-    private val viewModel : ContactsViewModel by activityViewModels()
+    private val viewModel: ContactsViewModel by activityViewModels()
     private val userViewModel: UserViewModel by activityViewModels()
     private lateinit var emptyContactsMessage: TextView
+
+    companion object {
+        const val USERNAME_NAV_KEY = "username"
+        const val IS_SUB_FRAGMENT_NAV_KEY = "isSubFragment"
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -69,7 +74,8 @@ class DirectoryFragment : Fragment() {
         adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onChanged() {
                 super.onChanged()
-                emptyContactsMessage.visibility = if (adapter.itemCount == 0) View.VISIBLE else View.GONE
+                emptyContactsMessage.visibility =
+                    if (adapter.itemCount == 0) View.VISIBLE else View.GONE
             }
         })
 

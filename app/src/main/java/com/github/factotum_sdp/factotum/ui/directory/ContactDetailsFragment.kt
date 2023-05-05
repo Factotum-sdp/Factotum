@@ -82,7 +82,7 @@ class ContactDetailsFragment : Fragment() {
         contactRole.text = contact.role
         contactImage.setImageResource(contact.profile_pic_id)
         contactPhone.text = contact.phone
-        contactAddress.text = contact.address
+        contactAddress.text = contact.addressName
         contactDetails.text = contact.details
     }
 

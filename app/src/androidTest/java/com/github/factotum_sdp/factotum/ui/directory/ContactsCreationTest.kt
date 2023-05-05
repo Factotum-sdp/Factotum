@@ -3,6 +3,7 @@ package com.github.factotum_sdp.factotum.ui.directory
 import android.widget.EditText
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.*
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
@@ -17,6 +18,7 @@ import androidx.test.uiautomator.By.*
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.models.Location
 import com.github.factotum_sdp.factotum.placeholder.Contact
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
@@ -164,7 +166,8 @@ class ContactsCreationTest {
         onView(withId(R.id.contact_username)).check(matches(withText("@$username")))
         onView(withId(R.id.contact_name)).check(matches(withText("John")))
         onView(withId(R.id.contact_surname)).check(matches(withText("Abby")))
-        onView(withId(R.id.contact_address)).check(matches(withText("123 Main St")))
+        val address = Location.createAndStore("123 Main St", getApplicationContext())
+        onView(withId(R.id.contact_address)).check(matches(withText(address?.addressName)))
         onView(withId(R.id.contact_phone)).check(matches(withText("555-555-1234")))
         onView(withId(R.id.contact_details)).check(matches(withText("This is a test note.")))
         getDatabase().reference.child("contacts").child(username).removeValue()

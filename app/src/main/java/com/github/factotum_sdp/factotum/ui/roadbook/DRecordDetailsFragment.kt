@@ -11,8 +11,11 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.models.DestinationRecord
+import com.github.factotum_sdp.factotum.models.Route
 import com.github.factotum_sdp.factotum.ui.directory.ContactDetailsFragment
-import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
+import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
+import com.github.factotum_sdp.factotum.ui.maps.MapsFragment
+import com.github.factotum_sdp.factotum.ui.maps.MapsViewModel
 import com.github.factotum_sdp.factotum.ui.picture.PictureFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -25,6 +28,8 @@ import com.google.android.material.tabs.TabLayoutMediator
 class DRecordDetailsFragment : Fragment() {
 
     private val rbViewModel: RoadBookViewModel by activityViewModels()
+    private val mapsViewModel: MapsViewModel by activityViewModels()
+    private val contactsViewModel: ContactsViewModel by activityViewModels()
     private lateinit var rec: DestinationRecord
     private lateinit var viewPager: ViewPager2
     override fun onCreateView(
@@ -73,8 +78,20 @@ class DRecordDetailsFragment : Fragment() {
             putString("username", rec.clientID)
         }
 
+        val currentContact = contactsViewModel.contacts.value?.first { c -> c.username == rec.clientID }
+        if (currentContact != null) {
+            mapsViewModel.addRoute(
+                Route(
+                    0.0, //Should be the current location
+                    0.0,
+                    currentContact.latitude ?: 0.0,
+                    currentContact.longitude ?: 0.0
+                )
+            )
+        }
+
         adapter.addFragment(DRecordInfoFragment(rec))
-        adapter.addFragment(RouteFragment())
+        adapter.addFragment(MapsFragment())
         adapter.addFragment(detailsFragment)
         adapter.addFragment(PictureFragment(rec.clientID))
 

@@ -17,15 +17,15 @@ import androidx.navigation.findNavController
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.models.Role
+import com.github.factotum_sdp.factotum.models.Route
 import com.github.factotum_sdp.factotum.placeholder.Contact
-import com.github.factotum_sdp.factotum.placeholder.RouteRecords.DUMMY_ROUTE
 import com.github.factotum_sdp.factotum.ui.maps.MapsViewModel
 import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
 
 class ContactDetailsFragment : Fragment() {
     private lateinit var currentContact: Contact
 
-    private val routeViewModel: MapsViewModel by activityViewModels()
+    private val mapsViewModel: MapsViewModel by activityViewModels()
     private val userViewModel: UserViewModel by activityViewModels()
 
     override fun onCreateView(
@@ -99,16 +99,18 @@ class ContactDetailsFragment : Fragment() {
         }
 
         view.findViewById<Button>(R.id.run_button).setOnClickListener {
-            val route = DUMMY_ROUTE[0] //remove when merged with contact creation and use real route
             val uri =
-                Uri.parse("google.navigation:q=${route.dst.latitude},${route.dst.longitude}&mode=b")
+                Uri.parse("google.navigation:q=${currentContact.latitude},${currentContact.longitude}&mode=b")
             val intent = Intent(Intent.ACTION_VIEW, uri)
             intent.setPackage(RouteFragment.MAPS_PKG)
             requireContext().startActivity(intent)
         }
 
         view.findViewById<Button>(R.id.show_all_button).setOnClickListener {
-            routeViewModel.addRoute(DUMMY_ROUTE[0]) //remove when merged with contact creation and use real route
+            if (currentContact.latitude == null || currentContact.longitude == null) {
+                return@setOnClickListener
+            }
+            mapsViewModel.addRoute(Route(0.0, 0.0, currentContact.latitude!!, currentContact.longitude!!))
             it.findNavController().navigate(R.id.action_contactDetailsFragment2_to_MapsFragment)
         }
     }

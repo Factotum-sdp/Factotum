@@ -25,11 +25,15 @@ import androidx.test.rule.GrantPermissionRule
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
+import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseDateFormatted
+import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseSafeString
 import com.github.factotum_sdp.factotum.models.DestinationRecord
 import com.github.factotum_sdp.factotum.models.User
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder.USER_COURIER
+import com.github.factotum_sdp.factotum.repositories.ShiftRepository.Companion.DELIVERY_LOG_DB_PATH
 import com.github.factotum_sdp.factotum.roadBookDataStore
+import com.github.factotum_sdp.factotum.shiftDataStore
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeLeftTheRecordAt
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightTheRecordAt
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
@@ -44,6 +48,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.*
+import org.junit.After
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -66,6 +71,7 @@ class RoadBookFragmentTest {
 
     @get:Rule
     val foreGroundService = GrantPermissionRule.grant(Manifest.permission.FOREGROUND_SERVICE)
+
 
     @get:Rule
     var testRule = ActivityScenarioRule(
@@ -95,6 +101,12 @@ class RoadBookFragmentTest {
                            USER_COURIER.email,
                            USER_COURIER.role)
         GeneralUtils.injectLoggedInUser(testRule, courier)
+    }
+
+    @After
+    fun cleanUp(){
+        val dbShiftRef = FirebaseInstance.getDatabase().reference.child(DELIVERY_LOG_DB_PATH)
+        dbShiftRef.removeValue()
     }
 
     @Test
@@ -386,6 +398,122 @@ class RoadBookFragmentTest {
         isStartingRecyclerViewCheck()
     }
 
+    // ============================================================================================
+    // ================================== Deliveries Caching Tests ================================
+
+    @Test
+    fun endShiftUpdates() {
+        val db = FirebaseInstance.getDatabase()
+        val context = ApplicationProvider.getApplicationContext<Context>().applicationContext
+        val dbShiftRef = db.reference
+            .child(DELIVERY_LOG_DB_PATH)
+            .child(firebaseSafeString(USER_COURIER.name))
+            .child(firebaseDateFormatted(Date()))
+
+        // finished a delivery
+        updateTimestampOfRecord(3)
+        updateTimestampOfRecord(4)
+
+        // finishes the shift
+        endShift()
+
+        // Our target value to fetch
+        // is represented as a List<String> in Firebase
+        val future = CompletableFuture<List<DestinationRecord>>()
+
+        dbShiftRef.get().addOnSuccessListener { snapshot ->
+            val deliveries = snapshot.children.mapNotNull {
+                it.getValue(DestinationRecord::class.java)
+            }
+            future.complete(deliveries)
+
+        }.addOnFailureListener {
+            future.completeExceptionally(it)
+            assert(false)
+        }
+        val rbViewModel = getRbViewModel()!!
+        val timestamped = rbViewModel.recordsListState.value!!.filter { it.timeStamp != null }
+        assert(future.get().all{ it.timeStamp != null })
+        assert(future.get().zip(timestamped).all { pair -> pair.first.destID == pair.second.destID })
+
+
+
+    }
+    @Test
+    fun shiftIsBackedUpCorrectlyWhenOffline() {
+        val db = FirebaseInstance.getDatabase()
+        db.goOffline()
+        val context = ApplicationProvider.getApplicationContext<Context>().applicationContext
+
+        // finished a shift
+        updateTimestampOfRecord(3)
+
+        // Navigate out of the RoadBookFragment
+        navigateOutsideAndComeBack()
+
+        var ls = emptyList<DestinationRecord>()
+        runBlocking {
+            ls = context.shiftDataStore.data.first()
+        }
+
+        db.goOnline()
+        val rbViewModel = getRbViewModel()!!
+
+        val timestamped = rbViewModel.recordsListState.value!!.filter { it.timeStamp != null }
+        assert(ls.all { it.timeStamp != null })
+        assert(ls.zip(timestamped).all { pair -> pair.first.destID == pair.second.destID })
+
+    }
+
+    @Test
+    fun networkShiftAndLocalBackUpConsistency() {
+        val db = FirebaseInstance.getDatabase()
+
+        val date = Calendar.getInstance().time
+        val ref = db.reference
+            .child(DELIVERY_LOG_DB_PATH)
+            .child(firebaseSafeString(USER_COURIER.name))
+            .child(firebaseDateFormatted(Date()))
+
+
+        // Our target value to fetch
+        // is represented as a List<String> in Firebase
+        val future = CompletableFuture<List<DestinationRecord>>()
+
+        ref.addListenerForSingleValueEvent(object: ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val deliveries = snapshot.children.mapNotNull {
+                    it.getValue(DestinationRecord::class.java)
+                }
+                future.complete(deliveries)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                future.completeExceptionally(error.toException())
+            }
+        })
+        // Add 1 record
+        updateTimestampOfRecord(2)
+
+        //end shift
+        endShift()
+
+        var fromLocal: List<DestinationRecord>
+        val context = ApplicationProvider.getApplicationContext<Context>().applicationContext
+        runBlocking {
+            fromLocal = context.shiftDataStore.data.first()
+        }
+
+        val fromNetwork = future.get()
+
+        assert(future.get().all{ it.timeStamp != null })
+        assert(
+            fromLocal
+                .zip(fromNetwork)
+                .all { pair -> pair.first.destID == pair.second.destID }
+        )
+    }
+
 
     // ============================================================================================
     // ===================================== Edit Tests ===========================================
@@ -553,32 +681,6 @@ class RoadBookFragmentTest {
         onView(withText("X17#1")).check(isCompletelyBelow(withText("More#1")))
     }
 
-    // ============================================================================================
-    // ===================================== End Shift ============================================
-//    @Test
-//    fun endShiftUpdates() {
-//
-//        // Edit a timestamp :
-//        swipeRightTheRecordAt(3)
-//        onView(withId(R.id.editTextTimestamp)).perform(click())
-//        onView(withText(timePickerUpdateBLabel)).perform(click())
-//        onView(withText(R.string.edit_dialog_update_b))
-//            .perform(click())
-//        onView(withId(R.id.finish_shift)).perform(click())
-//        onView(withText(R.string.end_shift_dialog_title))
-//            .check(matches(isDisplayed()))
-//        onView(withId(android.R.id.button1)).perform(click())
-//        var recordList: DRecordList?
-//        testRule.scenario.onActivity {
-//            val fragment = it.supportFragmentManager.fragments.first() as NavHostFragment
-//            fragment.let {
-//                val curr =
-//                    it.childFragmentManager.primaryNavigationFragment as RoadBookFragment
-//                recordList = curr.getRBViewModelForTest().recordsListState.value
-//                checkDeliveryLog(UsersPlaceHolder.USER_COURIER.name, recordList!!)
-//            }
-//        }
-//    }
 
     // ============================================================================================
     // ================================= OptionMenu RB settings ===================================
@@ -1051,6 +1153,37 @@ class RoadBookFragmentTest {
             .substringBeforeLast(":")
     }
 
+    private fun updateTimestampOfRecord(index: Int) {
+        if (index < 0 || index >= DestinationRecords.RECORDS.size) {
+            throw IllegalArgumentException("Index out of bounds")
+        }
+        onView(withText(DestinationRecords.RECORDS[index].destID)).check(matches(isDisplayed()))
+        swipeRightTheRecordAt(index)
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click())
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+    }
+
+    private fun getRbViewModel(): RoadBookViewModel? {
+        var rbViewModel : RoadBookViewModel? = null
+        testRule.scenario.onActivity {
+            val fragment = it.supportFragmentManager.fragments.first() as NavHostFragment
+            fragment.let {
+                val curr =
+                    it.childFragmentManager.primaryNavigationFragment as RoadBookFragment
+                rbViewModel = curr.getRBViewModelForTest()
+            }
+        }
+        return rbViewModel
+    }
+
+    private fun endShift(){
+        onView(withId(R.id.finish_shift)).perform(click())
+        onView(withText(R.string.end_shift_dialog_title))
+            .check(matches(isDisplayed()))
+        onView(withId(android.R.id.button1)).perform(click())
+    }
 
     class RecyclerViewItemCountAssertion(private val expectedCount: Int) : ViewAssertion {
         override fun check(view: View?, noViewFoundException: NoMatchingViewException?) {

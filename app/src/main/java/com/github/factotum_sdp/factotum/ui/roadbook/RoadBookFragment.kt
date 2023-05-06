@@ -92,6 +92,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         }
 
         setLiveLocationEvent()
+        Log.i("RoadBookFragment", "OnCreateView")
 
         setShiftRepository()
 
@@ -101,6 +102,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private fun setShiftRepository(){
         if (userViewModel.loggedInUser.value != null){
             if(rbViewModel.recordsListState.value != null) {
+                Log.i("RoadBookFragment", "Setting ShiftRepository")
                 val currentShift = Shift(
                     Date(),
                     userViewModel.loggedInUser.value!!,

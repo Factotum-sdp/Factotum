@@ -1,8 +1,6 @@
 package com.github.factotum_sdp.factotum.repositories
 
-import android.util.Log
 import androidx.datastore.core.DataStore
-import com.github.factotum_sdp.factotum.data.DeliveryLogger
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseDateFormatted
 import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseSafeString
@@ -18,6 +16,19 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
+/**
+ * This class models a ShiftRepository. It is in charge of being the unique place where
+ * to log the deliveries of a shift. It is responsible of keeping remote source up to date with
+ * local source, and vice-versa.
+ *
+ * @property localSource : DataStore<DRecordList>. Local source where data is stored and fetched from.
+ * @property shift : Shift. The shift to log deliveries for.
+ * @constructor
+ * Creates a ShiftRepository and sets the update of the remote and local sources.
+ *
+ * @param remoteSource : DatabaseReference. The remote source where data is stored and fetched from.
+ */
+
 class ShiftRepository(remoteSource: DatabaseReference,
                       private val localSource: DataStore<DRecordList>,
                       private val shift: Shift
@@ -28,8 +39,6 @@ class ShiftRepository(remoteSource: DatabaseReference,
 
     private var lastShiftNetworkBackUp: DRecordList? = null
     private var lastShiftLocalNetworkBackUp: DRecordList? = null
-
-    private val deliveryLogger: DeliveryLogger = DeliveryLogger()
 
     init {
         FirebaseInstance.onConnectedStatusChanged {
@@ -42,15 +51,9 @@ class ShiftRepository(remoteSource: DatabaseReference,
             }
             isConnectedToRemote = it
         }
-        val connectedUser = FirebaseInstance.getAuth().currentUser
-        if (connectedUser?.email != shift.user.email) {
-            Log.e("ShiftRepository", "Wrong user connected")
-        }
-        else {
-            backUpRef = remoteSource
-                .child(firebaseSafeString(connectedUser.displayName!!))
-                .child(firebaseDateFormatted(shift.date))
-        }
+        backUpRef = remoteSource
+            .child(firebaseSafeString(shift.user.name))
+            .child(firebaseDateFormatted(shift.date))
         backUpRef.addValueEventListener(object: ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val shiftsEnded = snapshot.children.mapNotNull {
@@ -62,6 +65,15 @@ class ShiftRepository(remoteSource: DatabaseReference,
             override fun onCancelled(error: DatabaseError) {}
         })
 
+    }
+
+    /**
+     * This method logs a delivery.
+     *
+     * @param record : DestinationRecord. The delivery to log.
+     */
+    fun logShift(deliveries : DRecordList){
+        setDeliveriesBackUp(deliveries)
     }
 
 
@@ -77,19 +89,6 @@ class ShiftRepository(remoteSource: DatabaseReference,
                 }
             }
         }
-    }
-
-    suspend fun getLastBackUp(): DRecordList {
-        if(isConnectedToRemote) {
-            lastShiftNetworkBackUp?.let {
-                return it
-            }
-        }
-        return getLastShiftLocalBackUp()
-    }
-
-    fun logShift(deliveries : DRecordList){
-        setDeliveriesBackUp(deliveries)
     }
 
     private fun setNetworkBackUp(deliveries: DRecordList) {

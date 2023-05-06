@@ -82,6 +82,10 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : Vi
         _shiftRepository = shiftRepository
     }
 
+    /**
+     * Log the current deliveries to the database if
+     *
+     */
     fun logDeliveries(){
         _shiftRepository?.logShift(currentDRecList())
     }

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.widget.SwitchCompat
@@ -16,10 +17,9 @@ import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
-import com.github.factotum_sdp.factotum.models.Contact
-import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
-import com.github.factotum_sdp.factotum.data.DeliveryLogger.Companion.DELIVERY_LOG_DB_PATH
+import com.github.factotum_sdp.factotum.data.DeliveryLogger
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
+import com.github.factotum_sdp.factotum.models.Contact
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
 import com.github.factotum_sdp.factotum.models.Shift
 import com.github.factotum_sdp.factotum.preferencesDataStore
@@ -28,6 +28,7 @@ import com.github.factotum_sdp.factotum.repositories.RoadBookRepository
 import com.github.factotum_sdp.factotum.repositories.ShiftRepository
 import com.github.factotum_sdp.factotum.roadBookDataStore
 import com.github.factotum_sdp.factotum.shiftDataStore
+import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.ui.settings.SettingsViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.*
@@ -92,15 +93,29 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
         setLiveLocationEvent()
 
-        if (userViewModel.loggedInUser.value != null){
-            val currentShift = Shift(Date(), userViewModel.loggedInUser.value!!)
-            rbViewModel.setShiftRepository(
-                ShiftRepository(
-                    FirebaseInstance.getDatabase().reference.child(DELIVERY_LOG_DB_PATH),
-                requireContext().shiftDataStore,
-                currentShift))
-        }
+        setShiftRepository()
+
         return view
+    }
+
+    private fun setShiftRepository(){
+        if (userViewModel.loggedInUser.value != null){
+            if(rbViewModel.recordsListState.value != null) {
+                val currentShift = Shift(
+                    Date(),
+                    userViewModel.loggedInUser.value!!,
+                    rbViewModel.recordsListState.value!!
+                )
+                rbViewModel.setShiftRepository(
+                    ShiftRepository(
+                        FirebaseInstance.getDatabase().reference.child(DeliveryLogger.DELIVERY_LOG_DB_PATH),
+                        requireContext().shiftDataStore,
+                        currentShift
+                    )
+                )
+            } else Log.w("RoadBookFragment", "RecordsListState is null")
+        }
+        else Log.w("RoadBookFragment", "User not logged in")
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -139,6 +154,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     //============================================================================================
     override fun onPause() {
         rbViewModel.backUp()
+        rbViewModel.logDeliveries()
         saveButtonStates()
         super.onPause()
     }

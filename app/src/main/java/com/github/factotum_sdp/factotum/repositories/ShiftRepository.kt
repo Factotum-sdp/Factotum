@@ -34,6 +34,10 @@ class ShiftRepository(remoteSource: DatabaseReference,
                       private val shift: Shift
 ) {
 
+    companion object{
+        const val DELIVERY_LOG_DB_PATH: String = "Delivery-Log"
+    }
+
     private var backUpRef: DatabaseReference = remoteSource
     private var isConnectedToRemote = false
 

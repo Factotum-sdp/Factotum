@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
-import com.github.factotum_sdp.factotum.data.DeliveryLogger
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.models.Contact
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
@@ -26,6 +25,7 @@ import com.github.factotum_sdp.factotum.preferencesDataStore
 import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
 import com.github.factotum_sdp.factotum.repositories.RoadBookRepository
 import com.github.factotum_sdp.factotum.repositories.ShiftRepository
+import com.github.factotum_sdp.factotum.repositories.ShiftRepository.Companion.DELIVERY_LOG_DB_PATH
 import com.github.factotum_sdp.factotum.roadBookDataStore
 import com.github.factotum_sdp.factotum.shiftDataStore
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
@@ -108,7 +108,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
                 )
                 rbViewModel.setShiftRepository(
                     ShiftRepository(
-                        FirebaseInstance.getDatabase().reference.child(DeliveryLogger.DELIVERY_LOG_DB_PATH),
+                        FirebaseInstance.getDatabase().reference.child(DELIVERY_LOG_DB_PATH),
                         requireContext().shiftDataStore,
                         currentShift
                     )

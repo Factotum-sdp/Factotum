@@ -94,6 +94,38 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : Vi
     }
 
     /**
+     * Get the next destination to deliver
+     *
+     * The result is null if there is no nextDestination for the actual records state
+     * @return DestinationRecord?
+     */
+    fun nextDestination(): DestinationRecord? {
+       return currentDRecList().getNextDestinationRecord()
+    }
+
+    /**
+     * Time stamp the given DestinationRecord
+     *
+     * @param timeStamp: Date
+     * @param record: DestinationRecord
+     */
+    fun timeStampARecord(timeStamp: Date, record: DestinationRecord) {
+        val newRec = DestinationRecord(
+            record.destID,
+            record.clientID,
+            timeStamp,
+            record.waitingTime,
+            record.rate,
+            record.actions,
+            record.notes
+        )
+        val ls = arrayListOf<DestinationRecord>()
+        ls.addAll(_recordsList.value as Collection<DestinationRecord>)
+        ls[currentDRecList().getIndexOf(record.destID)] = newRec
+
+        _recordsList.postValue(currentDRecList().replaceDisplayedList(ls))
+    }
+    /**
      * Create the final shift Log according to the current records state
      * of this RoadBookViewModel
      *
@@ -113,27 +145,6 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : Vi
         runBlocking {
             val lastBackUp = roadBookRepository.getLastBackUp()
             _recordsList.value = DRecordList(allRecords = lastBackUp, showArchived = currentDRecList().showArchived)
-        }
-    }
-
-    fun timestampNextDestinationRecord(timeStamp: Date) {
-        try {
-            val record = currentDRecList().getNextDestinationRecord()
-            val newRec = DestinationRecord(
-                record.destID,
-                record.clientID,
-                timeStamp,
-                record.waitingTime,
-                record.rate,
-                record.actions,
-                record.notes
-            )
-            val ls = arrayListOf<DestinationRecord>()
-            ls.addAll(_recordsList.value as Collection<DestinationRecord>)
-            ls[currentDRecList().getNextDestinationIndex()] = newRec
-
-            _recordsList.postValue(currentDRecList().replaceDisplayedList(ls))
-        } catch (_: NoSuchElementException) {
         }
     }
 

@@ -8,6 +8,7 @@ import android.provider.BaseColumns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.CursorAdapter
@@ -17,23 +18,26 @@ import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.cursoradapter.widget.SimpleCursorAdapter
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getDatabase
-import com.github.factotum_sdp.factotum.models.Location
 import com.github.factotum_sdp.factotum.databinding.FragmentContactCreationBinding
-import com.github.factotum_sdp.factotum.placeholder.Contact
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getDatabase
+import com.github.factotum_sdp.factotum.models.Contact
+import com.github.factotum_sdp.factotum.models.Location
+import com.github.factotum_sdp.factotum.models.Role
+import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment.Companion.USERNAME_NAV_KEY
 import kotlinx.coroutines.launch
 
 /**
  * A simple ContactCreation fragment.
  */
-class ContactCreation : Fragment() {
+class ContactCreationFragment : Fragment() {
 
     // Should not stay like that and instead roles should use roles from future ENUM
-    private val roles = listOf("Boss", "Courier", "Client")
+    private val roles = Role.values().map { it.name }
     private var currentContact: Contact? = null
     private val isUpdate: Boolean
         get() = currentContact != null
@@ -44,10 +48,13 @@ class ContactCreation : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
+    private val contactsViewModel: ContactsViewModel by activityViewModels()
+
 
     private lateinit var name: EditText
     private lateinit var surname: EditText
     private lateinit var username: EditText
+    private lateinit var managingClientUsername: EditText
     private lateinit var phoneNumber: EditText
     private lateinit var details: EditText
 
@@ -83,15 +90,20 @@ class ContactCreation : Fragment() {
         viewModel = ViewModelProvider(requireActivity())[ContactsViewModel::class.java]
         viewModel.setDatabase(getDatabase())
 
-        if (arguments?.getInt("id") != null) {
-            currentContact = viewModel.contacts.value?.get(arguments?.getInt("id")!!)
-        }
+        currentContact =
+            contactsViewModel.contacts.value?.find {
+                it.username == arguments?.getString(
+                    USERNAME_NAV_KEY
+                )
+            }
+
     }
 
     private fun setContactFields(view: View, contact: Contact?) {
         name = view.findViewById(R.id.editTextName)
         surname = view.findViewById(R.id.editTextSurname)
         username = view.findViewById(R.id.editTextUsername)
+        managingClientUsername = view.findViewById(R.id.editTextSuperClientUsername)
         phoneNumber = view.findViewById(R.id.contactCreationPhoneNumber)
         details = view.findViewById(R.id.contactCreationNotes)
 
@@ -100,7 +112,8 @@ class ContactCreation : Fragment() {
             name.setText(contact.name)
             surname.setText(contact.surname)
             username.setText(contact.username)
-            binding.contactCreationAddress.setQuery(contact.address, false)
+            managingClientUsername.setText(contact.super_client)
+            binding.contactCreationAddress.setQuery(contact.addressName, false)
             phoneNumber.setText(contact.phone)
             details.setText(contact.details)
         }
@@ -119,6 +132,27 @@ class ContactCreation : Fragment() {
             // Apply the adapter to the spinner
             spinner.adapter = adapter
         }
+
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                val selectedItem = parent?.getItemAtPosition(position).toString()
+                if (selectedItem == Role.CLIENT.name) {
+                    managingClientUsername.visibility = View.VISIBLE
+                } else {
+                    managingClientUsername.visibility = View.GONE
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                // Do nothing
+            }
+        }
+
     }
 
     private fun setAddressSearchTextListener(cursorAdapter: SimpleCursorAdapter) {
@@ -192,8 +226,14 @@ class ContactCreation : Fragment() {
             } else if (!isUsernameUnique(username.text.toString()) && currentContact?.username != username.text.toString()) {
                 showErrorToast(R.string.username_not_unique)
                 return@setOnClickListener
+            } else if (managingClientUsername.text.toString()
+                    .isNotEmpty() && !isUsernameExistingContact(managingClientUsername.text.toString())
+            ) {
+                showErrorToast(R.string.super_client_id_not_valid)
+                return@setOnClickListener
             } else {
                 if (currentContact != null) viewModel.deleteContact(currentContact!!)
+                val address = validateLocation()
                 viewModel.saveContact(
                     Contact(
                         username = username.text.toString(),
@@ -201,7 +241,11 @@ class ContactCreation : Fragment() {
                         name = name.text.toString(),
                         surname = surname.text.toString(),
                         profile_pic_id = R.drawable.contact_image,
-                        address = binding.contactCreationAddress.query.toString(),
+                        addressName = address?.addressName,
+                        latitude = address?.coordinates?.latitude,
+                        longitude = address?.coordinates?.longitude,
+                        super_client = if (spinner.selectedItem.toString() == Role.CLIENT.name)
+                            managingClientUsername.text.toString() else null,
                         phone = phoneNumber.text.toString(),
                         details = details.text.toString()
                     )
@@ -215,6 +259,15 @@ class ContactCreation : Fragment() {
         return viewModel.contacts.value?.find { it.username == username } == null
     }
 
+    private fun isUsernameExistingContact(username: String): Boolean {
+        return viewModel.contacts.value?.find { it.username == username && it.role == Role.CLIENT.name } != null
+    }
+
+    private fun validateLocation(): Location? {
+        val addressName = binding.contactCreationAddress.query.toString()
+        return Location.createAndStore(addressName, requireContext())
+    }
+
     private fun showErrorToast(resId: Int) {
         Toast.makeText(
             requireContext(),
@@ -222,4 +275,5 @@ class ContactCreation : Fragment() {
             Toast.LENGTH_SHORT
         ).show()
     }
+
 }

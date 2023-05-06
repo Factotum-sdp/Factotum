@@ -135,4 +135,15 @@ class DirectoryFragmentTest {
         onView(withId(R.id.empty_contacts_message)).check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
     }
 
+    @Test
+    fun mapsDoesntRunFromContactDetailsWithContactWithNoLocation() {
+        onView(withText("@01"))
+            .perform(click())
+        onView(withId(R.id.contact_details_fragment)).check(matches(isDisplayed()))
+        onView(withId(R.id.run_button)).perform(click())
+        onView(withId(R.id.contact_details_fragment)).check(matches(isDisplayed()))
+        onView(withId(R.id.show_all_button)).perform(click())
+        onView(withId(R.id.contact_details_fragment)).check(matches(isDisplayed()))
+    }
+
 }

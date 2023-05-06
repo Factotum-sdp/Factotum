@@ -13,7 +13,8 @@ import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.placeholder.Contact
+import com.github.factotum_sdp.factotum.models.Contact
+import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment.Companion.USERNAME_NAV_KEY
 
 class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.ContactsViewHolder>(),
     Filterable {
@@ -50,7 +51,7 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
                     R.id.action_directoryFragment_to_contactDetailsFragment2,
                     Bundle().apply {
                         putString(
-                            "username",
+                            USERNAME_NAV_KEY,
                             itemUsername.text.toString().substring(1)
                         ) // pass the id of the contact to the contact details fragment so that it can display the correct contact
                     })

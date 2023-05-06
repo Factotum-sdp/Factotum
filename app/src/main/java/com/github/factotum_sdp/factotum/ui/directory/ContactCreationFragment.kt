@@ -169,7 +169,7 @@ class ContactCreationFragment : Fragment() {
                     viewLifecycleOwner.lifecycleScope.launch {
                         val result = Location.geocoderQuery(newText, requireContext())
                         result?.forEachIndexed { index, suggestion ->
-                            cursor.addRow(arrayOf(index, suggestion.getAddressLine(0).toString()))
+                            cursor.addRow(arrayOf(index, suggestion.addressName))
                         }
                         cursorAdapter.changeCursor(cursor)
                     }

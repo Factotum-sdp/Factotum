@@ -24,7 +24,7 @@ import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.models.Contact
-import com.github.factotum_sdp.factotum.models.Location
+import com.github.factotum_sdp.factotum.models.AddressCoordinates
 import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.createRandomContacts
 import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.randomContacts
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
@@ -180,7 +180,7 @@ class ContactsUpdateTest {
             .check(matches(withText("Doe")))
         onView(withId(R.id.contact_username))
             .check(matches(withText("@johndoe")))
-        val address = Location.createAndStore("123 Main St", getApplicationContext())
+        val address = AddressCoordinates.createAndStore("123 Main St", getApplicationContext())
         onView(withId(R.id.contact_address))
             .check(matches(withText(address?.addressName)))
         onView(withId(R.id.contact_phone))

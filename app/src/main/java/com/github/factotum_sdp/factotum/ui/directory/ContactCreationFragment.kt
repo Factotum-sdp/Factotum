@@ -25,8 +25,8 @@ import androidx.navigation.findNavController
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.databinding.FragmentContactCreationBinding
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getDatabase
+import com.github.factotum_sdp.factotum.models.AddressCoordinates
 import com.github.factotum_sdp.factotum.models.Contact
-import com.github.factotum_sdp.factotum.models.Location
 import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment.Companion.USERNAME_NAV_KEY
 import kotlinx.coroutines.launch
@@ -163,11 +163,11 @@ class ContactCreationFragment : Fragment() {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                if (newText != null && newText.length > 2) {
+                if (newText != null) {
                     val cursor =
                         MatrixCursor(arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1))
                     viewLifecycleOwner.lifecycleScope.launch {
-                        val result = Location.geocoderQuery(newText, requireContext())
+                        val result = AddressCoordinates.geocoderQuery(newText, requireContext())
                         result?.forEachIndexed { index, suggestion ->
                             cursor.addRow(arrayOf(index, suggestion.addressName))
                         }
@@ -241,9 +241,9 @@ class ContactCreationFragment : Fragment() {
                         name = name.text.toString(),
                         surname = surname.text.toString(),
                         profile_pic_id = R.drawable.contact_image,
-                        addressName = address?.addressName,
-                        latitude = address?.coordinates?.latitude,
-                        longitude = address?.coordinates?.longitude,
+                        addressName = address.addressName,
+                        latitude = address.coordinates?.latitude,
+                        longitude = address.coordinates?.longitude,
                         super_client = if (spinner.selectedItem.toString() == Role.CLIENT.name)
                             managingClientUsername.text.toString() else null,
                         phone = phoneNumber.text.toString(),
@@ -263,9 +263,9 @@ class ContactCreationFragment : Fragment() {
         return viewModel.contacts.value?.find { it.username == username && it.role == Role.CLIENT.name } != null
     }
 
-    private fun validateLocation(): Location? {
+    private fun validateLocation(): AddressCoordinates {
         val addressName = binding.contactCreationAddress.query.toString()
-        return Location.createAndStore(addressName, requireContext())
+        return AddressCoordinates(addressName, requireContext())
     }
 
     private fun showErrorToast(resId: Int) {

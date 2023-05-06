@@ -6,7 +6,7 @@ import android.location.Geocoder
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.factotum_sdp.factotum.models.Location
+import com.github.factotum_sdp.factotum.models.AddressCoordinates
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import org.junit.Test
@@ -15,11 +15,11 @@ import java.io.File
 import java.util.concurrent.CountDownLatch
 
 @RunWith(AndroidJUnit4::class)
-class LocationTest {
+class AddressCoordinatesTest {
     @Test
     fun rightLocationCreates() {
         val addressName = "Route Cantonale 15, 1015 Lausanne"
-        val location = Location(addressName, getApplicationContext())
+        val addressCoordinates = AddressCoordinates(addressName, getApplicationContext())
         val geocoder = Geocoder(getApplicationContext())
         var result: Address? = null
         val latch = CountDownLatch(1)
@@ -32,38 +32,38 @@ class LocationTest {
         } else {
             result = geocoder.getFromLocationName(addressName, 1)?.get(0)
         }
-        assertEquals(location.coordinates!!.latitude, result!!.latitude)
-        assertEquals(location.coordinates!!.longitude, result!!.longitude)
+        assertEquals(addressCoordinates.coordinates!!.latitude, result!!.latitude)
+        assertEquals(addressCoordinates.coordinates!!.longitude, result!!.longitude)
 
     }
 
     @Test
     fun wrongLocationCreatesNull() {
         val addressName = "dfjsdk"
-        val location = Location(addressName, getApplicationContext())
-        assertEquals(location.coordinates, null)
-        assertEquals(location.addressName, addressName)
+        val addressCoordinates = AddressCoordinates(addressName, getApplicationContext())
+        assertEquals(addressCoordinates.coordinates, null)
+        assertEquals(addressCoordinates.addressName, addressName)
     }
 
     @Test
     fun searchQueryAddsToCache() {
         val query = "Lausanne"
         val context: Context = getApplicationContext()
-        val locationCache = Location.createAndStore(query, context)
-        val location = Location(query, context)
-        val cacheFile = File(context.cacheDir, Location.CACHE_FILE_NAME)
+        val addressCoordinatesCache = AddressCoordinates(query, context)
+        val addressCoordinates = AddressCoordinates(query, context)
+        val cacheFile = File(context.cacheDir, AddressCoordinates.CACHE_FILE_NAME)
         assertTrue(cacheFile.exists())
         var containsAddress = false
         var containsLat = false
         var containsLng = false
         cacheFile.forEachLine { line ->
-            if (line.contains(location.addressName.toString())) {
+            if (line.contains(addressCoordinates.addressName.toString())) {
                 containsAddress = true
             }
-            if (line.contains(location.coordinates!!.latitude.toString())) {
+            if (line.contains(addressCoordinates.coordinates!!.latitude.toString())) {
                 containsLat = true
             }
-            if (line.contains(location.coordinates!!.longitude.toString())) {
+            if (line.contains(addressCoordinates.coordinates!!.longitude.toString())) {
                 containsLng = true
             }
         }
@@ -76,9 +76,9 @@ class LocationTest {
     fun searchQueryDoNotAddIfNull() {
         val query = "wrong_query"
         val context: Context = getApplicationContext()
-        val cacheFile = File(context.cacheDir, Location.CACHE_FILE_NAME)
+        val cacheFile = File(context.cacheDir, AddressCoordinates.CACHE_FILE_NAME)
         val cacheSizeBefore = cacheFile.length()
-        val locationCache = Location.createAndStore(query, context)
+        val addressCoordinatesCache = AddressCoordinates(query, context)
         val cacheSizeAfter = cacheFile.length()
         assertEquals(cacheSizeBefore, cacheSizeAfter)
     }
@@ -87,10 +87,10 @@ class LocationTest {
     fun searchQueryDoNotDuplicate() {
         val query = "Lausanne"
         val context: Context = getApplicationContext()
-        val cacheFile = File(context.cacheDir, Location.CACHE_FILE_NAME)
-        Location.createAndStore(query, context)
+        val cacheFile = File(context.cacheDir, AddressCoordinates.CACHE_FILE_NAME)
+        AddressCoordinates(query, context)
         val cacheSizeBefore = cacheFile.length()
-        Location.createAndStore(query, context)
+        AddressCoordinates(query, context)
         val cacheSizeAfter = cacheFile.length()
         assertEquals(cacheSizeBefore, cacheSizeAfter)
     }
@@ -98,7 +98,7 @@ class LocationTest {
     @Test
     fun rightQueryReturnsMultiplesResults() {
         val query = "rue de Genève"
-        val result = Location.geocoderQuery(query, getApplicationContext())
+        val result = AddressCoordinates.geocoderQuery(query, getApplicationContext())
         assertTrue(result!!.size > 1)
     }
 }

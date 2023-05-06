@@ -26,53 +26,56 @@ class BossDisplayViewModel(context: Context) : ViewModel() {
     private val storage = Firebase.storage
     private val cachedFolderDao = database.cachedFolderDao()
 
-    init { loadFolders() }
+    init { updateFolders() }
 
-    fun refreshFolders() { loadFolders() }
+    fun refreshFolders() { updateFolders() }
 
-    private fun loadFolders() {
+    private fun updateFolders() {
         viewModelScope.launch {
-            val cachedFolders = withContext(Dispatchers.IO) {
-                cachedFolderDao.getAll()
+            val remoteFolders = fetchRemoteFolders()
+
+            if (remoteFolders != null) {
+                updateCachedFolders(remoteFolders)
+            } else {
+                displayCachedFolders()
             }
-            val storageReferences = cachedFolders.map { folder ->
-                storage.getReference(folder.path)
-            }
-            _folderReferences.value = storageReferences
-            updateLocalDatabaseFromFirebase()
         }
     }
 
+    private suspend fun updateCachedFolders(remoteFolders: List<StorageReference>) {
+        withContext(Dispatchers.IO) {
+            // Insert new remote folders into the local database
+            cachedFolderDao.insertAll(*remoteFolders.map { folder ->
+                CachedFolder(folder.path)
+            }.toTypedArray())
 
-    private suspend fun updateLocalDatabaseFromFirebase() {
-        val remoteFolders = fetchRemoteFolders()
+            // Find the difference between cached and remote folders
+            val cachedFolders = cachedFolderDao.getAll()
+            val remoteFolderPaths = remoteFolders.map { it.path }
+            val foldersToDelete = cachedFolders.filter { it.path !in remoteFolderPaths }
 
-        if (remoteFolders != null) {
-            withContext(Dispatchers.IO) {
-                // Insert new remote folders into the local database
-                cachedFolderDao.insertAll(*remoteFolders.map { folder ->
-                    CachedFolder(folder.path)
-                }.toTypedArray())
-
-                // Find the difference between cached and remote folders
-                val cachedFolders = cachedFolderDao.getAll()
-                val remoteFolderPaths = remoteFolders.map { it.path }
-                val foldersToDelete = cachedFolders.filter { it.path !in remoteFolderPaths}
-
-                // Delete cached folders that are not in remote folders
-                cachedFolderDao.deleteAll(foldersToDelete)
-            }
-
-            val updatedCachedFolders = withContext(Dispatchers.IO) {
-                cachedFolderDao.getAll()
-            }
-            val updatedStorageReferences = updatedCachedFolders.map { folder ->
-                storage.getReference(folder.path)
-            }
-            _folderReferences.postValue(updatedStorageReferences)
+            // Delete cached folders that are not in remote folders
+            cachedFolderDao.deleteAll(foldersToDelete)
         }
+
+        val updatedCachedFolders = withContext(Dispatchers.IO) {
+            cachedFolderDao.getAll()
+        }
+        val updatedStorageReferences = updatedCachedFolders.map { folder ->
+            storage.getReference(folder.path)
+        }
+        _folderReferences.postValue(updatedStorageReferences)
     }
 
+    private suspend fun displayCachedFolders() {
+        val cachedFolders = withContext(Dispatchers.IO) {
+            cachedFolderDao.getAll()
+        }
+        val storageReferences = cachedFolders.map { folder ->
+            storage.getReference(folder.path)
+        }
+        _folderReferences.postValue(storageReferences)
+    }
 
     private suspend fun fetchRemoteFolders(): List<StorageReference>? {
         return try {
@@ -86,3 +89,4 @@ class BossDisplayViewModel(context: Context) : ViewModel() {
         }
     }
 }
+

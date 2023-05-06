@@ -17,6 +17,7 @@ import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.databinding.FragmentDisplayBinding
 import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.ui.display.boss.BossDisplayViewModel
+import com.github.factotum_sdp.factotum.ui.display.boss.BossDisplayViewModelFactory
 import com.github.factotum_sdp.factotum.ui.display.boss.BossFolderAdapter
 import com.github.factotum_sdp.factotum.ui.display.client.ClientDisplayViewModel
 import com.github.factotum_sdp.factotum.ui.display.client.ClientDisplayViewModelFactory
@@ -25,8 +26,8 @@ import com.google.firebase.storage.StorageReference
 
 class DisplayFragment : Fragment() {
 
-    private val clientViewModel: ClientDisplayViewModel by viewModels { ClientDisplayViewModelFactory(userFolder) }
-    private val bossViewModel: BossDisplayViewModel by viewModels()
+    private val clientViewModel: ClientDisplayViewModel by viewModels{ ClientDisplayViewModelFactory(userFolder, requireContext()) }
+    private val bossViewModel: BossDisplayViewModel by viewModels{ BossDisplayViewModelFactory(requireContext()) }
     private val userViewModel: UserViewModel by activityViewModels()
     private var _binding: FragmentDisplayBinding? = null
     private val binding get() = _binding!!
@@ -56,32 +57,123 @@ class DisplayFragment : Fragment() {
         _binding = null
     }
 
-
     private fun setupObservers() {
         userViewModel.loggedInUser.observe(viewLifecycleOwner) { user ->
             userID.value = user.name
             userRole.value = user.role
+            userFolder.value = user.name
+
+            setupUIBasedOnUserRole()
         }
 
-        userRole.observe(viewLifecycleOwner) { role ->
-            userFolder.value = userID.value
-            when (role) {
-                Role.BOSS -> {
-                    setupBossUI()
-                    observeBossFolders()
-                }
-                Role.CLIENT -> {
-                    setupClientUI()
-                    observeClientPhotos()
-                }
-                else -> {
-                    setupClientUI()
-                    observeClientPhotos()
-                }
+        userFolder.observe(viewLifecycleOwner) { folder ->
+            if (folder !=clientViewModel.folderName.value) {
+                clientViewModel.setFolderName(folder)
+                clientViewModel.refreshImages()
             }
         }
     }
 
+    private fun setupUIBasedOnUserRole() {
+        when (userRole.value) {
+            Role.BOSS -> {
+                observeBossFolders()
+                setupBossUI()
+            }
+            Role.CLIENT -> {
+                observeClientPhotos()
+                setupClientUI()
+            }
+            else -> {
+                observeClientPhotos()
+                setupClientUI()
+            }
+        }
+    }
+
+    private fun openImage(imageUri: Uri) {
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(imageUri, "image/*")
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        startActivity(intent)
+    }
+
+    //================================================================
+    // Boss UI
+    //================================================================
+
+    private fun observeBossFolders() {
+        bossViewModel.folderReferences.observe(viewLifecycleOwner) { folderReferences ->
+            (binding.recyclerView.adapter as? BossFolderAdapter)?.submitList(folderReferences)
+        }
+    }
+
+    private fun setupBossUI() {
+        bossViewModel.refreshFolders()
+
+        binding.refreshButton.setOnClickListener {
+            bossViewModel.refreshFolders()
+        }
+
+        val bossFolderAdapter = BossFolderAdapter(
+            onCardClick = { clientFolder ->
+                userFolder.value = clientFolder.value
+                observeClientPhotos()
+                setupClientUI()
+            }
+        )
+
+        binding.recyclerView.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = bossFolderAdapter
+        }
+    }
+
+    //================================================================
+    // Client UI
+    //================================================================
+
+    private fun observeClientPhotos() {
+        clientViewModel.photoReferences.observe(viewLifecycleOwner) { photoReferences ->
+            (binding.recyclerView.adapter as? ClientPhotoAdapter)?.submitList(photoReferences)
+        }
+    }
+
+    private fun setupClientUI() {
+        clientViewModel.refreshImages()
+
+        binding.refreshButton.setOnClickListener {
+            clientViewModel.refreshImages()
+        }
+
+        val clientPhotoAdapter = ClientPhotoAdapter(
+            onShareClick = { storageReference ->
+                shareImage(storageReference, PHONE_NUMBER)
+            },
+            onCardClick = { uri ->
+                openImage(uri)
+            }
+        )
+
+        binding.recyclerView.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = clientPhotoAdapter
+        }
+    }
+
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (userRole.value == Role.BOSS && userFolder.value != userID.value) {
+                userFolder.value = userID.value
+                setupBossUI()
+                observeBossFolders()
+            } else {
+                isEnabled = false
+                requireActivity().onBackPressedDispatcher.onBackPressed()
+            }
+        }
+    }
 
     private fun shareImage(storageReference: StorageReference, phoneNumber: String) {
         storageReference.downloadUrl.addOnSuccessListener { uri ->
@@ -108,79 +200,6 @@ class DisplayFragment : Fragment() {
                 }
 
             startActivity(chooserIntent)
-        }
-    }
-
-    private fun openImage(imageUri: Uri) {
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(imageUri, "image/*")
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-        startActivity(intent)
-    }
-
-
-    private fun setupBossUI() {
-        binding.refreshButton.setOnClickListener {
-            bossViewModel.refreshFolders()
-        }
-
-        val bossFolderAdapter = BossFolderAdapter(
-            onCardClick = { clientFolder ->
-                userFolder.value = clientFolder.value
-                observeClientPhotos()
-                setupClientUI()
-            }
-        )
-
-        binding.recyclerView.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = bossFolderAdapter
-        }
-    }
-
-    private fun observeBossFolders() {
-        bossViewModel.folderReferences.observe(viewLifecycleOwner) { folderReferences ->
-            (binding.recyclerView.adapter as? BossFolderAdapter)?.submitList(folderReferences)
-        }
-    }
-
-    private fun setupClientUI() {
-        binding.refreshButton.setOnClickListener {
-            clientViewModel.refreshImages(userFolder.value!!)
-        }
-
-        val clientPhotoAdapter = ClientPhotoAdapter(
-            onShareClick = { storageReference ->
-                shareImage(storageReference, PHONE_NUMBER)
-            },
-            onCardClick = { uri ->
-                openImage(uri)
-            }
-        )
-
-        binding.recyclerView.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = clientPhotoAdapter
-        }
-    }
-
-    private fun observeClientPhotos() {
-        clientViewModel.photoReferences.observe(viewLifecycleOwner) { photoReferences ->
-            (binding.recyclerView.adapter as? ClientPhotoAdapter)?.submitList(photoReferences)
-        }
-    }
-
-    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            if (userRole.value == Role.BOSS && userFolder.value != userID.value) {
-                userFolder.value = userID.value
-                setupBossUI()
-                observeBossFolders()
-            } else {
-                isEnabled = false
-                requireActivity().onBackPressedDispatcher.onBackPressed()
-            }
         }
     }
 

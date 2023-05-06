@@ -43,14 +43,24 @@ class BossDisplayViewModel(context: Context) : ViewModel() {
         }
     }
 
+
     private suspend fun updateLocalDatabaseFromFirebase() {
         val remoteFolders = fetchRemoteFolders()
 
         if (remoteFolders != null) {
             withContext(Dispatchers.IO) {
+                // Insert new remote folders into the local database
                 cachedFolderDao.insertAll(*remoteFolders.map { folder ->
                     CachedFolder(folder.path)
                 }.toTypedArray())
+
+                // Find the difference between cached and remote folders
+                val cachedFolders = cachedFolderDao.getAll()
+                val remoteFolderPaths = remoteFolders.map { it.path }
+                val foldersToDelete = cachedFolders.filter { it.path !in remoteFolderPaths}
+
+                // Delete cached folders that are not in remote folders
+                cachedFolderDao.deleteAll(foldersToDelete)
             }
 
             val updatedCachedFolders = withContext(Dispatchers.IO) {
@@ -62,6 +72,7 @@ class BossDisplayViewModel(context: Context) : ViewModel() {
             _folderReferences.postValue(updatedStorageReferences)
         }
     }
+
 
     private suspend fun fetchRemoteFolders(): List<StorageReference>? {
         return try {

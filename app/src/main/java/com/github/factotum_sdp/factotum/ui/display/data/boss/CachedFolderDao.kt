@@ -1,6 +1,7 @@
 package com.github.factotum_sdp.factotum.ui.display.data.boss
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -13,6 +14,6 @@ interface CachedFolderDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg folders: CachedFolder)
 
-    @Query("DELETE FROM cached_folders")
-    fun deleteAll()
+    @Delete
+    fun deleteAll(folders: List<CachedFolder>)
 }

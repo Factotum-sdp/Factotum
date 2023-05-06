@@ -56,12 +56,11 @@ class ClientDisplayViewModel(
                 storage.getReference(it.path)
             }.sortedByDescending { getDateFromRef(it) }
 
-            Log.d("ClientDisplayViewModel", "Folder name: $folderName")
-            Log.d("ClientDisplayViewModel: ", "Loaded ${storageReferences.size} cached photos")
             _photoReferences.value = storageReferences
             updateImages(folderName)
         }
     }
+
 
     private fun updateImages(folderName: String) {
         viewModelScope.launch {
@@ -69,6 +68,12 @@ class ClientDisplayViewModel(
 
             if (remotePhotos != null) {
                 withContext(Dispatchers.IO) {
+                    val remotePhotoPaths = remotePhotos.map { it.path }
+                    val cachedPhotos = cachedPhotoDao.getAllByFolderName(folderName)
+
+                    val photosToDelete = cachedPhotos.filter { it.path !in remotePhotoPaths }
+                    cachedPhotoDao.deleteAll(photosToDelete)
+
                     cachedPhotoDao.insertAll(*remotePhotos.map { photo ->
                         CachedPhoto(photo.path, folderName)
                     }.toTypedArray())
@@ -85,6 +90,7 @@ class ClientDisplayViewModel(
             }
         }
     }
+
 
     private suspend fun fetchRemotePhotos(folderName: String): List<StorageReference>? {
         return try {

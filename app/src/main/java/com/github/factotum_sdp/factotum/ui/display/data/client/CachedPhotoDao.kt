@@ -1,6 +1,7 @@
 package com.github.factotum_sdp.factotum.ui.display.data.client
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -12,4 +13,7 @@ interface CachedPhotoDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg photos: CachedPhoto)
+
+    @Delete
+    fun deleteAll(photos: List<CachedPhoto>)
 }

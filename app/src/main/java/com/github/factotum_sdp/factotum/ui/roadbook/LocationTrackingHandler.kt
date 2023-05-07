@@ -8,18 +8,34 @@ import android.location.Location
 import android.os.IBinder
 import androidx.activity.ComponentActivity
 import com.github.factotum_sdp.factotum.services.LocationService
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 /**
  * The LocationTrackingHandler class
  *
- * Manage a LocationService instance, to provide
- * a simpler API for the UI part
+ * Stateful object to manage a LocationService instance.
+ * It provides a simpler API for the UI part.
+ * Should be mutated from only one place in the code.
  */
 class LocationTrackingHandler {
 
-    private lateinit var locationService: LocationService
+    private var locationService = LocationService()
     private var onLocationUpdate: ((location: Location) -> Unit)? = null
-    private var isTrackingEnabled = false
+
+    private val _isTrackingEnabled = MutableStateFlow(false)
+    private val _currentLocation = MutableStateFlow<Location?>(null)
+
+    /**
+     * The StateFlow<Location?> giving the current location when the tracking is enabled
+     */
+    val currentLocation = _currentLocation.asStateFlow()
+
+    /**
+     * The StateFlow<Boolean> giving whether the locationService is running or not
+     */
+    val isTrackingEnabled = _isTrackingEnabled.asStateFlow()
 
     /**
      * Start the location service
@@ -40,7 +56,7 @@ class LocationTrackingHandler {
      * @param componentActivity: ComponentActivity
      */
     fun stopLocationService(applicationContext: Context, componentActivity: ComponentActivity) {
-        if (isTrackingEnabled) {
+        if (isTrackingEnabled.value) {
             Intent(applicationContext, LocationService::class.java).apply {
                 action = LocationService.ACTION_STOP
                 unbindWrapForCI { componentActivity.unbindService(it) }
@@ -50,20 +66,17 @@ class LocationTrackingHandler {
     }
 
     /**
-     * Whether the location tracking service is enabled or not
-     * @return Boolean
-     */
-    fun isTrackingEnabled(): Boolean {
-        return isTrackingEnabled
-    }
-
-    /**
      * Set the event on each location update
      * @param onLocationUpdate: (Location) -> Unit
      */
     fun setOnLocationUpdate(onLocationUpdate: ((location: Location) -> Unit)) {
-        this.onLocationUpdate = onLocationUpdate
+        val newCB = { location: Location ->
+            _currentLocation.update { _: Location? -> location }
+            onLocationUpdate(location)
+        }
+        this.onLocationUpdate = newCB
     }
+
 
     // Defines callbacks for service binding, passed to bindService().
     private val connection = object : ServiceConnection {
@@ -75,11 +88,11 @@ class LocationTrackingHandler {
             onLocationUpdate?.let { f ->
                 locationService.setEventOnLocationUpdate(f)
             }
-            isTrackingEnabled = true
+            _isTrackingEnabled.update { _ -> true }
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
-            isTrackingEnabled = false
+            _isTrackingEnabled.update { _ -> false }
         }
     }
 

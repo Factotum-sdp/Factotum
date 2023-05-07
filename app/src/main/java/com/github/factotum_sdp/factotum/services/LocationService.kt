@@ -20,10 +20,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private const val CHANNEL_ID = "factotum_location_service"
 private const val CHANNEL_NAME = "Factotum Live Location Service"
@@ -69,7 +73,7 @@ class LocationService : Service() {
     }
 
     /**
-     * Set an event for each Location update
+     * Set the event for each Location update
      *
      * @param onLocationUpdate: (Location) -> Unit
      */

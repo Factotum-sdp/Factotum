@@ -3,7 +3,9 @@ package com.github.factotum_sdp.factotum
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import com.github.factotum_sdp.factotum.models.User
+import com.github.factotum_sdp.factotum.ui.roadbook.LocationTrackingHandler
 
 /**
  * ViewModel class for the App User
@@ -14,6 +16,23 @@ class UserViewModel : ViewModel() {
     private val _loggedInUser: MutableLiveData<User> = MutableLiveData()
     val loggedInUser: LiveData<User> = _loggedInUser
 
+    val locationTrackingHandler = LocationTrackingHandler()
+
+    /**
+     * LiveData<Location?> to observe the current user location
+     */
+    val userLocation = locationTrackingHandler.currentLocation.asLiveData()
+
+    /**
+     * LiveData<Boolean> to observe the location service running state
+     */
+    val userHasTrackingEnabled = locationTrackingHandler.isTrackingEnabled.asLiveData()
+
+    /**
+     * Set the logged in app user
+     *
+     * @param loggedInUser: User
+     */
     fun setLoggedInUser(loggedInUser: User) {
         _loggedInUser.postValue(loggedInUser)
     }

@@ -5,7 +5,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -90,7 +89,6 @@ class MainActivity : AppCompatActivity() {
         listenLogoutButton()
     }
 
-
     fun applicationSettingsViewModel(): SettingsViewModel {
         return settings
     }
@@ -113,18 +111,22 @@ class MainActivity : AppCompatActivity() {
 
         // Instantiate the current user
         user = ViewModelProvider(this)[UserViewModel::class.java]
-        binding.navView.findViewTreeLifecycleOwner()?.let { lco ->
-            user.loggedInUser.observe(lco) {
-                val format = "${it.name} (${it.role})"
-                userName.text = format
-                email.text = it.email
 
-                // Update the menu items and navigate to the predefined fragment
-                // according to the user role
-                updateMenuItems(it.role)
-                navigateToFragment(it.role)
-                scheduleUpload(it.role)
-            }
+        user.loggedInUser.observe(this) {
+            val format = "${it.name} (${it.role})"
+            userName.text = format
+            //email.text = it.email // Commented temporarily to show user live location
+
+            // Update the menu items and navigate to the predefined fragment
+            // according to the user role
+            updateMenuItems(it.role)
+            navigateToFragment(it.role)
+            scheduleUpload(it.role)
+        }
+        user.userLocation.observe(this) {
+            val coordinatesFormat =
+                "[${it?.latitude} ; ${it?.longitude}]"
+            email.text = coordinatesFormat
         }
     }
 

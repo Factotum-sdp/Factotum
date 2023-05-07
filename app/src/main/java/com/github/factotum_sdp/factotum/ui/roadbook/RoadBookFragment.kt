@@ -59,7 +59,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private val contactsViewModel : ContactsViewModel by activityViewModels()
 
     private lateinit var currentContacts: List<Contact>
-    private lateinit var locationTrackingHandler: LocationTrackingHandler
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -86,7 +85,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
             currentContacts = it
         }
 
-        locationTrackingHandler = userViewModel.locationTrackingHandler
         setLiveLocationEvent()
 
         return view
@@ -100,7 +98,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun setLiveLocationEvent() {
-        locationTrackingHandler.setOnLocationUpdate { currentLocation ->
+        userViewModel.locationTrackingHandler.setOnLocationUpdate { currentLocation ->
             rbViewModel.nextDestination()?.let {
                 val destination = clientLocation(it.clientID)
                 destination?.let { dest ->
@@ -239,13 +237,13 @@ class RoadBookFragment : Fragment(), MenuProvider {
         val locationSwitch =
             locationMenu.actionView!!.findViewById<SwitchCompat>(R.id.menu_item_switch)
         locationSwitch?.let {// Load current state to set the switch item
-            it.isChecked = locationTrackingHandler.isTrackingEnabled.value
+            it.isChecked = userViewModel.locationTrackingHandler.isTrackingEnabled.value
         }
         locationSwitch!!.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked)
-                locationTrackingHandler.startLocationService(requireContext(), requireActivity())
+                userViewModel.locationTrackingHandler.startLocationService(requireContext(), requireActivity())
             else if (lifecycle.currentState == Lifecycle.State.RESUMED && this.isVisible) {
-                locationTrackingHandler.stopLocationService(requireContext(), requireActivity())
+                userViewModel.locationTrackingHandler.stopLocationService(requireContext(), requireActivity())
             }
         }
     }
@@ -356,7 +354,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     }
 
     override fun onDestroy() {
-        locationTrackingHandler.stopLocationService(requireContext(), requireActivity())
+        userViewModel.locationTrackingHandler.stopLocationService(requireContext(), requireActivity())
         super.onDestroy()
     }
 

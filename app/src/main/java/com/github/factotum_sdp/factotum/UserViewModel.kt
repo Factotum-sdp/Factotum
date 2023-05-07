@@ -6,12 +6,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import com.github.factotum_sdp.factotum.models.User
 import com.github.factotum_sdp.factotum.ui.roadbook.LocationTrackingHandler
+import java.io.Serializable
 
 /**
  * ViewModel class for the App User
  * Observed in MainActivity
  */
-class UserViewModel : ViewModel() {
+class UserViewModel : ViewModel(), Serializable {
 
     private val _loggedInUser: MutableLiveData<User> = MutableLiveData()
     val locationTrackingHandler = LocationTrackingHandler()

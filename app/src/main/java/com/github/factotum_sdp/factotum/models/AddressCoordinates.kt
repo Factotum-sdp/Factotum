@@ -106,7 +106,7 @@ class AddressCoordinates {
             }
             val listToReturn : List<AddressCoordinates>?
             try {
-                listToReturn = result.get(1L, java.util.concurrent.TimeUnit.SECONDS)
+                listToReturn = result.get(2L, java.util.concurrent.TimeUnit.SECONDS)
             } catch (e: Exception) {
                 Log.e("Location", "Error getting location from geocoder",e)
                 return null

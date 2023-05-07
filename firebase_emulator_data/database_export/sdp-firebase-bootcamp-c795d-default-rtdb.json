@@ -1,11 +1,89 @@
-{"contacts": {
-    "00": {"address":"123 Fake Street","details":"I am a boss","latitude": 46.517719, "longitude": 6.569090, "username":"00","name":"John","phone":"123456789","profile_pic_id":2131165334,"role":"BOSS","surname":"Smith"},
-    "01": {"address":"456 Fake Street","details":"I am a courier","username":"01","name":"Jane","phone":"987654321","profile_pic_id":2131165334,"role":"COURIER","surname":"Jones"},
-    "02": {"address":"789 Fake Street","details":"I am a client","username":"02","name":"Joe","phone":"123987456","profile_pic_id":2131165334,"role":"CLIENT","surname":"Williams"},
-    "Buhagiat": {"address":"123 Fake Street","details":"I am a boss","latitude": 46.517719, "longitude": 6.569090,"username":"Buhagiat","name":"Jack","phone":"123456789","profile_pic_id":2131165334,"role":"COURIER","surname":"Brown"},
-    "X17": {"address":"456 Fake Street","details":"I am a courier","latitude": 46.517733,"longitude": 6.569090,"username":"X17","name":"Jill","phone":"987654321","profile_pic_id":2131165334,"role":"Courier","surname":"Taylor"}},
-"profile-dispatch": {
-    "9Q9PdkiVQKwgHcuEGyshqXyXHrHT": {"email":"courier@gmail.com","name":"Courier","password":"123456","role":"COURIER"},
-    "MjsOmqtNvvYB5RuFqbhmokvK1lxJ": {"email":"boss@gmail.com","name":"Boss","password":"123456","role":"BOSS"},
-    "YXd0EJCPabV6Xa7DDUunomS2SNue": {"email":"client@gmail.com","name":"Client","password":"123456","role":"CLIENT"},
-    "oO70izRfqiw4a8mXnFnfWLqk0gpa": {"email":"email@gmail.com","name":"Name","role":"COURIER"}}}
+{
+    "contacts": {
+        "00": {
+            "addressName": "123 Fake Street",
+            "details": "I am a boss",
+            "latitude": 46.517719,
+            "longitude": 6.569090,
+            "username": "00",
+            "name": "John",
+            "phone": "123456789",
+            "profile_pic_id": 2131165334,
+            "role": "BOSS",
+            "surname": "Smith"
+        },
+        "01": {
+            "addressName": "456 Fake Street",
+            "details": "I am a courier",
+            "latitude": 46.517719,
+            "longitude": 6.569090,
+            "username": "01",
+            "name": "Jane",
+            "phone": "987654321",
+            "profile_pic_id": 2131165334,
+            "role": "COURIER",
+            "surname": "Jones"
+        },
+        "02": {
+            "addressName": "789 Fake Street",
+            "details": "I am a client",
+            "latitude": 46.517719,
+            "longitude": 6.569090,
+            "username": "02",
+            "name": "Joe",
+            "phone": "123987456",
+            "profile_pic_id": 2131165334,
+            "role": "CLIENT",
+            "surname": "Williams"
+        },
+        "Buhagiat": {
+            "addressName": "123 Fake Street",
+            "details": "I am a boss",
+            "latitude": 46.517719,
+            "longitude": 6.569090,
+            "username": "Buhagiat",
+            "name": "Jack",
+            "phone": "123456789",
+            "profile_pic_id": 2131165334,
+            "role": "COURIER",
+            "surname": "Brown"
+        },
+        "X17": {
+            "addressName": "456 Fake Street",
+            "details": "I am a courier",
+            "latitude": 46.517733,
+            "longitude": 6.569090,
+            "username": "X17",
+            "name": "Jill",
+            "phone": "987654321",
+            "profile_pic_id": 2131165334,
+            "role": "Courier",
+            "surname": "Taylor"
+        }
+    },
+    "profile-dispatch": {
+        "9Q9PdkiVQKwgHcuEGyshqXyXHrHT": {
+            "email": "courier@gmail.com",
+            "name": "Courier",
+            "password": "123456",
+            "role": "COURIER"
+        },
+        "MjsOmqtNvvYB5RuFqbhmokvK1lxJ": {
+            "email": "boss@gmail.com",
+            "name": "Boss",
+            "password": "123456",
+            "role": "BOSS"
+        },
+        "YXd0EJCPabV6Xa7DDUunomS2SNue": {
+            "email": "client@gmail.com",
+            "name": "Client",
+            "password": "123456",
+            "role": "CLIENT"
+        },
+        "oO70izRfqiw4a8mXnFnfWLqk0gpa": {
+            "email": "email@gmail.com",
+            "name": "Name",
+            "role": "COURIER"
+        }
+    }
+}

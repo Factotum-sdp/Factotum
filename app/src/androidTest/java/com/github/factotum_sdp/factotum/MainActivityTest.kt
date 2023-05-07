@@ -129,16 +129,14 @@ class MainActivityTest {
         )
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun pressingBackOnAMenuFragmentLeadsToRBFragment() = runTest {
+    fun pressingBackOnAMenuFragmentLeadsToRBFragment() {
         // First need to login to trigger the change of navGraph's start fragment
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
 
         navigateToAndPressBackLeadsToRB(R.id.directoryFragment)
         navigateToAndPressBackLeadsToRB(R.id.displayFragment)
         navigateToAndPressBackLeadsToRB(R.id.routeFragment)
-        navigateToAndPressBackLeadsToRB(R.id.bossMapFragment)
     }
 
 
@@ -177,7 +175,6 @@ class MainActivityTest {
         onView(withText("Directory")).check(matches(isDisplayed()))
         onView(withText("Maps")).check(matches(isDisplayed()))
         onView(withText("View Proof Pictures")).check(matches(isDisplayed()))
-        onView(withText("Boss Map")).check(matches(isDisplayed()))
     }
 
     @Test

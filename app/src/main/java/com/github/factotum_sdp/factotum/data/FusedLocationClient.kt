@@ -60,6 +60,5 @@ class FusedLocationClient(
             }
         }
     }
-
 }
 

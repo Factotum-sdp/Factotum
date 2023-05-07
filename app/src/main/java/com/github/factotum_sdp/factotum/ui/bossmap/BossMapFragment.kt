@@ -12,8 +12,10 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.hasLocationPermission
+import com.github.factotum_sdp.factotum.ui.bossmap.data.BossLocation
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -31,15 +33,13 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
 private const val ZOOM_LEVEL_CITY = 14f
-private const val WAIT_TIME_LOCATION_UPDATE = 30000L
 
 class BossMapFragment : Fragment(), OnMapReadyCallback {
 
+    private val viewModel: BossMapViewModel by viewModels()
     private lateinit var mapView: MapView
     private lateinit var googleMap: GoogleMap
-    private lateinit var database: DatabaseReference
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private val handler = Handler(Looper.getMainLooper())
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -58,8 +58,6 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
 
-        // Initialize Firebase database
-        database = FirebaseDatabase.getInstance().getReference("Location")
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
         return view
@@ -83,8 +81,9 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
             activateLocation(googleMap)
         }
 
-        // Start fetching data periodically
-        handler.post(fetchDataRunnable)
+        viewModel.bossLocations.observe(viewLifecycleOwner) { locations ->
+            updateMarkers(locations)
+        }
     }
 
     private fun activateLocation(googleMap: GoogleMap) {
@@ -122,38 +121,17 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private val fetchDataRunnable = object : Runnable {
-        override fun run() {
-            fetchLocationsAndUpdateMarkers()
-            handler.postDelayed(this, WAIT_TIME_LOCATION_UPDATE)
+    private fun updateMarkers(locations: List<BossLocation>) {
+        googleMap.clear()
+
+        locations.forEach { location ->
+            googleMap.addMarker(
+                MarkerOptions()
+                    .position(location.position)
+                    .title(location.name)
+                    .icon(BitmapDescriptorFactory.defaultMarker(colorForUid(location.uid)))
+            )
         }
-    }
-
-    private fun fetchLocationsAndUpdateMarkers() {
-        database.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                googleMap.clear()
-
-                snapshot.children.forEach { child ->
-                    val uid = child.key ?: "Unknown"
-                    val name = child.child("name").getValue(String::class.java) ?: "Unknown"
-                    val latitude = child.child("latitude").getValue(Double::class.java) ?: 0.0
-                    val longitude = child.child("longitude").getValue(Double::class.java) ?: 0.0
-
-                    val position = LatLng(latitude, longitude)
-                    googleMap.addMarker(
-                        MarkerOptions()
-                            .position(position)
-                            .title(name)
-                            .icon(BitmapDescriptorFactory.defaultMarker(colorForUid(uid)))
-                    )
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.e("BossMapFragment: ", "onCancelled: $error")
-            }
-        })
     }
 
     private fun colorForUid(uid: String): Float {
@@ -171,7 +149,6 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onDestroy() {
-        handler.removeCallbacks(fetchDataRunnable)
         mapView.onDestroy()
         super.onDestroy()
     }

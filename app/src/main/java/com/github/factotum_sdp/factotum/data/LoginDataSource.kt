@@ -47,8 +47,6 @@ class LoginDataSource {
                 it.child("name").value as String,
                 it.child("email").value as String,
                 Role.valueOf(it.child("role").value as String),
-                it.child("latitude").value as Double?,
-                it.child("longitude").value as Double?
             )
             auth.currentUser?.updateProfile(
                 UserProfileChangeRequest.Builder()

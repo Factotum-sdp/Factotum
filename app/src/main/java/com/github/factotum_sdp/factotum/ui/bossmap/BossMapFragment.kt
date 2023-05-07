@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.hasLocationPermission
-import com.github.factotum_sdp.factotum.ui.bossmap.data.BossLocation
+import com.github.factotum_sdp.factotum.models.CourierLocation
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -73,7 +73,7 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
             activateLocation(googleMap)
         }
 
-        viewModel.bossLocations.observe(viewLifecycleOwner) { locations ->
+        viewModel.courierLocations.observe(viewLifecycleOwner) { locations ->
             updateMarkers(locations)
         }
     }
@@ -113,13 +113,13 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun updateMarkers(locations: List<BossLocation>) {
+    private fun updateMarkers(locations: List<CourierLocation>) {
         googleMap.clear()
 
         locations.forEach { location ->
             googleMap.addMarker(
                 MarkerOptions()
-                    .position(location.position)
+                    .position(LatLng(location.latitude!!, location.longitude!!))
                     .title(location.name)
                     .icon(BitmapDescriptorFactory.defaultMarker(colorForUid(location.uid)))
             )

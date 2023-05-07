@@ -14,9 +14,12 @@ import com.github.factotum_sdp.factotum.ui.roadbook.LocationTrackingHandler
 class UserViewModel : ViewModel() {
 
     private val _loggedInUser: MutableLiveData<User> = MutableLiveData()
-    val loggedInUser: LiveData<User> = _loggedInUser
-
     val locationTrackingHandler = LocationTrackingHandler()
+
+    /**
+     * LiveData<User> to observe the current user logged in
+     */
+    val loggedInUser: LiveData<User> = _loggedInUser
 
     /**
      * LiveData<Location?> to observe the current user location

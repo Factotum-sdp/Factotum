@@ -35,7 +35,7 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 private const val INTERVAL_UPLOAD_PICTURE_TIME_MINUTE = 5L
-private const val INTERVAL_UPLOAD_LOCATION_TIME_SECOND = 30L
+private const val INTERVAL_UPLOAD_LOCATION_TIME_SECOND = 15L
 
 class MainActivity : AppCompatActivity() {
 

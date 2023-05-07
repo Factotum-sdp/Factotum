@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.update
  */
 class LocationTrackingHandler {
 
-    private var locationService = LocationService()
+    private lateinit var locationService: LocationService
     private var onLocationUpdate: ((location: Location) -> Unit)? = null
 
     private val _isTrackingEnabled = MutableStateFlow(false)
@@ -88,11 +88,11 @@ class LocationTrackingHandler {
             onLocationUpdate?.let { f ->
                 locationService.setEventOnLocationUpdate(f)
             }
-            _isTrackingEnabled.update { _ -> true }
+            _isTrackingEnabled.update { true }
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
-            _isTrackingEnabled.update { _ -> false }
+            _isTrackingEnabled.update { false }
         }
     }
 

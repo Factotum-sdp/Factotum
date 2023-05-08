@@ -2,37 +2,23 @@ package com.github.factotum_sdp.factotum.repositories
 
 import androidx.datastore.core.DataStore
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
-import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseDateFormatted
-import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseSafeString
-import com.github.factotum_sdp.factotum.models.DestinationRecord
 import com.github.factotum_sdp.factotum.models.Shift
-import com.github.factotum_sdp.factotum.ui.roadbook.DRecordList
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
+import com.github.factotum_sdp.factotum.models.Shift.Companion.shiftDbPathFromRoot
+import com.github.factotum_sdp.factotum.ui.roadbook.ShiftList
 import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-/**
- * This class models a ShiftRepository. It is in charge of being the unique place where
- * to log the deliveries of a shift. It is responsible of keeping remote source up to date with
- * local source, and vice-versa.
- *
- * @property localSource : DataStore<DRecordList>. Local source where data is stored and fetched from.
- * @property shift : Shift. The shift to log deliveries for.
- * @constructor
- * Creates a ShiftRepository and sets the update of the remote and local sources.
- *
- * @param remoteSource : DatabaseReference. The remote source where data is stored and fetched from.
- */
 
-class ShiftRepository(remoteSource: DatabaseReference,
-                      private val localSource: DataStore<DRecordList>,
-                      private val shift: Shift
-) {
+/**
+ * This class is responsible for keeping track of the shifts logged by the user.
+ *
+ * @property remoteSource : DatabaseReference. The remote source of the data.
+ * @property localSource : DataStore<ShiftList>. The local source of the data.
+ */
+class ShiftRepository(private val remoteSource: DatabaseReference,
+                      private val localSource: DataStore<ShiftList>) {
 
     companion object{
         const val DELIVERY_LOG_DB_PATH: String = "Delivery-Log"
@@ -41,74 +27,54 @@ class ShiftRepository(remoteSource: DatabaseReference,
     private var backUpRef: DatabaseReference = remoteSource
     private var isConnectedToRemote = false
 
-    private var lastShiftNetworkBackUp: DRecordList? = null
-    private var lastShiftLocalNetworkBackUp: DRecordList? = null
+    private var localShiftList: ShiftList = ShiftList(emptyList())
 
     init {
         FirebaseInstance.onConnectedStatusChanged {
             if(it) {
                 CoroutineScope(Dispatchers.IO).launch {
                     // Always synchronize the network back-up when connection is back
-                    setNetworkBackUp(getLastShiftLocalBackUp())
+                    setNetworkShiftList()
                 }
 
             }
             isConnectedToRemote = it
         }
-        backUpRef = remoteSource
-            .child(firebaseSafeString(shift.user.name))
-            .child(firebaseDateFormatted(shift.date))
-        backUpRef.addValueEventListener(object: ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val shiftsEnded = snapshot.children.mapNotNull {
-                    it.getValue(DestinationRecord::class.java)
-                }
-                lastShiftNetworkBackUp = DRecordList(shiftsEnded)
-            }
 
-            override fun onCancelled(error: DatabaseError) {}
-        })
 
     }
+
 
     /**
-     * This method logs a delivery.
+     * This methog logs a shift to the local and remote sources.
      *
-     * @param record : DestinationRecord. The delivery to log.
+     * @param shift : Shift. The shift to log.
      */
-    fun logShift(deliveries : DRecordList){
-        setDeliveriesBackUp(deliveries)
-    }
-
-
-    private fun setDeliveriesBackUp(records: DRecordList){
-        val deliveries = DRecordList(records.filter { it.timeStamp != null })
-        if (deliveries.isNotEmpty() && deliveries != lastShiftNetworkBackUp){
-            CoroutineScope(Dispatchers.Default).launch {
-                if (isConnectedToRemote){
-                    setNetworkBackUp(deliveries)
-                    setLocalBackUp(deliveries)
-                } else {
-                    setLocalBackUp(deliveries)
-                }
-            }
+    fun logShift(shift : Shift){
+        if(!localShiftList.contains(shift))
+            localShiftList = localShiftList.add(shift)
+        CoroutineScope(Dispatchers.Default).launch {
+            addToLocalSource()
+        }
+        if(isConnectedToRemote){
+            setNetworkShiftList()
         }
     }
 
-    private fun setNetworkBackUp(deliveries: DRecordList) {
-        backUpRef.setValue(deliveries)
-    }
-
-    private suspend fun setLocalBackUp(deliveries: DRecordList){
-        if(lastShiftLocalNetworkBackUp != deliveries){
-            localSource.updateData {
-                lastShiftNetworkBackUp = deliveries
-                deliveries
-            }
+    private suspend fun addToLocalSource(){
+        localSource.updateData {
+            localShiftList
         }
     }
-    private suspend fun getLastShiftLocalBackUp(): DRecordList {
-        return lastShiftLocalNetworkBackUp ?: localSource.data.first()
+
+    private fun setNetworkShiftList(){
+        val mapUserNbShift = mutableMapOf<String, Int>()
+        localShiftList.forEach { shift ->
+            mapUserNbShift[shift.user.name] = (mapUserNbShift[shift.user.name] ?: 0) + 1
+            val nbShift = mapUserNbShift[shift.user.name]!!
+            shiftDbPathFromRoot(backUpRef, shift)
+                .child(nbShift.toString())
+                .setValue(shift)}
     }
 
 }

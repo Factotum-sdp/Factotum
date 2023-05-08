@@ -112,7 +112,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
                     ShiftRepository(
                         FirebaseInstance.getDatabase().reference.child(DELIVERY_LOG_DB_PATH),
                         requireContext().shiftDataStore,
-                        currentShift
                     )
                 )
             } else Log.w("RoadBookFragment", "RecordsListState is null")
@@ -156,7 +155,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
     //============================================================================================
     override fun onPause() {
         rbViewModel.backUp()
-        rbViewModel.logDeliveries()
         saveButtonStates()
         super.onPause()
     }
@@ -302,12 +300,20 @@ class RoadBookFragment : Fragment(), MenuProvider {
             dialogBuilder.setMessage(R.string.finish_shift_alert_question)
                 .setPositiveButton(R.string.end_shift) { dialog, _ ->
                     rbViewModel.recordsListState.let {
-                        rbViewModel.logDeliveries()
-                        Toast.makeText(
-                            requireContext(),
-                            R.string.shift_ended,
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        if(userViewModel.loggedInUser.value == null) Log.w("RoadBookFragment", "User is null, cannot log shift")
+                        else {
+                            val currentShift = Shift(
+                                Date(),
+                                userViewModel.loggedInUser.value!!,
+                                it.value!!
+                            )
+                            rbViewModel.logShift(currentShift)
+                            Toast.makeText(
+                                requireContext(),
+                                R.string.shift_ended,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 }
                 .setNegativeButton("Not now") { dialog, _ ->

@@ -54,4 +54,9 @@ object FirebaseStringFormat {
     fun firebaseDateFormatted(date: Date): String {
         return SimpleDateFormat("ddMMyyyy", Locale.getDefault()).format(date)
     }
+
+    fun firebaseParseDate(date: String) : Date?{
+        if (date.isEmpty()) return null
+        return SimpleDateFormat("ddMMyyyy", Locale.getDefault()).parse(date)
+    }
 }

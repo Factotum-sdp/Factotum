@@ -3,6 +3,7 @@ package com.github.factotum_sdp.factotum.ui.roadbook
 import androidx.lifecycle.*
 import com.github.factotum_sdp.factotum.models.DestinationRecord
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
+import com.github.factotum_sdp.factotum.models.Shift
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
 import com.github.factotum_sdp.factotum.repositories.RoadBookRepository
@@ -85,8 +86,9 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : Vi
      * Log the current deliveries to the database if
      *
      */
-    fun logDeliveries(){
-        _shiftRepository?.logShift(currentDRecList())
+    fun logShift(shift: Shift){
+        val shift = Shift(Date(), shift.user, currentDRecList())
+        _shiftRepository?.logShift(shift)
     }
 
     /**

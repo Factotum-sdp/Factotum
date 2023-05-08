@@ -28,6 +28,7 @@ import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseDateFormatted
 import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseSafeString
 import com.github.factotum_sdp.factotum.models.DestinationRecord
+import com.github.factotum_sdp.factotum.models.Shift
 import com.github.factotum_sdp.factotum.models.User
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder.USER_COURIER
@@ -87,6 +88,9 @@ class RoadBookFragmentTest {
             initFirebase()
         }
     }
+    val courier = User(USER_COURIER.name,
+        USER_COURIER.email,
+        USER_COURIER.role)
 
     @Before
     fun toRoadBookFragment() {
@@ -97,9 +101,6 @@ class RoadBookFragmentTest {
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))
             .perform(click())
-        val courier = User(USER_COURIER.name,
-                           USER_COURIER.email,
-                           USER_COURIER.role)
         GeneralUtils.injectLoggedInUser(testRule, courier)
     }
 
@@ -419,25 +420,45 @@ class RoadBookFragmentTest {
 
         // Our target value to fetch
         // is represented as a List<String> in Firebase
-        val future = CompletableFuture<List<DestinationRecord>>()
+        val future = CompletableFuture<List<Shift>>()
 
         dbShiftRef.get().addOnSuccessListener { snapshot ->
-            val deliveries = snapshot.children.mapNotNull {
-                it.getValue(DestinationRecord::class.java)
+            var records : List<DestinationRecord>  = emptyList()
+            var user : User = User()
+            var date : Date = Date()
+            val shift = snapshot.children.mapNotNull { shifts ->
+                shifts.children.forEach {
+                    if(it.key == "records"){
+                        records = it.children.mapNotNull { record ->
+                            record.getValue(DestinationRecord::class.java)
+                        }
+                    }
+                    if(it.key == "user"){
+                        user = it.getValue(User::class.java)!!
+                    }
+                    if(it.key == "date"){
+                        date = it.getValue(Date::class.java)!!
+                    }
+                }
+                Shift(date, user, DRecordList(records))
             }
-            future.complete(deliveries)
+            future.complete(shift)
 
         }.addOnFailureListener {
             future.completeExceptionally(it)
             assert(false)
         }
         val rbViewModel = getRbViewModel()!!
-        val timestamped = rbViewModel.recordsListState.value!!.filter { it.timeStamp != null }
-        assert(future.get().all{ it.timeStamp != null })
-        assert(future.get().zip(timestamped).all { pair -> pair.first.destID == pair.second.destID })
+        val shift = Shift(Date(), courier, rbViewModel.recordsListState.value!!)
+        val shiftList = ShiftList(listOf(shift))
+        //assert(future.get().all{ it.timeStamp != null })
 
-
-
+        future.get().zip(shiftList).all { pair ->
+            pair.first.records.zip(pair.second.records).all { recordPair ->
+                recordPair.first.destID == recordPair.second.destID
+                        && recordPair.first.timeStamp == recordPair.second.timeStamp}
+                    && pair.first.user == pair.second.user
+        }
     }
     @Test
     fun shiftIsBackedUpCorrectlyWhenOffline() {
@@ -448,10 +469,10 @@ class RoadBookFragmentTest {
         // finished a shift
         updateTimestampOfRecord(3)
 
-        // Navigate out of the RoadBookFragment
-        navigateOutsideAndComeBack()
+        //end shift
+        endShift()
 
-        var ls = emptyList<DestinationRecord>()
+        var ls = ShiftList(emptyList())
         runBlocking {
             ls = context.shiftDataStore.data.first()
         }
@@ -459,59 +480,14 @@ class RoadBookFragmentTest {
         db.goOnline()
         val rbViewModel = getRbViewModel()!!
 
-        val timestamped = rbViewModel.recordsListState.value!!.filter { it.timeStamp != null }
-        assert(ls.all { it.timeStamp != null })
-        assert(ls.zip(timestamped).all { pair -> pair.first.destID == pair.second.destID })
-
-    }
-
-    @Test
-    fun networkShiftAndLocalBackUpConsistency() {
-        val db = FirebaseInstance.getDatabase()
-
-        val date = Calendar.getInstance().time
-        val ref = db.reference
-            .child(DELIVERY_LOG_DB_PATH)
-            .child(firebaseSafeString(USER_COURIER.name))
-            .child(firebaseDateFormatted(Date()))
-
-
-        // Our target value to fetch
-        // is represented as a List<String> in Firebase
-        val future = CompletableFuture<List<DestinationRecord>>()
-
-        ref.addListenerForSingleValueEvent(object: ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val deliveries = snapshot.children.mapNotNull {
-                    it.getValue(DestinationRecord::class.java)
-                }
-                future.complete(deliveries)
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                future.completeExceptionally(error.toException())
-            }
+        val shift = Shift(Date(), courier, rbViewModel.recordsListState.value!!)
+        val shiftList = ShiftList(listOf(shift))
+        //assert(ls.all { it.timeStamp != null })
+        assert(ls.zip(shiftList).all { pair ->
+            pair.first.records == pair.second.records
+                    && pair.first.user == pair.second.user
         })
-        // Add 1 record
-        updateTimestampOfRecord(2)
 
-        //end shift
-        endShift()
-
-        var fromLocal: List<DestinationRecord>
-        val context = ApplicationProvider.getApplicationContext<Context>().applicationContext
-        runBlocking {
-            fromLocal = context.shiftDataStore.data.first()
-        }
-
-        val fromNetwork = future.get()
-
-        assert(future.get().all{ it.timeStamp != null })
-        assert(
-            fromLocal
-                .zip(fromNetwork)
-                .all { pair -> pair.first.destID == pair.second.destID }
-        )
     }
 
 

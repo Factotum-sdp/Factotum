@@ -1112,6 +1112,7 @@ class RoadBookFragmentTest {
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))
             .perform(click())
+        
     }
 
     private val newRecordClientID = "New"

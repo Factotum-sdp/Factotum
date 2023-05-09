@@ -4,8 +4,13 @@ import android.content.Context
 import android.location.Address
 import android.location.Geocoder
 import android.os.Build
+import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import androidx.test.uiautomator.By
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.Until
 import com.github.factotum_sdp.factotum.models.AddressCoordinates
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
@@ -100,5 +105,43 @@ class AddressCoordinatesTest {
         val query = "rue de Genève"
         val result = AddressCoordinates.geocoderQuery(query, getApplicationContext())
         assertTrue(result!!.size > 1)
+    }
+
+    @Test
+    fun searchOnCache(){
+        val query = "Lausanne"
+        val realContext: Context = getApplicationContext()
+        val realResult = AddressCoordinates(query, realContext)
+        setAirplaneMode(true)
+        val mockResult = AddressCoordinates(query, realContext)
+        assert(realResult.addressName == mockResult.addressName)
+        assert(realResult.coordinates!!.latitude == mockResult.coordinates!!.latitude)
+        assert(realResult.coordinates!!.longitude == mockResult.coordinates!!.longitude)
+        setAirplaneMode(false)
+
+    }
+
+    private fun setAirplaneMode(state : Boolean){
+        val currentState = Settings.System.getInt(
+            getInstrumentation().context.contentResolver,
+            Settings.Global.AIRPLANE_MODE_ON, 0
+        )
+        if ((if (state) 1 else 0) == currentState
+        ) {
+            return
+        }
+        val device = UiDevice.getInstance(getInstrumentation())
+        device.openQuickSettings()
+        val description = By.desc("Airplane mode")
+        device.wait(Until.hasObject(description), 500)
+        device.findObject(description).click()
+        device.pressBack()
+        device.pressBack()
+    }
+
+    private fun createsNull(){
+        val location = AddressCoordinates()
+        assertEquals(location.coordinates, null)
+        assertEquals(location.addressName, null)
     }
 }

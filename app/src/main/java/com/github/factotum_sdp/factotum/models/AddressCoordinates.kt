@@ -8,7 +8,6 @@ import android.os.Build
 import android.os.Build.VERSION_CODES.TIRAMISU
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat.getSystemService
 import com.google.android.gms.maps.model.LatLng
 import java.io.File
 import java.util.concurrent.CompletableFuture
@@ -78,7 +77,9 @@ class AddressCoordinates {
             return if (Build.VERSION.SDK_INT >= TIRAMISU) {
                 tiramisuResultHandler(query, geocoder, context)
             } else {
-                resultHandler(query, geocoder, context)
+                Log.e("Location", "SDK < TIRAMISU")
+                return null
+                //resultHandler(query, geocoder, context)
             }
         }
 
@@ -113,7 +114,7 @@ class AddressCoordinates {
             }
             return listToReturn
         }
-
+/* For now do not need backward handling anymore
         private fun resultHandler(query: String, geocoder: Geocoder, context: Context): List<AddressCoordinates>? {
             val result = CompletableFuture<List<AddressCoordinates>?>()
             try {
@@ -127,9 +128,9 @@ class AddressCoordinates {
             }
             return result.get(1L, java.util.concurrent.TimeUnit.SECONDS)
         }
-
+*/
         private fun isNetworkAvailable(context: Context): Boolean {
-            val connectivityManager = getSystemService(context, ConnectivityManager::class.java)
+            val connectivityManager = context.getSystemService(ConnectivityManager::class.java)
             val currentNetwork = connectivityManager?.activeNetwork ?: return false
             val caps = connectivityManager.getNetworkCapabilities(currentNetwork) ?: return false
             if (caps.hasCapability(NET_CAPABILITY_INTERNET)) return true

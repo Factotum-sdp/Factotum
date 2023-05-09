@@ -165,4 +165,5 @@
     <string name="super_client_username">Super client username</string>
     <string name="super_client_id_not_valid">The managing client\'s username is not valid.</string>
     <string name="contact_not_found">Contact not found</string>
+    <string name="decline_end_shift">Not now</string>
 </resources>

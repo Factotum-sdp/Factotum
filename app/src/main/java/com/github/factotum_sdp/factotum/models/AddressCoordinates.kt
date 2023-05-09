@@ -48,11 +48,6 @@ class AddressCoordinates {
         }
     }
 
-    constructor(){
-        coordinates = null
-        addressName = null
-    }
-
 
     companion object {
         const val CACHE_FILE_NAME = "locations.txt"

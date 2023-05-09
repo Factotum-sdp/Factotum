@@ -280,7 +280,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
                         ).show()
                     }
                 }
-                .setNegativeButton("Not now") { dialog, _ ->
+                .setNegativeButton(R.string.decline_end_shift) { dialog, _ ->
                     dialog.cancel()
                 }
             val alert = dialogBuilder.create()

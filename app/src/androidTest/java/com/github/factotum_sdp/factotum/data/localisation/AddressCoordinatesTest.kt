@@ -138,10 +138,4 @@ class AddressCoordinatesTest {
         device.pressBack()
         device.pressBack()
     }
-
-    private fun createsNull(){
-        val location = AddressCoordinates()
-        assertEquals(location.coordinates, null)
-        assertEquals(location.addressName, null)
-    }
 }

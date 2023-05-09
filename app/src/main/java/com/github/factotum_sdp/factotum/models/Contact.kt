@@ -1,5 +1,7 @@
 package com.github.factotum_sdp.factotum.models
 
+import android.location.Location
+
 data class Contact(
     val username: String = "",
     val role: String = "",
@@ -8,12 +10,12 @@ data class Contact(
     val profile_pic_id: Int = 0,
     val super_client: String? = null,
     val addressName: String? = null,
-    val latitude: Double? = null,
-    val longitude: Double? = null,
+    override val latitude: Double? = null,
+    override val longitude: Double? = null,
     val phone: String = "",
     val details: String? = null
-) {
-    fun hasCoordinates(): Boolean {
-        return latitude != null && longitude != null
+) : Localisable<Contact> {
+    override fun withLocation(location: Location): Contact {
+        return this.copy(latitude = location.latitude, longitude = location.longitude)
     }
 }

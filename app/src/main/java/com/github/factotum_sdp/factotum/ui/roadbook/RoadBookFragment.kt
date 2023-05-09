@@ -55,7 +55,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private lateinit var showArchivedButton: MenuItem
 
     private var usePreferences = false
-    private val locationTrackingHandler: LocationTrackingHandler = LocationTrackingHandler()
     private val userViewModel: UserViewModel by activityViewModels()
     private val contactsViewModel : ContactsViewModel by activityViewModels()
 
@@ -91,9 +90,15 @@ class RoadBookFragment : Fragment(), MenuProvider {
         return view
     }
 
+    override fun onPause() {
+        rbViewModel.backUp()
+        saveButtonStates()
+        super.onPause()
+    }
+
     @SuppressLint("NotifyDataSetChanged")
     private fun setLiveLocationEvent() {
-        locationTrackingHandler.setOnLocationUpdate { currentLocation ->
+        userViewModel.locationTrackingHandler.setOnLocationUpdate { currentLocation ->
             rbViewModel.nextDestination()?.let {
                 val destination = clientLocation(it.clientID)
                 destination?.let { dest ->
@@ -102,21 +107,8 @@ class RoadBookFragment : Fragment(), MenuProvider {
                         rbViewModel.timeStampARecord(cal.time, it)
                     }
                 }
-
             }
         }
-    }
-
-    private fun clientLocation(clientID: String): Location? {
-        val contact = currentContacts.firstOrNull {
-            it.username == clientID
-        } ?: return null
-        val location = Location("factotum")
-        contact.longitude?.let {
-            location.longitude = it
-            location.latitude = contact.latitude!!
-        } ?: return null
-        return location
     }
 
     private fun onDestinationPlace(current: Location, destination: Location): Boolean {
@@ -124,11 +116,11 @@ class RoadBookFragment : Fragment(), MenuProvider {
         return distance <= ON_DESTINATION_RADIUS // Remove constant
     }
 
-    //============================================================================================
-    override fun onPause() {
-        rbViewModel.backUp()
-        saveButtonStates()
-        super.onPause()
+    private fun clientLocation(clientID: String): Location? {
+        val contact = currentContacts.firstOrNull {
+            it.username == clientID
+        } ?: return null
+        return contact.getLocation()
     }
 
     private fun setOnDRecordClickListener(): (String) -> View.OnClickListener {
@@ -245,13 +237,13 @@ class RoadBookFragment : Fragment(), MenuProvider {
         val locationSwitch =
             locationMenu.actionView!!.findViewById<SwitchCompat>(R.id.menu_item_switch)
         locationSwitch?.let {// Load current state to set the switch item
-            it.isChecked = locationTrackingHandler.isTrackingEnabled()
+            it.isChecked = userViewModel.locationTrackingHandler.isTrackingEnabled.value
         }
         locationSwitch!!.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked)
-                locationTrackingHandler.startLocationService(requireContext(), requireActivity())
+                userViewModel.locationTrackingHandler.startLocationService(requireContext(), requireActivity())
             else if (lifecycle.currentState == Lifecycle.State.RESUMED && this.isVisible) {
-                locationTrackingHandler.stopLocationService(requireContext(), requireActivity())
+                userViewModel.locationTrackingHandler.stopLocationService(requireContext(), requireActivity())
             }
         }
     }
@@ -362,7 +354,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     }
 
     override fun onDestroy() {
-        locationTrackingHandler.stopLocationService(requireContext(), requireActivity())
+        userViewModel.locationTrackingHandler.stopLocationService(requireContext(), requireActivity())
         super.onDestroy()
     }
 

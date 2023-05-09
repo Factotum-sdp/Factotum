@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 /**
  * Data class that captures user information for logged in users retrieved from LoginRepository
  */
+
 @Serializable
 data class User(
     val name: String = "",

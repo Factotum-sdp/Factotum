@@ -63,8 +63,6 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeoutException
 
 
 @RunWith(AndroidJUnit4::class)
@@ -1112,7 +1110,7 @@ class RoadBookFragmentTest {
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))
             .perform(click())
-        
+
     }
 
     private val newRecordClientID = "New"

@@ -78,7 +78,7 @@ class AddressCoordinates {
             }
         }
 
-        private fun searchInCache(query: String, context: Context): List<AddressCoordinates>?{
+        fun searchInCache(query: String, context: Context): List<AddressCoordinates>?{
             val cacheFile = File(context.cacheDir, CACHE_FILE_NAME)
             var addressCoordinates : List<AddressCoordinates>? = emptyList()
             cacheFile.forEachLine { line ->

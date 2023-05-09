@@ -170,7 +170,7 @@ class DRecordDetailsFragmentTest {
         onView(withId(R.id.fragment_drecord_info_directors_parent)).check(matches(isDisplayed()))
     }
 
-    fun enableLocation() {
+    private fun enableLocation() {
         if (LocationUtils.hasLocationPopUp()) {
             device.findObject(UiSelector().textContains(buttonTextAllow)).click()
         }

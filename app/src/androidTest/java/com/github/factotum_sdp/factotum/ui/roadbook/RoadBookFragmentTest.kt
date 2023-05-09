@@ -2,6 +2,7 @@ package com.github.factotum_sdp.factotum.ui.roadbook
 
 import android.Manifest
 import android.content.Context
+import android.provider.Settings
 import android.view.View
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.RecyclerView
@@ -21,12 +22,14 @@ import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.GrantPermissionRule
+import androidx.test.uiautomator.By
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.Until
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
-import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseDateFormatted
-import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseSafeString
 import com.github.factotum_sdp.factotum.models.DestinationRecord
 import com.github.factotum_sdp.factotum.models.Shift
 import com.github.factotum_sdp.factotum.models.User
@@ -42,6 +45,7 @@ import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebas
 import com.github.factotum_sdp.factotum.utils.PreferencesSetting
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -59,6 +63,8 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 
 @RunWith(AndroidJUnit4::class)
@@ -374,6 +380,7 @@ class RoadBookFragmentTest {
     @Test
     fun roadBookFromBackUpAfterClearedOffline() {
         val db = FirebaseInstance.getDatabase()
+
         db.goOffline()
 
         isStartingRecyclerViewCheck()
@@ -406,54 +413,27 @@ class RoadBookFragmentTest {
     fun endShiftUpdates() {
         val db = FirebaseInstance.getDatabase()
         val context = ApplicationProvider.getApplicationContext<Context>().applicationContext
-        val dbShiftRef = db.reference
-            .child(DELIVERY_LOG_DB_PATH)
-            .child(firebaseSafeString(USER_COURIER.name))
-            .child(firebaseDateFormatted(Date()))
 
         // finished a delivery
         updateTimestampOfRecord(3)
         updateTimestampOfRecord(4)
+
+        val rbViewModel = getRbViewModel()!!
+        val shift = Shift(Date(), courier, rbViewModel.recordsListState.value!!)
+        val shiftList = ShiftList(listOf(shift))
+
+        val dbShiftRef = Shift.shiftDbPathFromRoot(db.reference.child(DELIVERY_LOG_DB_PATH), shift)
 
         // finishes the shift
         endShift()
 
         // Our target value to fetch
         // is represented as a List<String> in Firebase
-        val future = CompletableFuture<List<Shift>>()
+        val shifts = getShiftFromDb(dbShiftRef)
 
-        dbShiftRef.get().addOnSuccessListener { snapshot ->
-            var records : List<DestinationRecord>  = emptyList()
-            var user : User = User()
-            var date : Date = Date()
-            val shift = snapshot.children.mapNotNull { shifts ->
-                shifts.children.forEach {
-                    if(it.key == "records"){
-                        records = it.children.mapNotNull { record ->
-                            record.getValue(DestinationRecord::class.java)
-                        }
-                    }
-                    if(it.key == "user"){
-                        user = it.getValue(User::class.java)!!
-                    }
-                    if(it.key == "date"){
-                        date = it.getValue(Date::class.java)!!
-                    }
-                }
-                Shift(date, user, DRecordList(records))
-            }
-            future.complete(shift)
-
-        }.addOnFailureListener {
-            future.completeExceptionally(it)
-            assert(false)
-        }
-        val rbViewModel = getRbViewModel()!!
-        val shift = Shift(Date(), courier, rbViewModel.recordsListState.value!!)
-        val shiftList = ShiftList(listOf(shift))
         //assert(future.get().all{ it.timeStamp != null })
 
-        future.get().zip(shiftList).all { pair ->
+        shifts.zip(shiftList).all { pair ->
             pair.first.records.zip(pair.second.records).all { recordPair ->
                 recordPair.first.destID == recordPair.second.destID
                         && recordPair.first.timeStamp == recordPair.second.timeStamp}
@@ -489,6 +469,65 @@ class RoadBookFragmentTest {
         })
 
     }
+
+/*
+    @Test
+    fun shiftIsBackedUpCorrectlyWhenComingBackOnline() {
+        val db = FirebaseInstance.getDatabase()
+        setAirplaneMode(true)
+
+
+        val context = ApplicationProvider.getApplicationContext<Context>().applicationContext
+
+        // finished a shift
+        updateTimestampOfRecord(3)
+
+        //end shift
+        endShift()
+
+        var ls = ShiftList(emptyList())
+        runBlocking {
+            ls = context.shiftDataStore.data.first()
+        }
+
+
+        setAirplaneMode(false)
+        val rbViewModel = getRbViewModel()!!
+
+        val shift = Shift(Date(), courier, rbViewModel.recordsListState.value!!)
+        val shiftList = ShiftList(listOf(shift))
+        //assert(ls.all { it.timeStamp != null })
+        assert(ls.zip(shiftList).all { pair ->
+            pair.first.records == pair.second.records
+                    && pair.first.user == pair.second.user
+        })
+
+        val shiftDbRef = Shift.shiftDbPathFromRoot(db.reference.child(DELIVERY_LOG_DB_PATH), shift)
+        val future = CompletableFuture<List<Shift>>()
+        shiftDbRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val shifts = getShiftFromDb(shiftDbRef)
+                future.complete(shifts)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                assert(false)
+            }
+        })
+        var shifts : List<Shift>? = null
+        try {
+            shifts = future.get(15L, TimeUnit.SECONDS)
+        } catch (e: TimeoutException) {
+            assert(false)
+        }
+        assert(shifts != null)
+        assert(shifts!!.zip(shiftList).all { pair ->
+            pair.first.records == pair.second.records
+                    && pair.first.user == pair.second.user
+        })
+    }
+    */
+
 
 
     // ============================================================================================
@@ -1159,6 +1198,55 @@ class RoadBookFragmentTest {
         onView(withText(R.string.end_shift_dialog_title))
             .check(matches(isDisplayed()))
         onView(withId(android.R.id.button1)).perform(click())
+    }
+
+    private fun getShiftFromDb(dbShiftRef : DatabaseReference) : List<Shift>{
+        val future = CompletableFuture<List<Shift>>()
+        dbShiftRef.get().addOnSuccessListener { snapshot ->
+            var records : List<DestinationRecord>  = emptyList()
+            var user : User = User()
+            var date : Date = Date()
+            val shiftDb = snapshot.children.mapNotNull { shifts ->
+                shifts.children.forEach {
+                    if(it.key == "records"){
+                        records = it.children.mapNotNull { record ->
+                            record.getValue(DestinationRecord::class.java)
+                        }
+                    }
+                    if(it.key == "user"){
+                        user = it.getValue(User::class.java)!!
+                    }
+                    if(it.key == "date"){
+                        date = it.getValue(Date::class.java)!!
+                    }
+                }
+                Shift(date, user, DRecordList(records))
+            }
+            future.complete(shiftDb)
+
+        }.addOnFailureListener {
+            future.completeExceptionally(it)
+            assert(false)
+        }
+        return future.get()
+    }
+
+    private fun setAirplaneMode(state : Boolean){
+        val currentState = Settings.System.getInt(
+            getInstrumentation().context.contentResolver,
+            Settings.Global.AIRPLANE_MODE_ON, 0
+        )
+        if ((if (state) 1 else 0) == currentState
+        ) {
+            return
+        }
+        val device = UiDevice.getInstance(getInstrumentation())
+        device.openQuickSettings()
+        val description = By.desc("Airplane mode")
+        device.wait(Until.hasObject(description), 500)
+        device.findObject(description).click()
+        device.pressBack()
+        device.pressBack()
     }
 
     class RecyclerViewItemCountAssertion(private val expectedCount: Int) : ViewAssertion {

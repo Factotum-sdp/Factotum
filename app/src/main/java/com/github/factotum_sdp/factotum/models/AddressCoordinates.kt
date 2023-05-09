@@ -37,7 +37,7 @@ class AddressCoordinates {
         }
         else {
             coordinates = null
-            addressName = null
+            addressName = query
         }
     }
 

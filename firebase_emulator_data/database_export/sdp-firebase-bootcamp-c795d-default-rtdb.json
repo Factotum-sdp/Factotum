@@ -15,8 +15,6 @@
         "01": {
             "addressName": "456 Fake Street",
             "details": "I am a courier",
-            "latitude": 46.517719,
-            "longitude": 6.569090,
             "username": "01",
             "name": "Jane",
             "phone": "987654321",

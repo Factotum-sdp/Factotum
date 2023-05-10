@@ -1,5 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.directory
 
+import android.Manifest
 import android.content.Intent
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
@@ -13,8 +14,11 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.rule.GrantPermissionRule
+import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
+import androidx.test.uiautomator.Until.hasObject
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.models.Contact
@@ -27,6 +31,7 @@ import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.resetConta
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.LocationUtils
+import junit.framework.TestCase.assertTrue
 import org.hamcrest.CoreMatchers
 import org.hamcrest.Matchers.equalToIgnoringCase
 import org.junit.Before
@@ -39,6 +44,12 @@ import org.junit.runner.RunWith
 class ContactDetailsFragmentTest {
     @get:Rule
     var activityRule = ActivityScenarioRule(MainActivity::class.java)
+
+    @get:Rule
+    val permission = GrantPermissionRule.grant(
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION
+    )
 
     companion object {
         private lateinit var currContact: Contact
@@ -192,16 +203,11 @@ class ContactDetailsFragmentTest {
         Intents.release()
     }
 
-    /*
-        @Test
-        fun buttonShowDestination() {
-            onView(withId(R.id.show_all_button)).perform(click())
-            val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-            if (LocationUtils.hasLocationPopUp()) {
-                device.findObject(UiSelector().textContains(LocationUtils.buttonTextAllow)).click()
-            }
-            val markers = device.wait(hasObject(By.descContains("Destination")), 5000L)
-            assertTrue(markers)
-        }
-        */
+    @Test
+    fun buttonShowDestination() {
+        onView(withId(R.id.show_all_button)).perform(click())
+        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        val markers = device.wait(hasObject(By.descContains("Destination")), 5000L)
+        assertTrue(markers)
+    }
 }

@@ -15,15 +15,15 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
-import com.github.factotum_sdp.factotum.preferencesDataStore
 import com.github.factotum_sdp.factotum.UserViewModel
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.models.Contact
-import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
+import com.github.factotum_sdp.factotum.preferencesDataStore
 import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
 import com.github.factotum_sdp.factotum.repositories.RoadBookRepository
 import com.github.factotum_sdp.factotum.roadBookDataStore
+import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.ui.settings.SettingsViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.*
@@ -262,7 +262,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         endShiftButton.setOnMenuItemClickListener {
             val dialogBuilder = AlertDialog.Builder(requireContext())
             dialogBuilder.setMessage(R.string.finish_shift_alert_question)
-                .setPositiveButton(R.string.end_shift) { dialog, _ ->
+                .setPositiveButton(R.string.end_shift) { _, _ ->
                     rbViewModel.recordsListState.let {
                         rbViewModel.makeShiftLog(userViewModel.loggedInUser.value!!)
                         Toast.makeText(
@@ -272,7 +272,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
                         ).show()
                     }
                 }
-                .setNegativeButton("Not now") { dialog, _ ->
+                .setNegativeButton(R.string.decline_end_shift) { dialog, _ ->
                     dialog.cancel()
                 }
             val alert = dialogBuilder.create()

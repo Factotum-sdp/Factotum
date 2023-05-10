@@ -47,7 +47,11 @@ class RoadBookFragment : Fragment(), MenuProvider {
             RoadBookRepository(
                 FirebaseInstance.getDatabase().reference.child(ROADBOOK_DB_PATH),
                 requireContext().roadBookDataStore
-            )
+            ),
+            ShiftRepository(
+                FirebaseInstance.getDatabase().reference.child(DELIVERY_LOG_DB_PATH),
+                requireContext().shiftDataStore
+            ),
         )
     }
 
@@ -92,29 +96,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
         setLiveLocationEvent()
 
-        setShiftRepository()
-
         return view
-    }
-
-    private fun setShiftRepository(){
-        if (userViewModel.loggedInUser.value != null){
-            if(rbViewModel.recordsListState.value != null) {
-                Log.i("RoadBookFragment", "Setting ShiftRepository")
-                val currentShift = Shift(
-                    Date(),
-                    userViewModel.loggedInUser.value!!,
-                    rbViewModel.recordsListState.value!!
-                )
-                rbViewModel.setShiftRepository(
-                    ShiftRepository(
-                        FirebaseInstance.getDatabase().reference.child(DELIVERY_LOG_DB_PATH),
-                        requireContext().shiftDataStore,
-                    )
-                )
-            } else Log.w("RoadBookFragment", "RecordsListState is null")
-        }
-        else Log.w("RoadBookFragment", "User not logged in")
     }
 
     override fun onPause() {
@@ -289,23 +271,21 @@ class RoadBookFragment : Fragment(), MenuProvider {
         endShiftButton.setOnMenuItemClickListener {
             val dialogBuilder = AlertDialog.Builder(requireContext())
             dialogBuilder.setMessage(R.string.finish_shift_alert_question)
-                .setPositiveButton(R.string.end_shift) { dialog, _ ->
-                    rbViewModel.recordsListState.let {
-                        if(userViewModel.loggedInUser.value == null) Log.w("RoadBookFragment", "User is null, cannot log shift")
-                        else {
+                .setPositiveButton(R.string.end_shift) { _, _ ->
+                    rbViewModel.recordsListState.value?.let { recordList ->
+                        userViewModel.loggedInUser.value?.let {user->
                             val currentShift = Shift(
-                                Date(),
-                                userViewModel.loggedInUser.value!!,
-                                it.value!!
-                            )
+                            Date(),
+                            user,
+                            recordList
+                        )
                             rbViewModel.logShift(currentShift)
                             Toast.makeText(
                                 requireContext(),
                                 R.string.shift_ended,
                                 Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
+                            ).show() } ?: Log.w("RoadBookFragment", "User is null, cannot log shift")
+                    } ?: Log.w("RoadBookFragment", "Record list is null, cannot log shift")
                 }
                 .setNegativeButton("Not now") { dialog, _ ->
                     dialog.cancel()

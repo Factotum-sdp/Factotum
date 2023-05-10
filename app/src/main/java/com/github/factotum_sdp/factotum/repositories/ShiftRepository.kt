@@ -2,13 +2,17 @@ package com.github.factotum_sdp.factotum.repositories
 
 import androidx.datastore.core.DataStore
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
+import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseDateFormatted
+import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseSafeString
+import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseTimeFormatted
 import com.github.factotum_sdp.factotum.models.Shift
-import com.github.factotum_sdp.factotum.models.Shift.Companion.shiftDbPathFromRoot
 import com.github.factotum_sdp.factotum.ui.roadbook.ShiftList
 import com.google.firebase.database.DatabaseReference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 
 /**
@@ -27,14 +31,13 @@ class ShiftRepository(private val remoteSource: DatabaseReference,
     private var backUpRef: DatabaseReference = remoteSource
     private var isConnectedToRemote = false
 
-    private var localShiftList: ShiftList = ShiftList(emptyList())
 
     init {
         FirebaseInstance.onConnectedStatusChanged {
             if(it) {
                 CoroutineScope(Dispatchers.IO).launch {
                     // Always synchronize the network back-up when connection is back
-                    setNetworkShiftList()
+                    setNetworkShiftList(getFromLocalSource())
                 }
 
             }
@@ -51,30 +54,41 @@ class ShiftRepository(private val remoteSource: DatabaseReference,
      * @param shift : Shift. The shift to log.
      */
     fun logShift(shift : Shift){
+        var localShiftList = runBlocking { getFromLocalSource() }
         if(!localShiftList.contains(shift))
             localShiftList = localShiftList.add(shift)
         CoroutineScope(Dispatchers.Default).launch {
-            addToLocalSource()
+            addToLocalSource(localShiftList)
         }
         if(isConnectedToRemote){
-            setNetworkShiftList()
+            setNetworkShiftList(localShiftList)
         }
     }
 
-    private suspend fun addToLocalSource(){
+    private suspend fun addToLocalSource(localShiftList: ShiftList){
         localSource.updateData {
             localShiftList
         }
     }
 
-    private fun setNetworkShiftList(){
-        val mapUserNbShift = mutableMapOf<String, Int>()
+    private fun setNetworkShiftList(localShiftList: ShiftList){
         localShiftList.forEach { shift ->
-            mapUserNbShift[shift.user.name] = (mapUserNbShift[shift.user.name] ?: 0) + 1
-            val nbShift = mapUserNbShift[shift.user.name]!!
-            shiftDbPathFromRoot(backUpRef, shift)
-                .child(nbShift.toString())
-                .setValue(shift)}
+            shiftDbPathFromRoot(shift)
+                .setValue(shift)
+        }
+    }
+
+    private suspend fun getFromLocalSource(): ShiftList{
+        return try{ localSource.data.first() }
+        catch (e: Exception){
+            ShiftList(emptyList())
+        }
+    }
+
+    private fun shiftDbPathFromRoot(shift: Shift): DatabaseReference {
+        return backUpRef.child(firebaseSafeString(shift.user.name))
+            .child(firebaseDateFormatted(shift.date))
+            .child(firebaseTimeFormatted(shift.date))
     }
 
 }

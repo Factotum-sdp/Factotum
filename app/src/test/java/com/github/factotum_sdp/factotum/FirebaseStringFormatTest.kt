@@ -31,4 +31,16 @@ class FirebaseStringFormatTest {
         val revertedDate = FirebaseStringFormat.firebaseParseDate(formattedDate)
         assertEquals(date, revertedDate)
     }
+
+    @Test
+    fun firebaseHourRevert(){
+        val calendar = Calendar.getInstance()
+        calendar.clear()
+        calendar.set(Calendar.HOUR, 10)
+        calendar.set(Calendar.MINUTE, 10)
+        val date = Date(calendar.timeInMillis)
+        val formattedDate = FirebaseStringFormat.firebaseTimeFormatted(date)
+        val revertedDate = FirebaseStringFormat.firebaseParseTime(formattedDate)
+        assertEquals(date.time, revertedDate!!.time)
+    }
 }

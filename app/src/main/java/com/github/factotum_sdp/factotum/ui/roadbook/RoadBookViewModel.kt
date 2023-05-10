@@ -18,15 +18,13 @@ import java.util.*
  *
  * @param _dbRef The database root reference to register RoadBook data
  */
-class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : ViewModel() {
+class RoadBookViewModel(private val roadBookRepository: RoadBookRepository, private val shiftRepository: ShiftRepository) : ViewModel() {
 
     private val _recordsList: MutableLiveData<DRecordList> = MutableLiveData(DRecordList())
     val recordsListState: LiveData<DRecordList> = _recordsList
 
     private val clientOccurrences = HashMap<String, Int>()
     private lateinit var preferencesRepository: RoadBookPreferencesRepository
-
-    private var _shiftRepository : ShiftRepository? = null
 
     init {
         addDemoRecords(DestinationRecords.RECORDS)
@@ -74,21 +72,12 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : Vi
     }
 
     /**
-     * Sets the current shiftRepository
-     *
-     * @param shiftRepository
-     */
-    fun setShiftRepository(shiftRepository: ShiftRepository){
-        _shiftRepository = shiftRepository
-    }
-
-    /**
      * Log the current deliveries to the database if
      *
      */
     fun logShift(shift: Shift){
         val shift = Shift(Date(), shift.user, currentDRecList())
-        _shiftRepository?.logShift(shift)
+        shiftRepository?.logShift(shift)
     }
 
     /**
@@ -328,12 +317,13 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : Vi
     }
 
     // Factory needed to assign a value at construction time to the class attribute
-    class RoadBookViewModelFactory(private val repository: RoadBookRepository) :
+    @Suppress("UNCHECKED_CAST")
+    class RoadBookViewModelFactory(private val repository: RoadBookRepository, private val shiftRepository: ShiftRepository) :
         ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return modelClass
-                .getConstructor(RoadBookRepository::class.java)
-                .newInstance(repository)
+            if (modelClass.isAssignableFrom(RoadBookViewModel::class.java))
+                return RoadBookViewModel(repository, shiftRepository) as T
+            throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
 }

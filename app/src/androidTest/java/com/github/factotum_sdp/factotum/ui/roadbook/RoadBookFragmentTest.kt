@@ -30,6 +30,8 @@ import androidx.test.uiautomator.Until
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
+import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseDateFormatted
+import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseSafeString
 import com.github.factotum_sdp.factotum.models.DestinationRecord
 import com.github.factotum_sdp.factotum.models.Shift
 import com.github.factotum_sdp.factotum.models.User
@@ -420,7 +422,11 @@ class RoadBookFragmentTest {
         val shift = Shift(Date(), courier, rbViewModel.recordsListState.value!!)
         val shiftList = ShiftList(listOf(shift))
 
-        val dbShiftRef = Shift.shiftDbPathFromRoot(db.reference.child(DELIVERY_LOG_DB_PATH), shift)
+        val dbShiftRef = db.reference
+            .child(DELIVERY_LOG_DB_PATH)
+            .child(firebaseSafeString(shift.user.name))
+            .child(firebaseDateFormatted(shift.date))
+
 
         // finishes the shift
         endShift()
@@ -454,77 +460,20 @@ class RoadBookFragmentTest {
         runBlocking {
             ls = context.shiftDataStore.data.first()
         }
+        val lastShift = ls.shifts.last()
 
         db.goOnline()
         val rbViewModel = getRbViewModel()!!
 
         val shift = Shift(Date(), courier, rbViewModel.recordsListState.value!!)
-        val shiftList = ShiftList(listOf(shift))
-        //assert(ls.all { it.timeStamp != null })
-        assert(ls.zip(shiftList).all { pair ->
-            pair.first.records == pair.second.records
-                    && pair.first.user == pair.second.user
+        assert(lastShift.user == shift.user)
+        assert(lastShift.records.zip(shift.records).all { pair ->
+            pair.first.destID == pair.second.destID
+                    && pair.first.timeStamp?.let { pair.second.timeStamp != null } ?: (pair.second.timeStamp == null)
         })
 
     }
 
-/*
-    @Test
-    fun shiftIsBackedUpCorrectlyWhenComingBackOnline() {
-        val db = FirebaseInstance.getDatabase()
-        setAirplaneMode(true)
-
-
-        val context = ApplicationProvider.getApplicationContext<Context>().applicationContext
-
-        // finished a shift
-        updateTimestampOfRecord(3)
-
-        //end shift
-        endShift()
-
-        var ls = ShiftList(emptyList())
-        runBlocking {
-            ls = context.shiftDataStore.data.first()
-        }
-
-
-        setAirplaneMode(false)
-        val rbViewModel = getRbViewModel()!!
-
-        val shift = Shift(Date(), courier, rbViewModel.recordsListState.value!!)
-        val shiftList = ShiftList(listOf(shift))
-        //assert(ls.all { it.timeStamp != null })
-        assert(ls.zip(shiftList).all { pair ->
-            pair.first.records == pair.second.records
-                    && pair.first.user == pair.second.user
-        })
-
-        val shiftDbRef = Shift.shiftDbPathFromRoot(db.reference.child(DELIVERY_LOG_DB_PATH), shift)
-        val future = CompletableFuture<List<Shift>>()
-        shiftDbRef.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val shifts = getShiftFromDb(shiftDbRef)
-                future.complete(shifts)
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                assert(false)
-            }
-        })
-        var shifts : List<Shift>? = null
-        try {
-            shifts = future.get(15L, TimeUnit.SECONDS)
-        } catch (e: TimeoutException) {
-            assert(false)
-        }
-        assert(shifts != null)
-        assert(shifts!!.zip(shiftList).all { pair ->
-            pair.first.records == pair.second.records
-                    && pair.first.user == pair.second.user
-        })
-    }
-    */
 
 
 

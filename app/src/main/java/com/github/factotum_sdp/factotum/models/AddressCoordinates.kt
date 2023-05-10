@@ -74,7 +74,6 @@ class AddressCoordinates {
             } else {
                 Log.e("Location", "SDK < TIRAMISU")
                 return null
-                //resultHandler(query, geocoder, context)
             }
         }
 
@@ -109,21 +108,7 @@ class AddressCoordinates {
             }
             return listToReturn
         }
-/* For now do not need backward handling anymore
-        private fun resultHandler(query: String, geocoder: Geocoder, context: Context): List<AddressCoordinates>? {
-            val result = CompletableFuture<List<AddressCoordinates>?>()
-            try {
-                val geocodeResult = geocoder.getFromLocationName(query, MAX_RESULT)
-                val queryResults =
-                    if (geocodeResult == null || geocodeResult.isEmpty()) null else geocodeResult.map { address ->
-                        AddressCoordinates(address.getAddressLine(0), LatLng(address.latitude, address.longitude), context, false) }
-                result.complete(queryResults)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            return result.get(1L, java.util.concurrent.TimeUnit.SECONDS)
-        }
-*/
+
         private fun isNetworkAvailable(context: Context): Boolean {
             val connectivityManager = context.getSystemService(ConnectivityManager::class.java)
             val currentNetwork = connectivityManager?.activeNetwork ?: return false

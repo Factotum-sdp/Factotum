@@ -24,7 +24,7 @@ import com.google.android.material.snackbar.Snackbar
 
 class LoginFragment : Fragment() {
 
-    private lateinit var viewModel: LoginViewModel
+    private val viewModel: LoginViewModel by activityViewModels()
     private var _binding: FragmentLoginBinding? = null
 
     private val userViewModel: UserViewModel by activityViewModels()
@@ -45,9 +45,9 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val logVMFact = LoginViewModel.LoginViewModelFactory(userViewModel)
-        viewModel =
-            ViewModelProvider(this, logVMFact)[LoginViewModel::class.java]
+        //val logVMFact = LoginViewModel.LoginViewModelFactory(userViewModel)
+        //viewModel =
+        //    ViewModelProvider(this, logVMFact)[LoginViewModel::class.java]
 
         // Define the UI elements
         val emailEditText = binding.email

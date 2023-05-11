@@ -11,6 +11,7 @@ import com.github.factotum_sdp.factotum.models.User
 class LoginRepository(private val dataSource: LoginDataSource) {
 
     // in-memory cache of the loggedInUser object
+    private var uid: String? = null
     private var user: User? = null
 
     init {
@@ -23,7 +24,20 @@ class LoginRepository(private val dataSource: LoginDataSource) {
         return dataSource.login(userEmail, password)
     }
 
-    fun retrieveUser(uid: String): Result<User> {
+    fun isLoggedIn(): Boolean {
+        return user != null
+    }
+
+    fun getLoggedInUser(): User? {
+        return user
+    }
+
+    fun logout() {
+        user = null
+        dataSource.logout()
+    }
+
+    fun retrieveUserFromDB(uid: String): Result<User> {
         val result = dataSource.retrieveUser(uid)
 
         if (result is Result.Success) {

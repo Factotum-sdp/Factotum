@@ -14,7 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class LoginViewModel(private val userViewModel: UserViewModel) : ViewModel() {
+class LoginViewModel : ViewModel() {
 
     private var loginRepository: LoginRepository = LoginRepository(LoginDataSource())
     private val _loginForm = MutableLiveData<LoginFormState>()
@@ -27,6 +27,15 @@ class LoginViewModel(private val userViewModel: UserViewModel) : ViewModel() {
     val retrieveUsersResult: LiveData<RetrieveUserResult> = _retrieveUsersResult
 
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+
+    fun hasCachedUser(): User? {
+        val user = loginRepository.getLoggedInUser()
+        if (user != null) {
+            _loginResult.value = LoginResult(success = user.uid)
+            _retrieveUsersResult.value = RetrieveUserResult(success = user)
+        }
+        return user
+    }
 
     /**
      * Called when the login button is clicked.
@@ -44,11 +53,18 @@ class LoginViewModel(private val userViewModel: UserViewModel) : ViewModel() {
             }
         }
     }
+    fun getCurrentUser(): User? {
+        return loginRepository.getLoggedInUser()
+    }
+
+    fun logout() {
+        loginRepository.logout()
+    }
 
     fun retrieveUser(uid: String) {
         // launch in a separate asynchronous job
         viewModelScope.launch {
-            val result = withContext(dispatcher) { loginRepository.retrieveUser(uid) }
+            val result = withContext(dispatcher) { loginRepository.retrieveUserFromDB(uid) }
             if (result is Result.Success) {
                 _retrieveUsersResult.value =
                     RetrieveUserResult(

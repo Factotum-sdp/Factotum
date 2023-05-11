@@ -181,12 +181,13 @@ class SignUpFragment : Fragment() {
     private fun updateUi(model: String) {
         val welcome = getString(R.string.welcome) + " " + model
         Snackbar.make(requireView(), welcome, Snackbar.LENGTH_LONG).show()
-        val newUser = User(
-            binding.username.text.toString(),
-            binding.email.text.toString(),
-            Role.valueOf(binding.role.text.toString())
-        )
         val newUserUID = getAuth().currentUser?.uid ?: "no uid"
+        val newUser = User(
+            uid=newUserUID,
+            name=binding.username.text.toString(),
+            email=binding.email.text.toString(),
+            role=Role.valueOf(binding.role.text.toString())
+        )
         viewModel.updateUser(newUserUID, newUser)
     }
 

@@ -1,5 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.signup
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -48,7 +49,7 @@ class SignUpFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel =
-            ViewModelProvider(this, SignUpViewModelFactory())[SignUpViewModel::class.java]
+            ViewModelProvider(this, SignUpViewModelFactory(requireContext()))[SignUpViewModel::class.java]
 
         val usernameEditText = binding.username
         val emailEditText = binding.email
@@ -204,13 +205,13 @@ class SignUpFragment : Fragment() {
      * ViewModel provider factory to instantiate SignUpViewModel.
      * Required given SignUpViewModel has a non-empty constructor
      */
-    class SignUpViewModelFactory : ViewModelProvider.Factory {
+    class SignUpViewModelFactory (private val context: Context) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(SignUpViewModel::class.java)) {
                 return SignUpViewModel(
                     signUpDataSink = SignUpDataSink(),
-                    loginRepository = LoginRepository(LoginDataSource())
+                    loginRepository = LoginRepository(LoginDataSource(), context)
                 ) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")

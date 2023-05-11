@@ -18,7 +18,6 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
-import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getAuth
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getDatabase
 import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.repositories.SettingsRepository
@@ -27,7 +26,6 @@ import com.github.factotum_sdp.factotum.ui.login.LoginViewModel
 import com.github.factotum_sdp.factotum.ui.picture.UploadWorker
 import com.github.factotum_sdp.factotum.ui.settings.SettingsViewModel
 import com.google.android.material.navigation.NavigationView
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CoroutineScope
@@ -58,7 +56,9 @@ class MainActivity : AppCompatActivity() {
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
 
-        login = ViewModelProvider(this)[LoginViewModel::class.java]
+        val logVMFact = LoginViewModel.LoginViewModelFactory(applicationContext)
+        login =
+            ViewModelProvider(this, logVMFact)[LoginViewModel::class.java]
 
         contactsViewModel = ViewModelProvider(this)[ContactsViewModel::class.java]
         contactsViewModel.setDatabase(getDatabase())

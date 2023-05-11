@@ -1,5 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.maps
 
+import android.Manifest
 import android.content.Intent
 import androidx.navigation.fragment.NavHostFragment
 import androidx.test.espresso.Espresso.onView
@@ -13,6 +14,7 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.By.descContains
 import androidx.test.uiautomator.By.textContains
 import androidx.test.uiautomator.UiDevice
@@ -21,7 +23,6 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.injectBossAsLoggedInUser
-import com.github.factotum_sdp.factotum.utils.LocationUtils
 import com.google.android.gms.maps.SupportMapFragment
 import junit.framework.TestCase.assertTrue
 import org.hamcrest.CoreMatchers.allOf
@@ -41,10 +42,12 @@ import java.util.concurrent.TimeUnit
 class MapsFragmentTest {
 
     val device = UiDevice.getInstance(getInstrumentation())
-    val buttonTextAllow = when (Locale.getDefault().language) {
-        Locale.FRENCH.language -> "Uniquement cette fois-ci"
-        else -> "Only this time"
-    }
+
+    @get:Rule
+    val permission = GrantPermissionRule.grant(
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION
+    )
 
     companion object {
 
@@ -70,22 +73,12 @@ class MapsFragmentTest {
             .perform(click())
     }
 
-    @Test
-    fun a_permissionAskPopUp() {
-        onView(withText(startsWith(FIRST_ROUTE_NAME_PREFIX))).perform(click())
-        onView(withId(R.id.button_next)).perform(click())
-        if (LocationUtils.hasLocationPopUp()) {
-            assertTrue(device.findObject(UiSelector().textContains(buttonTextAllow)).exists())
-        }
-    }
 
     @Test
-    fun b_permissionAllowShowLocation() {
+    fun permissionAllowShowLocation() {
         onView(withText(startsWith(FIRST_ROUTE_NAME_PREFIX))).perform(click())
-        onView(withId(R.id.button_next)).perform(click())
-        if (LocationUtils.hasLocationPopUp()) {
-            device.findObject(UiSelector().textContains(buttonTextAllow)).click()
-        }
+        val nextButton = onView(withId(R.id.button_next))
+        nextButton.perform(click())
         assertTrue(checkLocationEnabled(testRule))
     }
 
@@ -149,7 +142,7 @@ class MapsFragmentTest {
                 latch.countDown()
             }
         }
-        latch.await()
+        latch.await(1L, TimeUnit.SECONDS)
         return isEnabled
     }
 

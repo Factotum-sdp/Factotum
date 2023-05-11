@@ -3,7 +3,7 @@ package com.github.factotum_sdp.factotum.data.localisation
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.factotum_sdp.factotum.models.Location
+import com.github.factotum_sdp.factotum.models.AddressCoordinates
 import com.github.factotum_sdp.factotum.models.Route
 import com.github.factotum_sdp.factotum.ui.maps.MapsViewModel
 import com.google.android.gms.maps.model.LatLng
@@ -119,10 +119,10 @@ class RouteTest {
     fun routeViewSetsLocation() {
         val mapView = MapsViewModel()
         val query = "Lausanne"
-        val location = Location(query, getApplicationContext())
-        mapView.setLocation(location)
-        assertEquals(location.coordinates!!.latitude, mapView.location.value!!.coordinates!!.latitude)
-        assertEquals(location.coordinates!!.longitude, mapView.location.value!!.coordinates!!.longitude)
+        val addressCoordinates = AddressCoordinates(query, getApplicationContext())
+        mapView.setLocation(addressCoordinates)
+        assertEquals(addressCoordinates.coordinates!!.latitude, mapView.addressCoordinates.value!!.coordinates!!.latitude)
+        assertEquals(addressCoordinates.coordinates!!.longitude, mapView.addressCoordinates.value!!.coordinates!!.longitude)
 
     }
 }

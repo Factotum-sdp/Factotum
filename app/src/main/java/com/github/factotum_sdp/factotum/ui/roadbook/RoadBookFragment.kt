@@ -287,7 +287,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
                             ).show() } ?: Log.w("RoadBookFragment", "User is null, cannot log shift")
                     } ?: Log.w("RoadBookFragment", "Record list is null, cannot log shift")
                 }
-                .setNegativeButton("Not now") { dialog, _ ->
+                .setNegativeButton(R.string.decline_end_shift) { dialog, _ ->
                     dialog.cancel()
                 }
             val alert = dialogBuilder.create()

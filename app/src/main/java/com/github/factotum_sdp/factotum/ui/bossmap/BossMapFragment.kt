@@ -9,10 +9,13 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.hasLocationPermission
 import com.github.factotum_sdp.factotum.models.CourierLocation
+import com.github.factotum_sdp.factotum.models.DeliveryStatus
+import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -29,6 +32,7 @@ private const val ZOOM_LEVEL_CITY = 14f
 class BossMapFragment : Fragment(), OnMapReadyCallback {
 
     private val viewModel: BossMapViewModel by viewModels()
+    private val contactsViewModel: ContactsViewModel by activityViewModels()
     private lateinit var mapView: MapView
     private lateinit var googleMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -75,6 +79,25 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
 
         viewModel.courierLocations.observe(viewLifecycleOwner) { locations ->
             updateMarkers(locations)
+        }
+
+        viewModel.deliveriesStatus.observe(viewLifecycleOwner) {
+            updateDestinationMarkers(it)
+        }
+
+        contactsViewModel.contacts.observe(viewLifecycleOwner) {
+            viewModel.updateContacts(it)
+        }
+    }
+
+    private fun updateDestinationMarkers(locations: List<DeliveryStatus>?) {
+        locations?.forEach { status ->
+            googleMap.addMarker(
+                MarkerOptions()
+                    .position(LatLng(status.latitude!!, status.longitude!!))
+                    .title(status.destID)
+                    .icon(if(status.timeStamp != null) BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN) else BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+            )
         }
     }
 

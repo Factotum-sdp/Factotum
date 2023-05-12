@@ -30,6 +30,7 @@ import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.randomCont
 import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.resetContact
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.logout
 import com.github.factotum_sdp.factotum.utils.LocationUtils
 import junit.framework.TestCase.assertTrue
 import org.hamcrest.CoreMatchers
@@ -60,6 +61,7 @@ class ContactDetailsFragmentTest {
             initFirebase()
             createRandomContacts(1)
             currContact = randomContacts[0]
+            logout()
         }
     }
 
@@ -89,7 +91,7 @@ class ContactDetailsFragmentTest {
     @Test
     fun deleteButtonIsNotDisplayedForACourier() {
         val user = UsersPlaceHolder.USER_COURIER
-        val loggedInUser = User(user.name, user.email, user.role)
+        val loggedInUser = User(user.uid, user.name, user.email, user.role)
         GeneralUtils.injectLoggedInUser(activityRule, loggedInUser)
         onView(withId(R.id.button_delete_contact))
             .check(doesNotExist())
@@ -98,7 +100,7 @@ class ContactDetailsFragmentTest {
     @Test
     fun deleteButtonIsNotDisplayedForAClient() {
         val user = UsersPlaceHolder.USER_CLIENT
-        val loggedInUser = User(user.name, user.email, user.role)
+        val loggedInUser = User(user.uid, user.name, user.email, user.role)
         GeneralUtils.injectLoggedInUser(activityRule, loggedInUser)
         onView(withId(R.id.button_delete_contact))
             .check(doesNotExist())

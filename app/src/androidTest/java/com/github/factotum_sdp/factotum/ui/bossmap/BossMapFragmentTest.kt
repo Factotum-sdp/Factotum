@@ -15,6 +15,7 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.logout
 import com.github.factotum_sdp.factotum.utils.LocationUtils
 import com.github.factotum_sdp.factotum.utils.LocationUtils.Companion.buttonTextAllow
 import kotlinx.coroutines.delay
@@ -40,6 +41,7 @@ class BossMapFragmentTest {
         @BeforeClass
         fun setUpClass() {
             initFirebase()
+            GeneralUtils.logout()
         }
     }
 

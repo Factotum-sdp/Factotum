@@ -20,6 +20,7 @@ import com.github.factotum_sdp.factotum.ui.display.utils.*
 import com.github.factotum_sdp.factotum.ui.picture.emptyFirebaseStorage
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.logout
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
@@ -67,6 +68,7 @@ class DisplayFragmentTest {
     fun tearDown() = runTest {
         launch { emptyFirebaseStorage(FirebaseStorage.getInstance().reference) }.join()
         Intents.release()
+        logout()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

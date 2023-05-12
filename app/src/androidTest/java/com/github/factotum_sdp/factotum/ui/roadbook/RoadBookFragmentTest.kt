@@ -91,9 +91,11 @@ class RoadBookFragmentTest {
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))
             .perform(click())
-        val courier = User(USER_COURIER.name,
-                           USER_COURIER.email,
-                           USER_COURIER.role)
+        val courier = User(
+                            USER_COURIER.uid,
+                            USER_COURIER.name,
+                            USER_COURIER.email,
+                            USER_COURIER.role)
         GeneralUtils.injectLoggedInUser(testRule, courier)
     }
 

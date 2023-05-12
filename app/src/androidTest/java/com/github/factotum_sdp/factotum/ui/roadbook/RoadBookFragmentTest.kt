@@ -1179,24 +1179,6 @@ class RoadBookFragmentTest {
         return future.get()
     }
 
-    private fun setAirplaneMode(state : Boolean){
-        val currentState = Settings.System.getInt(
-            getInstrumentation().context.contentResolver,
-            Settings.Global.AIRPLANE_MODE_ON, 0
-        )
-        if ((if (state) 1 else 0) == currentState
-        ) {
-            return
-        }
-        val device = UiDevice.getInstance(getInstrumentation())
-        device.openQuickSettings()
-        val description = By.desc("Airplane mode")
-        device.wait(Until.hasObject(description), 500)
-        device.findObject(description).click()
-        device.pressBack()
-        device.pressBack()
-    }
-
     class RecyclerViewItemCountAssertion(private val expectedCount: Int) : ViewAssertion {
         override fun check(view: View?, noViewFoundException: NoMatchingViewException?) {
             if (noViewFoundException != null) {

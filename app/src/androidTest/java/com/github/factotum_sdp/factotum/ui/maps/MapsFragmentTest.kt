@@ -2,6 +2,7 @@ package com.github.factotum_sdp.factotum.ui.maps
 
 import android.Manifest
 import android.content.Intent
+import android.util.Log
 import androidx.navigation.fragment.NavHostFragment
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
@@ -15,6 +16,7 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.GrantPermissionRule
+import androidx.test.uiautomator.By
 import androidx.test.uiautomator.By.descContains
 import androidx.test.uiautomator.By.textContains
 import androidx.test.uiautomator.UiDevice
@@ -23,7 +25,9 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.injectBossAsLoggedInUser
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.Polyline
 import junit.framework.TestCase.assertTrue
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.CoreMatchers.startsWith
@@ -51,7 +55,8 @@ class MapsFragmentTest {
 
     companion object {
 
-        val FIRST_ROUTE_NAME_PREFIX = "BC"
+        const val FIRST_ROUTE_NAME_PREFIX = "BC"
+
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {

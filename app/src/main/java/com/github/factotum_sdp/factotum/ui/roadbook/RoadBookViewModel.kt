@@ -3,10 +3,11 @@ package com.github.factotum_sdp.factotum.ui.roadbook
 import androidx.lifecycle.*
 import com.github.factotum_sdp.factotum.models.DestinationRecord
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
-import com.github.factotum_sdp.factotum.models.User
+import com.github.factotum_sdp.factotum.models.Shift
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
 import com.github.factotum_sdp.factotum.repositories.RoadBookRepository
+import com.github.factotum_sdp.factotum.repositories.ShiftRepository
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.*
@@ -17,7 +18,7 @@ import java.util.*
  *
  * @param _dbRef The database root reference to register RoadBook data
  */
-class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : ViewModel() {
+class RoadBookViewModel(private val roadBookRepository: RoadBookRepository, private val shiftRepository: ShiftRepository) : ViewModel() {
 
     private val _recordsList: MutableLiveData<DRecordList> = MutableLiveData(DRecordList())
     val recordsListState: LiveData<DRecordList> = _recordsList
@@ -71,6 +72,15 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : Vi
     }
 
     /**
+     * Log the current deliveries to the database if
+     *
+     */
+    fun logShift(shift: Shift){
+        val shift = Shift(Date(), shift.user, currentDRecList())
+        shiftRepository?.logShift(shift)
+    }
+
+    /**
      * Send the current recordsList data to the Database referenced at construction time
      */
     fun backUp() {
@@ -108,15 +118,6 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : Vi
         ls[currentDRecList().getIndexOf(record.destID)] = newRec
 
         _recordsList.postValue(currentDRecList().replaceDisplayedList(ls))
-    }
-    /**
-     * Create the final shift Log according to the current records state
-     * of this RoadBookViewModel
-     *
-     * @param loggedInUser: User
-     */
-    fun makeShiftLog(loggedInUser: User) {
-        roadBookRepository.makeShiftLog(currentDRecList(), loggedInUser)
     }
 
     /**
@@ -316,12 +317,13 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : Vi
     }
 
     // Factory needed to assign a value at construction time to the class attribute
-    class RoadBookViewModelFactory(private val repository: RoadBookRepository) :
+    @Suppress("UNCHECKED_CAST")
+    class RoadBookViewModelFactory(private val repository: RoadBookRepository, private val shiftRepository: ShiftRepository) :
         ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return modelClass
-                .getConstructor(RoadBookRepository::class.java)
-                .newInstance(repository)
+            if (modelClass.isAssignableFrom(RoadBookViewModel::class.java))
+                return RoadBookViewModel(repository, shiftRepository) as T
+            throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
 }

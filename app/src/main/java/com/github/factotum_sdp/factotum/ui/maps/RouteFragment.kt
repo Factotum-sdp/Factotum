@@ -14,8 +14,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.data.localisation.Location
 import com.github.factotum_sdp.factotum.databinding.FragmentRoutesBinding
+import com.github.factotum_sdp.factotum.models.AddressCoordinates
 import com.github.factotum_sdp.factotum.placeholder.RouteRecords.DUMMY_COURSE
 import com.github.factotum_sdp.factotum.placeholder.RouteRecords.DUMMY_ROUTE
 import com.google.android.material.snackbar.Snackbar
@@ -30,6 +30,7 @@ class RouteFragment : Fragment() {
         const val MAPS_PKG = "com.google.android.apps.maps"
         const val NO_RESULT = "No address found"
     }
+
     private var _binding: FragmentRoutesBinding? = null
     private val viewModel: MapsViewModel by activityViewModels()
 
@@ -58,19 +59,20 @@ class RouteFragment : Fragment() {
         setListenerSearch()
     }
 
-    private fun setListenerList(){
+    private fun setListenerList() {
         // instantiate fake data
         val listCourse = DUMMY_COURSE
         val listRoute = DUMMY_ROUTE
 
         val listView: ListView = binding.listViewRoutes
-        val adapter: ArrayAdapter<String?> = ArrayAdapter(requireContext(),
+        val adapter: ArrayAdapter<String?> = ArrayAdapter(
+            requireContext(),
             android.R.layout.simple_list_item_1,
             listCourse as List<String?>
         )
         listView.adapter = adapter
         adapter.notifyDataSetChanged()
-        listView.setOnItemClickListener{_, _, position, _ ->
+        listView.setOnItemClickListener { _, _, position, _ ->
             viewModel.addRoute(listRoute[position])
             viewModel.setRunRoute(listRoute[position])
             binding.buttonRun.visibility = Button.VISIBLE
@@ -78,15 +80,15 @@ class RouteFragment : Fragment() {
         }
     }
 
-    private fun setListenerButtons(){
+    private fun setListenerButtons() {
         binding.buttonNext.setOnClickListener {
             findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
         }
-        binding.buttonAll.setOnClickListener{
+        binding.buttonAll.setOnClickListener {
             viewModel.addAll(DUMMY_ROUTE)
             findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
         }
-        binding.buttonRun.setOnClickListener{
+        binding.buttonRun.setOnClickListener {
             val route = viewModel.runRouteState.value!!
             val googleMapsUrl = StringBuilder()
                 .append("http://maps.google.com/maps?")
@@ -102,18 +104,19 @@ class RouteFragment : Fragment() {
         }
     }
 
-    private fun setListenerSearch(){
+    private fun setListenerSearch() {
         binding.searchBar.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
             override fun onQueryTextSubmit(query: String?): Boolean {
                 if (query != null) {
-                    val location = Location.createAndStore(query, requireContext())
-                    if (location != null) viewModel.setLocation(location)
-                    val toShow = viewModel.location.value?.address?.toString() ?: NO_RESULT
+                    val addressCoordinates = AddressCoordinates(query, requireContext())
+                    if (addressCoordinates.isComplete()) viewModel.setLocation(addressCoordinates)
+                    val toShow = viewModel.addressCoordinates.value?.addressName ?: NO_RESULT
                     Snackbar.make(requireView(), toShow, Snackbar.LENGTH_LONG).show()
                 }
                 return true
             }
+
             override fun onQueryTextChange(newText: String?): Boolean {
                 return false
             }

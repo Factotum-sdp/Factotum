@@ -8,34 +8,31 @@ import android.view.ViewGroup
 import android.widget.SearchView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.placeholder.ContactsList
+import com.github.factotum_sdp.factotum.UserViewModel
+import com.github.factotum_sdp.factotum.models.Role
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.firebase.database.FirebaseDatabase
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 
 class DirectoryFragment : Fragment() {
 
-    private val mainScope = MainScope()
-    private lateinit var db: FirebaseDatabase
     private lateinit var adapter: ContactsRecyclerAdapter
+    private val viewModel: ContactsViewModel by activityViewModels()
+    private val userViewModel: UserViewModel by activityViewModels()
     private lateinit var emptyContactsMessage: TextView
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        db = MainActivity.getDatabase()
+    companion object {
+        const val USERNAME_NAV_KEY = "username"
+        const val IS_SUB_FRAGMENT_NAV_KEY = "isSubFragment"
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        ContactsList.init(db)
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_contacts, container, false)
     }
@@ -44,39 +41,46 @@ class DirectoryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+        adapter = ContactsRecyclerAdapter()
+        adapter.updateContacts(viewModel.contacts.value ?: emptyList())
+
+        viewModel.contacts.observe(viewLifecycleOwner) { contacts ->
+            adapter.updateContacts(contacts)
+        }
+
         val createContactButton = view.findViewById<FloatingActionButton>(R.id.add_contact_button)
-        createContactButton.setOnClickListener{
-            it.findNavController().navigate(R.id.action_directoryFragment_to_contactCreationFragment)
+        if (userViewModel.loggedInUser.value?.role == Role.COURIER) {
+            createContactButton.visibility = View.GONE
+        }
+        createContactButton.setOnClickListener {
+            it.findNavController()
+                .navigate(R.id.action_directoryFragment_to_contactCreationFragment)
         }
 
-        // Load contacts from local storage
-        ContactsList.loadContactsLocally(requireContext())
+        val recycler =
+            view.findViewById<RecyclerView>(R.id.contacts_recycler_view) // connect the recycler view to the layout
+        val searchView =
+            view.findViewById<SearchView>(R.id.contacts_search_view) // connect the search view to the layout
 
-        // Sync contacts from Firebase when connected to the internet
-        mainScope.launch {
-            ContactsList.syncContactsFromFirebase(requireContext())
-        }
-
-        val recycler = view.findViewById <RecyclerView>(R.id.contacts_recycler_view) // connect the recycler view to the layout
-        val searchView = view.findViewById <SearchView>(R.id.contacts_search_view) // connect the search view to the layout
-        emptyContactsMessage = view.findViewById(R.id.empty_contacts_message)
-
-        adapter = ContactsRecyclerAdapter(ContactsList.getItems())
         //the recycler is just the way we chose to represent the list of contacts
         recycler.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = this@DirectoryFragment.adapter
         }
 
-        adapter.onDataSetChangedListener = object : ContactsRecyclerAdapter.OnDataSetChangedListener {
-            override fun onDataSetChanged(itemCount: Int) {
-                emptyContactsMessage.visibility = if (itemCount == 0) View.VISIBLE else View.GONE
+        emptyContactsMessage = view.findViewById(R.id.empty_contacts_message)
+
+        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onChanged() {
+                super.onChanged()
+                emptyContactsMessage.visibility =
+                    if (adapter.itemCount == 0) View.VISIBLE else View.GONE
             }
-        }
+        })
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                // You can handle the search submission here if needed
                 return false
             }
 
@@ -86,12 +90,5 @@ class DirectoryFragment : Fragment() {
                 return true
             }
         })
-    }
-
-    override fun onPause() {
-        super.onPause()
-
-        // Save contacts to local storage when the app is paused
-        ContactsList.saveContactsLocally(requireContext())
     }
 }

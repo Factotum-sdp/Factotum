@@ -1,23 +1,38 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
 import android.os.Bundle
-import android.view.*
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.data.DestinationRecord
-import androidx.appcompat.widget.Toolbar
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment
-import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
+import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.models.DestinationRecord
+import com.github.factotum_sdp.factotum.models.Route
+import com.github.factotum_sdp.factotum.ui.directory.ContactDetailsFragment
+import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
+import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment.Companion.IS_SUB_FRAGMENT_NAV_KEY
+import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment.Companion.USERNAME_NAV_KEY
+import com.github.factotum_sdp.factotum.ui.maps.MapsFragment
+import com.github.factotum_sdp.factotum.ui.maps.MapsViewModel
 import com.github.factotum_sdp.factotum.ui.picture.PictureFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
-class DRecordDetailsFragment: Fragment() {
+/**
+ * The container fragment which display all the details of a DestinationRecord
+ *
+ * The sliding event shows different fragments related to the DestinationRecord
+ */
+class DRecordDetailsFragment : Fragment() {
 
     private val rbViewModel: RoadBookViewModel by activityViewModels()
+    private val mapsViewModel: MapsViewModel by activityViewModels()
+    private val contactsViewModel: ContactsViewModel by activityViewModels()
     private lateinit var rec: DestinationRecord
     private lateinit var viewPager: ViewPager2
     override fun onCreateView(
@@ -33,15 +48,9 @@ class DRecordDetailsFragment: Fragment() {
         }
 
         val toolbar = requireActivity().findViewById<Toolbar>(R.id.toolbar)
-        toolbar.setTitle("Dest. Record : $destID")
+        toolbar.title = "Dest. Record : $destID"
 
-        viewPager = view.findViewById(R.id.viewPager)
-        val adapter = DetailsFragmentsAdapter(this)
-        adapter.addFragment(DRecordInfoFragment(rec))
-        adapter.addFragment(RouteFragment())
-        adapter.addFragment(DirectoryFragment()) // To be replaced with ContactDetailsFragment()
-        adapter.addFragment(PictureFragment(rec.clientID))
-        viewPager.adapter = adapter
+        pagerSetup(view)
 
         return view
     }
@@ -55,6 +64,7 @@ class DRecordDetailsFragment: Fragment() {
             tab.setIcon(tabFrag.iconID)
         }.attach()
     }
+
     enum class TabFragment(val iconID: Int) {
         INFO(R.drawable.ic_info),
         MAPS(R.drawable.ic_map),
@@ -62,16 +72,55 @@ class DRecordDetailsFragment: Fragment() {
         PICTURE(R.drawable.ic_menu_camera)
     }
 
+    private fun pagerSetup(view: View) {
+        viewPager = view.findViewById(R.id.viewPager)
+        val adapter = DetailsFragmentsAdapter(this)
 
-    class DetailsFragmentsAdapter(fragment: Fragment): FragmentStateAdapter(fragment) {
+        val detailsFragment = ContactDetailsFragment::class.java.newInstance()
+        detailsFragment.arguments = Bundle().apply {
+            putString(USERNAME_NAV_KEY, rec.clientID)
+            putBoolean(IS_SUB_FRAGMENT_NAV_KEY, true)
+        }
+
+        contactsViewModel.contacts.value?.apply {
+            try {
+                val currentContact = first { c -> c.username == rec.clientID }
+                if (currentContact.hasCoordinates()) {
+                    mapsViewModel.addRoute(
+                        Route(
+                            0.0, //Should be the current location
+                            0.0,
+                            currentContact.latitude ?: 0.0,
+                            currentContact.longitude ?: 0.0
+                        )
+                    )
+                }
+            } catch (e: NoSuchElementException) {
+                // Handle the exception here
+                Log.e("Error", "Could not find contact with ID ${rec.clientID}")
+            }
+        }
+
+        adapter.addFragment(DRecordInfoFragment(rec))
+        adapter.addFragment(MapsFragment())
+        adapter.addFragment(detailsFragment)
+        adapter.addFragment(PictureFragment(rec.clientID))
+
+        viewPager.adapter = adapter
+    }
+
+
+    class DetailsFragmentsAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
         private val fragments: MutableList<Fragment> = mutableListOf()
 
         fun addFragment(fragment: Fragment) {
             fragments.add(fragment)
         }
+
         override fun getItemCount(): Int {
             return fragments.size
         }
+
         override fun createFragment(position: Int): Fragment {
             return fragments[position]
         }

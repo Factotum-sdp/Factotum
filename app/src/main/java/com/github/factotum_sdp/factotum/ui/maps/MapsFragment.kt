@@ -11,8 +11,9 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
-import com.github.factotum_sdp.factotum.data.localisation.Route
 import com.github.factotum_sdp.factotum.databinding.FragmentMapsBinding
+import com.github.factotum_sdp.factotum.hasLocationPermission
+import com.github.factotum_sdp.factotum.models.Route
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
@@ -33,12 +34,13 @@ class MapsFragment : Fragment() {
 
     private var _binding: FragmentMapsBinding? = null
     private val viewModel: MapsViewModel by activityViewModels()
-    private lateinit var mMap : GoogleMap
+    private lateinit var mMap: GoogleMap
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ){ isGranted ->
-        if (isGranted){
-            checkAndActivateLocation()
+    ) { isGranted ->
+        if (isGranted) {
+            requireContext().hasLocationPermission()
+            activateLocation(mMap)
         }
     }
 
@@ -73,14 +75,28 @@ class MapsFragment : Fragment() {
         }
     }
 
-    private fun initMapLocation(googleMap: GoogleMap){
-        if (!checkAndActivateLocation()){
+    private fun initMapLocation(googleMap: GoogleMap) {
+        if (!requireContext().hasLocationPermission()) {
             requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
-        googleMap.uiSettings.isMyLocationButtonEnabled = true
+        activateLocation(googleMap)
     }
 
-    private fun initMapUI(googleMap: GoogleMap){
+    private fun activateLocation(googleMap: GoogleMap) {
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            mMap.isMyLocationEnabled = true
+            googleMap.uiSettings.isMyLocationButtonEnabled = true
+        }
+    }
+
+    private fun initMapUI(googleMap: GoogleMap) {
         // clears map from previous markers
         googleMap.clear()
 
@@ -112,21 +128,6 @@ class MapsFragment : Fragment() {
             ?: CameraUpdateFactory.newLatLngZoom(EPFL_LOC, 8f)
 
         googleMap.moveCamera(cuf)
-    }
-
-    private fun checkAndActivateLocation() :Boolean{
-        if (ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            mMap.isMyLocationEnabled = true
-            return true
-        }
-        return false
     }
 
     override fun onDestroyView() {

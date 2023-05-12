@@ -1,17 +1,23 @@
 package com.github.factotum_sdp.factotum.ui.display.utils
 
 import android.content.Context
+import android.view.View
+import androidx.recyclerview.widget.RecyclerView
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.contrib.DrawerActions.open
+import androidx.test.espresso.matcher.BoundedMatcher
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.ktx.storage
 import com.google.firebase.storage.UploadTask
+import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.suspendCancellableCoroutine
-import java.util.concurrent.CountDownLatch
+import org.hamcrest.Description
+import org.hamcrest.Matcher
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import com.github.factotum_sdp.factotum.R
 
-const val WAIT_TIME_REFRESH = 1000L
-const val WAIT_TIME_INIT = 1000L
 const val TEST_IMAGE_PATH1 = "USER_25-03-2023_17-57-11.jpg"
 const val TEST_IMAGE_PATH2 = "USER_26-03-2023_17-57-11.jpg"
 const val TEST_IMAGE_PATH3 = "test_image3.jpg"
@@ -19,11 +25,12 @@ const val TEST_IMAGE_PATH4 = "test_image4.jpg"
 
 suspend fun uploadImageToStorageEmulator(
     context: Context,
+    folderName: String,
     imagePath: String,
     storagePath: String
 ): UploadTask.TaskSnapshot = suspendCancellableCoroutine { continuation ->
     try {
-        val storageReference = Firebase.storage.reference.child(storagePath)
+        val storageReference = Firebase.storage.reference.child("${folderName}/${storagePath}")
         val inputStream = context.assets.open(imagePath)
 
         val uploadTask = storageReference.putStream(inputStream)
@@ -41,28 +48,21 @@ suspend fun uploadImageToStorageEmulator(
     }
 }
 
-fun emptyStorageEmulator(storageRef : StorageReference) {
-    // Empty Firebase Storage
-    val latch = CountDownLatch(1)
+fun hasItemCount(count: Int): Matcher<View> {
+    return object : BoundedMatcher<View, RecyclerView>(RecyclerView::class.java) {
+        override fun describeTo(description: Description?) {
+            description?.appendText("Expected item count: $count")
+        }
 
-    storageRef.listAll().addOnSuccessListener { listResult ->
-        val itemsCount = listResult.items.size
-
-        if (itemsCount == 0) {
-            latch.countDown()
-        } else {
-            listResult.items.forEach { item ->
-                item.delete().addOnSuccessListener {
-                    if (latch.count - 1 == 0L) {
-                        latch.countDown()
-                    } else {
-                        latch.countDown()
-                    }
-                }
-            }
+        override fun matchesSafely(recyclerView: RecyclerView?): Boolean {
+            return recyclerView?.adapter?.itemCount == count
         }
     }
+}
 
-    // Wait for all files to be deleted before proceeding to the next test
-    latch.await()
+fun goToDisplayFragment() {
+    onView(withId(R.id.drawer_layout))
+        .perform(open())
+    onView(withId(R.id.displayFragment))
+        .perform(click())
 }

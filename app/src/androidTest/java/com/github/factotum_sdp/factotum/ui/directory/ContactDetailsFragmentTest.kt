@@ -1,33 +1,39 @@
 package com.github.factotum_sdp.factotum.ui.directory
 
+import android.Manifest
 import android.content.Intent
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
-import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
 import androidx.test.uiautomator.Until.hasObject
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.placeholder.ContactsList
+import com.github.factotum_sdp.factotum.models.Contact
+import com.github.factotum_sdp.factotum.models.User
+import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
-import com.github.factotum_sdp.factotum.utils.ContactsUtils
+import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.createRandomContacts
+import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.randomContacts
+import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.resetContact
+import com.github.factotum_sdp.factotum.utils.GeneralUtils
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.LocationUtils
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import junit.framework.TestCase.assertTrue
-import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers
+import org.hamcrest.Matchers.equalToIgnoringCase
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -39,59 +45,93 @@ class ContactDetailsFragmentTest {
     @get:Rule
     var activityRule = ActivityScenarioRule(MainActivity::class.java)
 
+    @get:Rule
+    val permission = GrantPermissionRule.grant(
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION
+    )
+
     companion object {
+        private lateinit var currContact: Contact
+
         @BeforeClass
         @JvmStatic
-        fun setUpDatabase() {
-            val database = Firebase.database
-            database.useEmulator("10.0.2.2", 9000)
-            MainActivity.setDatabase(database)
-
-            ContactsUtils.emptyFirebaseDatabase(database)
-
-            ContactsList.init(database)
-
-            runBlocking {
-                ContactsList.populateDatabase()
-            }
+        fun setUp() {
+            initFirebase()
+            createRandomContacts(1)
+            currContact = randomContacts[0]
         }
     }
 
     @Before
     fun goToContactDetails() {
+        GeneralUtils.injectBossAsLoggedInUser(activityRule)
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.directoryFragment))
             .perform(click())
-        onView(withId(R.id.contacts_recycler_view))
-            .perform(RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(0, click()))
+        onView(withText("@" + currContact.username))
+            .perform(click())
     }
 
     @Test
-    fun buttonIsDisplayed() {
-        onView(withId(R.id.button))
+    fun modifyButtonIsDisplayed() {
+        onView(withId(R.id.button_modify_contact))
             .check(matches(isDisplayed()))
     }
 
     @Test
-    fun buttonIsClickable() {
-        onView(withId(R.id.button))
+    fun deleteButtonIsDisplayedForABoss() {
+        onView(withId(R.id.button_delete_contact))
+            .check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun deleteButtonIsNotDisplayedForACourier() {
+        val user = UsersPlaceHolder.USER_COURIER
+        val loggedInUser = User(user.name, user.email, user.role)
+        GeneralUtils.injectLoggedInUser(activityRule, loggedInUser)
+        onView(withId(R.id.button_delete_contact))
+            .check(doesNotExist())
+    }
+
+    @Test
+    fun deleteButtonIsNotDisplayedForAClient() {
+        val user = UsersPlaceHolder.USER_CLIENT
+        val loggedInUser = User(user.name, user.email, user.role)
+        GeneralUtils.injectLoggedInUser(activityRule, loggedInUser)
+        onView(withId(R.id.button_delete_contact))
+            .check(doesNotExist())
+    }
+
+    @Test
+    fun modifyButtonIsClickable() {
+        onView(withId(R.id.button_modify_contact))
             .perform(click())
+    }
+
+    @Test
+    fun deleteButtonIsClickable() {
+        onView(withId(R.id.button_delete_contact))
+            .perform(click())
+        resetContact(currContact)
     }
 
     @Test
     fun correctInfoIsDisplayed() {
         onView(withId(R.id.contact_name))
-            .check(matches(withText(ContactsList.getItems()[0].name)))
+            .check(matches(withText(currContact.name)))
+        onView(withId(R.id.contact_surname))
+            .check(matches(withText(currContact.surname)))
         onView(withId(R.id.contact_phone))
-            .check(matches(withText(ContactsList.getItems()[0].phone)))
+            .check(matches(withText(currContact.phone)))
         onView(withId(R.id.contact_role))
-            .check(matches(withText(ContactsList.getItems()[0].role)))
+            .check(matches(withText(equalToIgnoringCase(currContact.role))))
         onView(withId(R.id.contact_address))
-            .check(matches(withText(ContactsList.getItems()[0].address)))
-        if (ContactsList.getItems()[0].details != null) {
+            .check(matches(withText(currContact.addressName)))
+        if (currContact.details != null) {
             onView(withId(R.id.contact_details))
-                .check(matches(withText(ContactsList.getItems()[0].details)))
+                .check(matches(withText(currContact.details)))
         }
     }
 
@@ -102,18 +142,55 @@ class ContactDetailsFragmentTest {
     }
 
     @Test
-    fun buttonReturnsToContacts() {
-        onView(withId(R.id.button))
+    fun superClientIsntDisplayedWithBossContact() {
+        onView(withId(R.id.contact_role))
+            .check(matches(withText("Boss")))
+        onView(withId(R.id.managing_client_shown))
+            .check(matches(withEffectiveVisibility(Visibility.GONE)))
+    }
+
+    @Test
+    fun modifyButtonGoesToContactEdition() {
+        onView(withId(R.id.button_modify_contact))
             .perform(click())
-        onView(withId(R.id.contacts_recycler_view))
+        onView(withId(R.id.contact_creation_fragment))
             .check(matches(isDisplayed()))
     }
 
     @Test
-    fun buttonRunOpensGoogleMaps(){
+    fun deleteButtonReturnsToContacts() {
+        onView(withId(R.id.button_delete_contact))
+            .perform(click())
+        onView(withId(R.id.contacts_recycler_view))
+            .check(matches(isDisplayed()))
+        resetContact(currContact)
+    }
+
+    @Test
+    fun deleteButtonDeletesContact() {
+        onView(withId(R.id.button_delete_contact))
+            .perform(click())
+        onView(withId(R.id.contacts_recycler_view))
+            .check(matches(isDisplayed()))
+        //check if size of recycler view is 4
+        onView(withId(R.id.contacts_recycler_view))
+            .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
+            .check { view, noViewFoundException ->
+                if (noViewFoundException != null) {
+                    throw noViewFoundException
+                }
+                val recyclerView = view as RecyclerView
+                val adapter = recyclerView.adapter
+                assert(adapter?.itemCount == 4)
+            }
+        resetContact(currContact)
+    }
+
+    @Test
+    fun buttonRunOpensGoogleMaps() {
         Intents.init()
         onView(withId(R.id.run_button)).perform(click())
-        if(LocationUtils.hasLocationPopUp()){
+        if (LocationUtils.hasLocationPopUp()) {
             val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
             device.findObject(UiSelector().textContains(LocationUtils.buttonTextAllow)).click()
         }
@@ -127,12 +204,8 @@ class ContactDetailsFragmentTest {
     }
 
     @Test
-    fun buttonShowDestination(){
+    fun buttonShowDestination() {
         onView(withId(R.id.show_all_button)).perform(click())
-        if(LocationUtils.hasLocationPopUp()){
-            val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-            device.findObject(UiSelector().textContains(LocationUtils.buttonTextAllow)).click()
-        }
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         val markers = device.wait(hasObject(By.descContains("Destination")), 5000L)
         assertTrue(markers)

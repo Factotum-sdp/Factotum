@@ -1,7 +1,7 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
-
-import com.github.factotum_sdp.factotum.data.DestinationRecord
-
+import com.github.factotum_sdp.factotum.models.DestinationRecord
+import java.lang.IllegalArgumentException
+import kotlinx.serialization.Serializable
 
 
 /**
@@ -10,18 +10,22 @@ import com.github.factotum_sdp.factotum.data.DestinationRecord
  * - Allows archived records management through a private field containing all the archived items
  * - Allows choice at construction time for the main List, whether it contains or not the archived records.
  */
-private fun displayedRecords(allRecords: List<DestinationRecord>,
-                             archived: List<DestinationRecord>,
-                             showArchived: Boolean): List<DestinationRecord> {
+private fun displayedRecords(
+    allRecords: List<DestinationRecord>,
+    archived: List<DestinationRecord>,
+    showArchived: Boolean
+): List<DestinationRecord> {
     if (showArchived)
         return allRecords
     return allRecords.minus(archived.toSet())
 }
 
-class DRecordList(private val allRecords: List<DestinationRecord> = listOf(),
-                  private val archived: List<DestinationRecord> = listOf(),
-                  private val showArchived: Boolean = false)
-    : List<DestinationRecord> by displayedRecords(allRecords, archived, showArchived) {
+@Serializable
+class DRecordList(
+    private val allRecords: List<DestinationRecord> = listOf(),
+    private val archived: List<DestinationRecord> = listOf(),
+    val showArchived: Boolean = false
+) : List<DestinationRecord> by displayedRecords(allRecords, archived, showArchived) {
 
     private val archivedSet = archived.toSet() // For performance
 
@@ -36,6 +40,34 @@ class DRecordList(private val allRecords: List<DestinationRecord> = listOf(),
     }
 
     /**
+     * Retrieve the index of the DestinationRecord with id "destID"
+     *
+     * @param destID: String
+     * @return The destination index
+     * @throws IllegalArgumentException when "destID" is not contained in the current main List
+     */
+    fun getIndexOf(destID: String): Int {
+        try {
+            return this.indexOfFirst { dRec -> dRec.destID == destID }
+        } catch (e: NoSuchElementException) {
+            throw IllegalArgumentException()
+        }
+    }
+
+    /**
+     * Get the next destination to deliver
+     *
+     * @return DestinationRecord or null when all Destination are already visited
+     */
+    fun getNextDestinationRecord(): DestinationRecord? {
+        return try {
+            this.first { dRec -> dRec.timeStamp == null }
+        } catch (e: NoSuchElementException) {
+            null
+        }
+    }
+
+    /**
      * Update the current main List (this) in an immutable way,
      * keeping all the others current settings.
      *
@@ -44,7 +76,7 @@ class DRecordList(private val allRecords: List<DestinationRecord> = listOf(),
      */
     fun replaceDisplayedList(ls: List<DestinationRecord>): DRecordList {
         val allRecs =
-            if(showArchived)
+            if (showArchived)
                 ls
             else
                 archived.plus(ls)

@@ -2,251 +2,162 @@ package com.github.factotum_sdp.factotum.ui.display
 
 import android.content.Context
 import android.content.Intent
-import androidx.fragment.app.testing.FragmentScenario
-import androidx.fragment.app.testing.launchFragmentInContainer
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers.*
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.ui.display.utils.*
+import com.github.factotum_sdp.factotum.ui.picture.emptyFirebaseStorage
+import com.github.factotum_sdp.factotum.utils.GeneralUtils
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.junit.After
-import org.junit.AfterClass
-import org.junit.Before
-import org.junit.BeforeClass
-import org.junit.Test
+import kotlinx.coroutines.test.runTest
+import org.junit.*
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class DisplayFragmentTest {
 
+    private lateinit var context: Context
+
+    @get:Rule
+    var testRule = ActivityScenarioRule(
+        MainActivity::class.java
+    )
+
     companion object {
         @JvmStatic
         @BeforeClass
         fun setUpClass() {
-            Firebase.storage.useEmulator("10.0.2.2", 9199)
-            Intents.init()
+            initFirebase()
         }
 
         @JvmStatic
         @AfterClass
         fun tearDownClass() {
-            Intents.release()
+            runBlocking{ emptyFirebaseStorage(Firebase.storage.reference) }
         }
     }
 
-    private lateinit var scenario: FragmentScenario<DisplayFragment>
-    private lateinit var context: Context
 
     @Before
     fun setUp() {
-        scenario = launchFragmentInContainer(themeResId = R.style.Theme_Factotum)
         context = InstrumentationRegistry.getInstrumentation().context
+        Intents.init()
     }
 
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     @After
-    fun tearDown() {
-        emptyStorageEmulator(Firebase.storage.reference)
-    }
-    @Test
-    fun displayFragmentUiElementsDisplayed() {
-        onView(withId(R.id.recyclerView)).check(matches(isDisplayed()))
-        onView(withId(R.id.refreshButton)).check(matches(isDisplayed()))
+    fun tearDown() = runTest {
+        launch { emptyFirebaseStorage(FirebaseStorage.getInstance().reference) }.join()
+        Intents.release()
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentRecyclerViewHasCorrectLayoutManager() {
-        scenario.onFragment { fragment ->
-            val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
-            assert(recyclerView.layoutManager is LinearLayoutManager)
-        }
+    fun displayOnlyOnePhotoIfSame() = runTest {
+        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
+        launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
+
+        //Press on the refresh button
+        onView(withId(R.id.refreshButton)).perform(click())
+
+        launch { uploadImageToStorageEmulator(context,"Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
+
+        //Press on the refresh button
+        onView(withId(R.id.refreshButton)).perform(click())
+
+        val recyclerView = onView(withId(R.id.recyclerView))
+
+        //Check if only one photo is displayed
+        recyclerView.check(matches(hasItemCount(1)))
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentRefreshButtonClicked() {
-        onView(withId(R.id.refreshButton)).perform(click())
-    }
+    fun displayTwoDifferentPhotosWorks() = runTest {
+        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
+        launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
 
-    @Test
-    fun displayFragmentDisplayOnlyOnePhotoIfSame() {
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
-        }
-
-        Thread.sleep(WAIT_TIME_INIT)
-
+        //Press on the refresh button
         onView(withId(R.id.refreshButton)).perform(click())
 
-        Thread.sleep(WAIT_TIME_REFRESH)
 
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
-        }
+        launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
 
-        Thread.sleep(WAIT_TIME_INIT)
-
+        //Press on the refresh button
         onView(withId(R.id.refreshButton)).perform(click())
 
-        Thread.sleep(WAIT_TIME_REFRESH)
 
-        scenario.onFragment { fragment ->
-            val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
-            assert(recyclerView.adapter?.itemCount == 1)
-        }
-    }
-
-    @Test
-    fun displayFragmentDisplayTwoDifferentPhotosWorks() {
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
-        }
-
-        Thread.sleep(WAIT_TIME_INIT)
-
-        onView(withId(R.id.refreshButton)).perform(click())
-
-        Thread.sleep(WAIT_TIME_REFRESH)
-
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2)
-        }
-
-        Thread.sleep(WAIT_TIME_INIT)
-
-        onView(withId(R.id.refreshButton)).perform(click())
-
-        Thread.sleep(WAIT_TIME_REFRESH)
-
-        scenario.onFragment { fragment ->
-            val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
-            assert(recyclerView.adapter?.itemCount == 2)
-        }
-    }
-
-    @Test
-    fun displayFragmentDisplayOneBadFormatPhotosWorks() {
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3)
-        }
-
-        Thread.sleep(WAIT_TIME_INIT)
-
-        onView(withId(R.id.refreshButton)).perform(click())
-
-        Thread.sleep(WAIT_TIME_REFRESH)
-
-        scenario.onFragment { fragment ->
-            val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
-            assert(recyclerView.adapter?.itemCount == 1)
-        }
+        val recyclerView = onView(withId(R.id.recyclerView))
+        recyclerView.check(matches(hasItemCount(2)))
     }
 
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentDisplayMixingFormatPhotosWorks() {
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
-        }
+    fun displayOneBadFormatPhotosWorks() = runTest {
+        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
+        launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH3, TEST_IMAGE_PATH3) }.join()
 
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3)
-        }
-
-        Thread.sleep(WAIT_TIME_INIT)
-
+        //Press on the refresh button
         onView(withId(R.id.refreshButton)).perform(click())
 
-        Thread.sleep(WAIT_TIME_REFRESH)
-
-        scenario.onFragment { fragment ->
-            val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
-            assert(recyclerView.adapter?.itemCount == 2)
-        }
-
-        //Empty storage
-        emptyStorageEmulator(Firebase.storage.reference)
-
-
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH4, TEST_IMAGE_PATH4)
-        }
-
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH2, TEST_IMAGE_PATH2)
-        }
-
-        Thread.sleep(WAIT_TIME_INIT)
-
-        onView(withId(R.id.refreshButton)).perform(click())
-
-        Thread.sleep(WAIT_TIME_REFRESH)
-
-        scenario.onFragment { fragment ->
-            val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
-            assert(recyclerView.adapter?.itemCount == 2)
-        }
+        val recyclerView = onView(withId(R.id.recyclerView))
+        recyclerView.check(matches(hasItemCount(1)))
     }
 
-
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentDisplayTwoBadFormatPhotosWorks() {
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH3, TEST_IMAGE_PATH3)
-        }
+    fun displayTwoBadFormatPhotosWorks() = runTest {
+        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
+        launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH3, TEST_IMAGE_PATH3) }.join()
 
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH4, TEST_IMAGE_PATH4)
-        }
+        launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH4, TEST_IMAGE_PATH4) }.join()
 
-        Thread.sleep(WAIT_TIME_INIT)
-
+        //Press on the refresh button
         onView(withId(R.id.refreshButton)).perform(click())
 
-        Thread.sleep(WAIT_TIME_REFRESH)
-
-        scenario.onFragment { fragment ->
-            val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
-            assert(recyclerView.adapter?.itemCount == 2)
-        }
+        val recyclerView = onView(withId(R.id.recyclerView))
+        recyclerView.check(matches(hasItemCount(2)))
     }
 
     @Test
-    fun displayFragmentDisplayNoPhotosIfEmpty() {
-        scenario.onFragment { fragment ->
-            val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
-            assert(recyclerView.adapter?.itemCount == 0)
-        }
+    fun displayNoPhotosIfEmpty() {
+        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
+        val recyclerView = onView(withId(R.id.recyclerView))
+        recyclerView.check(matches(hasItemCount(0)))
 
+        //Press on the refresh button
         onView(withId(R.id.refreshButton)).perform(click())
 
-        Thread.sleep(WAIT_TIME_REFRESH)
-
-        scenario.onFragment { fragment ->
-            val recyclerView = fragment.requireView().findViewById<RecyclerView>(R.id.recyclerView)
-            assert(recyclerView.adapter?.itemCount == 0)
-        }
+        recyclerView.check(matches(hasItemCount(0)))
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentClickingOnPhotosFireCorrectIntents() {
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
-        }
+    fun clickingOnPhotosFireCorrectIntents() = runTest {
+        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
+        launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
 
+        //Press on the refresh button
         onView(withId(R.id.refreshButton)).perform(click())
-
-        Thread.sleep(WAIT_TIME_REFRESH)
 
         onView(withId(R.id.recyclerView)).perform(
             RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
@@ -260,21 +171,123 @@ class DisplayFragmentTest {
         Intents.intended(hasFlag(Intent.FLAG_GRANT_READ_URI_PERMISSION))
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun displayFragmentSharingPhotoWorks() {
-        runBlocking {
-            uploadImageToStorageEmulator(context, TEST_IMAGE_PATH1, TEST_IMAGE_PATH1)
-        }
+    fun sharingPhotoWorks() = runTest {
+        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
+        launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
 
-        Thread.sleep(WAIT_TIME_INIT)
-
+        //Press on the refresh button
         onView(withId(R.id.refreshButton)).perform(click())
-
-        Thread.sleep(WAIT_TIME_REFRESH)
 
         onView(withId(R.id.shareButton)).perform(click())
 
         //Check if the intent of sharing has been called
         Intents.intended(hasAction(Intent.ACTION_CHOOSER))
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun bossCanSeeFolders() = runTest {
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
+        launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
+        launch { uploadImageToStorageEmulator(context, "Boss", TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
+
+        goToDisplayFragment()
+
+        val recyclerView = onView(withId(R.id.recyclerView))
+        recyclerView.check(matches(hasItemCount(2)))
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun bossCanClickOnFolderAndSeePhotos() = runTest {
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
+        launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
+        launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
+
+        goToDisplayFragment()
+
+        //click on the first folder
+        onView(withId(R.id.recyclerView)).perform(
+            RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
+                0,
+                click()
+            )
+        )
+
+        val recyclerView = onView(withId(R.id.recyclerView))
+        recyclerView.check(matches(hasItemCount(2)))
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun bossCanStillSeePhotos() = runTest {
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
+        launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
+
+        goToDisplayFragment()
+
+        //click on the first folder
+        onView(withId(R.id.recyclerView)).perform(
+            RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
+                0,
+                click()
+            )
+        )
+
+        //click on the first photo
+        onView(withId(R.id.recyclerView)).perform(
+            RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
+                0,
+                click()
+            )
+        )
+
+        Intents.intended(hasAction(Intent.ACTION_VIEW))
+        Intents.intended(hasType("image/*"))
+        Intents.intended(hasFlag(Intent.FLAG_GRANT_READ_URI_PERMISSION))
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun bossCanGoBackFromClientFolder() = runTest {
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
+        launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
+        launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
+
+        goToDisplayFragment()
+
+        //click on the first folder
+        onView(withId(R.id.recyclerView)).perform(
+            RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
+                0,
+                click()
+            )
+        )
+
+        //Go back
+        pressBack()
+
+        val recyclerView = onView(withId(R.id.recyclerView))
+        recyclerView.check(matches(hasItemCount(1)))
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun refreshWorksOnFolders() = runTest {
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
+        launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
+
+        goToDisplayFragment()
+
+        val recyclerView = onView(withId(R.id.recyclerView))
+        recyclerView.check(matches(hasItemCount(1)))
+
+        launch { uploadImageToStorageEmulator(context, "Boss", TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
+
+        onView(withId(R.id.refreshButton)).perform(click())
+
+        recyclerView.check(matches(hasItemCount(2)))
     }
 }

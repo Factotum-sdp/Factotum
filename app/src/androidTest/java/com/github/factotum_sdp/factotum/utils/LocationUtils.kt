@@ -12,6 +12,7 @@ class LocationUtils {
             Locale.FRENCH.language -> "Uniquement cette fois-ci"
             else -> "Only this time"
         }
+
         fun hasLocationPopUp(): Boolean {
             val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
             return device.wait(Until.hasObject(By.textContains(buttonTextAllow)), 1000)

@@ -1,16 +1,15 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.github.factotum_sdp.factotum.data.DestinationRecord
+import androidx.lifecycle.*
+import com.github.factotum_sdp.factotum.models.DestinationRecord
+import com.github.factotum_sdp.factotum.models.RoadBookPreferences
+import com.github.factotum_sdp.factotum.models.User
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
-import com.google.firebase.database.DatabaseReference
-import java.text.DateFormat
-import java.text.SimpleDateFormat.getDateInstance
+import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
+import com.github.factotum_sdp.factotum.repositories.RoadBookRepository
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.*
-import kotlin.collections.HashMap
 
 /**
  * The RoadBook ViewModel
@@ -18,31 +17,119 @@ import kotlin.collections.HashMap
  *
  * @param _dbRef The database root reference to register RoadBook data
  */
-class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
+class RoadBookViewModel(private val roadBookRepository: RoadBookRepository) : ViewModel() {
 
-    private val _recordsList: MutableLiveData<DRecordList> =
-        MutableLiveData(DRecordList())
+    private val _recordsList: MutableLiveData<DRecordList> = MutableLiveData(DRecordList())
     val recordsListState: LiveData<DRecordList> = _recordsList
 
-    private var dbRef: DatabaseReference
-    private val clientOccurences = HashMap<String, Int>()
+    private val clientOccurrences = HashMap<String, Int>()
+    private lateinit var preferencesRepository: RoadBookPreferencesRepository
 
     init {
-        val date = Calendar.getInstance().time
-        val dateRef = getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH).format(date)
-        dbRef = _dbRef // ref path to register all back-ups from this RoadBook
-                .child(dateRef)
-                //.child(getTimeInstance().format(date).plus(Random.nextInt().toString()))
-                // Let uncommented for testing purpose. Uncomment it for back-up uniqueness in the DB
-        // Only for demo purpose :
         addDemoRecords(DestinationRecords.RECORDS)
+    }
+
+    /**
+     * Set the preferencesRepository field of this ViewModel
+     *
+     * To be called before any call to a function dealing with the RoadBookPreferences i.e :
+     * initialPreferences()
+     * updateRoadBookPreferences()
+     *
+     * @param preferences: RoadBookPreferencesRepository
+     */
+    fun setPreferencesRepository(preferences: RoadBookPreferencesRepository) {
+        preferencesRepository = preferences
+    }
+
+    /**
+     * Fetch the initial observable RoadBookPreferences state
+     *
+     * @return LiveData<RoadBookPreferences> The initial preferences state
+     */
+    fun initialPreferences(): LiveData<RoadBookPreferences> {
+        return liveData {
+            emit(preferencesRepository.fetchInitialPreferences())
+        }
+    }
+
+    /**
+     * Update the DataStore RoadBookPreferences state
+     *
+     * @param preferences: RoadBookPreferences
+     */
+    fun updateRoadBookPreferences(preferences: RoadBookPreferences) {
+        viewModelScope.launch {
+            preferences.apply {
+                preferencesRepository.updateReordering(enableReordering)
+                preferencesRepository.updateDeletionOrArchiving(enableArchivingAndDeletion)
+                preferencesRepository.updateEdition(enableEdition)
+                preferencesRepository.updateDetailsAccess(enableDetailsAccess)
+                preferencesRepository.updateShowArchived(showArchived)
+            }
+        }
     }
 
     /**
      * Send the current recordsList data to the Database referenced at construction time
      */
     fun backUp() {
-        dbRef.setValue(_recordsList.value)
+        roadBookRepository.setBackUp(currentDRecList())
+    }
+
+    /**
+     * Get the next destination to deliver
+     *
+     * The result is null if there is no nextDestination for the actual records state
+     * @return DestinationRecord?
+     */
+    fun nextDestination(): DestinationRecord? {
+       return currentDRecList().getNextDestinationRecord()
+    }
+
+    /**
+     * Time stamp the given DestinationRecord
+     *
+     * @param timeStamp: Date
+     * @param record: DestinationRecord
+     */
+    fun timeStampARecord(timeStamp: Date, record: DestinationRecord) {
+        val newRec = DestinationRecord(
+            record.destID,
+            record.clientID,
+            timeStamp,
+            record.waitingTime,
+            record.rate,
+            record.actions,
+            record.notes
+        )
+        val ls = arrayListOf<DestinationRecord>()
+        ls.addAll(_recordsList.value as Collection<DestinationRecord>)
+        ls[currentDRecList().getIndexOf(record.destID)] = newRec
+
+        _recordsList.postValue(currentDRecList().replaceDisplayedList(ls))
+    }
+    /**
+     * Create the final shift Log according to the current records state
+     * of this RoadBookViewModel
+     *
+     * @param loggedInUser: User
+     */
+    fun makeShiftLog(loggedInUser: User) {
+        roadBookRepository.makeShiftLog(currentDRecList(), loggedInUser)
+    }
+
+    /**
+     * Replace the current displayed list by the last available back up of the RoadBookRepository
+     *
+     * Note that the the back up don't take into account the archiving state, all fetched from
+     * back up records are no more archived.
+     */
+    fun fetchBackBackUps(){
+        runBlocking {
+            val lastBackUp = roadBookRepository.getLastBackUp()
+            _recordsList.value = DRecordList(allRecords = lastBackUp, showArchived = currentDRecList().showArchived)
+        }
     }
 
     /**
@@ -56,9 +143,9 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         val fromLocation = ls[from]
         ls.removeAt(from)
         ls.add(to, fromLocation)
-        _recordsList.setValue(currentDRecList().replaceDisplayedList(ls))
+        _recordsList.value = currentDRecList().replaceDisplayedList(ls)
     }
-    
+
     /**
      * Add a new DestinationRecord at the end of the recordsList
      *
@@ -69,14 +156,16 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
      * @param actions The actions to be done on a destination
      * @param notes The additional notes concerning a destination
      */
-    fun addRecord(clientID: String, timeStamp: Date?, waitingTime: Int,
-                  rate: Int, actions: List<DestinationRecord.Action>, notes: String) {
+    fun addRecord(
+        clientID: String, timeStamp: Date?, waitingTime: Int,
+        rate: Int, actions: List<DestinationRecord.Action>, notes: String
+    ) {
         val newList = arrayListOf<DestinationRecord>()
         newList.addAll(_recordsList.value as Collection<DestinationRecord>)
         val destID = computeDestID(clientID)
         val rec = DestinationRecord(destID, clientID, timeStamp, waitingTime, rate, actions, notes)
         newList.add(rec)
-        _recordsList.setValue(currentDRecList().replaceDisplayedList(newList))
+        _recordsList.value = currentDRecList().replaceDisplayedList(newList)
     }
 
     /**
@@ -88,7 +177,7 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
         val newList = arrayListOf<DestinationRecord>()
         newList.addAll(currentDRecList() as Collection<DestinationRecord>)
         newList.removeAt(pos)
-        _recordsList.setValue(currentDRecList().replaceDisplayedList(newList))
+        _recordsList.value = currentDRecList().replaceDisplayedList(newList)
     }
 
     /**
@@ -104,19 +193,22 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
      * @param notes The additional notes concerning a destination
      * @return true if according the args, there is a change and the _recordList is updated, false otherwise
      */
-    fun editRecordAt(pos: Int, clientID: String, timeStamp: Date?, waitingTime: Int,
-                     rate: Int, actions: List<DestinationRecord.Action>, notes: String): Boolean {
-        val currentRec = _recordsList.value!![pos]
+    fun editRecordAt(
+        pos: Int, clientID: String, timeStamp: Date?, waitingTime: Int,
+        rate: Int, actions: List<DestinationRecord.Action>, notes: String
+    ): Boolean {
+        val currentRec = currentDRecList()[pos]
         var destID = currentRec.destID
-        if(currentRec.clientID != clientID) {
+        if (currentRec.clientID != clientID) {
             destID = computeDestID(clientID)
         }
-        val newRec = DestinationRecord(destID, clientID, timeStamp, waitingTime, rate, actions, notes)
+        val newRec =
+            DestinationRecord(destID, clientID, timeStamp, waitingTime, rate, actions, notes)
         val ls = arrayListOf<DestinationRecord>()
         ls.addAll(_recordsList.value as Collection<DestinationRecord>)
         ls[pos] = newRec
-        if(currentRec != newRec) {
-            _recordsList.setValue(currentDRecList().replaceDisplayedList(ls))
+        if (currentRec != newRec) {
+            _recordsList.value = currentDRecList().replaceDisplayedList(ls)
             return true
         }
         // Prefer to be explicit with a boolean value, for the front-end to know it has to refresh, or act accordingly.
@@ -130,7 +222,7 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
      * @param pos: Int Index of the target record to archive
      */
     fun archiveRecordAt(pos: Int) {
-        _recordsList.setValue(currentDRecList().archiveRecord(pos))
+        _recordsList.value = currentDRecList().archiveRecord(pos)
     }
 
     /**
@@ -139,7 +231,7 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
      * @param pos: Int Index of the target record to unarchive
      */
     fun unarchiveRecordAt(pos: Int) {
-        _recordsList.setValue(currentDRecList().unarchiveRecord(pos))
+        _recordsList.value = currentDRecList().unarchiveRecord(pos)
     }
 
     /**
@@ -170,25 +262,45 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
      * (i.e all the records will be in the current _recordsList)
      */
     fun showArchivedRecords() {
-        _recordsList.setValue(currentDRecList().withArchived())
+        _recordsList.value = currentDRecList().withArchived()
     }
 
     /**
      * Change the current recordsList state by "removing" the archived records
      */
     fun hideArchivedRecords() {
-        _recordsList.setValue(currentDRecList().withoutArchived())
+        _recordsList.value = currentDRecList().withoutArchived()
     }
-
 
     //Needed to update the destIDOccurrences cache
     private fun addDemoRecords(ls: List<DestinationRecord>) {
         val newList = arrayListOf<DestinationRecord>()
         ls.forEach {
             val destID = computeDestID(it.clientID)
-            newList.add(DestinationRecord(destID, it.clientID, it.timeStamp, it.waitingTime, it.rate, it.actions, it.notes))
+            newList.add(
+                DestinationRecord(
+                    destID,
+                    it.clientID,
+                    it.timeStamp,
+                    it.waitingTime,
+                    it.rate,
+                    it.actions,
+                    it.notes
+                )
+            )
         }
-        _recordsList.setValue(currentDRecList().replaceDisplayedList(newList))
+        _recordsList.value = currentDRecList().replaceDisplayedList(newList)
+    }
+
+    /**
+     * Clear all records
+     */
+    fun clearAllRecords(){
+        _recordsList.value =
+            DRecordList(
+                allRecords = emptyList(),
+                showArchived = currentDRecList().showArchived
+            )
     }
 
     private fun currentDRecList(): DRecordList {
@@ -196,7 +308,7 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
     }
 
     private fun computeDestID(clientID: String): String {
-        val occ = clientOccurences.compute(clientID) { _, oldOcc ->
+        val occ = clientOccurrences.compute(clientID) { _, oldOcc ->
             var occ = oldOcc ?: 0
             ++occ
         }
@@ -204,12 +316,12 @@ class RoadBookViewModel(_dbRef: DatabaseReference) : ViewModel() {
     }
 
     // Factory needed to assign a value at construction time to the class attribute
-    class RoadBookViewModelFactory(private val _dbRef: DatabaseReference)
-        : ViewModelProvider.Factory {
+    class RoadBookViewModelFactory(private val repository: RoadBookRepository) :
+        ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return modelClass
-                .getConstructor(DatabaseReference::class.java)
-                .newInstance(_dbRef)
+                .getConstructor(RoadBookRepository::class.java)
+                .newInstance(repository)
         }
     }
 }

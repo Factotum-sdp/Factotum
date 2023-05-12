@@ -3,6 +3,8 @@ package com.github.factotum_sdp.factotum.data.localisation
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.factotum_sdp.factotum.models.AddressCoordinates
+import com.github.factotum_sdp.factotum.models.Route
 import com.github.factotum_sdp.factotum.ui.maps.MapsViewModel
 import com.google.android.gms.maps.model.LatLng
 import junit.framework.TestCase.assertEquals
@@ -13,7 +15,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class RouteTest {
     @Test
-    fun routeRightlyCreatedWithDouble(){
+    fun routeRightlyCreatedWithDouble() {
         val srcLat = 46.5190999750367
         val srcLng = 6.566757598226489
         val dstLat = 46.52072048076863
@@ -25,7 +27,7 @@ class RouteTest {
         assertEquals(dstLng, route.dst.longitude)
     }
 
-    fun routeRightlyUpdates(){
+    fun routeRightlyUpdates() {
         val srcLat = 46.5190999750367
         val srcLng = 6.566757598226489
         val dstLat = 46.52072048076863
@@ -38,7 +40,7 @@ class RouteTest {
     }
 
     @Test
-    fun routeRightlyCreatedWithLatLon(){
+    fun routeRightlyCreatedWithLatLon() {
         val srcLat = 46.5190999750367
         val srcLng = 6.566757598226489
         val dstLat = 46.52072048076863
@@ -53,24 +55,25 @@ class RouteTest {
     }
 
     @Test
-    fun routePrintsRightCoordinates(){
+    fun routePrintsRightCoordinates() {
         val srcLat = 46.5190999750367
         val srcLng = 6.566757598226489
         val dstLat = 46.52072048076863
         val dstLng = 6.567838722207785
         val route = Route(srcLat, srcLng, dstLat, dstLng)
-        val str = "The route starts at coordinates ($srcLat, $srcLng) and finishes at coordinates ($dstLat, $dstLng)"
+        val str =
+            "The route starts at coordinates ($srcLat, $srcLng) and finishes at coordinates ($dstLat, $dstLng)"
         assertEquals(str, route.toString())
     }
 
     @Test
-    fun routeViewInitializesCorrectly(){
+    fun routeViewInitializesCorrectly() {
         val mapView = MapsViewModel()
         assertEquals(0, mapView.routesState.value!!.size)
     }
 
     @Test
-    fun routeViewAdd(){
+    fun routeViewAdd() {
         val mapView = MapsViewModel()
         val route = Route(10.0, 10.0, 10.0, 10.0)
         val route2 = Route(10.0, 10.0, 10.0, 10.0)
@@ -82,7 +85,7 @@ class RouteTest {
     }
 
     @Test
-    fun routeViewAddAll(){
+    fun routeViewAddAll() {
         val mapView = MapsViewModel()
         val route = Route(10.0, 10.0, 10.0, 10.0)
         val route2 = Route(10.0, 10.0, 10.0, 10.0)
@@ -94,8 +97,9 @@ class RouteTest {
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
+
     @Test
-    fun routeViewSetsRun(){
+    fun routeViewSetsRun() {
         val mapView = MapsViewModel()
         val route = Route(10.0, 10.0, 10.0, 10.0)
         mapView.setRunRoute(route)
@@ -103,7 +107,7 @@ class RouteTest {
     }
 
     @Test
-    fun routeViewDeletes(){
+    fun routeViewDeletes() {
         val mapView = MapsViewModel()
         val route = Route(10.0, 10.0, 10.0, 10.0)
         mapView.addRoute(route)
@@ -112,13 +116,13 @@ class RouteTest {
     }
 
     @Test
-    fun routeViewSetsLocation(){
+    fun routeViewSetsLocation() {
         val mapView = MapsViewModel()
-        val query =  "Lausanne"
-        val location = Location(query, getApplicationContext())
-        mapView.setLocation(location)
-        assertEquals(location.address!!.latitude, mapView.location.value!!.address!!.latitude)
-        assertEquals(location.address!!.longitude, mapView.location.value!!.address!!.longitude)
+        val query = "Lausanne"
+        val addressCoordinates = AddressCoordinates(query, getApplicationContext())
+        mapView.setLocation(addressCoordinates)
+        assertEquals(addressCoordinates.coordinates!!.latitude, mapView.addressCoordinates.value!!.coordinates!!.latitude)
+        assertEquals(addressCoordinates.coordinates!!.longitude, mapView.addressCoordinates.value!!.coordinates!!.longitude)
 
     }
 }

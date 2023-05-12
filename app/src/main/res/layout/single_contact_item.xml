@@ -1,40 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    tools:ignore="UseCompoundDrawables">
 
     <ImageView
         android:id="@+id/contact_image"
-        android:layout_height="50dp"
         android:layout_width="100dp"
-        tools:srcCompat="@tools:sample/avatars"
-        android:layout_margin="10dp"
+        android:layout_height="50dp"
         android:layout_gravity="center_vertical"
-        android:contentDescription="@string/contact_image" />
+        android:layout_margin="10dp"
+        android:contentDescription="@string/contact_image"
+        tools:srcCompat="@tools:sample/avatars" />
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/contact_surname_and_name"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="10dp"
+        android:text="@string/contact_surname_and_name"
+        android:textSize="20sp" />
 
-        <TextView
-            android:id="@+id/contact_role"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="@string/contact_role"
-            android:textSize="20sp" />
+    <TextView
+        android:id="@+id/contact_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="25dp"
+        android:text="@string/Single_contact_username"
+        android:textStyle="italic"
+        android:textSize="15sp"/>
 
-        <TextView
-            android:id="@+id/contact_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="@string/contact_name"
-            android:textSize="20sp"
-            android:layout_marginStart="10dp"/>
-
-    </LinearLayout>
 </LinearLayout>

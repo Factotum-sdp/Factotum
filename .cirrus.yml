@@ -1,5 +1,5 @@
 container:
-  image: cirrusci/android-sdk:30
+  image: cirrusci/android-sdk:33
   cpu: 8
   memory: 16G
   kvm: true
@@ -8,13 +8,17 @@ env:
   CC_TEST_REPORTER_ID: ENCRYPTED[ca4c0af7dbdaac713bbfd84dcba3b49a8d8d65f83693235e570b944f676fa090bbd8bdb55093d5b6c2be7ef8adb8a92a]
   MAPS_API_KEY: ENCRYPTED[!7d26352921350ef03cf3f093a6d3dbf919cd78b69cb813dd565ed168b905fdb1844751a63bb213bcb46ed98e794a86e0!]
 
+
 check_android_task:
   name: Run Android tests
+  install_jdk17_script: |
+    sudo apt-get update
+    sudo apt-get install -y openjdk-17-jdk
   install_emulator_script:
-    sdkmanager --install "system-images;android-30;google_apis_playstore;x86_64"
+    sdkmanager --install "system-images;android-33;google_apis;x86_64"
   create_avd_script: echo no | avdmanager create avd --force
       --name emulator
-      --package "system-images;android-30;google_apis_playstore;x86_64"
+      --package "system-images;android-33;google_apis;x86_64"
   start_avd_background_script: $ANDROID_HOME/emulator/emulator
       -avd emulator
       -no-audio
@@ -27,7 +31,6 @@ check_android_task:
     chmod +x gradlew
     echo MAPS_API_KEY=$MAPS_API_KEY >> local.properties
     ./gradlew assembleDebugAndroidTest
-      
   download_firebase_emulator_script: |
     curl -Lo ./firebase https://firebase.tools/bin/linux/latest
   assemble_instrumented_tests_script: |
@@ -45,9 +48,11 @@ check_android_task:
     ./cc-test-reporter before-build
   screen_record_background_script:
     for n in $(seq 1 20); do adb exec-out screenrecord --time-limit=180 --output-format=h264 - > $n.h264; done
+  start_logcat_background_script:
+    adb logcat > log.log
   check_script: |
     chmod +x firebase
-    ./firebase emulators:exec --project sdp-firebase-bootcamp-c795d './gradlew check connectedCheck'
+    ./firebase emulators:exec --import=./firebase_emulator_data --project sdp-firebase-bootcamp-c795d './gradlew check connectedCheck'
   report_codeclimate_script: |
     export JACOCO_SOURCE_PATH=app/src/main/java/
     ./cc-test-reporter format-coverage ./app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml --input-type jacoco
@@ -55,6 +60,10 @@ check_android_task:
   lint_script:
     ./gradlew lintDebug
   always:
+    stop_logcat_script: |
+      if [[ $(adb devices | awk 'NR>1 {print $1}') =~ "emulator.*" ]]; then
+        adb logcat -c
+      fi
     wait_for_screenrecord_script: |
       pkill -2 -x adb
       sleep 2
@@ -69,3 +78,5 @@ check_android_task:
     androidtest_artifacts:
       path: "./app/build/outputs/**/*.xml"
       format: junit
+    logs_artifacts:
+      path: log.log

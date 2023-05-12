@@ -8,13 +8,17 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.fillUserEntryAndEnterTheApp
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getAuth
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.Matchers.not
 import org.junit.AfterClass
 import org.junit.BeforeClass
@@ -32,31 +36,12 @@ class LoginFragmentTest {
 
     companion object {
 
+        @OptIn(ExperimentalCoroutinesApi::class)
         @BeforeClass
         @JvmStatic
-        fun setUpDatabase() {
-            val database: FirebaseDatabase = Firebase.database
-            val auth: FirebaseAuth = Firebase.auth
-            database.useEmulator("10.0.2.2", 9000)
-            auth.useEmulator("10.0.2.2", 9099)
-
-            MainActivity.setDatabase(database)
-            MainActivity.setAuth(auth)
-
-            UsersPlaceHolder.init(database, auth)
-
-            runBlocking {
-                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER1)
-            }
-            runBlocking {
-                UsersPlaceHolder.addUserToDb(UsersPlaceHolder.USER3)
-            }
-            runBlocking {
-                UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER1)
-            }
-            runBlocking {
-                UsersPlaceHolder.addAuthUser(UsersPlaceHolder.USER2)
-            }
+        fun setUpDatabase() = runTest {
+            initFirebase()
+            UsersPlaceHolder.init(getDatabase(), getAuth())
         }
 
         @AfterClass
@@ -64,20 +49,10 @@ class LoginFragmentTest {
         fun stopAuthEmulator() {
             val auth = Firebase.auth
             auth.signOut()
-            MainActivity.setAuth(auth)
+            FirebaseInstance.setAuth(auth)
         }
 
-        fun fillUserEntryAndGoToRBFragment(email: String, password: String) {
-            onView(withId(R.id.email)).perform(typeText(email))
-            onView(withId(R.id.fragment_login_directors_parent)).perform(
-                closeSoftKeyboard()
-            )
-            onView(withId(R.id.password)).perform(typeText(password))
-            onView(withId(R.id.fragment_login_directors_parent)).perform(
-                closeSoftKeyboard()
-            )
-            onView(withId(R.id.login)).perform(click())
-        }
+
     }
 
     @Test
@@ -105,8 +80,9 @@ class LoginFragmentTest {
         }
     }
 
+    @Test
     fun correctUserEntryLeadsToRoadBook() {
-        fillUserEntryAndGoToRBFragment("jane.doe@gmail.com", "123456")
+        fillUserEntryAndEnterTheApp("jane.doe@gmail.com", "123456")
         FirebaseAuth.AuthStateListener { firebaseAuth ->
             if (firebaseAuth.currentUser != null) {
                 onView(withId(R.id.fragment_roadbook_directors_parent)).check(matches(isDisplayed()))
@@ -145,3 +121,4 @@ class LoginFragmentTest {
         onView(withId(R.id.fragment_signup_directors_parent)).check(matches(isDisplayed()))
     }
 }
+

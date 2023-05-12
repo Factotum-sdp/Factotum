@@ -1,25 +1,30 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_directory_directors_parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
-    tools:context=".ui.directory.DirectoryFragment"
-    android:id="@+id/fragment_directory_directors_parent">
+    tools:context=".ui.directory.DirectoryFragment">
 
     <SearchView
         android:id="@+id/contacts_search_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:iconifiedByDefault="false"
+        android:queryHint="Search contacts..." />
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/contacts_recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:layout_marginTop="4dp" />
+
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/add_contact_button"
             android:layout_width="wrap_content"
@@ -27,19 +32,23 @@
             android:layout_gravity="bottom|end"
             android:layout_marginEnd="@dimen/fab_margin"
             android:layout_marginBottom="16dp"
-            app:srcCompat="@android:drawable/ic_input_add"
+            android:contentDescription="@string/add_contacts_floating_button"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:contentDescription="@string/add_contacts_floating_button" />
+            app:srcCompat="@android:drawable/ic_input_add" />
+
+        <TextView
+            android:id="@+id/empty_contacts_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:text="@string/no_contacts_found"
+            android:textAlignment="center"
+            android:textStyle="italic"
+            android:textSize="20sp"
+            android:visibility="gone" />
     </FrameLayout>
-
-    <TextView
-        android:id="@+id/empty_contacts_message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/no_contacts_found"
-        android:visibility="gone" />
-
-
 
 </LinearLayout>

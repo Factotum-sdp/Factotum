@@ -37,15 +37,16 @@
     <string name="snap_text_on_rec_unarchive">Record unarchived</string>
 
     <string name="menu_maps">Maps</string>
-    <string name="run">Run</string>
+    <string name="run">Go To dst</string>
     <string name="rate_text_view">rate</string>
     <string name="wait_text_view">wait</string>
     <string name="arrival_text_view">arrival</string>
     <string name="actions_text_view">actions</string>
 
     <string name="main_diary_activity">Main Diary Activity</string>
-    <string name="contact_name">John Doe</string>
-    <string name="contact_role">Example Role</string>
+    <string name="contact_name">John</string>
+    <string name="contact_surname">Doe</string>
+    <string name="contact_role">Boss</string>
     <string name="contact_image">Contact_image</string>
     <string name="contact_address">123 Example Street 1022 Lausanne</string>
     <string name="contact_phone">+4178*******</string>
@@ -69,8 +70,8 @@
     <string name="no_role_selected">Please select a role</string>
     <string name="login_failed">"Login failed"</string>
     <string name="user_not_found">"User not found"</string>
-    <string name="retrieve_users_failed">Error retrieving users</string>
-    <string name="retrieve_users_success">Users retrieved successfully</string>
+    <string name="retrieve_user_failed">Error retrieving user</string>
+    <string name="retrieve_user_success">User retrieved successfully</string>
     <string name="web_client_id">"539052463718–6gefd2fnlvbb1h9aiq09kil6sip37i0u.apps.googleusercontent.com"</string>
     <string name="forgot_my_password_text">Forgot my password</string>
     <string name="password_text">Password</string>
@@ -95,7 +96,7 @@
 
     <string name="rb_label_swiper_edition">Swipe R. Editon</string>
     <string name="rb_label_dragdrop"><![CDATA[Drag & Drop]]></string>
-    <string name="edit_dialog_cancel_b">cancel</string>
+    <string name="edit_dialog_cancel_b">Cancel</string>
     <string name="edit_dialog_update_b">update</string>
     <string name="menu_view_proof_picture">View Proof Pictures</string>
     <string name="refresh">Refresh</string>
@@ -113,7 +114,7 @@
     <string name="edit_confirmed_snap_label">Record edited</string>
     <string name="rb_label_touch_click">Touch click</string>
     <string name="share">Share</string>
-    <string name="no_contacts_found">No contacts found</string>
+    <string name="no_contacts_found">No contacts found. Please check your search criteria and try again.</string>
     <string name="add_contacts_floating_button">add Contacts floating button</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -121,7 +122,7 @@
     <string name="surname">Surname</string>
     <string name="address">Address</string>
     <string name="phone_number">Phone number</string>
-    <string name="create_contact">Create contact</string>
+    <string name="create_contact_text">Create contact</string>
     <string name="notes">Notes</string>
     <string name="drecord_notes_mi_title">DRecord notes</string>
     <string name="textvlabel_destination_id">Destination ID</string>
@@ -132,4 +133,38 @@
     <string name="textvlabel_actions">Actions</string>
     <string name="textvlabel_notes">Notes</string>
     <string name="rb_label_show_archived">Show archived</string>
+    <string name="delete_contact_button">Delete Contact</string>
+    <string name="button_modify_contact">Modify contact</string>
+    <string name="form_button_update">Update Contact</string>
+    <string name="form_button_create">Create Contact</string>
+    <string name="contact_surname_and_name">Doe John</string>
+    <string name="search_contacts">Search contacts …</string>
+    <string name="loc_service_notification_message">Location service for Factotum is working</string>
+    <string name="loc_service_notification_title">Tracking location</string>
+    <string name="end_shift">end shift</string>
+    <string name="finish_shift_alert_question">"Are you sure you want to end your shift?"</string>
+    <string name="shift_ended">Shift ended</string>
+    <string name="end_shift_dialog_title">End shift</string>
+    <string name="textUsername">Username</string>
+    <string name="contact_details_username">\@username</string>
+    <string name="Single_contact_username">\@username</string>
+    <string name="username_not_unique">Sorry, that username is already taken. Please choose a different username.</string>
+    <string name="empty_username">Please enter username to add user.</string>
+    <string name="roadbookpreferencescheckedtextview">RoadBookPreferencesCheckedTextView</string>
+    <string name="application_settings">Application Settings</string>
+    <string name="save_roadbook_preferences">Save RoadBook Preferences</string>
+    <string name="load_road_book_back_up">Load RoadBook back-up</string>
+    <string name="delete_all_roadbook">Delete all RoadBook</string>
+    <string name="delete_all_roadbook_dialog_title">Delete all the current RoadBook records ?</string>
+    <string name="positive_label_delete_all_roadbook_dialog">Confirm</string>
+    <string name="negative_label_delete_all_roadbook_dialog">No !</string>
+    <string name="snap_delete_all_roadbook">All Roadbook records have been deleted</string>
+    <string name="snap_load_roadbook_backup">The last backup has been loaded</string>
+    <string name="managing_client_text">Managing Client: </string>
+    <string name="managing_client">\@managing_client</string>
+    <string name="super_client_username">Super client username</string>
+    <string name="super_client_id_not_valid">The managing client\'s username is not valid.</string>
+    <string name="contact_not_found">Contact not found</string>
+    <string name="boss_Map">Boss Map</string>
+    <string name="decline_end_shift">Not now</string>
 </resources>

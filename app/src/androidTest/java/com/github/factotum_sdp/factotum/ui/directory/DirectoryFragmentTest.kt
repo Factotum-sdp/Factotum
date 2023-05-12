@@ -2,6 +2,7 @@ package com.github.factotum_sdp.factotum.ui.directory
 
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
@@ -15,12 +16,12 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.placeholder.ContactsList
 import com.github.factotum_sdp.factotum.utils.ContactsUtils
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
+import com.github.factotum_sdp.factotum.utils.GeneralUtils
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import junit.framework.TestCase.assertTrue
-import kotlinx.coroutines.runBlocking
+import junit.framework.TestCase.fail
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -29,7 +30,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class DirectoryFragmentTest {
-    private val _waitForAnimation = 500L
 
     @get:Rule
     var testRule = ActivityScenarioRule(
@@ -37,31 +37,31 @@ class DirectoryFragmentTest {
     )
 
     companion object {
+        private var nbContacts = 0
+
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
-            val database = Firebase.database
-            database.useEmulator("10.0.2.2", 9000)
-            MainActivity.setDatabase(database)
-
-            ContactsUtils.emptyFirebaseDatabase(database)
-
-            ContactsList.init(database)
-
-            runBlocking {
-                ContactsList.populateDatabase()
+            initFirebase()
+            nbContacts = getDatabase().reference.child("contacts").get().run {
+                addOnSuccessListener {
+                    nbContacts = it.childrenCount.toInt()
+                }
+                addOnFailureListener {
+                    fail("Could not get the number of contacts in the database")
+                }
+                nbContacts
             }
         }
     }
 
     @Before
     fun setUp() {
-
+        GeneralUtils.injectBossAsLoggedInUser(testRule)
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.directoryFragment))
             .perform(click())
-
     }
 
     @Test
@@ -85,9 +85,21 @@ class DirectoryFragmentTest {
     }
 
     @Test
+    fun addButtonExists() {
+        onView(withId(R.id.add_contact_button)).check(matches(isDisplayed()))
+
+    }
+
+    @Test
+    fun addButtonOpensContactCreation() {
+        onView(withId(R.id.add_contact_button)).perform(click())
+        onView(withId(R.id.contact_creation_fragment)).check(matches(isDisplayed()))
+    }
+
+
+    @Test
     fun allContactsCanBeClickedOn() {
-        val device = UiDevice.getInstance(getInstrumentation())
-        for (i in 0 until ContactsList.size) {
+        for (i in 0 until nbContacts) {
             onView(withId(R.id.contacts_recycler_view))
                 .perform(
                     RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
@@ -95,13 +107,11 @@ class DirectoryFragmentTest {
                         click()
                     )
                 )
-            val contactName =
-                device.findObject(UiSelector().descriptionContains("All contact Info"))
-            assertTrue(contactName.exists())
-            device.pressBack()
-            Thread.sleep(_waitForAnimation)
+            onView(withId(R.id.contact_details_fragment)).check(matches(isDisplayed()))
+            pressBack()
         }
     }
+
 
     @Test
     fun correctContactsShownWithMatchingQuery() {
@@ -111,7 +121,29 @@ class DirectoryFragmentTest {
 
         // Check if the expected contact is visible in the RecyclerView
         onView(withId(R.id.contacts_recycler_view))
-            .perform(scrollToHolder(ContactsUtils.withHolderContactName("John Smith")))
+            .perform(scrollToHolder(ContactsUtils.withHolderContactName("Smith  John")))
+    }
+
+    @Test
+    fun incorrectQueryShowsNoMatchingQueryMessage() {
+        onView(withId(R.id.empty_contacts_message)).check(matches(withEffectiveVisibility(Visibility.GONE)))
+        // Type a search query in the search view and close the soft keyboard
+        onView(withId(R.id.contacts_search_view))
+            .perform(typeText("urpioeqwjlfdaff"), closeSoftKeyboard())
+
+        // Check if the expected contact is visible in the RecyclerView
+        onView(withId(R.id.empty_contacts_message)).check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
+    }
+
+    @Test
+    fun mapsDoesntRunFromContactDetailsWithContactWithNoLocation() {
+        onView(withText("@01"))
+            .perform(click())
+        onView(withId(R.id.contact_details_fragment)).check(matches(isDisplayed()))
+        onView(withId(R.id.run_button)).perform(click())
+        onView(withId(R.id.contact_details_fragment)).check(matches(isDisplayed()))
+        onView(withId(R.id.show_all_button)).perform(click())
+        onView(withId(R.id.contact_details_fragment)).check(matches(isDisplayed()))
     }
 
 }

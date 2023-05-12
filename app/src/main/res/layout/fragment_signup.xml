@@ -41,10 +41,10 @@
             android:layout_width="337dp"
             android:layout_height="55dp"
             android:layout_marginBottom="16dp"
+            android:autofillHints=""
             android:hint="@string/full_name_text"
             android:inputType="textPersonName"
-            android:selectAllOnFocus="true"
-            android:autofillHints="" />
+            android:selectAllOnFocus="true" />
 
         <TextView
             android:id="@+id/textView2"
@@ -58,10 +58,10 @@
             android:layout_width="337dp"
             android:layout_height="55dp"
             android:layout_marginBottom="16dp"
+            android:autofillHints=""
             android:hint="@string/prompt_email"
             android:inputType="textEmailAddress"
-            android:selectAllOnFocus="true"
-            android:autofillHints="" />
+            android:selectAllOnFocus="true" />
 
         <TextView
             android:id="@+id/textView3"
@@ -75,25 +75,25 @@
             android:layout_width="337dp"
             android:layout_height="55dp"
             android:layout_marginBottom="16dp"
+            android:autofillHints=""
             android:hint="@string/prompt_password"
             android:imeActionLabel="@string/action_sign_in_short"
             android:imeOptions="actionDone"
             android:inputType="textPassword"
-            android:selectAllOnFocus="true"
-            android:autofillHints="" />
+            android:selectAllOnFocus="true" />
 
         <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="280dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:hint="@string/select_role_text"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+            android:hint="@string/select_role_text">
 
             <AutoCompleteTextView
                 android:id="@+id/role"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:inputType="none"/>
+                android:inputType="none" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <ProgressBar

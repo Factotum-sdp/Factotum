@@ -42,10 +42,10 @@
             android:layout_width="337dp"
             android:layout_height="55dp"
             android:layout_marginBottom="16dp"
+            android:autofillHints=""
             android:hint="@string/prompt_email"
             android:inputType="textEmailAddress"
-            android:selectAllOnFocus="true"
-            android:autofillHints="" />
+            android:selectAllOnFocus="true" />
 
         <TextView
             android:id="@+id/textView2"
@@ -59,20 +59,12 @@
             android:layout_width="337dp"
             android:layout_height="55dp"
             android:layout_marginBottom="16dp"
+            android:autofillHints=""
             android:hint="@string/prompt_password"
             android:imeActionLabel="@string/action_sign_in_short"
             android:imeOptions="actionDone"
             android:inputType="textPassword"
-            android:selectAllOnFocus="true"
-            android:autofillHints="" />
-
-        <TextView
-            android:id="@+id/profile_retrival_error"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/retrieve_users_failed"
-            android:textColor="#FF0000"
-            android:visibility="gone" />
+            android:selectAllOnFocus="true" />
 
         <TextView
             android:id="@+id/pwdForgot"
@@ -81,8 +73,8 @@
             android:layout_marginBottom="16dp"
             android:clickable="true"
             android:focusable="true"
-            android:visibility="gone"
-            android:text="@string/forgot_my_password_text" />
+            android:text="@string/forgot_my_password_text"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/login"
@@ -141,7 +133,6 @@
                 android:layout_height="wrap_content"
                 android:text="@string/create_one_text" />
         </LinearLayout>
-
 
 
     </LinearLayout>

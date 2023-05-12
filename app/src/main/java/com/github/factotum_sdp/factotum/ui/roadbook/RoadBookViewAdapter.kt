@@ -7,8 +7,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.data.DestinationRecord.Action
-import com.github.factotum_sdp.factotum.data.DestinationRecord
+import com.github.factotum_sdp.factotum.models.DestinationRecord
+import com.github.factotum_sdp.factotum.models.DestinationRecord.Action
 import java.util.*
 
 /**
@@ -63,6 +63,7 @@ class RoadBookViewAdapter(private val onClickListenerFromDestId: (String) -> Vie
         itemView.setOnClickListener(onClickListenerFromDestId(holder.destID.text.toString()))
     }
 
+    // These are specific String format for the RecyclerView UI
     private fun rateStringFormat(rate: Int, label: String): String {
         return "$label : $rate"
     }
@@ -73,14 +74,17 @@ class RoadBookViewAdapter(private val onClickListenerFromDestId: (String) -> Vie
             return "$label : $waitTime'"
         return ""
     }
+
     // arrival : _ or arrival : HH:MM:SS AM-PM
     private fun timestampStringFormat(date: Date?, label: String): String {
         return "$label : ${DestinationRecord.timeStampFormat(date)}"
     }
+
     // actions : () or actions : (pick x2 |contact)
     private fun actionsStringFormat(actions: List<Action>, label: String): String {
         return "$label : ${DestinationRecord.actionsFormat(actions)}"
     }
+
     override fun getItemCount(): Int = displayedDRecords.size
 
     /**

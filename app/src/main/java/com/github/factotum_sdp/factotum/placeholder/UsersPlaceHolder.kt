@@ -1,10 +1,13 @@
 package com.github.factotum_sdp.factotum.placeholder
 
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.data.LoginDataSource
-import com.github.factotum_sdp.factotum.data.Role
+import com.github.factotum_sdp.factotum.models.Role
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-import kotlinx.coroutines.CompletableDeferred
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * Temporary PlaceHolder object for fake users data
@@ -12,42 +15,41 @@ import kotlinx.coroutines.CompletableDeferred
  */
 object UsersPlaceHolder {
 
-    private val users = mutableListOf<User>()
     private lateinit var dataSource: FirebaseDatabase
     private lateinit var auth: FirebaseAuth
 
     private const val password = "123456"
-    val USER1 = User(
+    val USER1 = UserWithPassword(
         "Valentino Rossi",
         "valentino.rossi@epfl.ch",
         Role.BOSS,
         password
     )
-    val USER2 = User(
+    val USER2 = UserWithPassword(
         "Marc Marquez",
         "marc.marquez@epfl.ch",
         Role.BOSS,
         password
     )
-    val USER3 = User(
+    val USER3 = UserWithPassword(
         "Jane Doe",
         "jane.doe@gmail.com",
         Role.BOSS,
         password
     )
-    val USER_BOSS = User(
+    val USER_BOSS = UserWithPassword(
         "Boss",
         "boss@gmail.com",
         Role.BOSS,
         password
     )
-    val USER_COURIER = User(
+    val USER_COURIER = UserWithPassword(
         "Courier",
         "courier@gmail.com",
         Role.COURIER,
         password
     )
-    val USER_CLIENT = User(
+    val USER_CLIENT = UserWithPassword(
         "Client",
         "client@gmail.com",
         Role.CLIENT,
@@ -57,50 +59,36 @@ object UsersPlaceHolder {
     fun init(dataSource: FirebaseDatabase, auth: FirebaseAuth) {
         this.dataSource = dataSource
         this.auth = auth
-        users.add(USER1)
-        users.add(USER2)
-        users.add(USER3)
-        users.add(USER_BOSS)
-        users.add(USER_COURIER)
-        users.add(USER_CLIENT)
     }
 
     /**
-     * Populates the database with users.
+     * Populates the database with user.
      */
-    suspend fun addUserToDb(user: User) {
-        val deferred = CompletableDeferred<Unit>()
-
-        dataSource.getReference(LoginDataSource.DISPATCH_DB_PATH).push().setValue(user)
+    suspend fun addUserToDb(user: UserWithPassword) = suspendCoroutine { continuation ->
+        dataSource.getReference(LoginDataSource.DISPATCH_DB_PATH)
+            .child(FirebaseInstance.getAuth().currentUser?.uid ?: "")
+            .setValue(user)
             .addOnSuccessListener {
-                deferred.complete(Unit)
+                continuation.resume(Unit)
             }
             .addOnFailureListener { exception ->
-                deferred.completeExceptionally(exception)
+                continuation.resumeWithException(exception)
             }
 
-        deferred.await()
+        auth.signOut()
     }
 
-    suspend fun addAuthUser(user: User) {
-        val deferred = CompletableDeferred<Unit>()
-
+    suspend fun addAuthUser(user: UserWithPassword) = suspendCoroutine { continuation ->
         auth.createUserWithEmailAndPassword(user.email, password)
             .addOnSuccessListener {
-                deferred.complete(Unit)
+                continuation.resume(Unit)
             }
             .addOnFailureListener { exception ->
-                deferred.completeExceptionally(exception)
+                continuation.resumeWithException(exception)
             }
-
-        deferred.await()
     }
 
-    fun emptyFirebaseDatabase(database: FirebaseDatabase) {
-        database.reference.child(LoginDataSource.DISPATCH_DB_PATH).removeValue()
-    }
-
-    data class User(
+    data class UserWithPassword(
         val name: String,
         val email: String,
         val role: Role,

@@ -9,13 +9,13 @@ import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.github.factotum_sdp.factotum.R
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import java.io.File
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
-class PictureFragment(clientID : String): Fragment() {
+class PictureFragment(clientID: String) : Fragment() {
 
     private lateinit var photoFile: File
     private lateinit var photoUri: Uri
@@ -23,6 +23,8 @@ class PictureFragment(clientID : String): Fragment() {
     private val storage: FirebaseStorage = FirebaseStorage.getInstance()
     private val storageRef: StorageReference = storage.reference
     private val folderName: String = clientID.ifBlank { "default" }
+    private val userID : String = FirebaseAuth.getInstance().currentUser?.uid.toString()
+
 
     override fun onStart() {
         super.onStart()
@@ -41,7 +43,7 @@ class PictureFragment(clientID : String): Fragment() {
         val dateFormat = SimpleDateFormat("dd-MM-yyyy_HH-mm-ss", Locale.getDefault())
         val currentDateAndTime = dateFormat.format(Date())
 
-        photoName = "USER_${currentDateAndTime}.jpg"
+        photoName = "${userID}_${currentDateAndTime}.jpg"
         photoFile = File(tempFolder, photoName) // Create the photo file in the temporary folder
         photoUri = FileProvider.getUriForFile(requireContext(), fileProvider, photoFile)
 

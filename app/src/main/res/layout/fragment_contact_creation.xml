@@ -2,15 +2,16 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/contact_creation_fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.directory.ContactCreation"
-    android:id="@+id/contact_creation_fragment">
+    tools:context=".ui.directory.ContactCreationFragment">
 
     <RelativeLayout
         android:id="@+id/basic_contact_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <ImageView
             android:id="@+id/contact_image_creation"
             android:layout_width="150dp"
@@ -20,50 +21,63 @@
             android:contentDescription="@string/contact_image"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@android:drawable/ic_menu_add">
-        </ImageView>
+            app:srcCompat="@android:drawable/ic_menu_add" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
             android:layout_toEndOf="@id/contact_image_creation"
-            android:orientation="vertical"
-            android:layout_centerVertical="true">
+            android:orientation="vertical">
+
             <EditText
                 android:id="@+id/editTextName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:autofillHints="name"
                 android:hint="@string/name"
-                android:inputType="textPersonName"
-                android:autofillHints="name" />
+                android:inputType="textPersonName" />
 
             <EditText
                 android:id="@+id/editTextSurname"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:autofillHints="surname"
                 android:hint="@string/surname"
-                android:inputType="textPersonName"
-                android:autofillHints="name" />
+                android:inputType="textPersonName" />
+
+            <EditText
+                android:id="@+id/editTextUsername"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints="username"
+                android:hint="@string/textUsername"
+                android:inputType="textPersonName" />
         </LinearLayout>
     </RelativeLayout>
+
     <LinearLayout
-        android:layout_marginTop="50dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_below="@id/basic_contact_info">
+        android:layout_below="@id/basic_contact_info"
+        android:layout_marginTop="50dp"
+        android:orientation="vertical">
+
         <androidx.appcompat.widget.SearchView
             android:id="@+id/contactCreationAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:queryHint="Search address..."
-            app:iconifiedByDefault="false"/>
+            app:iconifiedByDefault="false"
+            app:queryHint="Search address..." />
+
         <EditText
             android:id="@+id/contactCreationPhoneNumber"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/phone_number"
             android:autofillHints="phone"
+            android:hint="@string/phone_number"
             android:inputType="phone" />
+
         <EditText
             android:id="@+id/contactCreationNotes"
             android:layout_width="match_parent"
@@ -72,23 +86,33 @@
             android:importantForAutofill="no"
             android:inputType="textCapSentences|textMultiLine"
             android:maxLength="2000"
-            android:maxLines="4"/>
+            android:maxLines="4" />
 
         <Spinner
             android:id="@+id/roles_spinner"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"/>
+
+        <EditText
+            android:id="@+id/editTextSuperClientUsername"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:autofillHints="username"
+            android:hint="@string/super_client_username"
+            android:inputType="textPersonName"
+            android:visibility="gone"/>
     </LinearLayout>
 
     <Button
-        android:id="@+id/create_contact"
+        android:id="@+id/confirm_form"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="50dp"
-        android:text="@string/create_contact"/>
-
+        android:text="@string/create_contact_text" />
 
 
 </RelativeLayout>

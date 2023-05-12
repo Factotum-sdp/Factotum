@@ -2,7 +2,7 @@ package com.github.factotum_sdp.factotum.ui.auth
 
 import androidx.core.util.PatternsCompat
 
-abstract class BaseAuthState{
+abstract class BaseAuthState {
     abstract val emailError: Int?
     abstract val passwordError: Int?
     abstract val isDataValid: Boolean

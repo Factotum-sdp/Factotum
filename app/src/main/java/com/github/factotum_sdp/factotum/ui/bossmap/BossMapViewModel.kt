@@ -16,7 +16,11 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 
 private const val WAIT_TIME_LOCATION_UPDATE = 15000L
 
@@ -69,7 +73,9 @@ class BossMapViewModel : ViewModel() {
     private fun fetchDeliveryState(){
         roadbookDbRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val dStatus = snapshot.children.mapNotNull {
+                val date = Calendar.getInstance().time
+                val dateRef = SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH).format(date)
+                val dStatus = snapshot.child(dateRef).children.mapNotNull {
                     val record = it.getValue(DestinationRecord::class.java)
                     val client = _contacts.value?.find { contact -> contact.username == record?.clientID }
                     if (client != null) {
@@ -86,6 +92,7 @@ class BossMapViewModel : ViewModel() {
                     }
                 }
                 _deliveriesStatus.value = dStatus
+                Log.d("BossMapViewModel: ", "onDataChange: $dStatus")
             }
             override fun onCancelled(error: DatabaseError) {
                 Log.e("BossMapViewModel: ", "onCancelled: $error")

@@ -3,6 +3,7 @@ package com.github.factotum_sdp.factotum.ui.bossmap
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -91,6 +92,7 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun updateDestinationMarkers(locations: List<DeliveryStatus>?) {
+        Log.d("updateDestinationMarkers", locations.toString())
         locations?.forEach { status ->
             googleMap.addMarker(
                 MarkerOptions()
@@ -137,7 +139,7 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun updateMarkers(locations: List<CourierLocation>) {
-        googleMap.clear()
+        //googleMap.clear()
 
         locations.forEach { location ->
             googleMap.addMarker(

@@ -5,6 +5,5 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "cached_folders")
 data class CachedFolder(
-    @PrimaryKey
-    val path : String,
+    @PrimaryKey val path : String,
 )

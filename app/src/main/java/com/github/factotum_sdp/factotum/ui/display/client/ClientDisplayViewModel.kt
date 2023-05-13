@@ -44,15 +44,16 @@ class ClientDisplayViewModel(
         _folderName.value = folderName
     }
 
+
     private fun updateImages() {
         viewModelScope.launch {
             val folderName = _folderName.value ?: return@launch
-            val remotePhotos = fetchRemotePhotos(folderName)
 
+            displayCachedPhotos(folderName)
+
+            val remotePhotos = fetchRemotePhotos(folderName)
             if (remotePhotos != null) {
                 updateCachedPhotos(folderName, remotePhotos)
-            } else {
-                displayCachedPhotos(folderName)
             }
         }
     }
@@ -95,12 +96,9 @@ class ClientDisplayViewModel(
         return try {
             val folderReference = storage.reference.child(folderName)
             val photosListResult = folderReference.listAll().await()
-
             photosListResult.items
-        } catch (e: StorageException) {
-            null
         } catch (e: Exception) {
-            emptyList()
+            null
         }
     }
 

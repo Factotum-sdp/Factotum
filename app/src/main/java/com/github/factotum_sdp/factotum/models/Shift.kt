@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 import java.util.Date
 
 @Serializable
-data class Shift(@Serializable(with = DateKSerializer::class)val date: Date = Date(), val user: User = User(), val records: DRecordList = DRecordList(
+data class Shift(@Serializable(with = DateKSerializer::class)val date: Date? = null, val user: User = User(), val records: DRecordList = DRecordList(
     emptyList()
 )
 )

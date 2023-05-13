@@ -32,6 +32,7 @@ import com.github.factotum_sdp.factotum.models.Shift
 import com.github.factotum_sdp.factotum.models.User
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder.USER_COURIER
+import com.github.factotum_sdp.factotum.repositories.ShiftRepository
 import com.github.factotum_sdp.factotum.repositories.ShiftRepository.Companion.DELIVERY_LOG_DB_PATH
 import com.github.factotum_sdp.factotum.roadBookDataStore
 import com.github.factotum_sdp.factotum.shiftDataStore
@@ -412,10 +413,11 @@ class RoadBookFragmentTest {
         val shift = Shift(Date(), courier, rbViewModel.recordsListState.value!!)
         val shiftList = ShiftList(listOf(shift))
 
+        val date = shift.date ?: ShiftRepository.DEFAULT_DATE_FOR_PATH
         val dbShiftRef = db.reference
             .child(DELIVERY_LOG_DB_PATH)
             .child(firebaseSafeString(shift.user.name))
-            .child(firebaseDateFormatted(shift.date))
+            .child(firebaseDateFormatted(date))
 
         // finishes the shift
         endShift()

@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.util.Date
 
 
 /**
@@ -26,6 +27,7 @@ class ShiftRepository(private val remoteSource: DatabaseReference,
 
     companion object{
         const val DELIVERY_LOG_DB_PATH: String = "Delivery-Log"
+        val DEFAULT_DATE_FOR_PATH: Date = Date()
     }
 
     private var backUpRef: DatabaseReference = remoteSource
@@ -86,9 +88,10 @@ class ShiftRepository(private val remoteSource: DatabaseReference,
     }
 
     private fun shiftDbPathFromRoot(shift: Shift): DatabaseReference {
+        val date = shift.date ?: DEFAULT_DATE_FOR_PATH
         return backUpRef.child(firebaseSafeString(shift.user.name))
-            .child(firebaseDateFormatted(shift.date))
-            .child(firebaseTimeFormatted(shift.date))
+            .child(firebaseDateFormatted(date))
+            .child(firebaseTimeFormatted(date))
     }
 
 }

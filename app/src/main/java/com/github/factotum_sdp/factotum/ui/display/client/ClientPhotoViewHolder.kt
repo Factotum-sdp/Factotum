@@ -11,7 +11,6 @@ class ClientPhotoViewHolder(
     private val onCardClick: (Uri) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    private var storageReference: StorageReference? = null
     private var url: String? = null
 
     init {
@@ -22,20 +21,16 @@ class ClientPhotoViewHolder(
         }
 
         binding.cardView.setOnClickListener {
-            storageReference?.downloadUrl?.addOnSuccessListener { uri ->
-                onCardClick(uri)
+            url?.let { urlString ->
+                onCardClick(Uri.parse(urlString))
             }
         }
     }
 
-
-    fun bind(storageReference: StorageReference, url: String?) {
-        this.storageReference = storageReference
+    fun bind(photoName : String, url: String?) {
         this.url = url
-        val dateTime = extractNewName(storageReference.name)
-        binding.displayItemView.text = dateTime
+        binding.displayItemView.text = extractNewName(photoName)
     }
-
 
     private fun extractNewName(name: String): String {
         val regex = Regex("""\d{2}-\d{2}-\d{4}_\d{2}-\d{2}""")

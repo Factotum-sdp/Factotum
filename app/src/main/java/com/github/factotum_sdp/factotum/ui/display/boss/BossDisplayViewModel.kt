@@ -5,12 +5,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.factotum_sdp.factotum.ui.display.AppDatabase
+import com.github.factotum_sdp.factotum.ui.display.data.AppDatabase
 import com.github.factotum_sdp.factotum.ui.display.data.boss.CachedFolder
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageException
 import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -21,9 +20,9 @@ class BossDisplayViewModel(context: Context) : ViewModel() {
     val folderReferences: LiveData<List<StorageReference>>
         get() = _folderReferences
 
-    private val database = AppDatabase.getInstance(context)
-    private val storage = Firebase.storage
-    private val cachedFolderDao = database.cachedFolderDao()
+    private val database by lazy { AppDatabase.getInstance(context) }
+    private val storage by lazy { FirebaseStorage.getInstance() }
+    private val cachedFolderDao by lazy { database.cachedFolderDao() }
 
     init { updateFolders() }
 

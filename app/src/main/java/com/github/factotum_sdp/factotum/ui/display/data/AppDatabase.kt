@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum.ui.display
+package com.github.factotum_sdp.factotum.ui.display.data
 
 
 import android.content.Context

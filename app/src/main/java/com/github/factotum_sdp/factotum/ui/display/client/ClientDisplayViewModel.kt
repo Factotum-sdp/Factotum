@@ -5,11 +5,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.factotum_sdp.factotum.ui.display.AppDatabase
+import com.github.factotum_sdp.factotum.ui.display.data.AppDatabase
 import com.github.factotum_sdp.factotum.ui.display.data.client.CachedPhoto
 import com.github.factotum_sdp.factotum.ui.display.data.client.CachedPhotoDao
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageException
 import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,7 +18,6 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
 
 class ClientDisplayViewModel(
     private val _folderName: MutableLiveData<String>,
@@ -32,9 +30,9 @@ class ClientDisplayViewModel(
     val photoReferences: LiveData<List<StorageReference>> = _photoReferences
     val folderName: LiveData<String> = _folderName
 
-    private val database = AppDatabase.getInstance(context)
-    private val storage = FirebaseStorage.getInstance()
-    private val cachedPhotoDao: CachedPhotoDao = database.cachedPhotoDao()
+    private val database by lazy { AppDatabase.getInstance(context) }
+    private val storage by lazy { FirebaseStorage.getInstance() }
+    private val cachedPhotoDao by lazy { database.cachedPhotoDao() }
 
     init { updateImages() }
 

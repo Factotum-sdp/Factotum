@@ -11,7 +11,6 @@ import com.github.factotum_sdp.factotum.ui.display.DisplayFragment
 import com.github.factotum_sdp.factotum.ui.display.ReferenceDiffCallback
 import com.google.firebase.storage.StorageReference
 
-// Adapter for displaying photos in the recycler view
 class ClientPhotoAdapter(
     private val lifecycleOwner: LifecycleOwner,
     private val viewModel: ClientDisplayViewModel,
@@ -24,13 +23,11 @@ class ClientPhotoAdapter(
         return ClientPhotoViewHolder(binding, onShareClick, onCardClick)
     }
 
-
     override fun onBindViewHolder(holder: ClientPhotoViewHolder, position: Int) {
-        val storageReference = getItem(position)
+        val pictureReference : StorageReference = getItem(position)
 
-        viewModel.getUrlForPhoto(storageReference.path).observe(lifecycleOwner) { url ->
-            holder.bind(storageReference, url)
+        viewModel.getUrlForPhoto(pictureReference.path).observe(lifecycleOwner) { url ->
+            holder.bind(pictureReference.name, url)
         }
     }
-
 }

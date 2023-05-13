@@ -55,7 +55,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         )
     }
 
-    // Following fields loaded in onCreateMenu()
+    // Following fields are loaded in onCreateMenu()
     private lateinit var fragMenu: Menu
     private lateinit var dragAndDropButton: MenuItem
     private lateinit var swipeLeftButton: MenuItem
@@ -273,7 +273,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
             dialogBuilder.setMessage(R.string.finish_shift_alert_question)
                 .setPositiveButton(R.string.end_shift) { _, _ ->
                     rbViewModel.recordsListState.value?.let { recordList ->
-                        userViewModel.loggedInUser.value?.let {user->
+                        userViewModel.loggedInUser.value?.let { user->
                             val currentShift = Shift(
                             Date(),
                             user,

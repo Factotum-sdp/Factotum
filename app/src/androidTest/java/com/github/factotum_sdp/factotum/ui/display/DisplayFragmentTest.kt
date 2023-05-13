@@ -27,6 +27,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import org.hamcrest.Matchers
 import org.junit.*
 import org.junit.runner.RunWith
 
@@ -174,16 +175,41 @@ class DisplayFragmentTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun sharingPhotoWorks() = runTest {
-        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
-        launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
+        launch { uploadImageToStorageEmulator(context, "Buhagiat", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
 
-        //Press on the refresh button
-        onView(withId(R.id.refreshButton)).perform(click())
+        goToDisplayFragment();
+
+        onView(withId(R.id.recyclerView)).perform(
+            RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
+                0,
+                click()
+            )
+        )
 
         onView(withId(R.id.shareButton)).perform(click())
 
-        //Check if the intent of sharing has been called
         Intents.intended(hasAction(Intent.ACTION_CHOOSER))
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun cantShareIfNoPhoneNumber() = runTest {
+        launch { uploadImageToStorageEmulator(context, "750ukPcnZS3xZKTAk6fQmj04", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
+
+        goToDisplayFragment();
+
+        onView(withId(R.id.recyclerView)).perform(
+            RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
+                0,
+                click()
+            )
+        )
+
+        onView(withId(R.id.shareButton)).perform(click())
+
+        assert(Intents.getIntents().isEmpty())
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

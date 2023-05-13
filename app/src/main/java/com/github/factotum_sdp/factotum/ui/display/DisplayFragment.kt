@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -16,6 +17,7 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.databinding.FragmentDisplayBinding
 import com.github.factotum_sdp.factotum.models.Role
+import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.ui.display.boss.BossDisplayViewModel
 import com.github.factotum_sdp.factotum.ui.display.boss.BossDisplayViewModelFactory
 import com.github.factotum_sdp.factotum.ui.display.boss.BossFolderAdapter
@@ -29,6 +31,7 @@ class DisplayFragment : Fragment() {
     private val clientViewModel: ClientDisplayViewModel by viewModels{ ClientDisplayViewModelFactory(userFolder, requireContext()) }
     private val bossViewModel: BossDisplayViewModel by viewModels{ BossDisplayViewModelFactory(requireContext()) }
     private val userViewModel: UserViewModel by activityViewModels()
+    private val contactsViewModel: ContactsViewModel by activityViewModels()
     private var _binding: FragmentDisplayBinding? = null
     private val binding get() = _binding!!
     private val userID = MutableLiveData("Unknown")
@@ -141,28 +144,29 @@ class DisplayFragment : Fragment() {
     }
 
     private fun setupClientUI() {
-    clientViewModel.refreshImages()
-
-    binding.refreshButton.setOnClickListener {
         clientViewModel.refreshImages()
-    }
 
-    val clientPhotoAdapter = ClientPhotoAdapter(
-        lifecycleOwner = viewLifecycleOwner,
-        viewModel = clientViewModel,
-        onShareClick = { uri ->
-            shareImage(uri, PHONE_NUMBER)
-        },
-        onCardClick = { uri ->
-            openImage(uri)
+        binding.refreshButton.setOnClickListener {
+            clientViewModel.refreshImages()
         }
-    )
 
-    binding.recyclerView.apply {
-        layoutManager = LinearLayoutManager(context)
-        adapter = clientPhotoAdapter
+        val clientPhotoAdapter = ClientPhotoAdapter(
+            lifecycleOwner = viewLifecycleOwner,
+            viewModel = clientViewModel,
+            userRole = userRole.value!!,
+            onShareClick = { uri ->
+                shareImage(uri)
+            },
+            onCardClick = { uri ->
+                openImage(uri)
+            }
+        )
+
+        binding.recyclerView.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = clientPhotoAdapter
+        }
     }
-}
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -177,33 +181,43 @@ class DisplayFragment : Fragment() {
         }
     }
 
-    private fun shareImage(uri: Uri, phoneNumber: String) {
+
+    private fun shareImage(uri: Uri) {
         val shareText = "Here is your delivery: $uri"
 
-        val generalShareIntent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, shareText)
-        }
+        contactsViewModel.contacts.observe(viewLifecycleOwner) { contacts ->
+            val userContact = contacts.find { it.username == userFolder.value }
+            val phone = userContact?.phone
 
-        val smsIntent = Intent(Intent.ACTION_SENDTO).apply {
-            data = Uri.parse("smsto:$phoneNumber")
-            putExtra("sms_body", shareText)
-        }
+            if (!phone.isNullOrEmpty()) {
+                val generalShareIntent = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, shareText)
+                }
 
-        val whatsappIntent = Intent(Intent.ACTION_VIEW).apply {
-            data = Uri.parse("https://api.whatsapp.com/send?phone=$phoneNumber&text=$shareText")
-            setPackage("com.whatsapp")
-        }
+                val smsIntent = Intent(Intent.ACTION_SENDTO).apply {
+                    data = Uri.parse("smsto:$phone")
+                    putExtra("sms_body", shareText)
+                }
 
-        val chooserIntent =
-            Intent.createChooser(generalShareIntent, getString(R.string.share)).apply {
-                putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(whatsappIntent, smsIntent))
+                val whatsappIntent = Intent(Intent.ACTION_VIEW).apply {
+                    data = Uri.parse("https://api.whatsapp.com/send?phone=$phone&text=$shareText")
+                    setPackage("com.whatsapp")
+                }
+
+                val chooserIntent =
+                Intent.createChooser(generalShareIntent, getString(R.string.share)).apply {
+                    putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(whatsappIntent, smsIntent))
+                }
+
+                startActivity(chooserIntent)
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "No phone number found for ${userFolder.value}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
-
-        startActivity(chooserIntent)
-    }
-
-    companion object{
-        const val PHONE_NUMBER = "1234567890"
+        }
     }
 }

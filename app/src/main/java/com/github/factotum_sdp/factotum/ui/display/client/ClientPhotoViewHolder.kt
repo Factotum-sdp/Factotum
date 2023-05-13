@@ -1,6 +1,7 @@
 package com.github.factotum_sdp.factotum.ui.display.client
 
 import android.net.Uri
+import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.databinding.DisplayItemPictureBinding
 import com.google.firebase.storage.StorageReference
@@ -30,6 +31,10 @@ class ClientPhotoViewHolder(
     fun bind(photoName : String, url: String?) {
         this.url = url
         binding.displayItemView.text = extractNewName(photoName)
+    }
+
+    fun hideShareButton() {
+        binding.shareButton.visibility = View.GONE
     }
 
     private fun extractNewName(name: String): String {

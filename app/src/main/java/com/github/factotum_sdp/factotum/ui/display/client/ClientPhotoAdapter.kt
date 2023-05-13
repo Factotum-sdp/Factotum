@@ -7,6 +7,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ListAdapter
 import com.github.factotum_sdp.factotum.databinding.DisplayItemPictureBinding
+import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.ui.display.DisplayFragment
 import com.github.factotum_sdp.factotum.ui.display.ReferenceDiffCallback
 import com.google.firebase.storage.StorageReference
@@ -14,6 +15,7 @@ import com.google.firebase.storage.StorageReference
 class ClientPhotoAdapter(
     private val lifecycleOwner: LifecycleOwner,
     private val viewModel: ClientDisplayViewModel,
+    private val userRole: Role,
     private val onShareClick: (Uri) -> Unit = {},
     private val onCardClick: (Uri) -> Unit = {}
 ) : ListAdapter<StorageReference, ClientPhotoViewHolder>(ReferenceDiffCallback()) {
@@ -28,6 +30,10 @@ class ClientPhotoAdapter(
 
         viewModel.getUrlForPhoto(pictureReference.path).observe(lifecycleOwner) { url ->
             holder.bind(pictureReference.name, url)
+
+            if(userRole == Role.CLIENT) {
+                holder.hideShareButton()
+            }
         }
     }
 }

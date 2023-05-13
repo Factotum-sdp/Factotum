@@ -1,15 +1,15 @@
 package com.github.factotum_sdp.factotum
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getAuth
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
@@ -17,25 +17,25 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getAuth
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getDatabase
 import com.github.factotum_sdp.factotum.models.Role
-import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
 import com.github.factotum_sdp.factotum.repositories.SettingsRepository
-import com.github.factotum_sdp.factotum.ui.picture.UploadWorker
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
+import com.github.factotum_sdp.factotum.ui.picture.UploadWorker
 import com.github.factotum_sdp.factotum.ui.settings.SettingsViewModel
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
-private const val INTERVAL_UPLOAD_TIME_MINUTE = 5L
-private const val MAX_UPLOAD_RETRY_TIME = 5000L
-private const val MAX_OPERATION_RETRY_TIME = 5000L
-private const val MAX_DOWNLOAD_RETRY_TIME = 5000L
+private const val INTERVAL_UPLOAD_PICTURE_TIME_MINUTE = 5L
+private const val INTERVAL_UPLOAD_LOCATION_TIME_SECOND = 15L
 
 class MainActivity : AppCompatActivity() {
 
@@ -45,13 +45,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var user: UserViewModel
     private lateinit var settings: SettingsViewModel
     private lateinit var contactsViewModel: ContactsViewModel
+    private val handler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        FirebaseStorage.getInstance().maxUploadRetryTimeMillis = MAX_UPLOAD_RETRY_TIME
-        FirebaseStorage.getInstance().maxDownloadRetryTimeMillis = MAX_DOWNLOAD_RETRY_TIME
-        FirebaseStorage.getInstance().maxOperationRetryTimeMillis = MAX_OPERATION_RETRY_TIME
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -73,7 +70,8 @@ class MainActivity : AppCompatActivity() {
             setOf(
                 R.id.roadBookFragment, R.id.directoryFragment,
                 R.id.loginFragment, R.id.routeFragment,
-                R.id.displayFragment, R.id.settingsFragment
+                R.id.displayFragment,R.id.bossMapFragment,
+                R.id.settingsFragment
             ), drawerLayout
         )
 
@@ -98,7 +96,6 @@ class MainActivity : AppCompatActivity() {
         listenLogoutButton()
     }
 
-
     fun applicationSettingsViewModel(): SettingsViewModel {
         return settings
     }
@@ -121,18 +118,22 @@ class MainActivity : AppCompatActivity() {
 
         // Instantiate the current user
         user = ViewModelProvider(this)[UserViewModel::class.java]
-        binding.navView.findViewTreeLifecycleOwner()?.let { lco ->
-            user.loggedInUser.observe(lco) {
-                val format = "${it.name} (${it.role})"
-                userName.text = format
-                email.text = it.email
 
-                // Update the menu items and navigate to the predefined fragment
-                // according to the user role
-                updateMenuItems(it.role)
-                navigateToFragment(it.role)
-                scheduleUpload(it.role)
-            }
+        user.loggedInUser.observe(this) {
+            val format = "${it.name} (${it.role})"
+            userName.text = format
+            //email.text = it.email // Commented temporarily to show user live location
+
+            // Update the menu items and navigate to the predefined fragment
+            // according to the user role
+            updateMenuItems(it.role)
+            navigateToFragment(it.role)
+            scheduleUpload(it.role)
+        }
+        user.userLocation.observe(this) {
+            val coordinatesFormat =
+                "[${it?.latitude} ; ${it?.longitude}]"
+            email.text = coordinatesFormat
         }
     }
 
@@ -155,9 +156,11 @@ class MainActivity : AppCompatActivity() {
                 navMenu.findItem(R.id.directoryFragment).isVisible = false
                 navMenu.findItem(R.id.routeFragment).isVisible = false
                 navMenu.findItem(R.id.settingsFragment).isVisible = false
+                navMenu.findItem(R.id.bossMapFragment).isVisible = false
             }
             Role.COURIER -> {
                 navMenu.findItem(R.id.displayFragment).isVisible = false
+                navMenu.findItem(R.id.bossMapFragment).isVisible = false
             }
             else -> {
                 navMenu.findItem(R.id.roadBookFragment).isVisible = true
@@ -191,12 +194,38 @@ class MainActivity : AppCompatActivity() {
         if (role == Role.COURIER) {
             CoroutineScope(Dispatchers.IO).launch {
                 val uploadWorkRequest =
-                    PeriodicWorkRequestBuilder<UploadWorker>(INTERVAL_UPLOAD_TIME_MINUTE, TimeUnit.MINUTES)
+                    PeriodicWorkRequestBuilder<UploadWorker>(INTERVAL_UPLOAD_PICTURE_TIME_MINUTE, TimeUnit.MINUTES)
                         .build()
                 WorkManager.getInstance(this@MainActivity).enqueue(uploadWorkRequest)
             }
+
+            handler.postDelayed(object : Runnable {
+                override fun run() {
+                    // Upload courier's location to Firebase
+                    uploadCourierLocation()
+                    handler.postDelayed(this, INTERVAL_UPLOAD_LOCATION_TIME_SECOND * 1000)
+                }
+            }, INTERVAL_UPLOAD_LOCATION_TIME_SECOND * 1000)
         }
     }
+
+
+    private fun uploadCourierLocation() {
+        // Get the courier's current location from the location tracker
+        val courierUID = auth.currentUser?.uid ?: return
+        val location = user.userLocation.value
+        val database = Firebase.database.reference.child("Location").child(courierUID)
+        if (location != null) {
+            // Upload the longitude and latitude to Firebase
+            database.child("name").setValue(user.loggedInUser.value?.name)
+            database.child("longitude").setValue(location.longitude)
+            database.child("latitude").setValue(location.latitude)
+        } else {
+            // Delete the "courierUID" entry from the "Location" node
+            database.removeValue()
+        }
+    }
+
 
     // Set the OnNavigationItemSelectedListener for the NavigationView
     private val onNavigationItemSelectedListener =

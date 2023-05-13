@@ -62,10 +62,9 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.10.0'
     androidTestImplementation 'androidx.arch.core:core-testing:2.2.0'
     debugImplementation "androidx.fragment:fragment-testing:1.5.7"
-    implementation 'androidx.core:core-ktx:1.10.0'
+    implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.fragment:fragment-ktx:1.5.7'
@@ -84,6 +83,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5'
     implementation 'androidx.room:room-runtime:2.5.1'
     kapt 'androidx.room:room-compiler:2.5.1'
+
 
     implementation 'com.github.bumptech.glide:glide:4.15.1'
     kapt 'com.github.bumptech.glide:compiler:4.15.1'

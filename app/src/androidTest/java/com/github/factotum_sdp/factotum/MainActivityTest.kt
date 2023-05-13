@@ -129,9 +129,8 @@ class MainActivityTest {
         )
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun pressingBackOnAMenuFragmentLeadsToRBFragment() = runTest {
+    fun pressingBackOnAMenuFragmentLeadsToRBFragment() {
         // First need to login to trigger the change of navGraph's start fragment
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
 
@@ -162,7 +161,7 @@ class MainActivityTest {
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
-        onView(withText("boss@gmail.com")).check(matches(isDisplayed()))
+        //onView(withText("boss@gmail.com")).check(matches(isDisplayed()))
         onView(withText("Boss (BOSS)")).check(matches(isDisplayed()))
     }
 

@@ -2,6 +2,7 @@ package com.github.factotum_sdp.factotum.ui.roadbook
 
 import android.Manifest
 import android.content.Context
+import android.provider.Settings
 import android.view.View
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.RecyclerView
@@ -21,15 +22,24 @@ import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.GrantPermissionRule
+import androidx.test.uiautomator.By
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.Until
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
+import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseDateFormatted
+import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseSafeString
 import com.github.factotum_sdp.factotum.models.DestinationRecord
+import com.github.factotum_sdp.factotum.models.Shift
 import com.github.factotum_sdp.factotum.models.User
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder.USER_COURIER
+import com.github.factotum_sdp.factotum.repositories.ShiftRepository.Companion.DELIVERY_LOG_DB_PATH
 import com.github.factotum_sdp.factotum.roadBookDataStore
+import com.github.factotum_sdp.factotum.shiftDataStore
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeLeftTheRecordAt
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightTheRecordAt
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
@@ -37,6 +47,7 @@ import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebas
 import com.github.factotum_sdp.factotum.utils.PreferencesSetting
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -44,6 +55,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.*
+import org.junit.After
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -67,6 +79,7 @@ class RoadBookFragmentTest {
     @get:Rule
     val foreGroundService = GrantPermissionRule.grant(Manifest.permission.FOREGROUND_SERVICE)
 
+
     @get:Rule
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
@@ -81,6 +94,9 @@ class RoadBookFragmentTest {
             initFirebase()
         }
     }
+    val courier = User(USER_COURIER.name,
+        USER_COURIER.email,
+        USER_COURIER.role)
 
     @Before
     fun toRoadBookFragment() {
@@ -91,10 +107,13 @@ class RoadBookFragmentTest {
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))
             .perform(click())
-        val courier = User(USER_COURIER.name,
-                           USER_COURIER.email,
-                           USER_COURIER.role)
         GeneralUtils.injectLoggedInUser(testRule, courier)
+    }
+
+    @After
+    fun cleanUp(){
+        val dbShiftRef = FirebaseInstance.getDatabase().reference.child(DELIVERY_LOG_DB_PATH)
+        dbShiftRef.removeValue()
     }
 
     @Test
@@ -361,6 +380,7 @@ class RoadBookFragmentTest {
     @Test
     fun roadBookFromBackUpAfterClearedOffline() {
         val db = FirebaseInstance.getDatabase()
+
         db.goOffline()
 
         isStartingRecyclerViewCheck()
@@ -385,6 +405,76 @@ class RoadBookFragmentTest {
         //Check starting records are displayed :
         isStartingRecyclerViewCheck()
     }
+
+    // ============================================================================================
+    // ================================== Deliveries Caching Tests ================================
+
+    @Test
+    fun endShiftUpdates() {
+        val db = FirebaseInstance.getDatabase()
+        val context = ApplicationProvider.getApplicationContext<Context>().applicationContext
+
+        // finished a delivery
+        updateTimestampOfRecord(3)
+        updateTimestampOfRecord(4)
+
+        val rbViewModel = getRbViewModel()!!
+        val shift = Shift(Date(), courier, rbViewModel.recordsListState.value!!)
+        val shiftList = ShiftList(listOf(shift))
+
+        val dbShiftRef = db.reference
+            .child(DELIVERY_LOG_DB_PATH)
+            .child(firebaseSafeString(shift.user.name))
+            .child(firebaseDateFormatted(shift.date))
+
+
+        // finishes the shift
+        endShift()
+
+        // Our target value to fetch
+        // is represented as a List<String> in Firebase
+        val shifts = getShiftFromDb(dbShiftRef)
+
+        //assert(future.get().all{ it.timeStamp != null })
+
+        shifts.zip(shiftList).all { pair ->
+            pair.first.records.zip(pair.second.records).all { recordPair ->
+                recordPair.first.destID == recordPair.second.destID
+                        && recordPair.first.timeStamp == recordPair.second.timeStamp}
+                    && pair.first.user == pair.second.user
+        }
+    }
+    @Test
+    fun shiftIsBackedUpCorrectlyWhenOffline() {
+        val db = FirebaseInstance.getDatabase()
+        db.goOffline()
+        val context = ApplicationProvider.getApplicationContext<Context>().applicationContext
+
+        // finished a shift
+        updateTimestampOfRecord(3)
+
+        //end shift
+        endShift()
+
+        var ls = ShiftList(emptyList())
+        runBlocking {
+            ls = context.shiftDataStore.data.first()
+        }
+        val lastShift = ls.shifts.last()
+
+        db.goOnline()
+        val rbViewModel = getRbViewModel()!!
+
+        val shift = Shift(Date(), courier, rbViewModel.recordsListState.value!!)
+        assert(lastShift.user == shift.user)
+        assert(lastShift.records.zip(shift.records).all { pair ->
+            pair.first.destID == pair.second.destID
+                    && pair.first.timeStamp?.let { pair.second.timeStamp != null } ?: (pair.second.timeStamp == null)
+        })
+
+    }
+
+
 
 
     // ============================================================================================
@@ -553,32 +643,6 @@ class RoadBookFragmentTest {
         onView(withText("X17#1")).check(isCompletelyBelow(withText("More#1")))
     }
 
-    // ============================================================================================
-    // ===================================== End Shift ============================================
-//    @Test
-//    fun endShiftUpdates() {
-//
-//        // Edit a timestamp :
-//        swipeRightTheRecordAt(3)
-//        onView(withId(R.id.editTextTimestamp)).perform(click())
-//        onView(withText(timePickerUpdateBLabel)).perform(click())
-//        onView(withText(R.string.edit_dialog_update_b))
-//            .perform(click())
-//        onView(withId(R.id.finish_shift)).perform(click())
-//        onView(withText(R.string.end_shift_dialog_title))
-//            .check(matches(isDisplayed()))
-//        onView(withId(android.R.id.button1)).perform(click())
-//        var recordList: DRecordList?
-//        testRule.scenario.onActivity {
-//            val fragment = it.supportFragmentManager.fragments.first() as NavHostFragment
-//            fragment.let {
-//                val curr =
-//                    it.childFragmentManager.primaryNavigationFragment as RoadBookFragment
-//                recordList = curr.getRBViewModelForTest().recordsListState.value
-//                checkDeliveryLog(UsersPlaceHolder.USER_COURIER.name, recordList!!)
-//            }
-//        }
-//    }
 
     // ============================================================================================
     // ================================= OptionMenu RB settings ===================================
@@ -995,6 +1059,7 @@ class RoadBookFragmentTest {
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))
             .perform(click())
+
     }
 
     private val newRecordClientID = "New"
@@ -1051,6 +1116,68 @@ class RoadBookFragmentTest {
             .substringBeforeLast(":")
     }
 
+    private fun updateTimestampOfRecord(index: Int) {
+        if (index < 0 || index >= DestinationRecords.RECORDS.size) {
+            throw IllegalArgumentException("Index out of bounds")
+        }
+        onView(withText(DestinationRecords.RECORDS[index].destID)).check(matches(isDisplayed()))
+        swipeRightTheRecordAt(index)
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click())
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+    }
+
+    private fun getRbViewModel(): RoadBookViewModel? {
+        var rbViewModel : RoadBookViewModel? = null
+        testRule.scenario.onActivity {
+            val fragment = it.supportFragmentManager.fragments.first() as NavHostFragment
+            fragment.let {
+                val curr =
+                    it.childFragmentManager.primaryNavigationFragment as RoadBookFragment
+                rbViewModel = curr.getRBViewModelForTest()
+            }
+        }
+        return rbViewModel
+    }
+
+    private fun endShift(){
+        onView(withId(R.id.finish_shift)).perform(click())
+        onView(withText(R.string.end_shift_dialog_title))
+            .check(matches(isDisplayed()))
+        onView(withId(android.R.id.button1)).perform(click())
+    }
+
+    private fun getShiftFromDb(dbShiftRef : DatabaseReference) : List<Shift>{
+        val future = CompletableFuture<List<Shift>>()
+        dbShiftRef.get().addOnSuccessListener { snapshot ->
+            var records : List<DestinationRecord>  = emptyList()
+            var user : User = User()
+            var date : Date = Date()
+            val shiftDb = snapshot.children.mapNotNull { shifts ->
+                shifts.children.forEach {
+                    if(it.key == "records"){
+                        records = it.children.mapNotNull { record ->
+                            record.getValue(DestinationRecord::class.java)
+                        }
+                    }
+                    if(it.key == "user"){
+                        user = it.getValue(User::class.java)!!
+                    }
+                    if(it.key == "date"){
+                        date = it.getValue(Date::class.java)!!
+                    }
+                }
+                Shift(date, user, DRecordList(records))
+            }
+            future.complete(shiftDb)
+
+        }.addOnFailureListener {
+            future.completeExceptionally(it)
+            assert(false)
+        }
+        return future.get()
+    }
 
     class RecyclerViewItemCountAssertion(private val expectedCount: Int) : ViewAssertion {
         override fun check(view: View?, noViewFoundException: NoMatchingViewException?) {

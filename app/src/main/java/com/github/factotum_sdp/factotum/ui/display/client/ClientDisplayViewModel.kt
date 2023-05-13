@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.factotum_sdp.factotum.ui.display.data.AppDatabase
 import com.github.factotum_sdp.factotum.ui.display.data.client.CachedPhoto
-import com.github.factotum_sdp.factotum.ui.display.data.client.CachedPhotoDao
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.Dispatchers
@@ -120,6 +119,5 @@ class ClientDisplayViewModel(
         }
     }
 }
-
 
 

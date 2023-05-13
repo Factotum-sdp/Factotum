@@ -80,4 +80,3 @@ class BossDisplayViewModel(context: Context) : ViewModel() {
         }
     }
 }
-

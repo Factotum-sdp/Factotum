@@ -4,7 +4,6 @@ import android.net.Uri
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.databinding.DisplayItemPictureBinding
-import com.google.firebase.storage.StorageReference
 
 class ClientPhotoViewHolder(
     private val binding: DisplayItemPictureBinding,

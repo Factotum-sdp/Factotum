@@ -1,6 +1,5 @@
 package com.github.factotum_sdp.factotum.ui.display.boss
 
-
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

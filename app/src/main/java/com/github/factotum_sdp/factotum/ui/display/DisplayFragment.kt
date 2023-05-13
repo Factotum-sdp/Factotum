@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.databinding.FragmentDisplayBinding
+import com.github.factotum_sdp.factotum.models.Contact
 import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.ui.display.boss.BossDisplayViewModel
@@ -24,7 +25,6 @@ import com.github.factotum_sdp.factotum.ui.display.boss.BossFolderAdapter
 import com.github.factotum_sdp.factotum.ui.display.client.ClientDisplayViewModel
 import com.github.factotum_sdp.factotum.ui.display.client.ClientDisplayViewModelFactory
 import com.github.factotum_sdp.factotum.ui.display.client.ClientPhotoAdapter
-import com.google.firebase.storage.StorageReference
 
 class DisplayFragment : Fragment() {
 
@@ -181,43 +181,58 @@ class DisplayFragment : Fragment() {
         }
     }
 
+    //================================================================
+    // Sharing
+    //================================================================
 
     private fun shareImage(uri: Uri) {
-        val shareText = "Here is your delivery: $uri"
-
         contactsViewModel.contacts.observe(viewLifecycleOwner) { contacts ->
-            val userContact = contacts.find { it.username == userFolder.value }
-            val phone = userContact?.phone
-
-            if (!phone.isNullOrEmpty()) {
-                val generalShareIntent = Intent(Intent.ACTION_SEND).apply {
-                    type = "text/plain"
-                    putExtra(Intent.EXTRA_TEXT, shareText)
-                }
-
-                val smsIntent = Intent(Intent.ACTION_SENDTO).apply {
-                    data = Uri.parse("smsto:$phone")
-                    putExtra("sms_body", shareText)
-                }
-
-                val whatsappIntent = Intent(Intent.ACTION_VIEW).apply {
-                    data = Uri.parse("https://api.whatsapp.com/send?phone=$phone&text=$shareText")
-                    setPackage("com.whatsapp")
-                }
-
-                val chooserIntent =
-                Intent.createChooser(generalShareIntent, getString(R.string.share)).apply {
-                    putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(whatsappIntent, smsIntent))
-                }
-
-                startActivity(chooserIntent)
-            } else {
-                Toast.makeText(
-                    requireContext(),
-                    "No phone number found for ${userFolder.value}",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+            val phone = getUserContactPhone(contacts)
+            shareViaAppropriateChannel(phone, "Here is your delivery: $uri")
         }
+    }
+
+    private fun getUserContactPhone(contacts: List<Contact>): String? {
+        val userContact = contacts.find { it.username == userFolder.value }
+        return userContact?.phone
+    }
+
+    private fun shareViaAppropriateChannel(phone: String?, shareText: String) {
+        if (!phone.isNullOrEmpty()) {
+            val (generalShareIntent, smsIntent, whatsappIntent) = prepareIntents(phone, shareText)
+            startChooserIntent(generalShareIntent, smsIntent, whatsappIntent)
+        } else {
+            Toast.makeText(
+                requireContext(),
+                "No phone number found for ${userFolder.value}",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    private fun prepareIntents(phone: String, shareText: String): Triple<Intent, Intent, Intent> {
+        val generalShareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, shareText)
+        }
+
+        val smsIntent = Intent(Intent.ACTION_SENDTO).apply {
+            data = Uri.parse("smsto:$phone")
+            putExtra("sms_body", shareText)
+        }
+
+        val whatsappIntent = Intent(Intent.ACTION_VIEW).apply {
+            data = Uri.parse("https://api.whatsapp.com/send?phone=$phone&text=$shareText")
+            setPackage("com.whatsapp")
+        }
+
+        return Triple(generalShareIntent, smsIntent, whatsappIntent)
+    }
+
+    private fun startChooserIntent(generalShareIntent: Intent, smsIntent: Intent, whatsappIntent: Intent) {
+        val chooserIntent = Intent.createChooser(generalShareIntent, getString(R.string.share)).apply {
+            putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(whatsappIntent, smsIntent))
+        }
+        startActivity(chooserIntent)
     }
 }

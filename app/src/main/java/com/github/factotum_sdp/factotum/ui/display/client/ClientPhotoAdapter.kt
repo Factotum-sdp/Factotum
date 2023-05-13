@@ -4,11 +4,9 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ListAdapter
 import com.github.factotum_sdp.factotum.databinding.DisplayItemPictureBinding
 import com.github.factotum_sdp.factotum.models.Role
-import com.github.factotum_sdp.factotum.ui.display.DisplayFragment
 import com.github.factotum_sdp.factotum.ui.display.ReferenceDiffCallback
 import com.google.firebase.storage.StorageReference
 

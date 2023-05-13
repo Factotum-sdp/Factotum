@@ -1,6 +1,5 @@
 package com.github.factotum_sdp.factotum.ui.display.data
 
-
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room

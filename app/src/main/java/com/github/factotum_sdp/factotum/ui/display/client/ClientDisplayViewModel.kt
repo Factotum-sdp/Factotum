@@ -44,6 +44,16 @@ class ClientDisplayViewModel(
         _folderName.value = folderName
     }
 
+    fun getUrlForPhoto(photoPath: String): LiveData<String?> {
+        val photoLiveData = MutableLiveData<String?>()
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val cachedPhoto = cachedPhotoDao.getPhotoByPath(photoPath)
+            photoLiveData.postValue(cachedPhoto?.url)
+        }
+
+        return photoLiveData
+    }
 
     private fun updateImages() {
         viewModelScope.launch {
@@ -67,7 +77,8 @@ class ClientDisplayViewModel(
             cachedPhotoDao.deleteAll(photosToDelete)
 
             cachedPhotoDao.insertAll(*remotePhotos.map { photo ->
-                CachedPhoto(photo.path, folderName)
+                val url = photo.downloadUrl.await().toString()
+                CachedPhoto(photo.path, folderName, url)
             }.toTypedArray())
         }
 

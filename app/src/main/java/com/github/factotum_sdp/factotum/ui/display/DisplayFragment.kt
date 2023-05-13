@@ -141,26 +141,28 @@ class DisplayFragment : Fragment() {
     }
 
     private fun setupClientUI() {
+    clientViewModel.refreshImages()
+
+    binding.refreshButton.setOnClickListener {
         clientViewModel.refreshImages()
-
-        binding.refreshButton.setOnClickListener {
-            clientViewModel.refreshImages()
-        }
-
-        val clientPhotoAdapter = ClientPhotoAdapter(
-            onShareClick = { storageReference ->
-                shareImage(storageReference, PHONE_NUMBER)
-            },
-            onCardClick = { uri ->
-                openImage(uri)
-            }
-        )
-
-        binding.recyclerView.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = clientPhotoAdapter
-        }
     }
+
+    val clientPhotoAdapter = ClientPhotoAdapter(
+        lifecycleOwner = viewLifecycleOwner,
+        viewModel = clientViewModel,
+        onShareClick = { uri ->
+            shareImage(uri, PHONE_NUMBER)
+        },
+        onCardClick = { uri ->
+            openImage(uri)
+        }
+    )
+
+    binding.recyclerView.apply {
+        layoutManager = LinearLayoutManager(context)
+        adapter = clientPhotoAdapter
+    }
+}
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -175,32 +177,30 @@ class DisplayFragment : Fragment() {
         }
     }
 
-    private fun shareImage(storageReference: StorageReference, phoneNumber: String) {
-        storageReference.downloadUrl.addOnSuccessListener { uri ->
-            val shareText = "Here is your delivery: $uri"
+    private fun shareImage(uri: Uri, phoneNumber: String) {
+        val shareText = "Here is your delivery: $uri"
 
-            val generalShareIntent = Intent(Intent.ACTION_SEND).apply {
-                type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, shareText)
-            }
-
-            val smsIntent = Intent(Intent.ACTION_SENDTO).apply {
-                data = Uri.parse("smsto:$phoneNumber")
-                putExtra("sms_body", shareText)
-            }
-
-            val whatsappIntent = Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse("https://api.whatsapp.com/send?phone=$phoneNumber&text=$shareText")
-                setPackage("com.whatsapp")
-            }
-
-            val chooserIntent =
-                Intent.createChooser(generalShareIntent, getString(R.string.share)).apply {
-                    putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(whatsappIntent, smsIntent))
-                }
-
-            startActivity(chooserIntent)
+        val generalShareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, shareText)
         }
+
+        val smsIntent = Intent(Intent.ACTION_SENDTO).apply {
+            data = Uri.parse("smsto:$phoneNumber")
+            putExtra("sms_body", shareText)
+        }
+
+        val whatsappIntent = Intent(Intent.ACTION_VIEW).apply {
+            data = Uri.parse("https://api.whatsapp.com/send?phone=$phoneNumber&text=$shareText")
+            setPackage("com.whatsapp")
+        }
+
+        val chooserIntent =
+            Intent.createChooser(generalShareIntent, getString(R.string.share)).apply {
+                putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(whatsappIntent, smsIntent))
+            }
+
+        startActivity(chooserIntent)
     }
 
     companion object{

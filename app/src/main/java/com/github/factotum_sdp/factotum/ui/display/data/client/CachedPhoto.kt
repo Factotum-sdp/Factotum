@@ -6,5 +6,6 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "cached_photo")
 data class CachedPhoto(
     @PrimaryKey val path: String,
-    val folderName: String
+    val folderName: String,
+    val url: String
 )

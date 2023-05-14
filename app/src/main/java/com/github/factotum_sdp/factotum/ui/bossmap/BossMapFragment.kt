@@ -2,8 +2,10 @@ package com.github.factotum_sdp.factotum.ui.bossmap
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Bitmap.createScaledBitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,6 +48,10 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    private val mailBoxSize = 100
+    private lateinit var bitmapDeliveredScaled : Bitmap
+    private lateinit var bitmapNotDeliveredScaled : Bitmap
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -56,6 +62,14 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
         mapView.getMapAsync(this)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+
+        bitmapDeliveredScaled = createScaledBitmap(
+            BitmapFactory.decodeResource(requireContext().resources, R.drawable.mailbox_delivered),
+            mailBoxSize, mailBoxSize, false)
+
+        bitmapNotDeliveredScaled = createScaledBitmap(
+            BitmapFactory.decodeResource(requireContext().resources, R.drawable.mailbox_lowered_flag),
+            mailBoxSize, mailBoxSize, false)
 
         return view
     }
@@ -79,11 +93,11 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
         }
 
         viewModel.courierLocations.observe(viewLifecycleOwner) { locations ->
-            updateMarkers(locations)
+            updateMap(locations, viewModel.deliveriesStatus.value ?: emptyList())
         }
 
-        viewModel.deliveriesStatus.observe(viewLifecycleOwner) {
-            updateDestinationMarkers(it)
+        viewModel.deliveriesStatus.observe(viewLifecycleOwner) {deliveryStatus ->
+            updateMap(viewModel.courierLocations.value ?: emptyList(), deliveryStatus)
         }
 
         contactsViewModel.contacts.observe(viewLifecycleOwner) {
@@ -91,14 +105,21 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    private fun updateMap(locations: List<CourierLocation>, deliveryStatus: List<DeliveryStatus>) {
+        googleMap.clear()
+        updateMarkers(locations)
+        updateDestinationMarkers(deliveryStatus)
+    }
+
     private fun updateDestinationMarkers(locations: List<DeliveryStatus>?) {
-        Log.d("updateDestinationMarkers", locations.toString())
         locations?.forEach { status ->
             googleMap.addMarker(
                 MarkerOptions()
                     .position(LatLng(status.latitude!!, status.longitude!!))
                     .title(status.destID)
-                    .icon(if(status.timeStamp != null) BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN) else BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                    .icon(if(status.timeStamp != null)
+                        BitmapDescriptorFactory.fromBitmap(bitmapDeliveredScaled)
+                        else BitmapDescriptorFactory.fromBitmap(bitmapNotDeliveredScaled))
             )
         }
     }
@@ -139,8 +160,6 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun updateMarkers(locations: List<CourierLocation>) {
-        //googleMap.clear()
-
         locations.forEach { location ->
             googleMap.addMarker(
                 MarkerOptions()

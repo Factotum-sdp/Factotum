@@ -92,8 +92,7 @@ class DRecordEditDialogBuilder(
         setViewModelUpdates({ _, _ ->
             // On negative button do nothing
         }, { _, _ ->
-            // On positive button :
-            try {
+            withUserEntryErrorManagement {
                 rbViewModel.addRecord(
                     checkClientID(clientIDView.text.toString()),
                     parseTimestamp(timestampView.text.toString()),
@@ -103,10 +102,6 @@ class DRecordEditDialogBuilder(
                     notesView.text.toString()
                 )
                 setSnackBar(host.getString(R.string.snap_text_record_added), 700)
-            } catch (e: InvalidClientIDException) {
-                setSnackBar(context.getString(R.string.invalid_client_id_snack_bar), 1400)
-            } catch (e: Exception) {
-                setSnackBar(host.getString(R.string.edit_rejected_snap_label), 1400)
             }
         })
         return this
@@ -131,8 +126,8 @@ class DRecordEditDialogBuilder(
             // On negative button : Update the screen, no changes to back-end
             rbRecyclerView.adapter!!.notifyItemChanged(position)
         }, { _, _ ->
-            val recHasChanged: Boolean
-            try { // On positive button : Try to edit the record
+            var recHasChanged: Boolean
+            withUserEntryErrorManagement {
                 recHasChanged =
                     rbViewModel.editRecordAt(
                         position,
@@ -145,14 +140,20 @@ class DRecordEditDialogBuilder(
                     )
                 if (recHasChanged)
                     setSnackBar(context.getString(R.string.edit_confirmed_snap_label), 700)
-            } catch (e: InvalidClientIDException) {
-                setSnackBar(context.getString(R.string.invalid_client_id_snack_bar), 1400)
-            } catch (e: Exception) {
-                setSnackBar(host.getString(R.string.edit_rejected_snap_label), 1400)
             }
             rbRecyclerView.adapter!!.notifyItemChanged(position)
         })
         return this
+    }
+
+    private fun withUserEntryErrorManagement(toExecute: () -> Unit) {
+        try { // On positive button : Try to edit the record
+            toExecute()
+        } catch (e: InvalidClientIDException) {
+            setSnackBar(context.getString(R.string.invalid_client_id_snack_bar), 1400)
+        } catch (e: Exception) {
+            setSnackBar(host.getString(R.string.edit_rejected_snap_label), 1400)
+        }
     }
 
     private fun checkClientID(userEntry: String): String {

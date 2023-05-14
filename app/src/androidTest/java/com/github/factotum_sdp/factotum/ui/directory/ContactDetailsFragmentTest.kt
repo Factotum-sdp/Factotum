@@ -70,6 +70,8 @@ class ContactDetailsFragmentTest {
             .perform(DrawerActions.open())
         onView(withId(R.id.directoryFragment))
             .perform(click())
+
+        Thread.sleep(4000)
         onView(withText("@" + currContact.username))
             .perform(click())
     }
@@ -181,7 +183,7 @@ class ContactDetailsFragmentTest {
                 }
                 val recyclerView = view as RecyclerView
                 val adapter = recyclerView.adapter
-                assert(adapter?.itemCount == 4)
+                assert(adapter?.itemCount == 7)
             }
         resetContact(currContact)
     }

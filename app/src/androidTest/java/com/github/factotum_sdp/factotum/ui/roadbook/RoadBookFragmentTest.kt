@@ -483,11 +483,20 @@ class RoadBookFragmentTest {
     }
 
     @Test
-    fun editWithAWrongClientIDIsShownOnScreen() {
+    fun editWithAWrongClientIDIsShownOnTheDialog() {
         swipeRightTheRecordAt(2)
         onView(withId(R.id.autoCompleteClientID)).perform(typeText("edited"))
         onView(withId(R.id.editTextRate)).perform(click())
         onView((withText(R.string.invalid_client_id_text))).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun editWithAWrongClientIDAndConfirmDoesNotApplyChanges() {
+        swipeRightTheRecordAt(2)
+        onView(withId(R.id.autoCompleteClientID))
+            .perform(click(), clearText(), typeText("edited"), closeSoftKeyboard())
+        onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
+        onView(withText(DestinationRecords.RECORDS[2].destID)).check(matches(isDisplayed()))
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

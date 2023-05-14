@@ -359,7 +359,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     }
 
     companion object {
-        private const val ROADBOOK_DB_PATH = "Sheet-shift"
+        const val ROADBOOK_DB_PATH = "Sheet-shift"
         const val DEST_ID_NAV_ARG_KEY = "destID"
     }
 

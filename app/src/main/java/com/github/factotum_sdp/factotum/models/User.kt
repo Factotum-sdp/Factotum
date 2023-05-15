@@ -12,7 +12,7 @@ data class User(
     val name: String = "",
     val email: String = "",
     val role: Role = Role.UNKNOWN,
-    val username: String,
+    val username: String = "",
     override val latitude: Double? = null,
     override val longitude: Double? = null
 ) : Localisable<User> {

@@ -38,7 +38,14 @@
         android:id="@+id/dRecordDetailsFragment"
         android:name="com.github.factotum_sdp.factotum.ui.roadbook.DRecordDetailsFragment"
         android:label="Record details"
-        tools:layout="@layout/fragment_drecord_details" />
+        tools:layout="@layout/fragment_drecord_details" >
+        <action
+            android:id="@+id/action_dRecordDetailsFragment_to_MapsFragment"
+            app:destination="@id/MapsFragment" />
+        <action
+            android:id="@+id/action_dRecordDetailsFragment_to_contactCreationFragment"
+            app:destination="@id/contactCreationFragment" />
+    </fragment>
     <fragment
         android:id="@+id/directoryFragment"
         android:name="com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment"
@@ -102,6 +109,9 @@
         <action
             android:id="@+id/action_contactCreation_to_directoryFragment"
             app:destination="@id/directoryFragment" />
+        <action
+            android:id="@+id/action_contactCreationFragment_to_contactDetailsFragment2"
+            app:destination="@id/contactDetailsFragment2" />
     </fragment>
     <fragment
         android:id="@+id/displayFragment"
@@ -113,4 +123,9 @@
         android:name="com.github.factotum_sdp.factotum.ui.settings.SettingsFragment"
         android:label="SettingsFragment"
         tools:layout="@layout/fragment_settings" />
+    <fragment
+        android:id="@+id/bossMapFragment"
+        android:name="com.github.factotum_sdp.factotum.ui.bossmap.BossMapFragment"
+        android:label="BossMapFragment"
+        tools:layout="@layout/fragment_boss_map" />
 </navigation>

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.widget.SwitchCompat
@@ -15,15 +16,19 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
-import com.github.factotum_sdp.factotum.preferencesDataStore
 import com.github.factotum_sdp.factotum.UserViewModel
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.models.Contact
-import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
+import com.github.factotum_sdp.factotum.models.Shift
+import com.github.factotum_sdp.factotum.preferencesDataStore
 import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
 import com.github.factotum_sdp.factotum.repositories.RoadBookRepository
+import com.github.factotum_sdp.factotum.repositories.ShiftRepository
+import com.github.factotum_sdp.factotum.repositories.ShiftRepository.Companion.DELIVERY_LOG_DB_PATH
 import com.github.factotum_sdp.factotum.roadBookDataStore
+import com.github.factotum_sdp.factotum.shiftDataStore
+import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.ui.settings.SettingsViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.*
@@ -42,11 +47,15 @@ class RoadBookFragment : Fragment(), MenuProvider {
             RoadBookRepository(
                 FirebaseInstance.getDatabase().reference.child(ROADBOOK_DB_PATH),
                 requireContext().roadBookDataStore
-            )
+            ),
+            ShiftRepository(
+                FirebaseInstance.getDatabase().reference.child(DELIVERY_LOG_DB_PATH),
+                requireContext().shiftDataStore
+            ),
         )
     }
 
-    // Following fields loaded in onCreateMenu()
+    // Following fields are loaded in onCreateMenu()
     private lateinit var fragMenu: Menu
     private lateinit var dragAndDropButton: MenuItem
     private lateinit var swipeLeftButton: MenuItem
@@ -55,7 +64,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private lateinit var showArchivedButton: MenuItem
 
     private var usePreferences = false
-    private val locationTrackingHandler: LocationTrackingHandler = LocationTrackingHandler()
     private val userViewModel: UserViewModel by activityViewModels()
     private val contactsViewModel : ContactsViewModel by activityViewModels()
 
@@ -91,9 +99,15 @@ class RoadBookFragment : Fragment(), MenuProvider {
         return view
     }
 
+    override fun onPause() {
+        rbViewModel.backUp()
+        saveButtonStates()
+        super.onPause()
+    }
+
     @SuppressLint("NotifyDataSetChanged")
     private fun setLiveLocationEvent() {
-        locationTrackingHandler.setOnLocationUpdate { currentLocation ->
+        userViewModel.locationTrackingHandler.setOnLocationUpdate { currentLocation ->
             rbViewModel.nextDestination()?.let {
                 val destination = clientLocation(it.clientID)
                 destination?.let { dest ->
@@ -102,21 +116,8 @@ class RoadBookFragment : Fragment(), MenuProvider {
                         rbViewModel.timeStampARecord(cal.time, it)
                     }
                 }
-
             }
         }
-    }
-
-    private fun clientLocation(clientID: String): Location? {
-        val contact = currentContacts.firstOrNull {
-            it.username == clientID
-        } ?: return null
-        val location = Location("factotum")
-        contact.longitude?.let {
-            location.longitude = it
-            location.latitude = contact.latitude!!
-        } ?: return null
-        return location
     }
 
     private fun onDestinationPlace(current: Location, destination: Location): Boolean {
@@ -124,11 +125,11 @@ class RoadBookFragment : Fragment(), MenuProvider {
         return distance <= ON_DESTINATION_RADIUS // Remove constant
     }
 
-    //============================================================================================
-    override fun onPause() {
-        rbViewModel.backUp()
-        saveButtonStates()
-        super.onPause()
+    private fun clientLocation(clientID: String): Location? {
+        val contact = currentContacts.firstOrNull {
+            it.username == clientID
+        } ?: return null
+        return contact.getLocation()
     }
 
     private fun setOnDRecordClickListener(): (String) -> View.OnClickListener {
@@ -245,13 +246,13 @@ class RoadBookFragment : Fragment(), MenuProvider {
         val locationSwitch =
             locationMenu.actionView!!.findViewById<SwitchCompat>(R.id.menu_item_switch)
         locationSwitch?.let {// Load current state to set the switch item
-            it.isChecked = locationTrackingHandler.isTrackingEnabled()
+            it.isChecked = userViewModel.locationTrackingHandler.isTrackingEnabled.value
         }
         locationSwitch!!.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked)
-                locationTrackingHandler.startLocationService(requireContext(), requireActivity())
+                userViewModel.locationTrackingHandler.startLocationService(requireContext(), requireActivity())
             else if (lifecycle.currentState == Lifecycle.State.RESUMED && this.isVisible) {
-                locationTrackingHandler.stopLocationService(requireContext(), requireActivity())
+                userViewModel.locationTrackingHandler.stopLocationService(requireContext(), requireActivity())
             }
         }
     }
@@ -270,17 +271,23 @@ class RoadBookFragment : Fragment(), MenuProvider {
         endShiftButton.setOnMenuItemClickListener {
             val dialogBuilder = AlertDialog.Builder(requireContext())
             dialogBuilder.setMessage(R.string.finish_shift_alert_question)
-                .setPositiveButton(R.string.end_shift) { dialog, _ ->
-                    rbViewModel.recordsListState.let {
-                        rbViewModel.makeShiftLog(userViewModel.loggedInUser.value!!)
-                        Toast.makeText(
-                            requireContext(),
-                            R.string.shift_ended,
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                .setPositiveButton(R.string.end_shift) { _, _ ->
+                    rbViewModel.recordsListState.value?.let { recordList ->
+                        userViewModel.loggedInUser.value?.let { user->
+                            val currentShift = Shift(
+                            Date(),
+                            user,
+                            recordList
+                        )
+                            rbViewModel.logShift(currentShift)
+                            Toast.makeText(
+                                requireContext(),
+                                R.string.shift_ended,
+                                Toast.LENGTH_SHORT
+                            ).show() } ?: Log.w("RoadBookFragment", "User is null, cannot log shift")
+                    } ?: Log.w("RoadBookFragment", "Record list is null, cannot log shift")
                 }
-                .setNegativeButton("Not now") { dialog, _ ->
+                .setNegativeButton(R.string.decline_end_shift) { dialog, _ ->
                     dialog.cancel()
                 }
             val alert = dialogBuilder.create()
@@ -352,7 +359,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     }
 
     companion object {
-        private const val ROADBOOK_DB_PATH = "Sheet-shift"
+        const val ROADBOOK_DB_PATH = "Sheet-shift"
         const val DEST_ID_NAV_ARG_KEY = "destID"
     }
 
@@ -362,7 +369,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     }
 
     override fun onDestroy() {
-        locationTrackingHandler.stopLocationService(requireContext(), requireActivity())
+        userViewModel.locationTrackingHandler.stopLocationService(requireContext(), requireActivity())
         super.onDestroy()
     }
 

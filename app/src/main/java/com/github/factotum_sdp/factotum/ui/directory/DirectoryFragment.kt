@@ -13,13 +13,21 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.UserViewModel
+import com.github.factotum_sdp.factotum.models.Role
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class DirectoryFragment : Fragment() {
 
     private lateinit var adapter: ContactsRecyclerAdapter
-    private val viewModel : ContactsViewModel by activityViewModels()
+    private val viewModel: ContactsViewModel by activityViewModels()
+    private val userViewModel: UserViewModel by activityViewModels()
     private lateinit var emptyContactsMessage: TextView
+
+    companion object {
+        const val USERNAME_NAV_KEY = "username"
+        const val IS_SUB_FRAGMENT_NAV_KEY = "isSubFragment"
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,6 +50,9 @@ class DirectoryFragment : Fragment() {
         }
 
         val createContactButton = view.findViewById<FloatingActionButton>(R.id.add_contact_button)
+        if (userViewModel.loggedInUser.value?.role == Role.COURIER) {
+            createContactButton.visibility = View.GONE
+        }
         createContactButton.setOnClickListener {
             it.findNavController()
                 .navigate(R.id.action_directoryFragment_to_contactCreationFragment)
@@ -63,7 +74,8 @@ class DirectoryFragment : Fragment() {
         adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onChanged() {
                 super.onChanged()
-                emptyContactsMessage.visibility = if (adapter.itemCount == 0) View.VISIBLE else View.GONE
+                emptyContactsMessage.visibility =
+                    if (adapter.itemCount == 0) View.VISIBLE else View.GONE
             }
         })
 
@@ -79,5 +91,4 @@ class DirectoryFragment : Fragment() {
             }
         })
     }
-
 }

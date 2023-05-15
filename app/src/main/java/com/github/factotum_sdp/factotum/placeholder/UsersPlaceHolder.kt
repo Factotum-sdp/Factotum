@@ -67,33 +67,6 @@ object UsersPlaceHolder {
         this.auth = auth
     }
 
-    /**
-     * Populates the database with user.
-     */
-    suspend fun addUserToDb(user: UserWithPassword) = suspendCoroutine { continuation ->
-        dataSource.getReference(LoginDataSource.DISPATCH_DB_PATH)
-            .child(FirebaseInstance.getAuth().currentUser?.uid ?: "")
-            .setValue(user)
-            .addOnSuccessListener {
-                continuation.resume(Unit)
-            }
-            .addOnFailureListener { exception ->
-                continuation.resumeWithException(exception)
-            }
-
-        auth.signOut()
-    }
-
-    suspend fun addAuthUser(user: UserWithPassword) = suspendCoroutine { continuation ->
-        auth.createUserWithEmailAndPassword(user.email, password)
-            .addOnSuccessListener {
-                continuation.resume(Unit)
-            }
-            .addOnFailureListener { exception ->
-                continuation.resumeWithException(exception)
-            }
-    }
-
     data class UserWithPassword(
         val name: String,
         val email: String,

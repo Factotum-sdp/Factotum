@@ -37,7 +37,7 @@
     <string name="snap_text_on_rec_unarchive">Record unarchived</string>
 
     <string name="menu_maps">Maps</string>
-    <string name="run">Run</string>
+    <string name="run">Go To dst</string>
     <string name="rate_text_view">rate</string>
     <string name="wait_text_view">wait</string>
     <string name="arrival_text_view">arrival</string>
@@ -100,8 +100,8 @@
 
     <string name="rb_label_swiper_edition">Swipe R. Editon</string>
     <string name="rb_label_dragdrop"><![CDATA[Drag & Drop]]></string>
-    <string name="edit_dialog_cancel_b">cancel</string>
-    <string name="edit_dialog_update_b">update</string>
+    <string name="edit_dialog_cancel_b">Cancel</string>
+    <string name="edit_dialog_update_b">Confirm</string>
     <string name="menu_view_proof_picture">View Proof Pictures</string>
     <string name="refresh">Refresh</string>
     <string name="hint_dialog_client_id">Client ID</string>
@@ -165,4 +165,13 @@
     <string name="negative_label_delete_all_roadbook_dialog">No !</string>
     <string name="snap_delete_all_roadbook">All Roadbook records have been deleted</string>
     <string name="snap_load_roadbook_backup">The last backup has been loaded</string>
+    <string name="managing_client_text">Managing Client: </string>
+    <string name="managing_client">\@managing_client</string>
+    <string name="super_client_username">Super client username</string>
+    <string name="super_client_id_not_valid">The managing client\'s username is not valid.</string>
+    <string name="contact_not_found">Contact not found</string>
+    <string name="boss_Map">Boss Map</string>
+    <string name="decline_end_shift">Not now</string>
+    <string name="invalid_client_id_snack_bar">Invalid Client ID, please correct it</string>
+    <string name="invalid_client_id_text">Invalid Client ID</string>
 </resources>

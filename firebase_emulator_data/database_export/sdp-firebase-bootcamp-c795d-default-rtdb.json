@@ -1,4 +1,100 @@
 {
+    "contacts": {
+        "00": {
+            "addressName": "123 Fake Street",
+            "details": "I am a boss",
+            "latitude": 46.517719,
+            "longitude": 6.569090,
+            "username": "00",
+            "name": "John",
+            "phone": "123456789",
+            "profile_pic_id": 2131165334,
+            "role": "BOSS",
+            "surname": "Smith"
+        },
+        "01": {
+            "addressName": "456 Fake Street",
+            "details": "I am a courier",
+            "username": "01",
+            "name": "Jane",
+            "phone": "987654321",
+            "profile_pic_id": 2131165334,
+            "role": "COURIER",
+            "surname": "Jones"
+        },
+        "02": {
+            "addressName": "789 Fake Street",
+            "details": "I am a client",
+            "latitude": 46.517719,
+            "longitude": 6.569090,
+            "username": "02",
+            "name": "Joe",
+            "phone": "123987456",
+            "profile_pic_id": 2131165334,
+            "role": "CLIENT",
+            "surname": "Williams"
+        },
+        "Buhagiat": {
+            "addressName": "123 Fake Street",
+            "details": "I am a boss",
+            "latitude": 46.517719,
+            "longitude": 6.569090,
+            "username": "Buhagiat",
+            "name": "Jack",
+            "phone": "123456789",
+            "profile_pic_id": 2131165334,
+            "role": "COURIER",
+            "surname": "Brown"
+        },
+        "X17": {
+            "addressName": "456 Fake Street",
+            "details": "I am a courier",
+            "latitude": 46.517733,
+            "longitude": 6.569090,
+            "username": "X17",
+            "name": "Jill",
+            "phone": "987654321",
+            "profile_pic_id": 2131165334,
+            "role": "Courier",
+            "surname": "Taylor"
+        },
+        "More": {
+        "addressName": "",
+        "details": "La loi de Moore",
+        "name": "Moore",
+        "phone": "0796521331",
+        "profile_pic_id": 2131165334,
+        "role": "CLIENT",
+        "surname": "Loi",
+        "username": "More"
+        },
+        "New": {
+        "addressName": "Morges, Switzerland",
+        "details": "",
+        "latitude": 46.5088127,
+        "longitude": 6.496130099999999,
+        "name": "Nouveau",
+        "phone": "0785623569",
+        "profile_pic_id": 2131165334,
+        "role": "CLIENT",
+        "super_client": "",
+        "surname": "Romane",
+        "username": "New"
+        },
+        "QG": {
+        "addressName": "Lausanne, Switzerland",
+        "details": "",
+        "latitude": 46.5196535,
+        "longitude": 6.6322734,
+        "name": "QG",
+        "phone": "07828833488",
+        "profile_pic_id": 2131165334,
+        "role": "CLIENT",
+        "super_client": "",
+        "surname": "QG",
+        "username": "QG"
+        }    
+    },
     "profile-dispatch": {
         "9Q9PdkiVQKwgHcuEGyshqXyXHrHT": {
             "email": "courier@gmail.com",
@@ -26,82 +122,6 @@
             "name": "Name",
             "role": "COURIER",
             "username": "name"
-        }
-    },
-    "contacts": {
-        "00": {
-            "address": "123 Fake Street",
-            "details": "I am a boss",
-            "username": "00",
-            "name": "John",
-            "phone": "123456789",
-            "profile_pic_id": 2131165334,
-            "role": "Boss",
-            "surname": "Smith"
-        },
-        "01": {
-            "address": "456 Fake Street",
-            "details": "I am a courier",
-            "username": "01",
-            "name": "Jane",
-            "phone": "987654321",
-            "profile_pic_id": 2131165334,
-            "role": "Courier",
-            "surname": "Jones"
-        },
-        "02": {
-            "address": "789 Fake Street",
-            "details": "I am a client",
-            "username": "02",
-            "name": "Joe",
-            "phone": "123987456",
-            "profile_pic_id": 2131165334,
-            "role": "Client",
-            "surname": "Williams"
-        },
-        "03": {
-            "address": "123 Fake Street",
-            "details": "I am a boss",
-            "username": "03",
-            "name": "Jack",
-            "phone": "123456789",
-            "profile_pic_id": 2131165334,
-            "role": "Boss",
-            "surname": "Brown"
-        },
-        "04": {
-            "address": "456 Fake Street",
-            "details": "I am a courier",
-            "username": "04",
-            "name": "Jill",
-            "phone": "987654321",
-            "profile_pic_id": 2131165334,
-            "role": "Courier",
-            "surname": "Taylor"
-        },
-        "Buhagiat": {
-            "address": "123 Fake Street",
-            "details": "I am a boss",
-            "latitude": 46.517719,
-            "longitude": 6.569090,
-            "username": "Buhagiat",
-            "name": "Jack",
-            "phone": "123456789",
-            "profile_pic_id": 2131165334,
-            "role": "Boss",
-            "surname": "Brown"
-        },
-        "X17": {
-            "address": "456 Fake Street",
-            "details": "I am a courier",
-            "latitude": 46.517733,
-            "longitude": 6.569090,
-            "username": "X17",
-            "name": "Jill",
-            "phone": "987654321",
-            "profile_pic_id": 2131165334,
-            "role": "Courier",
-            "surname": "Taylor"
         }
     }
 }

@@ -8,7 +8,6 @@ import com.github.factotum_sdp.factotum.databinding.DisplayItemFolderBinding
 import com.github.factotum_sdp.factotum.ui.display.ReferenceDiffCallback
 import com.google.firebase.storage.StorageReference
 
-// Adapter for displaying photos in the recycler view
 class BossFolderAdapter(
     private val onCardClick: (MutableLiveData<String>) -> Unit = {}
 ) : ListAdapter<StorageReference, BossFolderViewHolder>(ReferenceDiffCallback()) {

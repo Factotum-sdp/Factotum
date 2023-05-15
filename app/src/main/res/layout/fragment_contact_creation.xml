@@ -21,7 +21,7 @@
             android:contentDescription="@string/contact_image"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@android:drawable/ic_menu_add"></ImageView>
+            app:srcCompat="@android:drawable/ic_menu_add" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -91,7 +91,18 @@
         <Spinner
             android:id="@+id/roles_spinner"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"/>
+
+        <EditText
+            android:id="@+id/editTextSuperClientUsername"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:autofillHints="username"
+            android:hint="@string/super_client_username"
+            android:inputType="textPersonName"
+            android:visibility="gone"/>
     </LinearLayout>
 
     <Button

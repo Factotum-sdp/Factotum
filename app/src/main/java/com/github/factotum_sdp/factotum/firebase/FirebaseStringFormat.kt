@@ -51,7 +51,27 @@ object FirebaseStringFormat {
      *
      * @return the formatted date
      */
-    fun firebaseDateFormatted(): String {
-        return SimpleDateFormat("ddMMyyyy", Locale.getDefault()).format(Date())
+    fun firebaseDateFormatted(date: Date): String {
+        return SimpleDateFormat("ddMMyyyy", Locale.ENGLISH).format(date)
+    }
+
+    /**
+     * This function parses a date formatted as ddMMyyyy
+     *
+     * @param date : String to be parsed
+     * @return the parsed date
+     */
+    fun firebaseParseDate(date: String) : Date?{
+        if (date.isEmpty()) return null
+        return SimpleDateFormat("ddMMyyyy", Locale.ENGLISH).parse(date)
+    }
+
+    fun firebaseTimeFormatted(date: Date): String {
+        return SimpleDateFormat("HH:mm", Locale.ENGLISH).format(date)
+    }
+
+    fun firebaseParseTime(date: String): Date?{
+        if (date.isEmpty()) return null
+        return SimpleDateFormat("HH:mm", Locale.ENGLISH).parse(date)
     }
 }

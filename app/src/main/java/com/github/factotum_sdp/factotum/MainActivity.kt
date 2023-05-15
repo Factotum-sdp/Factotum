@@ -37,6 +37,8 @@ import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -44,6 +46,9 @@ import java.util.concurrent.TimeUnit
 
 private const val INTERVAL_UPLOAD_PICTURE_TIME_MINUTE = 5L
 private const val INTERVAL_UPLOAD_LOCATION_TIME_SECOND = 15L
+private const val MAX_UPLOAD_RETRY_TIME = 5000L
+private const val MAX_OPERATION_RETRY_TIME = 5000L
+private const val MAX_DOWNLOAD_RETRY_TIME = 5000L
 
 
 class MainActivity : AppCompatActivity() {
@@ -66,6 +71,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        FirebaseStorage.getInstance().maxUploadRetryTimeMillis = MAX_UPLOAD_RETRY_TIME
+        FirebaseStorage.getInstance().maxDownloadRetryTimeMillis = MAX_DOWNLOAD_RETRY_TIME
+        FirebaseStorage.getInstance().maxOperationRetryTimeMillis = MAX_OPERATION_RETRY_TIME
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)

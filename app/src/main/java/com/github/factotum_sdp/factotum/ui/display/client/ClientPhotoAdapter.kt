@@ -3,14 +3,18 @@ package com.github.factotum_sdp.factotum.ui.display.client
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.ListAdapter
 import com.github.factotum_sdp.factotum.databinding.DisplayItemPictureBinding
+import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.ui.display.ReferenceDiffCallback
 import com.google.firebase.storage.StorageReference
 
-// Adapter for displaying photos in the recycler view
 class ClientPhotoAdapter(
-    private val onShareClick: (StorageReference) -> Unit = {},
+    private val lifecycleOwner: LifecycleOwner,
+    private val viewModel: ClientDisplayViewModel,
+    private val userRole: Role,
+    private val onShareClick: (Uri) -> Unit = {},
     private val onCardClick: (Uri) -> Unit = {}
 ) : ListAdapter<StorageReference, ClientPhotoViewHolder>(ReferenceDiffCallback()) {
 
@@ -20,6 +24,14 @@ class ClientPhotoAdapter(
     }
 
     override fun onBindViewHolder(holder: ClientPhotoViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        val pictureReference : StorageReference = getItem(position)
+
+        viewModel.getUrlForPhoto(pictureReference.path).observe(lifecycleOwner) { url ->
+            holder.bind(pictureReference.name, url)
+
+            if(userRole == Role.CLIENT) {
+                holder.hideShareButton()
+            }
+        }
     }
 }

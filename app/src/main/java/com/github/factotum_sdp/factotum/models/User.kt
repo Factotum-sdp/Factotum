@@ -6,6 +6,8 @@ import android.net.Uri
 /**
  * Data class that captures user information for logged in users retrieved from LoginRepository
  */
+
+@Serializable
 data class User(
     val name: String,
     val email: String,

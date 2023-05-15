@@ -48,7 +48,7 @@ class LoginFragment : Fragment() {
         val logVMFact = LoginViewModel.LoginViewModelFactory(userViewModel)
         viewModel =
             ViewModelProvider(this, logVMFact)[LoginViewModel::class.java]
-
+        
         // Define the UI elements
         val emailEditText = binding.email
         val passwordEditText = binding.password

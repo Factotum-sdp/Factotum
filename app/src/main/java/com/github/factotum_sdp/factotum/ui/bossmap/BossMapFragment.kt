@@ -1,7 +1,5 @@
 package com.github.factotum_sdp.factotum.ui.bossmap
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Bitmap.createScaledBitmap
 import android.graphics.BitmapFactory
@@ -92,6 +90,7 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
                 cameraPositionInitialized = true
 
             }
+        }
 
             viewModel.deliveriesStatus.observe(viewLifecycleOwner) { deliveryStatus ->
                 updateMap(viewModel.courierLocations.value ?: emptyList(), deliveryStatus)
@@ -100,7 +99,7 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
             contactsViewModel.contacts.observe(viewLifecycleOwner) {
                 viewModel.updateContacts(it)
             }
-        }
+
     }
 
     private fun updateMap(locations: List<CourierLocation>, deliveryStatus: List<DeliveryStatus>) {
@@ -121,7 +120,7 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
             )
         }
     }
-    
+
     private fun updateMarkers(locations: List<CourierLocation>) {
         locations.forEach { location ->
             googleMap.addMarker(

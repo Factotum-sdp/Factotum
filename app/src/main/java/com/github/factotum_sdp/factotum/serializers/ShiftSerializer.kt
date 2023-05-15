@@ -22,7 +22,6 @@ object ShiftSerializer : Serializer<ShiftList> {
             e.printStackTrace()
             defaultValue
         }
-
     }
 
     override suspend fun writeTo(t: ShiftList, output: OutputStream) {

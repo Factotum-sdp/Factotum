@@ -2,7 +2,6 @@ package com.github.factotum_sdp.factotum.ui.roadbook
 
 import android.Manifest
 import android.content.Context
-import android.provider.Settings
 import android.view.View
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.RecyclerView
@@ -22,11 +21,7 @@ import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.GrantPermissionRule
-import androidx.test.uiautomator.By
-import androidx.test.uiautomator.UiDevice
-import androidx.test.uiautomator.Until
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
@@ -37,6 +32,7 @@ import com.github.factotum_sdp.factotum.models.Shift
 import com.github.factotum_sdp.factotum.models.User
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder.USER_COURIER
+import com.github.factotum_sdp.factotum.repositories.ShiftRepository
 import com.github.factotum_sdp.factotum.repositories.ShiftRepository.Companion.DELIVERY_LOG_DB_PATH
 import com.github.factotum_sdp.factotum.roadBookDataStore
 import com.github.factotum_sdp.factotum.shiftDataStore
@@ -45,10 +41,7 @@ import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightT
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.PreferencesSetting
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
@@ -94,9 +87,7 @@ class RoadBookFragmentTest {
             initFirebase()
         }
     }
-    val courier = User(USER_COURIER.name,
-        USER_COURIER.email,
-        USER_COURIER.role)
+    private val courier = User(USER_COURIER.name, USER_COURIER.email, USER_COURIER.role)
 
     @Before
     fun toRoadBookFragment() {
@@ -210,7 +201,7 @@ class RoadBookFragmentTest {
     }
 
     // ============================================================================================
-    // ================================== RoadBook Caching Tests ================================
+    // ================================== RoadBook Back-up Tests ================================
     @Test
     fun roadBookIsBackedUpCorrectlyWhenOnline() {
         val db = FirebaseInstance.getDatabase()
@@ -274,33 +265,16 @@ class RoadBookFragmentTest {
     }
 
     @Test
-    fun networkAndLocalBackUpConsistency() {
+    fun networkAndThenLocalOnlyBackUpAreConsistent() {
         val db = FirebaseInstance.getDatabase()
-
         val date = Calendar.getInstance().time
         val ref = db.reference
             .child("Sheet-shift")
             .child(SimpleDateFormat.getDateInstance().format(date))
 
-
         // Our target value to fetch
         // is represented as a List<String> in Firebase
         val future = CompletableFuture<List<DestinationRecord>>()
-
-        ref.addListenerForSingleValueEvent(object: ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val records = snapshot.children.mapNotNull {
-                    it.getValue(DestinationRecord::class.java)
-                }
-                future.complete(records)
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                future.completeExceptionally(error.toException())
-            }
-        })
-        // Add 1 record
-        newRecord()
 
         // Navigate out of the RoadBookFragment
         onView(withId(R.id.drawer_layout))
@@ -311,6 +285,27 @@ class RoadBookFragmentTest {
             .perform(DrawerActions.open())
         onView(withId(R.id.routeFragment)).perform(click())
 
+        ref.get().addOnSuccessListener { snapshot ->
+            val records = snapshot.children.mapNotNull {
+                it.getValue(DestinationRecord::class.java)
+            }
+            future.complete(records)
+
+        }.addOnFailureListener {
+            future.completeExceptionally(it)
+        }
+
+        // Add 1 record (To bypass the app cache and write to the disk)
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.roadBookFragment))
+            .perform(click())
+        newRecord()
+
+        // Navigate out of the RoadBookFragment
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.routeFragment)).perform(click())
 
         var fromLocal: List<DestinationRecord>
         val context = ApplicationProvider.getApplicationContext<Context>().applicationContext
@@ -320,11 +315,8 @@ class RoadBookFragmentTest {
 
         val fromNetwork = future.get()
 
-        assert(
-            fromLocal
-                //.subList(0, fromLocal.size - 1)// Need to remove the record added
-                .zip(fromNetwork)
-                .all { pair -> pair.first.destID == pair.second.destID }
+        assert( // While removing the record added
+            fromLocal.subList(0, fromLocal.size - 1) == fromNetwork
         )
     }
 
@@ -412,7 +404,6 @@ class RoadBookFragmentTest {
     @Test
     fun endShiftUpdates() {
         val db = FirebaseInstance.getDatabase()
-        val context = ApplicationProvider.getApplicationContext<Context>().applicationContext
 
         // finished a delivery
         updateTimestampOfRecord(3)
@@ -422,11 +413,11 @@ class RoadBookFragmentTest {
         val shift = Shift(Date(), courier, rbViewModel.recordsListState.value!!)
         val shiftList = ShiftList(listOf(shift))
 
+        val date = shift.date ?: ShiftRepository.DEFAULT_DATE_FOR_PATH
         val dbShiftRef = db.reference
             .child(DELIVERY_LOG_DB_PATH)
             .child(firebaseSafeString(shift.user.name))
-            .child(firebaseDateFormatted(shift.date))
-
+            .child(firebaseDateFormatted(date))
 
         // finishes the shift
         endShift()
@@ -434,8 +425,6 @@ class RoadBookFragmentTest {
         // Our target value to fetch
         // is represented as a List<String> in Firebase
         val shifts = getShiftFromDb(dbShiftRef)
-
-        //assert(future.get().all{ it.timeStamp != null })
 
         shifts.zip(shiftList).all { pair ->
             pair.first.records.zip(pair.second.records).all { recordPair ->
@@ -473,9 +462,6 @@ class RoadBookFragmentTest {
         })
 
     }
-
-
-
 
     // ============================================================================================
     // ===================================== Edit Tests ===========================================

@@ -18,7 +18,8 @@ import java.util.*
  *
  * @param _dbRef The database root reference to register RoadBook data
  */
-class RoadBookViewModel(private val roadBookRepository: RoadBookRepository, private val shiftRepository: ShiftRepository) : ViewModel() {
+class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
+                        private val shiftRepository: ShiftRepository) : ViewModel() {
 
     private val _recordsList: MutableLiveData<DRecordList> = MutableLiveData(DRecordList())
     val recordsListState: LiveData<DRecordList> = _recordsList

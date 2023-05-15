@@ -71,6 +71,7 @@ class GeneralUtils {
                 closeSoftKeyboard()
             )
             onView(withId(R.id.login)).perform(click())
+            Thread.sleep(1000)
         }
 
         fun injectBossAsLoggedInUser(testRule: ActivityScenarioRule<MainActivity>) {

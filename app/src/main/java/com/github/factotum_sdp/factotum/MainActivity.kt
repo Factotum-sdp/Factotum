@@ -1,21 +1,17 @@
 package com.github.factotum_sdp.factotum
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.AlertDialog
-import android.content.Intent
 import android.os.Bundle
-import android.widget.ImageView
 import android.os.Handler
 import android.os.Looper
+import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
-import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
@@ -28,7 +24,6 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
-import com.github.factotum_sdp.factotum.ui.user.ProfilePictureSelectorFragment
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getAuth
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getDatabase
 import com.github.factotum_sdp.factotum.models.Role
@@ -36,6 +31,8 @@ import com.github.factotum_sdp.factotum.repositories.SettingsRepository
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.ui.picture.UploadWorker
 import com.github.factotum_sdp.factotum.ui.settings.SettingsViewModel
+import com.github.factotum_sdp.factotum.ui.user.ProfilePictureSelectorFragment
+import com.github.factotum_sdp.factotum.ui.user.ProfilePictureViewerFragment
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
@@ -61,9 +58,9 @@ class MainActivity : AppCompatActivity() {
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ){ isGranted ->
-        if (isGranted){
-            launchProfilePictureSelectorFragment()
+    ) { isGranted ->
+        if (isGranted) {
+            launchFragment(ProfilePictureSelectorFragment())
         }
     }
 
@@ -90,7 +87,7 @@ class MainActivity : AppCompatActivity() {
             setOf(
                 R.id.roadBookFragment, R.id.directoryFragment,
                 R.id.loginFragment, R.id.routeFragment,
-                R.id.displayFragment,R.id.bossMapFragment,
+                R.id.displayFragment, R.id.bossMapFragment,
                 R.id.settingsFragment
             ), drawerLayout
         )
@@ -146,7 +143,7 @@ class MainActivity : AppCompatActivity() {
                     requestPermissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
                 }
                 1 -> {
-
+                    launchFragment(ProfilePictureViewerFragment())
                 }
             }
         }
@@ -162,6 +159,7 @@ class MainActivity : AppCompatActivity() {
             val format = "${it.name} (${it.role})"
             userName.text = format
             //email.text = it.email // Commented temporarily to show user live location
+            image.setImageURI(it.profilePicture)
 
             // Update the menu items and navigate to the predefined fragment
             // according to the user role
@@ -176,8 +174,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun launchProfilePictureSelectorFragment() {
-        val fragment = ProfilePictureSelectorFragment()
+    private fun launchFragment(fragment: Fragment) {
         val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.nav_host_fragment_content_main, fragment)
         transaction.addToBackStack(null)
@@ -206,10 +203,12 @@ class MainActivity : AppCompatActivity() {
                 navMenu.findItem(R.id.settingsFragment).isVisible = false
                 navMenu.findItem(R.id.bossMapFragment).isVisible = false
             }
+
             Role.COURIER -> {
                 navMenu.findItem(R.id.displayFragment).isVisible = false
                 navMenu.findItem(R.id.bossMapFragment).isVisible = false
             }
+
             else -> {
                 navMenu.findItem(R.id.roadBookFragment).isVisible = true
                 navMenu.findItem(R.id.directoryFragment).isVisible = true
@@ -242,7 +241,10 @@ class MainActivity : AppCompatActivity() {
         if (role == Role.COURIER) {
             CoroutineScope(Dispatchers.IO).launch {
                 val uploadWorkRequest =
-                    PeriodicWorkRequestBuilder<UploadWorker>(INTERVAL_UPLOAD_PICTURE_TIME_MINUTE, TimeUnit.MINUTES)
+                    PeriodicWorkRequestBuilder<UploadWorker>(
+                        INTERVAL_UPLOAD_PICTURE_TIME_MINUTE,
+                        TimeUnit.MINUTES
+                    )
                         .build()
                 WorkManager.getInstance(this@MainActivity).enqueue(uploadWorkRequest)
             }
@@ -285,6 +287,7 @@ class MainActivity : AppCompatActivity() {
                     startActivity(intent)
                     true
                 }
+
                 else -> {
                     val navController = findNavController(R.id.nav_host_fragment_content_main)
                     val handled = NavigationUI.onNavDestinationSelected(menuItem, navController)

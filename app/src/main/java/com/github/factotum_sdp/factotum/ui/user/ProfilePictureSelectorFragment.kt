@@ -19,7 +19,7 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.databinding.FragmentProfilePictureSelectorBinding
 
 /**
- *
+ * Fragment that represents the profile picture selector
  */
 class ProfilePictureSelectorFragment : Fragment() {
 
@@ -66,8 +66,7 @@ class ProfilePictureSelectorFragment : Fragment() {
                     continue
                 }
                 val path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA))
-                paths.add(path)
-                Log.d("ProfilePictureSelector", "path: $path")
+                paths.add(0, path)
             }
             cursor.close()
         }
@@ -79,12 +78,9 @@ class ProfilePictureSelectorFragment : Fragment() {
 
         // Set up the on item click listener for the grid view
         gridView.onItemClickListener =
-            AdapterView.OnItemClickListener { parent, view, position, id ->
-                // Get the selected photo
-                val selectedPhoto = adapter.getItem(position) as ContactsContract.Contacts.Photo
-
-                // Set the profile picture to the selected photo
-                // profilePicture.setImageResource(selectedPhoto.resourceId)
+            AdapterView.OnItemClickListener { _, _, position, _ ->
+                val selectedPhoto = adapter.getItem(position)
+                profilePicture.setImageURI(Uri.parse(selectedPhoto))
             }
 
         // Set up the on click listener for the edit button
@@ -92,19 +88,26 @@ class ProfilePictureSelectorFragment : Fragment() {
             // TODO: Handle the edit profile picture button click
         }*/
     }
-}
 
-class PhotoAdapter(context: Context, private val photos: List<String>) :
-    ArrayAdapter<String>(context, 0, photos) {
+    /**
+     * Adapter for the grid view that displays the user's photos
+     */
+    inner class PhotoAdapter(context: Context, private val photos: List<String>) :
+        ArrayAdapter<String>(context, 0, photos) {
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        var view = convertView
-        if (view == null) {
-            view = LayoutInflater.from(context).inflate(R.layout.grid_item_photo, parent, false)
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+            var view = convertView
+            if (view == null) {
+                view = LayoutInflater.from(context).inflate(
+                    R.layout.grid_item_photo,
+                    parent,
+                    false
+                )
+            }
+            val imageView = view!!.findViewById<ImageView>(R.id.photo)
+            val imagePath = photos[position]
+            imageView.setImageURI(Uri.parse(imagePath))
+            return view
         }
-        val imageView = view!!.findViewById<ImageView>(R.id.photo)
-        val imagePath = photos[position]
-        imageView.setImageURI(Uri.parse(imagePath))
-        return view
     }
 }

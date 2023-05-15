@@ -1,45 +1,82 @@
 package com.github.factotum_sdp.factotum.ui.display.boss
 
-import android.util.Log
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.factotum_sdp.factotum.ui.display.data.AppDatabase
+import com.github.factotum_sdp.factotum.ui.display.data.boss.CachedFolder
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageException
 import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
-
-class BossDisplayViewModel : ViewModel() {
+class BossDisplayViewModel(context: Context) : ViewModel() {
     private val _folderReferences = MutableLiveData<List<StorageReference>>()
     val folderReferences: LiveData<List<StorageReference>>
         get() = _folderReferences
 
-    private var cachedFolderReferences = listOf<StorageReference>()
+    private val database by lazy { AppDatabase.getInstance(context) }
+    private val storage by lazy { FirebaseStorage.getInstance() }
+    private val cachedFolderDao by lazy { database.cachedFolderDao() }
 
-    init { loadFolders() }
+    init { updateFolders() }
 
-    fun refreshFolders() {
-        loadFolders()
+    fun refreshFolders() { updateFolders() }
+
+    private fun updateFolders() {
+        viewModelScope.launch {
+            displayCachedFolders()
+
+            val remoteFolders = fetchRemoteFolders()
+            if (remoteFolders != null) {
+                updateCachedFolders(remoteFolders)
+            }
+        }
     }
 
-    private fun loadFolders() {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val storageRef = FirebaseStorage.getInstance().reference
-                val listEntries = storageRef.listAll().await()
-                val folderList = listEntries.prefixes.sortedBy { it.name }
+    private suspend fun updateCachedFolders(remoteFolders: List<StorageReference>) {
+        withContext(Dispatchers.IO) {
+            cachedFolderDao.insertAll(*remoteFolders.map { folder ->
+                CachedFolder(folder.path)
+            }.toTypedArray())
 
-                if (folderList != cachedFolderReferences) {
-                    cachedFolderReferences = folderList
-                    _folderReferences.postValue(folderList)
-                }
+            val cachedFolders = cachedFolderDao.getAll()
+            val remoteFolderPaths = remoteFolders.map { it.path }
+            val foldersToDelete = cachedFolders.filter { it.path !in remoteFolderPaths }
 
-            } catch (e: Exception) {
-                Log.e("BossDisplayViewModel", "Error loading folders: ${e.message}")
-            }
+            cachedFolderDao.deleteAll(foldersToDelete)
+        }
+
+        val updatedCachedFolders = withContext(Dispatchers.IO) {
+            cachedFolderDao.getAll()
+        }
+        val updatedStorageReferences = updatedCachedFolders.map { folder ->
+            storage.getReference(folder.path)
+        }
+        _folderReferences.postValue(updatedStorageReferences)
+    }
+
+    private suspend fun displayCachedFolders() {
+        val cachedFolders = withContext(Dispatchers.IO) {
+            cachedFolderDao.getAll()
+        }
+        val storageReferences = cachedFolders.map { folder ->
+            storage.getReference(folder.path)
+        }
+        _folderReferences.postValue(storageReferences)
+    }
+
+    private suspend fun fetchRemoteFolders(): List<StorageReference>? {
+        return try {
+            val foldersListResult = storage.reference.listAll().await()
+            foldersListResult.prefixes
+        } catch (e: StorageException) {
+            null
         }
     }
 }

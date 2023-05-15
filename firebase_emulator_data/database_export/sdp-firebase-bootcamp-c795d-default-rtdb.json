@@ -57,7 +57,43 @@
             "profile_pic_id": 2131165334,
             "role": "Courier",
             "surname": "Taylor"
-        }
+        },
+        "More": {
+        "addressName": "",
+        "details": "La loi de Moore",
+        "name": "Moore",
+        "phone": "0796521331",
+        "profile_pic_id": 2131165334,
+        "role": "CLIENT",
+        "surname": "Loi",
+        "username": "More"
+        },
+        "New": {
+        "addressName": "Morges, Switzerland",
+        "details": "",
+        "latitude": 46.5088127,
+        "longitude": 6.496130099999999,
+        "name": "Nouveau",
+        "phone": "0785623569",
+        "profile_pic_id": 2131165334,
+        "role": "CLIENT",
+        "super_client": "",
+        "surname": "Romane",
+        "username": "New"
+        },
+        "QG": {
+        "addressName": "Lausanne, Switzerland",
+        "details": "",
+        "latitude": 46.5196535,
+        "longitude": 6.6322734,
+        "name": "QG",
+        "phone": "07828833488",
+        "profile_pic_id": 2131165334,
+        "role": "CLIENT",
+        "super_client": "",
+        "surname": "QG",
+        "username": "QG"
+        }    
     },
     "profile-dispatch": {
         "9Q9PdkiVQKwgHcuEGyshqXyXHrHT": {

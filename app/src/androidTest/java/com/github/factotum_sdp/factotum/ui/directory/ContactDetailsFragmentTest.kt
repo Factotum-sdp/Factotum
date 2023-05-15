@@ -170,19 +170,8 @@ class ContactDetailsFragmentTest {
     fun deleteButtonDeletesContact() {
         onView(withId(R.id.button_delete_contact))
             .perform(click())
-        onView(withId(R.id.contacts_recycler_view))
-            .check(matches(isDisplayed()))
-        //check if size of recycler view is 4
-        onView(withId(R.id.contacts_recycler_view))
-            .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
-            .check { view, noViewFoundException ->
-                if (noViewFoundException != null) {
-                    throw noViewFoundException
-                }
-                val recyclerView = view as RecyclerView
-                val adapter = recyclerView.adapter
-                assert(adapter?.itemCount == 4)
-            }
+
+        onView(withText("@${currContact.username}")).check(doesNotExist())
         resetContact(currContact)
     }
 

@@ -36,6 +36,7 @@ import com.github.factotum_sdp.factotum.repositories.ShiftRepository
 import com.github.factotum_sdp.factotum.repositories.ShiftRepository.Companion.DELIVERY_LOG_DB_PATH
 import com.github.factotum_sdp.factotum.roadBookDataStore
 import com.github.factotum_sdp.factotum.shiftDataStore
+import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookFragment.Companion.ROADBOOK_DB_PATH
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeLeftTheRecordAt
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightTheRecordAt
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
@@ -207,7 +208,7 @@ class RoadBookFragmentTest {
         val db = FirebaseInstance.getDatabase()
         val date = Calendar.getInstance().time
         val ref = db.reference
-            .child("Sheet-shift")
+            .child(ROADBOOK_DB_PATH)
             .child(SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH).format(date))
 
         // Add 1 record
@@ -323,7 +324,7 @@ class RoadBookFragmentTest {
     @Test
     fun roadBookIsCorrectlyCleared() {
         clearRoadBook()
-        isRecylerViewEmptyCheck()
+        isRecyclerViewEmptyCheck()
     }
 
     @Test
@@ -474,10 +475,28 @@ class RoadBookFragmentTest {
 
     @Test
     fun editARecordDestIDWorks() {
+        val newClientID = DestinationRecords.RECORDS[1].clientID
         swipeRightTheRecordAt(2)
-        onView(withText("X17")).perform(typeText("edited"))
+        onView(withId(R.id.autoCompleteClientID)).perform(clearText()).perform(typeText(newClientID))
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
-        onView((withText("X17edited#1"))).check(matches(isDisplayed()))
+        onView((withText("$newClientID#2"))).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun editWithAWrongClientIDIsShownOnTheDialog() {
+        swipeRightTheRecordAt(2)
+        onView(withId(R.id.autoCompleteClientID)).perform(typeText("edited"))
+        onView(withId(R.id.editTextRate)).perform(click())
+        onView((withText(R.string.invalid_client_id_text))).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun editWithAWrongClientIDAndConfirmDoesNotApplyChanges() {
+        swipeRightTheRecordAt(2)
+        onView(withId(R.id.autoCompleteClientID))
+            .perform(click(), clearText(), typeText("edited"), closeSoftKeyboard())
+        onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
+        onView(withText(DestinationRecords.RECORDS[2].destID)).check(matches(isDisplayed()))
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -501,13 +520,13 @@ class RoadBookFragmentTest {
     fun editWithAWrongFormatIsAborted() {
         swipeRightTheRecordAt(2)
         onView(withId(R.id.autoCompleteClientID))
-            .perform(click(), typeText("edited"), closeSoftKeyboard())
+            .perform(click(), clearText(), typeText("$newRecordClientID "), closeSoftKeyboard())
         onView(withId(R.id.editTextTimestamp)).perform(click())
         onView(withText(timePickerCancelBLabel)).perform(click())
         onView(withId(R.id.editTextTimestamp)).perform(typeText("2222"))
         onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
 
-        onView((withText("X17edited#1")))
+        onView((withText("$newRecordClientID#1")))
             .check(doesNotExist())
     }
 
@@ -524,7 +543,7 @@ class RoadBookFragmentTest {
         eraseFirstRecTimestamp()
         swipeRightTheRecordAt(2)
         onView(withId(R.id.autoCompleteClientID))
-            .perform(click(), clearText(), typeText("New "), closeSoftKeyboard())
+            .perform(click(), clearText(), typeText("$newRecordClientID "), closeSoftKeyboard())
 
         val cal: Calendar = Calendar.getInstance()
         onView(withId(R.id.editTextTimestamp)).perform(click())
@@ -543,7 +562,7 @@ class RoadBookFragmentTest {
 
         // Edit all fields :
         onView(withId(R.id.autoCompleteClientID))
-            .perform(click(), clearText(), typeText("NewEvery "), closeSoftKeyboard())
+            .perform(click(), clearText(), typeText("$newRecordClientID "), closeSoftKeyboard())
 
         val cal: Calendar = Calendar.getInstance()
         onView(withId(R.id.editTextTimestamp)).perform(click())
@@ -566,7 +585,7 @@ class RoadBookFragmentTest {
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
 
         // Check edited record is corretly displayed :
-        onView(withText("NewEvery#1")).check(matches(isDisplayed()))
+        onView(withText("$newRecordClientID#1")).check(matches(isDisplayed()))
 
         eraseFirstRecTimestamp() // For having no ambiguity btw Timestamp on screen
         onView(withText(startsWith("arrival : ${timestampUntilHourFormat(cal)}"))).check(
@@ -593,10 +612,10 @@ class RoadBookFragmentTest {
     @Test
     fun cancelOnRecordEditionWorks() {
         swipeRightTheRecordAt(2)
-        onView(withText("X17")).perform(typeText("edited"))
+        onView(withId(R.id.autoCompleteClientID)).perform(click(), clearText(), typeText(newRecordClientID))
         onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
         // Same record is displayed, without the edited text happened to his destRecordID
-        onView((withText("X17#1"))).check(matches(isDisplayed()))
+        onView((withText(DestinationRecords.RECORDS[2].destID))).check(matches(isDisplayed()))
     }
 
     // ============================================================================================
@@ -607,8 +626,10 @@ class RoadBookFragmentTest {
     fun dragAndDropByInjectionIsWorking() = runTest {
         // Not possible for the moment in to cover the onMove() of the ItemtTouchHelper Callback,
         // However here, I simulate its behavior to triggers the ViewModel change.
+        val firstDestID = DestinationRecords.RECORDS[2].destID
+        val followingDestID = DestinationRecords.RECORDS[3].destID
         runBlocking {
-            onView(withText("X17#1")).check(isCompletelyAbove(withText("More#1")))
+            onView(withText(firstDestID)).check(isCompletelyAbove(withText(followingDestID)))
             testRule.scenario.onActivity {
                 val fragment = it.supportFragmentManager.fragments.first() as NavHostFragment
 
@@ -625,8 +646,8 @@ class RoadBookFragmentTest {
             delay(WORST_REFRESH_TIME)
         }
 
-        onView(withText("X17#1")).check(matches(isDisplayed()))
-        onView(withText("X17#1")).check(isCompletelyBelow(withText("More#1")))
+        onView(withText(firstDestID)).check(matches(isDisplayed()))
+        onView(withText(firstDestID)).check(isCompletelyBelow(withText(followingDestID)))
     }
 
 
@@ -1048,7 +1069,7 @@ class RoadBookFragmentTest {
 
     }
 
-    private val newRecordClientID = "New"
+    private val newRecordClientID = DestinationRecords.RECORD_TO_ADD.clientID
 
     private fun newRecord() {
         newRecordWithId(newRecordClientID)
@@ -1061,7 +1082,7 @@ class RoadBookFragmentTest {
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
     }
 
-    private fun isRecylerViewEmptyCheck() {
+    private fun isRecyclerViewEmptyCheck() {
         // Find the RecyclerView by its ID
         val recyclerView = onView(withId(R.id.list))
         recyclerView.check(RecyclerViewItemCountAssertion(0))

@@ -31,6 +31,7 @@ import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 
 private const val ZOOM_LEVEL_CITY = 14f
+private const val MAIL_BOX_SIZE = 100
 
 class BossMapFragment : Fragment(), OnMapReadyCallback {
 
@@ -48,7 +49,7 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private val mailBoxSize = 100
+
     private lateinit var bitmapDeliveredScaled : Bitmap
     private lateinit var bitmapNotDeliveredScaled : Bitmap
 
@@ -65,11 +66,11 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
 
         bitmapDeliveredScaled = createScaledBitmap(
             BitmapFactory.decodeResource(requireContext().resources, R.drawable.mailbox_delivered),
-            mailBoxSize, mailBoxSize, false)
+            MAIL_BOX_SIZE, MAIL_BOX_SIZE, false)
 
         bitmapNotDeliveredScaled = createScaledBitmap(
             BitmapFactory.decodeResource(requireContext().resources, R.drawable.mailbox_lowered_flag),
-            mailBoxSize, mailBoxSize, false)
+            MAIL_BOX_SIZE, MAIL_BOX_SIZE, false)
 
         return view
     }

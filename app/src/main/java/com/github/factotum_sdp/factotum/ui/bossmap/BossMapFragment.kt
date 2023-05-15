@@ -74,6 +74,8 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
         return view
     }
 
+
+
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
         googleMap.uiSettings.isZoomControlsEnabled = true

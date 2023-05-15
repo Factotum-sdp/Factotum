@@ -78,7 +78,7 @@ class BossMapViewModel : ViewModel() {
                 val dStatus = snapshot.child(dateRef).children.mapNotNull {
                     val record = it.getValue(DestinationRecord::class.java)
                     val client = _contacts.value?.find { contact -> contact.username == record?.clientID }
-                    if (client != null) {
+                    if (client?.latitude != null && client.longitude != null) {
                         DeliveryStatus(
                             destID = record?.destID ?: "",
                             clientID = record?.clientID ?: "",

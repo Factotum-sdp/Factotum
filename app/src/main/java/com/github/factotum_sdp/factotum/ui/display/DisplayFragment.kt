@@ -1,16 +1,25 @@
 package com.github.factotum_sdp.factotum.ui.display
 
+import android.app.DatePickerDialog
 import android.content.Intent
+import android.icu.util.Calendar
+import android.icu.util.GregorianCalendar
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.factotum_sdp.factotum.R
@@ -26,7 +35,10 @@ import com.github.factotum_sdp.factotum.ui.display.client.ClientDisplayViewModel
 import com.github.factotum_sdp.factotum.ui.display.client.ClientDisplayViewModelFactory
 import com.github.factotum_sdp.factotum.ui.display.client.ClientPhotoAdapter
 
-class DisplayFragment : Fragment() {
+class DisplayFragment : Fragment(), MenuProvider {
+
+    private lateinit var displayMenu : Menu
+    private lateinit var calendarButton: MenuItem
 
     private val clientViewModel: ClientDisplayViewModel by viewModels{ ClientDisplayViewModelFactory(userFolder, requireContext()) }
     private val bossViewModel: BossDisplayViewModel by viewModels{ BossDisplayViewModelFactory(requireContext()) }
@@ -43,16 +55,49 @@ class DisplayFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentDisplayBinding.inflate(inflater, container, false)
-        setupObservers()
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             onBackPressedCallback
         )
+    }
+
+    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+        menuInflater.inflate(R.menu.display_menu, menu)
+        displayMenu = menu
+
+        calendarButton = menu.findItem(R.id.menu_date_picker)
+        calendarButton.setOnMenuItemClickListener {
+            showDatePickerDialog()
+            true
+        }
+
+        setupObservers()
+    }
+
+    private fun showDatePickerDialog() {
+        val c = Calendar.getInstance()
+        val year = c.get(Calendar.YEAR)
+        val month = c.get(Calendar.MONTH)
+        val day = c.get(Calendar.DAY_OF_MONTH)
+
+        val dpd = DatePickerDialog(requireContext(), { _, year, monthOfYear, dayOfMonth ->
+            val selectedDate = GregorianCalendar(year, monthOfYear, dayOfMonth).time
+            clientViewModel.filterImagesByDate(selectedDate)
+        }, year, month, day)
+        dpd.show()
+    }
+
+    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+        if (menuItem.itemId == android.R.id.home) {
+            return false
+        }
+        return true
     }
 
     override fun onDestroyView() {
@@ -114,6 +159,7 @@ class DisplayFragment : Fragment() {
 
     private fun setupBossUI() {
         bossViewModel.refreshFolders()
+        calendarButton.isVisible = false
 
         binding.refreshButton.setOnClickListener {
             bossViewModel.refreshFolders()
@@ -131,6 +177,7 @@ class DisplayFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
             adapter = bossFolderAdapter
         }
+
     }
 
     //================================================================
@@ -145,6 +192,7 @@ class DisplayFragment : Fragment() {
 
     private fun setupClientUI() {
         clientViewModel.refreshImages()
+        calendarButton.isVisible = true
 
         binding.refreshButton.setOnClickListener {
             clientViewModel.refreshImages()
@@ -166,6 +214,7 @@ class DisplayFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
             adapter = clientPhotoAdapter
         }
+
     }
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {

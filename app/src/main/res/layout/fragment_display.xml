@@ -5,7 +5,8 @@
     android:id="@+id/fragment_display_directors_parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.display.DisplayFragment">
+    tools:context=".ui.display.DisplayFragment"
+    tools:ignore="ExtraText">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
@@ -25,4 +26,5 @@
         android:text="@string/refresh"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

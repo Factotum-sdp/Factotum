@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,6 +28,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 private const val ZOOM_LEVEL_CITY = 14f
 private const val SCALE_FACTOR_ICON = 0.7f
@@ -34,8 +37,8 @@ private const val MAIL_BOX_SIZE = 100
 
 class BossMapFragment : Fragment(), OnMapReadyCallback {
 
-    private val viewModel: BossMapViewModel by viewModels()
     private var cameraPositionInitialized = false
+    private val viewModel: BossMapViewModel by viewModels()
     private val contactsViewModel: ContactsViewModel by activityViewModels()
     private lateinit var mapView: MapView
     private lateinit var googleMap: GoogleMap
@@ -92,13 +95,13 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-            viewModel.deliveriesStatus.observe(viewLifecycleOwner) { deliveryStatus ->
-                updateMap(viewModel.courierLocations.value ?: emptyList(), deliveryStatus)
-            }
+        viewModel.deliveriesStatus.observe(viewLifecycleOwner) { deliveryStatus ->
+            updateMap(viewModel.courierLocations.value ?: emptyList(), deliveryStatus)
+        }
 
-            contactsViewModel.contacts.observe(viewLifecycleOwner) {
-                viewModel.updateContacts(it)
-            }
+        contactsViewModel.contacts.observe(viewLifecycleOwner) {
+            viewModel.updateContacts(it)
+        }
 
     }
 
@@ -180,9 +183,9 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
         for (location1 in locations) {
             var sumDistance = 0.0
             for (location2 in locations) {
-                val distance = Math.sqrt(
-                    Math.pow(location1.latitude!! - location2.latitude!!, 2.0) +
-                            Math.pow(location1.longitude!! - location2.longitude!!, 2.0)
+                val distance = sqrt(
+                    (location1.latitude!! - location2.latitude!!).pow(2.0) +
+                            (location1.longitude!! - location2.longitude!!).pow(2.0)
                 )
                 sumDistance += distance
             }

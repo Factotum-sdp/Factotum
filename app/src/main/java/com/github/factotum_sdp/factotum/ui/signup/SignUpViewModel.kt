@@ -16,9 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
 
-class SignUpViewModel(
-    private val signUpDataSink: SignUpDataSink
-) : ViewModel() {
+class SignUpViewModel(private val signUpDataSink: SignUpDataSink) : ViewModel() {
 
     private val _signupForm = MutableLiveData<SignUpFormState>()
     val signupFormState: LiveData<SignUpFormState> = _signupForm

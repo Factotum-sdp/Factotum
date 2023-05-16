@@ -212,7 +212,6 @@ class MainActivityTest {
         onView(withText("Helen Bates (COURIER)")).check(matches(isDisplayed()))
     }
 
-    @Test
     fun signUpFormWithAllFieldsAndClickAndLogin() {
         onView(withId(R.id.signup)).perform(click())
         onView(withId(R.id.name)).perform(typeText("Name"))

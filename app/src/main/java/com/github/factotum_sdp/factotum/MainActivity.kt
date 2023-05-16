@@ -30,7 +30,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -79,7 +78,7 @@ class MainActivity : AppCompatActivity() {
             setOf(
                 R.id.roadBookFragment, R.id.directoryFragment,
                 R.id.loginFragment, R.id.routeFragment,
-                R.id.displayFragment,R.id.bossMapFragment,
+                R.id.displayFragment, R.id.bossMapFragment,
                 R.id.settingsFragment
             ), drawerLayout
         )
@@ -167,10 +166,12 @@ class MainActivity : AppCompatActivity() {
                 navMenu.findItem(R.id.settingsFragment).isVisible = false
                 navMenu.findItem(R.id.bossMapFragment).isVisible = false
             }
+
             Role.COURIER -> {
                 navMenu.findItem(R.id.displayFragment).isVisible = false
                 navMenu.findItem(R.id.bossMapFragment).isVisible = false
             }
+
             else -> {
                 navMenu.findItem(R.id.roadBookFragment).isVisible = true
                 navMenu.findItem(R.id.directoryFragment).isVisible = true
@@ -203,7 +204,10 @@ class MainActivity : AppCompatActivity() {
         if (role == Role.COURIER) {
             CoroutineScope(Dispatchers.IO).launch {
                 val uploadWorkRequest =
-                    PeriodicWorkRequestBuilder<UploadWorker>(INTERVAL_UPLOAD_PICTURE_TIME_MINUTE, TimeUnit.MINUTES)
+                    PeriodicWorkRequestBuilder<UploadWorker>(
+                        INTERVAL_UPLOAD_PICTURE_TIME_MINUTE,
+                        TimeUnit.MINUTES
+                    )
                         .build()
                 WorkManager.getInstance(this@MainActivity).enqueue(uploadWorkRequest)
             }
@@ -246,6 +250,7 @@ class MainActivity : AppCompatActivity() {
                     startActivity(intent)
                     true
                 }
+
                 else -> {
                     val navController = findNavController(R.id.nav_host_fragment_content_main)
                     val handled = NavigationUI.onNavDestinationSelected(menuItem, navController)

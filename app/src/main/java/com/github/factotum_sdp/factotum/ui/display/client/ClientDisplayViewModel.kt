@@ -1,6 +1,7 @@
 package com.github.factotum_sdp.factotum.ui.display.client
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,6 +16,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -84,7 +86,7 @@ class ClientDisplayViewModel(
         }
         val updatedStorageReferences = updatedCachedPhotos.map {
             storage.getReference(it.path)
-        }.sortedByDescending { getDateFromRef(it) }
+        }.sortedWith { date1, date2 -> getDateFromRef(date2).compareTo(getDateFromRef(date1)) }
 
         _photoReferences.postValue(updatedStorageReferences)
     }
@@ -95,7 +97,8 @@ class ClientDisplayViewModel(
         }
         val storageReferences = cachedPhotos.map {
             storage.getReference(it.path)
-        }.sortedByDescending { getDateFromRef(it) }
+        }.sortedWith { date1, date2 -> getDateFromRef(date2).compareTo(getDateFromRef(date1)) }
+
 
         _photoReferences.postValue(storageReferences)
     }
@@ -110,8 +113,37 @@ class ClientDisplayViewModel(
         }
     }
 
+    fun filterImagesByDate(date: Date) {
+        viewModelScope.launch {
+            val folderName = _folderName.value ?: return@launch
+            val cachedPhotos = withContext(Dispatchers.IO) {
+                cachedPhotoDao.getAllByFolderName(folderName)
+            }
+            val storageReferences = cachedPhotos.map {
+                storage.getReference(it.path)
+            }.filter { isSameDay(getDateFromRef(it), date) }
+                .sortedWith {  date1, date2 -> getDateFromRef(date2).compareTo(getDateFromRef(date1)) }
+
+            Log.d("ClientDisplayViewModel", "filterImagesByDate: $storageReferences")
+
+            _photoReferences.postValue(storageReferences)
+        }
+    }
+
+    private fun isSameDay(date1: Date, date2: Date): Boolean {
+        val cal1 = Calendar.getInstance()
+        cal1.time = date1
+
+        val cal2 = Calendar.getInstance()
+        cal2.time = date2
+
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH) &&
+                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
+    }
+
     private fun getDateFromRef(ref: StorageReference): Date {
-        val dateString = ref.name.substringAfterLast("_").substringBeforeLast(".")
+        val dateString = ref.name.substringAfter("_").substringBeforeLast(".")
         return try {
             dateFormat.parse(dateString) as Date
         } catch (e: ParseException) {
@@ -119,5 +151,3 @@ class ClientDisplayViewModel(
         }
     }
 }
-
-

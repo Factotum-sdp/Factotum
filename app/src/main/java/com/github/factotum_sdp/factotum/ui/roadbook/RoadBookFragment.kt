@@ -34,6 +34,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.*
 
 private const val ON_DESTINATION_RADIUS = 15.0
+private const val NO_USER_FOR_DB_PATH = "no_user"
 
 /**
  * A fragment representing a RoadBook which is a list of DestinationRecord
@@ -46,6 +47,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         RoadBookViewModel.RoadBookViewModelFactory(
             RoadBookRepository(
                 FirebaseInstance.getDatabase().reference.child(ROADBOOK_DB_PATH),
+                userViewModel.loggedInUser.value?.name ?: NO_USER_FOR_DB_PATH,
                 requireContext().roadBookDataStore
             ),
             ShiftRepository(
@@ -83,7 +85,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
             adapter.submitList(it)
         }
 
-        // Set events that triggers change in the Roadoook ViewModel
+        // Set events that triggers change in the RoadBook ViewModel
         setRoadBookEvents(rbViewModel, view)
 
         // Set up the RoadBook RecyclerView

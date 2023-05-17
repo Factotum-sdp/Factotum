@@ -92,6 +92,7 @@ class Route(srcLat: Double, srcLon: Double, dstLat: Double, dstLon: Double) {
     private fun drawRoute(origin: LatLng, dest: LatLng, googleMaps: GoogleMap) {
         GlobalScope.launch(Dispatchers.Main) {
             val url = getDirectionsUrl(origin, dest)
+            Log.d("url", url)
             val data = downloadUrl(url)
             Log.d("data", data)
             val routes = parseDirections(data)
@@ -148,7 +149,7 @@ class Route(srcLat: Double, srcLon: Double, dstLat: Double, dstLon: Double) {
         val strDest = "destination=${dest.latitude},${dest.longitude}"
         val sensor = "sensor=false"
         val mode = "mode=bicycling"
-        val apiKey = "AIzaSyBEx_kuzj2xCiWvH5ewLj9LGoPznh8XTc0"
+        val apiKey = "AIzaSyDZ9MlLId-v7rdA76USFTn3GkuTT6JshrY"
         val parameters = "$strOrigin&$strDest&$sensor&$mode&key=$apiKey"
         val output = "json"
         return "https://maps.googleapis.com/maps/api/directions/$output?$parameters"

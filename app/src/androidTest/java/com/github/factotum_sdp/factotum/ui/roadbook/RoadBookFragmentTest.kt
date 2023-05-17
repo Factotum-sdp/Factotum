@@ -1149,7 +1149,9 @@ class RoadBookFragmentTest {
     }
 
     private fun endShift(){
-        onView(withId(R.id.finish_shift)).perform(click())
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        Thread.sleep(4000)
+        onView(withText(R.string.end_shift)).perform(click())
         onView(withText(R.string.end_shift_dialog_title))
             .check(matches(isDisplayed()))
         onView(withId(android.R.id.button1)).perform(click())

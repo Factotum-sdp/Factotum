@@ -141,7 +141,7 @@
     <string name="search_contacts">Search contacts …</string>
     <string name="loc_service_notification_message">Location service for Factotum is working</string>
     <string name="loc_service_notification_title">Tracking location</string>
-    <string name="end_shift">end shift</string>
+    <string name="end_shift">End Shift</string>
     <string name="finish_shift_alert_question">"Are you sure you want to end your shift?"</string>
     <string name="shift_ended">Shift ended</string>
     <string name="end_shift_dialog_title">End shift</string>
@@ -169,4 +169,7 @@
     <string name="decline_end_shift">Not now</string>
     <string name="invalid_client_id_snack_bar">Invalid Client ID, please correct it</string>
     <string name="invalid_client_id_text">Invalid Client ID</string>
+    <string name="refresh_button">RefreshButton</string>
+    <string name="bag_button">BagButton</string>
+    <string name="location_switch">LocationSwitch</string>
 </resources>

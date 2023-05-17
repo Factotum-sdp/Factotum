@@ -6,11 +6,13 @@ import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.models.User
-import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
+import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder.USER_BOSS
+import com.github.factotum_sdp.factotum.ui.login.LoginViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
@@ -26,9 +28,10 @@ class GeneralUtils {
         private var storage: FirebaseStorage = Firebase.storage
         private var emulatorSet = false
         private val BOSS_USER = User(
-            UsersPlaceHolder.USER_BOSS.name,
-            UsersPlaceHolder.USER_BOSS.email,
-            UsersPlaceHolder.USER_BOSS.role
+            USER_BOSS.uid,
+            USER_BOSS.name,
+            USER_BOSS.email,
+            USER_BOSS.role
         )
 
         fun initFirebase(online: Boolean = true) {
@@ -80,5 +83,12 @@ class GeneralUtils {
                 user.setLoggedInUser(loggedInUser)
             }
         }
+
+        fun logout() {
+            val loginViewModel = LoginViewModel(
+                getInstrumentation().targetContext)
+            loginViewModel.logout()
+        }
+
     }
 }

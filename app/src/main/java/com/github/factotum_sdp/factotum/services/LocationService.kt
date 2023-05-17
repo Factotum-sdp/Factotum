@@ -46,7 +46,7 @@ class LocationService() : Service() {
     private val binder = LocalBinder()
     private var locationClient: LocationClient? = null
 
-    override fun onBind(p0: Intent?): IBinder? {
+    override fun onBind(p0: Intent?): IBinder {
         return binder
     }
 

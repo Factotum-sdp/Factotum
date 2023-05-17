@@ -1,7 +1,9 @@
 package com.github.factotum_sdp.factotum.ui.bossmap
 
-import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Bitmap.createScaledBitmap
+import android.graphics.BitmapFactory
+import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Bundle
@@ -10,9 +12,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.models.CourierLocation
+import com.github.factotum_sdp.factotum.models.DeliveryStatus
+import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
@@ -25,13 +30,19 @@ import com.google.android.gms.maps.model.MarkerOptions
 
 private const val ZOOM_LEVEL_CITY = 14f
 private const val SCALE_FACTOR_ICON = 0.7f
+private const val MAIL_BOX_SIZE = 100
 
 class BossMapFragment : Fragment(), OnMapReadyCallback {
 
     private val viewModel: BossMapViewModel by viewModels()
     private var cameraPositionInitialized = false
+    private val contactsViewModel: ContactsViewModel by activityViewModels()
     private lateinit var mapView: MapView
     private lateinit var googleMap: GoogleMap
+
+
+    private lateinit var bitmapDeliveredScaled : Bitmap
+    private lateinit var bitmapNotDeliveredScaled : Bitmap
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,6 +52,16 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
         mapView = view.findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
+
+
+        bitmapDeliveredScaled = createScaledBitmap(
+            BitmapFactory.decodeResource(requireContext().resources, R.drawable.mailbox_delivered),
+            MAIL_BOX_SIZE, MAIL_BOX_SIZE, false)
+
+        bitmapNotDeliveredScaled = createScaledBitmap(
+            BitmapFactory.decodeResource(requireContext().resources, R.drawable.mailbox_lowered_flag),
+            MAIL_BOX_SIZE, MAIL_BOX_SIZE, false)
+
         return view
     }
 
@@ -57,7 +78,7 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
         )
 
         viewModel.courierLocations.observe(viewLifecycleOwner) { locations ->
-            updateMarkers(locations)
+            updateMap(locations, viewModel.deliveriesStatus.value ?: emptyList())
             if (!cameraPositionInitialized) {
                 val geometricMedian = calculateGeometricMedian(locations)
                 googleMap.moveCamera(
@@ -67,14 +88,40 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
                     )
                 )
                 cameraPositionInitialized = true
+
             }
+        }
+
+            viewModel.deliveriesStatus.observe(viewLifecycleOwner) { deliveryStatus ->
+                updateMap(viewModel.courierLocations.value ?: emptyList(), deliveryStatus)
+            }
+
+            contactsViewModel.contacts.observe(viewLifecycleOwner) {
+                viewModel.updateContacts(it)
+            }
+
+    }
+
+    private fun updateMap(locations: List<CourierLocation>, deliveryStatus: List<DeliveryStatus>) {
+        googleMap.clear()
+        updateMarkers(locations)
+        updateDestinationMarkers(deliveryStatus)
+    }
+
+    private fun updateDestinationMarkers(locations: List<DeliveryStatus>?) {
+        locations?.forEach { status ->
+            googleMap.addMarker(
+                MarkerOptions()
+                    .position(LatLng(status.latitude!!, status.longitude!!))
+                    .title(status.destID)
+                    .icon(if(status.timeStamp != null)
+                        BitmapDescriptorFactory.fromBitmap(bitmapDeliveredScaled)
+                        else BitmapDescriptorFactory.fromBitmap(bitmapNotDeliveredScaled))
+            )
         }
     }
 
-
     private fun updateMarkers(locations: List<CourierLocation>) {
-        googleMap.clear()
-
         locations.forEach { location ->
             googleMap.addMarker(
                 MarkerOptions()

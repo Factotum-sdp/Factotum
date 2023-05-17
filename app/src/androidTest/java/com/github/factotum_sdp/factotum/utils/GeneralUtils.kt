@@ -18,8 +18,6 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 
 class GeneralUtils {
     companion object {
@@ -27,12 +25,14 @@ class GeneralUtils {
         private var auth: FirebaseAuth = Firebase.auth
         private var storage: FirebaseStorage = Firebase.storage
         private var emulatorSet = false
-        private val BOSS_USER = User(UsersPlaceHolder.USER_BOSS.name,
-                                     UsersPlaceHolder.USER_BOSS.email,
-                                     UsersPlaceHolder.USER_BOSS.role,
-                                     UsersPlaceHolder.USER_BOSS.username)
+        private val BOSS_USER = User(
+            UsersPlaceHolder.USER_BOSS.name,
+            UsersPlaceHolder.USER_BOSS.email,
+            UsersPlaceHolder.USER_BOSS.role,
+            UsersPlaceHolder.USER_BOSS.username
+        )
 
-        fun initFirebase(online : Boolean = true) {
+        fun initFirebase(online: Boolean = true) {
 
             if (!emulatorSet) {
                 database.useEmulator("10.0.2.2", 9000)
@@ -57,10 +57,6 @@ class GeneralUtils {
             return auth
         }
 
-        fun getStorage(): FirebaseStorage {
-            return storage
-        }
-
         fun fillUserEntryAndEnterTheApp(email: String, password: String) {
             onView(withId(R.id.email)).perform(typeText(email))
             onView(withId(R.id.fragment_login_directors_parent)).perform(
@@ -72,15 +68,16 @@ class GeneralUtils {
                 closeSoftKeyboard()
             )
             onView(withId(R.id.login)).perform(click())
+            Thread.sleep(1000)
         }
 
         fun injectBossAsLoggedInUser(testRule: ActivityScenarioRule<MainActivity>) {
-           injectLoggedInUser(testRule, BOSS_USER)
+            injectLoggedInUser(testRule, BOSS_USER)
         }
 
         fun injectLoggedInUser(testRule: ActivityScenarioRule<MainActivity>, loggedInUser: User) {
             testRule.scenario.onActivity {
-                val user = it.applicationUser()
+                val user = it.applicationUserViewModel()
                 user.setLoggedInUser(loggedInUser)
             }
         }

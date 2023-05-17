@@ -108,7 +108,7 @@ class MainActivity : AppCompatActivity() {
         return settings
     }
 
-    fun applicationUser(): UserViewModel {
+    fun applicationUserViewModel(): UserViewModel {
         return user
     }
 

@@ -97,7 +97,7 @@
     <string name="rb_label_swiper_edition">Swipe R. Editon</string>
     <string name="rb_label_dragdrop"><![CDATA[Drag & Drop]]></string>
     <string name="edit_dialog_cancel_b">Cancel</string>
-    <string name="edit_dialog_update_b">update</string>
+    <string name="edit_dialog_update_b">Confirm</string>
     <string name="menu_view_proof_picture">View Proof Pictures</string>
     <string name="refresh">Refresh</string>
     <string name="hint_dialog_client_id">Client ID</string>
@@ -167,4 +167,6 @@
     <string name="contact_not_found">Contact not found</string>
     <string name="boss_Map">Boss Map</string>
     <string name="decline_end_shift">Not now</string>
+    <string name="invalid_client_id_snack_bar">Invalid Client ID, please correct it</string>
+    <string name="invalid_client_id_text">Invalid Client ID</string>
 </resources>

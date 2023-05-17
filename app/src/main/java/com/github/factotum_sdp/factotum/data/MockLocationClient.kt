@@ -10,26 +10,26 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-private const val TIMES_WITHOUT_MOVING = 2
-class MockLocationClient: LocationClient {
+private val DEFAULT_JOURNEY = listOf(
+    PELICAN,
+    PELICAN,
+    PELICAN_TO_ROLEX_1,
+    PELICAN_TO_ROLEX_2,
+    FRONT_OF_ROLEX
+)
+class MockLocationClient(private val journey: List<Location> = DEFAULT_JOURNEY): LocationClient {
 
     @SuppressLint("MissingPermission")
     override fun getLocationUpdates(interval: Long): Flow<Location> {
         val longerInterval = interval * 4
         return flow {
-            for(i in 0 until TIMES_WITHOUT_MOVING) {
-                emit(PELICAN)
+            for(loc in journey) {
+                emit(loc)
                 delay(longerInterval)
             }
 
-            emit(PELICAN_TO_ROLEX_1)
-            delay(longerInterval)
-
-            emit(PELICAN_TO_ROLEX_2)
-            delay(longerInterval)
-
             while (true) {
-                emit(FRONT_OF_ROLEX)
+                emit(journey.last())
                 delay(longerInterval)
             }
         }

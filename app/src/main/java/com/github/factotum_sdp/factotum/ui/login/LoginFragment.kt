@@ -17,8 +17,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
-import com.github.factotum_sdp.factotum.models.User
 import com.github.factotum_sdp.factotum.databinding.FragmentLoginBinding
+import com.github.factotum_sdp.factotum.models.User
 import com.google.android.material.snackbar.Snackbar
 
 
@@ -48,7 +48,7 @@ class LoginFragment : Fragment() {
         val logVMFact = LoginViewModel.LoginViewModelFactory(requireContext())
         viewModel =
             ViewModelProvider(this, logVMFact)[LoginViewModel::class.java]
-
+        
         // Define the UI elements
         val emailEditText = binding.email
         val passwordEditText = binding.password

@@ -1,10 +1,8 @@
 package com.github.factotum_sdp.factotum.repositories
 
 import androidx.datastore.core.DataStore
-import com.github.factotum_sdp.factotum.data.DeliveryLogger
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.models.DestinationRecord
-import com.github.factotum_sdp.factotum.models.User
 import com.github.factotum_sdp.factotum.ui.roadbook.DRecordList
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -42,7 +40,6 @@ class RoadBookRepository(remoteSource: DatabaseReference,
     private var lastNetworkBackUp: DRecordList? = null
     private var lastLocalNetworkBackUp: DRecordList? = null
 
-    private val deliveryLogger: DeliveryLogger = DeliveryLogger()
 
     init {
         FirebaseInstance.onConnectedStatusChanged {
@@ -111,16 +108,6 @@ class RoadBookRepository(remoteSource: DatabaseReference,
             }
         }
         return getLastLocalBackUp()
-    }
-
-    /**
-     * Creates the final lof of the shift and send it to a specific Firebase node
-     *
-     * @param records: DRecordList
-     * @param user: User
-     */
-    fun makeShiftLog(records: DRecordList, user: User) {
-        deliveryLogger.logDeliveries(records, user.name)
     }
 
     private fun setNetworkBackUp(records: DRecordList) {

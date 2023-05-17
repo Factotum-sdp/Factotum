@@ -23,6 +23,9 @@ import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
+
+private const val ERASE_B_LABEL = "Erase"
+
 /**
  * That Class represent a DialogBuilder specifically designed to build a custom
  * AlertDialog containing all the fields needed to edit a DestinationRecord.
@@ -75,6 +78,7 @@ class DRecordEditDialogBuilder(
         setClientIDsAdapter()
         setTimestampTimePicker()
         setActionsAdapter()
+        setClientIDFieldCheck()
 
         return super.create()
     }
@@ -88,10 +92,9 @@ class DRecordEditDialogBuilder(
         setViewModelUpdates({ _, _ ->
             // On negative button do nothing
         }, { _, _ ->
-            // On positive button :
-            try {
+            withUserEntryErrorManagement {
                 rbViewModel.addRecord(
-                    clientIDView.text.toString(),
+                    checkClientID(clientIDView.text.toString()),
                     parseTimestamp(timestampView.text.toString()),
                     parseWaitTimeOrRate(waitingTimeView.text.toString()),
                     parseWaitTimeOrRate(rateView.text.toString()),
@@ -99,8 +102,6 @@ class DRecordEditDialogBuilder(
                     notesView.text.toString()
                 )
                 setSnackBar(host.getString(R.string.snap_text_record_added), 700)
-            } catch (e: java.lang.Exception) {
-                setSnackBar(host.getString(R.string.edit_rejected_snap_label), 1400)
             }
         })
         return this
@@ -125,12 +126,12 @@ class DRecordEditDialogBuilder(
             // On negative button : Update the screen, no changes to back-end
             rbRecyclerView.adapter!!.notifyItemChanged(position)
         }, { _, _ ->
-            val recHasChanged: Boolean
-            try { // On positive button : Try to edit the record
+            var recHasChanged: Boolean
+            withUserEntryErrorManagement {
                 recHasChanged =
                     rbViewModel.editRecordAt(
                         position,
-                        clientIDView.text.toString().trim(),
+                        checkClientID(clientIDView.text.toString()),
                         parseTimestamp(timestampView.text.toString()),
                         parseWaitTimeOrRate(waitingTimeView.text.toString()),
                         parseWaitTimeOrRate(rateView.text.toString()),
@@ -139,13 +140,30 @@ class DRecordEditDialogBuilder(
                     )
                 if (recHasChanged)
                     setSnackBar(context.getString(R.string.edit_confirmed_snap_label), 700)
-            } catch (e: java.lang.Exception) {
-                setSnackBar(host.getString(R.string.edit_rejected_snap_label), 1400)
             }
             rbRecyclerView.adapter!!.notifyItemChanged(position)
         })
         return this
     }
+
+    private fun withUserEntryErrorManagement(toExecute: () -> Unit) {
+        try { // On positive button : Try to edit the record
+            toExecute()
+        } catch (e: InvalidClientIDException) {
+            setSnackBar(context.getString(R.string.invalid_client_id_snack_bar), 1400)
+        } catch (e: Exception) {
+            setSnackBar(host.getString(R.string.edit_rejected_snap_label), 1400)
+        }
+    }
+
+    private fun checkClientID(userEntry: String): String {
+        val possibleClientID = userEntry.trim()
+        if(!isValidClientID(possibleClientID))
+            throw InvalidClientIDException()
+        return possibleClientID
+    }
+
+    class InvalidClientIDException: Exception("Invalid Client ID")
 
     private fun setSnackBar(content: String, duration: Int) {
         Snackbar
@@ -176,7 +194,6 @@ class DRecordEditDialogBuilder(
     // Here we will need to get the clients IDs through a ViewModel instance
     // initiated in the mainActivity and representing all the clients
     private fun setClientIDsAdapter() {
-
         clientIDView.threshold = 1
         contactsViewModel.contacts.observe(host.viewLifecycleOwner) { it ->
             val clientIDsAdapter = ArrayAdapter(
@@ -226,7 +243,22 @@ class DRecordEditDialogBuilder(
         actionsView.threshold = 1
     }
 
-    companion object {
-        private const val ERASE_B_LABEL = "Erase"
+    private fun setClientIDFieldCheck() {
+        clientIDView.validator = object : AutoCompleteTextView.Validator {
+            override fun isValid(text: CharSequence): Boolean {
+                val possibleClientID = text.toString().trim()
+                return isValidClientID(possibleClientID)
+            }
+
+            override fun fixText(invalidText: CharSequence): CharSequence {
+                // If .isValid() returns false then the code comes here
+                return context.getString(R.string.invalid_client_id_text)
+            }
+        }
+    }
+
+    private fun isValidClientID(possibleClientID: String): Boolean {
+        val currentContacts = contactsViewModel.contacts.value ?: emptyList()
+        return currentContacts.any { c -> c.username == possibleClientID }
     }
 }

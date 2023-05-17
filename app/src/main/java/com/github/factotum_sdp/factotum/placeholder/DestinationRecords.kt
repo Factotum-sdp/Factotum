@@ -2,7 +2,7 @@ package com.github.factotum_sdp.factotum.placeholder
 
 import com.github.factotum_sdp.factotum.models.DestinationRecord
 import com.github.factotum_sdp.factotum.models.DestinationRecord.Action
-import java.util.*
+import java.util.Calendar
 
 /**
  * Temporary PlaceHolder for some DestinationRecord synthetic data
@@ -19,7 +19,13 @@ object DestinationRecords {
         val cal: Calendar = Calendar.getInstance()
         RECORDS.addAll(
             listOf(
-                DestinationRecord("QG#1", "QG", cal.time, 3, 1, arrayListOf(), ""),
+                DestinationRecord(
+                    "QG#1",
+                    "QG",
+                    cal.time,
+                    3,
+                    1,
+                    arrayListOf(), ""),
                 DestinationRecord(
                     "Buhagiat#1",
                     "Buhagiat",
@@ -37,11 +43,19 @@ object DestinationRecords {
                     1,
                     arrayListOf(Action.DELIVER, Action.CONTACT),
                     ""
+                ),
+                DestinationRecord(
+                    "More#1",
+                    "More",
+                    null,
+                    0,
+                    1,
+                    arrayListOf(Action.PICK, Action.DELIVER)
                 )
             )
         )
 
-        for (i in 1..15)
+        for (i in 2..15)
             RECORDS.add(
                 DestinationRecord(
                     "More#$i",

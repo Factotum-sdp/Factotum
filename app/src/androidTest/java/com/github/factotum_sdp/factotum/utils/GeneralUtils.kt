@@ -1,7 +1,5 @@
 package com.github.factotum_sdp.factotum.utils
 
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
@@ -61,10 +59,6 @@ class GeneralUtils {
             return auth
         }
 
-        fun getStorage(): FirebaseStorage {
-            return storage
-        }
-
         fun fillUserEntryAndEnterTheApp(email: String, password: String) {
             onView(withId(R.id.email)).perform(typeText(email))
             onView(withId(R.id.fragment_login_directors_parent)).perform(
@@ -76,6 +70,7 @@ class GeneralUtils {
                 closeSoftKeyboard()
             )
             onView(withId(R.id.login)).perform(click())
+            Thread.sleep(1000)
         }
 
         fun injectBossAsLoggedInUser(testRule: ActivityScenarioRule<MainActivity>) {
@@ -84,7 +79,7 @@ class GeneralUtils {
 
         fun injectLoggedInUser(testRule: ActivityScenarioRule<MainActivity>, loggedInUser: User) {
             testRule.scenario.onActivity {
-                val user = it.applicationUser()
+                val user = it.applicationUserViewModel()
                 user.setLoggedInUser(loggedInUser)
             }
         }

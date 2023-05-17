@@ -14,7 +14,6 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
@@ -83,9 +82,9 @@ class BossMapFragmentTest {
         val cuf = CameraUpdateFactory.newLatLng(LatLng(46.517719,6.569090))
         moveMapCamera(testRule, cuf)
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        val mailboxBuaghiat = device.wait(Until.findObject(By.descContains(DestinationRecords.RECORDS[1].destID)), 5000L)
+        val mailboxBuaghiat = device.wait(Until.findObject(By.descContains("Mailbox")), 5000L)
         assert(mailboxBuaghiat != null)
-        val mailboxX17 = device.findObject(By.descContains(DestinationRecords.RECORDS[2].destID))
+        val mailboxX17 = device.findObject(By.descContains("Mailbox"))
         assert(mailboxX17 != null)
 
     }

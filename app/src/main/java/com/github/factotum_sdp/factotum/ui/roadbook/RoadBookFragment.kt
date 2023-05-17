@@ -361,7 +361,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     }
 
     companion object {
-        const val ROADBOOK_DB_PATH = "Sheet-shift" //change to "Sheet-shift2" for manual testing
+        const val ROADBOOK_DB_PATH = "Sheet-shift2" //change to "Sheet-shift2" for manual testing
         const val DEST_ID_NAV_ARG_KEY = "destID"
     }
 

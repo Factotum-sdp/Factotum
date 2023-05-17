@@ -1,5 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.bossmap
 
+import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Bitmap.createScaledBitmap
@@ -31,6 +32,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 private const val ZOOM_LEVEL_CITY = 14f
 private const val SCALE_FACTOR_ICON = 0.7f
 private const val MAIL_BOX_SIZE = 100
+private const val MAILBOX_TITLE = "Mailbox"
 
 class BossMapFragment : Fragment(), OnMapReadyCallback {
 
@@ -92,14 +94,23 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-            viewModel.deliveriesStatus.observe(viewLifecycleOwner) { deliveryStatus ->
+        viewModel.deliveriesStatus.observe(viewLifecycleOwner) { deliveryStatus ->
                 updateMap(viewModel.courierLocations.value ?: emptyList(), deliveryStatus)
             }
 
-            contactsViewModel.contacts.observe(viewLifecycleOwner) {
+        contactsViewModel.contacts.observe(viewLifecycleOwner) {
                 viewModel.updateContacts(it)
             }
-
+        googleMap.setOnMarkerClickListener { marker ->
+            marker.title?.let { title ->
+                if (title.startsWith(MAILBOX_TITLE)) {
+                    val mailboxNumber = title.split(" ")[1]
+                    val deliveryStatus = viewModel.deliveriesStatus.value?.get(mailboxNumber) ?: emptyList()
+                    showDeliveryInfos(Pair(mailboxNumber, deliveryStatus))
+                }
+            }
+            true
+        }
     }
 
     private fun updateMap(locations: List<CourierLocation>, deliveryStatus: Map<String, List<DeliveryStatus>>) {
@@ -111,15 +122,12 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
     private fun updateDestinationMarkers(locations: Map<String, List<DeliveryStatus>>?) {
         locations?.forEach { entry ->
             val isFullyDelivered = entry.value.all { it.timeStamp != null }
-            val listOfAllDeliveryStatus = StringBuilder()
-            entry.value.forEach { status ->
-                listOfAllDeliveryStatus.append("${status.courier} : ${status.destID}\n")
-            }
+            val title = MAILBOX_TITLE + " " + entry.key
             val coordinates = LatLng(entry.value[0].latitude!!, entry.value[0].longitude!!)
             googleMap.addMarker(
                 MarkerOptions()
                     .position(coordinates)
-                    .title(listOfAllDeliveryStatus.toString())
+                    .title(title)
                     .icon(
                         if (isFullyDelivered)
                             BitmapDescriptorFactory.fromBitmap(bitmapDeliveredScaled)
@@ -127,6 +135,27 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
                     )
             )
         }
+    }
+
+    private fun showDeliveryInfos(deliveryStatus: Pair<String, List<DeliveryStatus>>){
+        val deliveryInfos = StringBuilder()
+        deliveryStatus.second.forEach {status ->
+            deliveryInfos.append("${status.courier} : ${status.timeStamp ?: "not delivered"}\n")
+        }
+        AlertDialog.Builder(requireContext())
+            .setTitle("Delivery status of ${deliveryStatus.first}")
+            .setMessage(deliveryInfos.toString())
+            .setPositiveButton("OK") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setNegativeButton("History"){ dialog, _ ->
+                dialog.dismiss()
+            }
+            .setNeutralButton("Proof Pictures"){ dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+
     }
 
     private fun updateMarkers(locations: List<CourierLocation>) {

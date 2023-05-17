@@ -19,12 +19,13 @@ import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.logout
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.hamcrest.Matchers.anything
 import org.junit.After
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
@@ -233,7 +234,7 @@ class MainActivityTest {
             closeSoftKeyboard()
         )
         onView(withId(R.id.role)).perform(click())
-        Espresso.onData(Matchers.anything()).inRoot(RootMatchers.isPlatformPopup()).atPosition(1)
+        Espresso.onData(anything()).inRoot(RootMatchers.isPlatformPopup()).atPosition(1)
             .perform(click())
         onView(withId(R.id.username)).perform(typeText("X17"))
         onView(withId(R.id.signup)).perform(click())

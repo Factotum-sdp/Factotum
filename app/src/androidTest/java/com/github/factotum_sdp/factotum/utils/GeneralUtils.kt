@@ -18,8 +18,6 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 
 class GeneralUtils {
     companion object {
@@ -79,7 +77,7 @@ class GeneralUtils {
 
         fun injectLoggedInUser(testRule: ActivityScenarioRule<MainActivity>, loggedInUser: User) {
             testRule.scenario.onActivity {
-                val user = it.applicationUser()
+                val user = it.applicationUserViewModel()
                 user.setLoggedInUser(loggedInUser)
             }
         }

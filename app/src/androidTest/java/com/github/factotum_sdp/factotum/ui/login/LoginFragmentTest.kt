@@ -10,6 +10,7 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
+import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder.USER2
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.fillUserEntryAndEnterTheApp
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
@@ -33,7 +34,6 @@ class LoginFragmentTest {
     )
 
     companion object {
-
         @BeforeClass
         @JvmStatic
         fun setUpDb() {
@@ -91,11 +91,11 @@ class LoginFragmentTest {
 
     @Test
     fun userNotInProfileDispatchUserNotFoundMessage() {
-        onView(withId(R.id.email)).perform(typeText("marc.marquez@epfl.ch"))
+        onView(withId(R.id.email)).perform(typeText(USER2.email))
         onView(withId(R.id.fragment_login_directors_parent)).perform(
             closeSoftKeyboard()
         )
-        onView(withId(R.id.password)).perform(typeText("123456"))
+        onView(withId(R.id.password)).perform(typeText(USER2.password))
         onView(withId(R.id.fragment_login_directors_parent)).perform(
             closeSoftKeyboard()
         )

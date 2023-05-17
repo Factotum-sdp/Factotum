@@ -1,6 +1,5 @@
 package com.github.factotum_sdp.factotum.ui.signup
 
-import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -49,7 +48,7 @@ class SignUpFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel =
-            ViewModelProvider(this, SignUpViewModelFactory(requireContext()))[SignUpViewModel::class.java]
+            ViewModelProvider(this, SignUpViewModelFactory())[SignUpViewModel::class.java]
 
         val nameEditText = binding.name
         val emailEditText = binding.email
@@ -200,13 +199,14 @@ class SignUpFragment : Fragment() {
                     showSignUpFailed(it)
                 }
                 authResult.success?.let {
-                    val newUser = User(
-                        binding.name.text.toString(),
-                        binding.email.text.toString(),
-                        Role.valueOf(binding.role.text.toString()),
-                        binding.username.text.toString()
-                    )
                     val newUserUID = getAuth().currentUser?.uid ?: "no uid"
+                    val newUser = User(
+                        uid = newUserUID,
+                        name = binding.name.text.toString(),
+                        email = binding.email.text.toString(),
+                        role = Role.valueOf(binding.role.text.toString()),
+                        username = binding.username.text.toString()
+                    )
                     viewModel.updateUser(newUserUID, newUser)
                 }
             })
@@ -227,18 +227,6 @@ class SignUpFragment : Fragment() {
     private fun updateUi(model: String) {
         val welcome = getString(R.string.welcome) + " " + model
         Snackbar.make(requireView(), welcome, Snackbar.LENGTH_LONG).show()
-        
-        //
-        val newUserUID = getAuth().currentUser?.uid ?: "no uid"
-        val newUser = User(
-            uid=newUserUID,
-            name=binding.username.text.toString(),
-            email=binding.email.text.toString(),
-            role=Role.valueOf(binding.role.text.toString())
-        )
-        viewModel.updateUser(newUserUID, newUser)
-        //
-        
         findNavController().navigate(R.id.action_signUpFragment_pop)
     }
 
@@ -255,14 +243,11 @@ class SignUpFragment : Fragment() {
      * ViewModel provider factory to instantiate SignUpViewModel.
      * Required given SignUpViewModel has a non-empty constructor
      */
-    class SignUpViewModelFactory (private val context: Context) : ViewModelProvider.Factory {
+    class SignUpViewModelFactory : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(SignUpViewModel::class.java)) {
-                return SignUpViewModel(
-                    signUpDataSink = SignUpDataSink(),
-                    loginRepository = LoginRepository(LoginDataSource(), context)
-                ) as T
+                return SignUpViewModel(signUpDataSink = SignUpDataSink()) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }

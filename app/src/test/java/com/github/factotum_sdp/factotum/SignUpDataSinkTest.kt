@@ -6,6 +6,7 @@ import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.models.User
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
@@ -25,7 +26,7 @@ class SignUpDataSinkTest {
     private val userRole = Role.BOSS
     private val username = "username"
     private val userUID = "UID"
-    private val user = User(userName, userEmail, userRole, username)
+    private val user = User(userUID, userName, userEmail, userRole, username)
 
     @Test
     fun signUp_Successful() {
@@ -40,8 +41,8 @@ class SignUpDataSinkTest {
         // when
         val result = signUpDataSink.signUp(userEmail, validPassword)
 
-        // then
-        MatcherAssert.assertThat(result, `is`(Result.Success(userEmail)))
+            // then
+            assertThat(result, `is`(Result.Success(userEmail)))
     }
 
     @Test
@@ -59,7 +60,7 @@ class SignUpDataSinkTest {
         val result = signUpDataSink.signUp(userEmail, validPassword)
 
         // then
-        MatcherAssert.assertThat(result, `is`(Result.Error(exception)))
+        assertThat(result, `is`(Result.Error(exception)))
     }
 
     @Test
@@ -74,7 +75,7 @@ class SignUpDataSinkTest {
         val result = signUpDataSink.updateUser(userUID, user)
 
         // then
-        MatcherAssert.assertThat(result, `is`(Result.Success(userName)))
+        assertThat(result, `is`(Result.Success(userName)))
     }
 
     @Test
@@ -92,7 +93,7 @@ class SignUpDataSinkTest {
         val result = signUpDataSink.updateUser(userUID, user)
 
         // then
-        MatcherAssert.assertThat(result, `is`(Result.Error(exception)))
+        assertThat(result, `is`(Result.Error(exception)))
     }
 
     @Test
@@ -107,7 +108,7 @@ class SignUpDataSinkTest {
         val result = signUpDataSink.fetchUsername(username)
 
         // then
-        MatcherAssert.assertThat(result, `is`(Result.Success(username)))
+        assertThat(result, `is`(Result.Success(username)))
     }
 
     @Test
@@ -125,7 +126,7 @@ class SignUpDataSinkTest {
         val result = signUpDataSink.fetchUsername(username)
 
         // then
-        MatcherAssert.assertThat(result, `is`(Result.Error(exception)))
+        assertThat(result, `is`(Result.Error(exception)))
     }
 
     @Test
@@ -143,6 +144,6 @@ class SignUpDataSinkTest {
         val result = signUpDataSink.fetchUsername(username)
 
         // then
-        MatcherAssert.assertThat(result, `is`(Result.Error(exception)))
+        assertThat(result, `is`(Result.Error(exception)))
     }
 }

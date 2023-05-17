@@ -1,13 +1,8 @@
 package com.github.factotum_sdp.factotum.placeholder
 
-import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
-import com.github.factotum_sdp.factotum.data.LoginDataSource
 import com.github.factotum_sdp.factotum.models.Role
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * Temporary PlaceHolder object for fake users data
@@ -20,46 +15,52 @@ object UsersPlaceHolder {
 
     private const val password = "123456"
     val USER1 = UserWithPassword(
-        "Valentino Rossi",
-        "valentino.rossi@epfl.ch",
-        Role.BOSS,
-        "vrossi",
-        password,
+        uid = "user1",
+        name="Valentino Rossi",
+        email="valentino.rossi@epfl.ch",
+        username="vrossi",
+        role=Role.BOSS,
+        password = password
     )
     val USER2 = UserWithPassword(
-        "Marc Marquez",
-        "marc.marquez@epfl.ch",
-        Role.BOSS,
-        "mmarquez",
-        password
+        uid = "user2",
+        name = "Marc Marquez",
+        email = "marc.marquez@epfl.ch",
+        username="mmarquez",
+        role = Role.BOSS,
+        password = password
     )
     val USER3 = UserWithPassword(
-        "Jane Doe",
-        "jane.doe@gmail.com",
-        Role.BOSS,
-        "jdoe",
-        password
+        uid = "user3",
+        name = "Jane Doe",
+        email = "jane.doe@gmail.com",
+        username="jdoe",
+        role = Role.BOSS,
+        password = password
     )
     val USER_BOSS = UserWithPassword(
-        "Boss",
-        "boss@gmail.com",
-        Role.BOSS,
-        "boss",
-        password
+        uid = "user4",
+        name = "Boss",
+        email = "boss@gmail.com",
+        username="boss",
+        role = Role.BOSS,
+        password = password
     )
     val USER_COURIER = UserWithPassword(
-        "Courier",
-        "courier@gmail.com",
-        Role.COURIER,
-        "courier",
-        password
+        uid = "user5",
+        name = "Courier",
+        email = "courier@gmail.com",
+        username="courier",
+        role = Role.COURIER,
+        password = password
     )
     val USER_CLIENT = UserWithPassword(
-        "Client",
-        "client@gmail.com",
-        Role.CLIENT,
-        "client",
-        password
+        uid = "user6",
+        name = "Client",
+        email = "client@gmail.com",
+        username="client",
+        role = Role.CLIENT,
+        password = password
     )
 
     fun init(dataSource: FirebaseDatabase, auth: FirebaseAuth) {
@@ -68,6 +69,7 @@ object UsersPlaceHolder {
     }
 
     data class UserWithPassword(
+        val uid: String,
         val name: String,
         val email: String,
         val role: Role,

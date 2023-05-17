@@ -19,13 +19,13 @@ class LoginDataSourceTest {
     @Mock
     private lateinit var loginDataSource: LoginDataSource
 
+    private val userId = "1234"
     private val userName = "Jane Doe"
     private val userEmail = "jane.doe@gmail.com"
     private val userRole = Role.BOSS
     private val validPassword = "123456"
     private val username = "123456789"
     private val invalidPassword = "123456789"
-    private val user = User(userName, userEmail, userRole, username)
 
     @Test
     fun `login with correct credentials returns a LoggedInUser`() {
@@ -64,7 +64,10 @@ class LoginDataSourceTest {
     }
 
     @Test
-    fun `retrieve user return the user`() {
+    fun `retrieve profiles returns a list of users`() {
+        // given
+        val user = User(userId, userName, userEmail, userRole)
+
         loginDataSource = mock(LoginDataSource::class.java)
 
         doReturn(Result.Success(user)).`when`(loginDataSource).retrieveUser(userEmail)

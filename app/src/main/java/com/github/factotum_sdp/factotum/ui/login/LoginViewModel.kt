@@ -1,12 +1,16 @@
 package com.github.factotum_sdp.factotum.ui.login
 
-import androidx.lifecycle.*
+import android.content.Context
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.data.LoginDataSource
-import com.github.factotum_sdp.factotum.repositories.LoginRepository
 import com.github.factotum_sdp.factotum.data.Result
 import com.github.factotum_sdp.factotum.models.User
+import com.github.factotum_sdp.factotum.repositories.LoginRepository
 import com.github.factotum_sdp.factotum.ui.auth.BaseAuthResult
 import com.github.factotum_sdp.factotum.ui.auth.BaseAuthState
 import kotlinx.coroutines.CoroutineDispatcher
@@ -14,9 +18,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class LoginViewModel(private val userViewModel: UserViewModel) : ViewModel() {
+class LoginViewModel (context: Context): ViewModel() {
 
-    private var loginRepository: LoginRepository = LoginRepository(LoginDataSource())
+    private var loginRepository: LoginRepository = LoginRepository(LoginDataSource(), context)
     private val _loginForm = MutableLiveData<LoginFormState>()
     val loginFormState: LiveData<LoginFormState> = _loginForm
 
@@ -27,6 +31,14 @@ class LoginViewModel(private val userViewModel: UserViewModel) : ViewModel() {
     val retrieveUsersResult: LiveData<RetrieveUserResult> = _retrieveUsersResult
 
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+
+    fun checkIfCachedUser() {
+        val user = loginRepository.getLoggedInUser()
+        if (user != null) {
+            _loginResult.value = LoginResult(success = user.uid)
+            _retrieveUsersResult.value = RetrieveUserResult(success = user)
+        }
+    }
 
     /**
      * Called when the login button is clicked.
@@ -45,10 +57,14 @@ class LoginViewModel(private val userViewModel: UserViewModel) : ViewModel() {
         }
     }
 
+    fun logout() {
+        loginRepository.logout()
+    }
+
     fun retrieveUser(uid: String) {
         // launch in a separate asynchronous job
         viewModelScope.launch {
-            val result = withContext(dispatcher) { loginRepository.retrieveUser(uid) }
+            val result = withContext(dispatcher) { loginRepository.retrieveUserFromDB(uid) }
             if (result is Result.Success) {
                 _retrieveUsersResult.value =
                     RetrieveUserResult(
@@ -90,12 +106,12 @@ class LoginViewModel(private val userViewModel: UserViewModel) : ViewModel() {
     ) : BaseAuthResult(success, error)
 
     // Factory needed to assign a value at construction time to the class attribute
-    class LoginViewModelFactory(private val userViewModel: UserViewModel) :
+    class LoginViewModelFactory(private val context: Context) :
         ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return modelClass
-                .getConstructor(UserViewModel::class.java)
-                .newInstance(userViewModel)
+                .getConstructor(Context::class.java)
+                .newInstance(context)
         }
     }
 

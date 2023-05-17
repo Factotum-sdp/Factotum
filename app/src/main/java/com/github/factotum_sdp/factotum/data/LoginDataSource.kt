@@ -44,10 +44,11 @@ class LoginDataSource {
                 return@addOnSuccessListener
             }
             val user = User(
-                it.child("name").value as String,
-                it.child("email").value as String,
-                Role.valueOf(it.child("role").value as String),
-                it.child("username").value as String
+                uid=uid,
+                name=it.child("name").value as String,
+                email=it.child("email").value as String,
+                role=Role.valueOf(it.child("role").value as String),
+                username=it.child("username").value as String
             )
             auth.currentUser?.updateProfile(
                 UserProfileChangeRequest.Builder()
@@ -60,6 +61,10 @@ class LoginDataSource {
             )
         }
         return profilesResultFuture.get()
+    }
+
+    fun logout() {
+        auth.signOut()
     }
 
     companion object {

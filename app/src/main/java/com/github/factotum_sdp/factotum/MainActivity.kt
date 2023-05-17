@@ -18,15 +18,14 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
-import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getAuth
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getDatabase
 import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.repositories.SettingsRepository
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
+import com.github.factotum_sdp.factotum.ui.login.LoginViewModel
 import com.github.factotum_sdp.factotum.ui.picture.UploadWorker
 import com.github.factotum_sdp.factotum.ui.settings.SettingsViewModel
 import com.google.android.material.navigation.NavigationView
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
@@ -45,8 +44,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
-    private val auth: FirebaseAuth = getAuth()
     private lateinit var user: UserViewModel
+    private lateinit var login: LoginViewModel
     private lateinit var settings: SettingsViewModel
     private lateinit var contactsViewModel: ContactsViewModel
     private val handler = Handler(Looper.getMainLooper())
@@ -64,6 +63,10 @@ class MainActivity : AppCompatActivity() {
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
+
+        val logVMFact = LoginViewModel.LoginViewModelFactory(applicationContext)
+        login =
+            ViewModelProvider(this, logVMFact)[LoginViewModel::class.java]
 
         contactsViewModel = ViewModelProvider(this)[ContactsViewModel::class.java]
         contactsViewModel.setDatabase(getDatabase())
@@ -147,7 +150,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun listenLogoutButton() {
         binding.navView.menu.findItem(R.id.signoutButton).setOnMenuItemClickListener {
-            auth.signOut()
+            login.logout()
             finish()
             startActivity(intent)
             true
@@ -225,7 +228,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun uploadCourierLocation() {
         // Get the courier's current location from the location tracker
-        val courierUID = auth.currentUser?.uid ?: return
+        if (user.loggedInUser.value == null) return
+        val courierUID = user.loggedInUser.value!!.uid
         val location = user.userLocation.value
         val database = Firebase.database.reference.child("Location").child(courierUID)
         if (location != null) {
@@ -245,7 +249,7 @@ class MainActivity : AppCompatActivity() {
         NavigationView.OnNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.signoutButton -> {
-                    auth.signOut()
+                    login.logout()
                     finish()
                     startActivity(intent)
                     true

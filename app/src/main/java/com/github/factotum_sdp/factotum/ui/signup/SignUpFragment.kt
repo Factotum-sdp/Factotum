@@ -1,5 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.signup
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -48,7 +49,7 @@ class SignUpFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel =
-            ViewModelProvider(this, SignUpViewModelFactory())[SignUpViewModel::class.java]
+            ViewModelProvider(this, SignUpViewModelFactory(requireContext()))[SignUpViewModel::class.java]
 
         val nameEditText = binding.name
         val emailEditText = binding.email
@@ -226,6 +227,18 @@ class SignUpFragment : Fragment() {
     private fun updateUi(model: String) {
         val welcome = getString(R.string.welcome) + " " + model
         Snackbar.make(requireView(), welcome, Snackbar.LENGTH_LONG).show()
+        
+        //
+        val newUserUID = getAuth().currentUser?.uid ?: "no uid"
+        val newUser = User(
+            uid=newUserUID,
+            name=binding.username.text.toString(),
+            email=binding.email.text.toString(),
+            role=Role.valueOf(binding.role.text.toString())
+        )
+        viewModel.updateUser(newUserUID, newUser)
+        //
+        
         findNavController().navigate(R.id.action_signUpFragment_pop)
     }
 
@@ -242,12 +255,13 @@ class SignUpFragment : Fragment() {
      * ViewModel provider factory to instantiate SignUpViewModel.
      * Required given SignUpViewModel has a non-empty constructor
      */
-    class SignUpViewModelFactory : ViewModelProvider.Factory {
+    class SignUpViewModelFactory (private val context: Context) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(SignUpViewModel::class.java)) {
                 return SignUpViewModel(
-                    signUpDataSink = SignUpDataSink()
+                    signUpDataSink = SignUpDataSink(),
+                    loginRepository = LoginRepository(LoginDataSource(), context)
                 ) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")

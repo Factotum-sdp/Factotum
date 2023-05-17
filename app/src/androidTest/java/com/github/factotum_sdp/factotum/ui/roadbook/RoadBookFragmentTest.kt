@@ -90,7 +90,7 @@ class RoadBookFragmentTest {
             initFirebase()
         }
     }
-    private val courier = User(USER_COURIER.name, USER_COURIER.email, USER_COURIER.role, USER_COURIER.username)
+    private val courier = User(USER_COURIER.uid, USER_COURIER.name, USER_COURIER.email, USER_COURIER.role, USER_COURIER.username)
 
     @Before
     fun toRoadBookFragment() {
@@ -258,7 +258,7 @@ class RoadBookFragmentTest {
         onView(withId(R.id.fragment_route_directors_parent))
             .check(matches(isDisplayed()))
 
-        var ls = emptyList<DestinationRecord>()
+        var ls: List<DestinationRecord>
         runBlocking {
             ls = context.roadBookDataStore.data.first()
         }
@@ -448,7 +448,7 @@ class RoadBookFragmentTest {
         //end shift
         endShift()
 
-        var ls = ShiftList(emptyList())
+        var ls: ShiftList
         runBlocking {
             ls = context.shiftDataStore.data.first()
         }
@@ -1180,8 +1180,8 @@ class RoadBookFragmentTest {
         val future = CompletableFuture<List<Shift>>()
         dbShiftRef.get().addOnSuccessListener { snapshot ->
             var records : List<DestinationRecord>  = emptyList()
-            var user : User = User()
-            var date : Date = Date()
+            var user = User()
+            var date = Date()
             val shiftDb = snapshot.children.mapNotNull { shifts ->
                 shifts.children.forEach {
                     if(it.key == "records"){

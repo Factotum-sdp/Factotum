@@ -77,8 +77,8 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
      *
      */
     fun logShift(shift: Shift){
-        val shift = Shift(Date(), shift.user, currentDRecList())
-        shiftRepository?.logShift(shift)
+        val createdShift = Shift(Date(), shift.user, currentDRecList())
+        shiftRepository.logShift(createdShift)
     }
 
     /**

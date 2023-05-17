@@ -9,12 +9,15 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
+import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
+import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.fillUserEntryAndEnterTheApp
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import org.hamcrest.Matchers.not
+import org.junit.After
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -44,6 +47,11 @@ class LoginFragmentTest {
             auth.signOut()
             FirebaseInstance.setAuth(auth)
         }
+    }
+
+    @After
+    fun leave() {
+        GeneralUtils.logout()
     }
 
     @Test

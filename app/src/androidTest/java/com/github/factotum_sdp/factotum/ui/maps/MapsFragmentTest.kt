@@ -51,7 +51,8 @@ class MapsFragmentTest {
 
     companion object {
 
-        val FIRST_ROUTE_NAME_PREFIX = "BC"
+        const val FIRST_ROUTE_NAME_PREFIX = "BC"
+
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {

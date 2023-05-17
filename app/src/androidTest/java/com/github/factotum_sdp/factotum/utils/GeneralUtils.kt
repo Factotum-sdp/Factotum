@@ -76,7 +76,7 @@ class GeneralUtils {
 
         fun injectLoggedInUser(testRule: ActivityScenarioRule<MainActivity>, loggedInUser: User) {
             testRule.scenario.onActivity {
-                val user = it.applicationUser()
+                val user = it.applicationUserViewModel()
                 user.setLoggedInUser(loggedInUser)
             }
         }

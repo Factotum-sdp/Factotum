@@ -30,7 +30,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -109,7 +108,7 @@ class MainActivity : AppCompatActivity() {
         return settings
     }
 
-    fun applicationUser(): UserViewModel {
+    fun applicationUserViewModel(): UserViewModel {
         return user
     }
 

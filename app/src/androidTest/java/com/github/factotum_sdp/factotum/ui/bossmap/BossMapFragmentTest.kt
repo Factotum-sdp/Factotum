@@ -14,6 +14,8 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.data.LocationClientFactory
+import com.github.factotum_sdp.factotum.data.MockLocationClient
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
@@ -59,6 +61,7 @@ class BossMapFragmentTest {
 
     @Test
     fun testBossMapFragmentWorksProperly(): Unit = runBlocking {
+        LocationClientFactory.setMockClient(MockLocationClient())
         GeneralUtils.fillUserEntryAndEnterTheApp("courier@gmail.com", "123456")
 
         activateLocation()

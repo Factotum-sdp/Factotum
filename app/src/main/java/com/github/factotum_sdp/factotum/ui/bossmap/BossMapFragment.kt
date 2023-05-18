@@ -2,7 +2,6 @@ package com.github.factotum_sdp.factotum.ui.bossmap
 
 import android.app.AlertDialog
 import android.content.Context
-impor
 import android.graphics.Bitmap
 import android.graphics.Bitmap.createScaledBitmap
 import android.graphics.BitmapFactory
@@ -154,7 +153,7 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
             }
             .setNegativeButton("History"){ dialog, _ ->
                 val bundle = Bundle()
-                val jsonStatus = Gson().toJson(deliveryStatus.second)
+                val jsonStatus = Gson().toJson(deliveryStatus.second) //TODO : changer pas list de delivery status history
                 bundle.putString("History", jsonStatus)
                 findNavController()
                     .navigate(R.id.action_bossMapFragment_to_deliveryHistoryFragment, bundle)

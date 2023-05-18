@@ -12,9 +12,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.models.CourierLocation
 import com.github.factotum_sdp.factotum.models.DeliveryStatus
@@ -152,10 +154,11 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
                 dialog.dismiss()
             }
             .setNeutralButton("Proof Pictures"){ dialog, _ ->
+                val bundle = bundleOf("ProofPicture" to deliveryStatus.first)
+                findNavController()
+                    .navigate(R.id.action_bossMapFragment_to_photoProofRecapFragment, bundle)
                 dialog.dismiss()
-            }
-            .show()
-
+            }.show()
     }
 
     private fun updateMarkers(locations: List<CourierLocation>) {

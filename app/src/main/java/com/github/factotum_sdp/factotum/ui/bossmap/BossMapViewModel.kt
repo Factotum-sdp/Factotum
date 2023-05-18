@@ -109,7 +109,6 @@ class BossMapViewModel : ViewModel() {
     fun updateContacts(updateContacts : List<Contact>){
         _contacts.value = updateContacts
     }
-
     override fun onCleared() {
         super.onCleared()
         handler.removeCallbacks(fetchDataRunnable)

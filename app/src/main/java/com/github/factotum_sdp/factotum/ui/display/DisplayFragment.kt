@@ -118,19 +118,28 @@ class DisplayFragment : Fragment() {
         binding.refreshButton.setOnClickListener {
             bossViewModel.refreshFolders()
         }
+        val proofPicture = arguments?.getString("ProofPicture")
+        proofPicture?.let { seeProofPicture ->
+            arguments?.remove("ProofPicture")
+            userFolder.value = seeProofPicture
+            observeClientPhotos()
+            setupClientUI()
+        } ?: run {
+            val bossFolderAdapter =
+                BossFolderAdapter(
+                    onCardClick = { clientFolder ->
+                        userFolder.value = clientFolder.value
+                        observeClientPhotos()
+                        setupClientUI()
+                    }
+                )
 
-        val bossFolderAdapter = BossFolderAdapter(
-            onCardClick = { clientFolder ->
-                userFolder.value = clientFolder.value
-                observeClientPhotos()
-                setupClientUI()
+            binding.recyclerView.apply {
+                layoutManager = LinearLayoutManager(context)
+                adapter = bossFolderAdapter
             }
-        )
-
-        binding.recyclerView.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = bossFolderAdapter
         }
+
     }
 
     //================================================================

@@ -123,5 +123,14 @@
         android:id="@+id/bossMapFragment"
         android:name="com.github.factotum_sdp.factotum.ui.bossmap.BossMapFragment"
         android:label="BossMapFragment"
-        tools:layout="@layout/fragment_boss_map" />
+        tools:layout="@layout/fragment_boss_map" >
+        <action
+            android:id="@+id/action_bossMapFragment_to_photoProofRecapFragment"
+            app:destination="@id/photoProofRecapFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/photoProofRecapFragment"
+        android:name="com.github.factotum_sdp.factotum.ui.bossmap.PhotoProofRecapFragment"
+        android:label="fragment_photo_proof_recap"
+        tools:layout="@layout/fragment_photo_proof_recap" />
 </navigation>

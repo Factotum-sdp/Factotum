@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import com.github.factotum_sdp.factotum.R
@@ -198,6 +199,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         }
         setLiveLocationSwitch(fragMenu)
         setRefreshButtonListener(fragMenu)
+        setBagButtonListener(fragMenu)
         setEndShiftButtonListener(fragMenu)
 
         // Only at menu initialization
@@ -262,6 +264,14 @@ class RoadBookFragment : Fragment(), MenuProvider {
         val refreshButton = menu.findItem(R.id.refresh_button)
         refreshButton.setOnMenuItemClickListener {
             rbRecyclerView.adapter?.notifyDataSetChanged()
+            true
+        }
+    }
+
+    private fun setBagButtonListener(menu: Menu) {
+        val bagButton = menu.findItem(R.id.bag_button)
+        bagButton.setOnMenuItemClickListener {
+            this.findNavController().navigate(R.id.bagFragment)
             true
         }
     }

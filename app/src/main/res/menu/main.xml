@@ -35,7 +35,7 @@
             tools:ignore="AlwaysShowAction" />
         <item
             android:id="@+id/bag_button"
-            android:icon="@drawable/bag"
+            android:icon="@drawable/back_pack"
             android:title="@string/bag_button"
             app:showAsAction="always" />
         <item

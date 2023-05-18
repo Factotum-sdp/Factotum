@@ -172,4 +172,5 @@
     <string name="refresh_button">RefreshButton</string>
     <string name="bag_button">BagButton</string>
     <string name="location_switch">LocationSwitch</string>
+    <string name="package_schedule_icon">package schedule icon</string>
 </resources>

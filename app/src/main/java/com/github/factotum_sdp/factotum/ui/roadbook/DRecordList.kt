@@ -24,10 +24,12 @@ private fun displayedRecords(
 class DRecordList(
     private val allRecords: List<DestinationRecord> = listOf(),
     private val archived: List<DestinationRecord> = listOf(),
+    //private val timestamped: Set<DestinationRecord> = setOf(),
     val showArchived: Boolean = false
 ) : List<DestinationRecord> by displayedRecords(allRecords, archived, showArchived) {
 
     private val archivedSet = archived.toSet() // For performance
+
 
     /**
      * Check if the record at position "index" is archived
@@ -67,9 +69,44 @@ class DRecordList(
         }
     }
 
+    // append the record, for sure not archived
+    fun addRecord(record: DestinationRecord): DRecordList {
+        return DRecordList(allRecords.plus(record), archived, showArchived)
+    }
+
+    fun removeRecordAt(pos: Int): DRecordList {
+        val recordToRemove = this[pos]
+        if (archivedSet.contains(recordToRemove)) {
+            return DRecordList(allRecords.minus(recordToRemove), archived.minus(recordToRemove), showArchived)
+        }
+        return DRecordList(allRecords.minus(recordToRemove), archived, showArchived)
+    }
+
+    fun editRecordAt(pos: Int, newRecord: DestinationRecord): DRecordList {
+        val oldRecord = this[pos]
+        val posInAll = allRecords.indexOfFirst { it.destID == oldRecord.destID }
+        if(archivedSet.contains(oldRecord)) {
+            val posInArchived = archived.indexOfFirst { it.destID == oldRecord.destID }
+            return DRecordList(
+                replaceRecordAt(posInAll, newRecord, allRecords),
+                replaceRecordAt(posInArchived, newRecord, archived),
+                showArchived
+            )
+        }
+        return DRecordList(replaceRecordAt(posInAll, newRecord, allRecords), archived, showArchived)
+    }
+
+    private fun replaceRecordAt(pos: Int, record: DestinationRecord,
+                                records: List<DestinationRecord>): List<DestinationRecord> {
+        val ls = arrayListOf<DestinationRecord>()
+        ls.addAll(records)
+        ls[pos] = record
+        return ls
+    }
+
     /**
      * Update the current main List (this) in an immutable way,
-     * keeping all the others current settings.
+     * Only use that method when records are not edited, or removed in "ls".
      *
      * @param ls: List<DestinationRecord> The new list to replace the current (this) main List
      * @return a new DRecordList with the main List updated

@@ -168,7 +168,6 @@ class MainActivity : AppCompatActivity() {
                 navMenu.findItem(R.id.bossMapFragment).isVisible = false
             }
             Role.COURIER -> {
-                navMenu.findItem(R.id.displayFragment).isVisible = false
                 navMenu.findItem(R.id.bossMapFragment).isVisible = false
             }
             else -> {

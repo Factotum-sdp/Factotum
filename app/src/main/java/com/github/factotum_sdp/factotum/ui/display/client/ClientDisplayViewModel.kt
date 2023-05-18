@@ -1,7 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.display.client
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -64,6 +63,7 @@ class ClientDisplayViewModel(
             if (remotePhotos != null) {
                 updateCachedPhotos(folderName, remotePhotos)
             }
+
         }
     }
 
@@ -99,7 +99,6 @@ class ClientDisplayViewModel(
             storage.getReference(it.path)
         }.sortedWith { date1, date2 -> getDateFromRef(date2).compareTo(getDateFromRef(date1)) }
 
-
         _photoReferences.postValue(storageReferences)
     }
 
@@ -123,8 +122,6 @@ class ClientDisplayViewModel(
                 storage.getReference(it.path)
             }.filter { isSameDay(getDateFromRef(it), date) }
                 .sortedWith {  date1, date2 -> getDateFromRef(date2).compareTo(getDateFromRef(date1)) }
-
-            Log.d("ClientDisplayViewModel", "filterImagesByDate: $storageReferences")
 
             _photoReferences.postValue(storageReferences)
         }

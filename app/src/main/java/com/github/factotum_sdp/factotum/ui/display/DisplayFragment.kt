@@ -128,9 +128,9 @@ class DisplayFragment : Fragment(), MenuProvider {
                 observeBossFolders()
                 setupBossUI()
             }
-            Role.CLIENT -> {
-                observeClientPhotos()
-                setupClientUI()
+            Role.COURIER -> {
+                observeBossFolders()
+                setupBossUI()
             }
             else -> {
                 observeClientPhotos()

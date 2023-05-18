@@ -33,9 +33,11 @@ class BossMapViewModel : ViewModel() {
     private val _courierLocations = MutableLiveData<List<CourierLocation>>()
     private val _deliveriesStatus = MutableLiveData<Map<String,List<DeliveryStatus>>>()
     private val _contacts = MutableLiveData<List<Contact>>()
+    private val _history = MutableLiveData<List<DeliveryStatus>>()
 
     val courierLocations: LiveData<List<CourierLocation>> get() = _courierLocations
     val deliveriesStatus : LiveData<Map<String,List<DeliveryStatus>>> get() = _deliveriesStatus
+    val history : LiveData<List<DeliveryStatus>> get() = _history
 
 
     private val fetchDataRunnable = object : Runnable {
@@ -48,6 +50,10 @@ class BossMapViewModel : ViewModel() {
     init {
         handler.post(fetchDataRunnable)
         fetchDeliveryState()
+    }
+
+    fun setHistory(history: List<DeliveryStatus>){
+        _history.value = history
     }
 
     private fun fetchLocationsAndUpdateMarkers() {

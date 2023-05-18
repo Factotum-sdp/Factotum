@@ -30,6 +30,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.gson.Gson
 
 private const val ZOOM_LEVEL_CITY = 14f
 private const val SCALE_FACTOR_ICON = 0.7f
@@ -151,6 +152,11 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
                 dialog.dismiss()
             }
             .setNegativeButton("History"){ dialog, _ ->
+                val bundle = Bundle()
+                val jsonStatus = Gson().toJson(deliveryStatus.second)
+                bundle.putString("History", jsonStatus)
+                findNavController()
+                    .navigate(R.id.action_bossMapFragment_to_deliveryHistoryFragment, bundle)
                 dialog.dismiss()
             }
             .setNeutralButton("Proof Pictures"){ dialog, _ ->

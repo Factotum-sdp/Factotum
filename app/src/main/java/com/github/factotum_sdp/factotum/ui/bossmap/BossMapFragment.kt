@@ -1,9 +1,9 @@
 package com.github.factotum_sdp.factotum.ui.bossmap
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Bitmap.createScaledBitmap
 import android.graphics.BitmapFactory
-import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Bundle

@@ -16,10 +16,13 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.logout
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
@@ -40,6 +43,11 @@ class MainActivityTest {
         fun setUpDatabase() = runTest {
             initFirebase()
         }
+    }
+
+    @After
+    fun leave() {
+        logout()
     }
 
     //========================================================================================

@@ -24,6 +24,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.data.LocationClientFactory
+import com.github.factotum_sdp.factotum.data.MockLocationClient
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseDateFormatted
 import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseSafeString
@@ -88,7 +90,7 @@ class RoadBookFragmentTest {
             initFirebase()
         }
     }
-    private val courier = User(USER_COURIER.name, USER_COURIER.email, USER_COURIER.role)
+    private val courier = User(USER_COURIER.uid, USER_COURIER.name, USER_COURIER.email, USER_COURIER.role)
 
     @Before
     fun toRoadBookFragment() {
@@ -256,7 +258,7 @@ class RoadBookFragmentTest {
         onView(withId(R.id.fragment_route_directors_parent))
             .check(matches(isDisplayed()))
 
-        var ls = emptyList<DestinationRecord>()
+        var ls: List<DestinationRecord>
         runBlocking {
             ls = context.roadBookDataStore.data.first()
         }
@@ -446,7 +448,7 @@ class RoadBookFragmentTest {
         //end shift
         endShift()
 
-        var ls = ShiftList(emptyList())
+        var ls: ShiftList
         runBlocking {
             ls = context.shiftDataStore.data.first()
         }
@@ -966,6 +968,7 @@ class RoadBookFragmentTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun noAutomaticTimestampIsDoneOutOfDestinationPlace() = runTest {
+        injectMockLocationWithDefaultJourney()
 
         // Non timestamped record, hence swipe left shows deletion dialog
         swipeLeftTheRecordAt(1)
@@ -992,6 +995,8 @@ class RoadBookFragmentTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test // Buhagiat is exactly at the same coordinates where the courier will arrive
     fun automaticTimestampIsDoneOnExactDestinationPlace() = runTest {
+        injectMockLocationWithDefaultJourney()
+
         // Non timestamped record, hence swipe left shows deletion dialog
         swipeLeftTheRecordAt(1)
         onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
@@ -1017,6 +1022,8 @@ class RoadBookFragmentTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun automaticTimestampIsDoneOnDestinationPlacePerimeter() = runTest {
+        injectMockLocationWithDefaultJourney()
+
         // Delete Buhagiat and let the X17 which is at the Rolex center (< 15m of where the courier arrive)
         swipeLeftTheRecordAt(1)
         onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
@@ -1039,8 +1046,18 @@ class RoadBookFragmentTest {
         }
     }
 
-    // Test with another record on top the timestamp is never done
-
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun fusedLocationEndToEndTest() = runTest {
+        onView(withId(R.id.location_switch)).perform(click())
+        runBlocking {
+            delay(updateTimeMockLocationClient)
+            onView(withId(R.id.drawer_layout))
+                .perform(DrawerActions.open())
+            onView(withText("null")).check(doesNotExist())
+            // Check that the coordinates are not more set to null
+        }
+    }
 
     // ============================================================================================
     // ===================================== Helpers ==============================================
@@ -1049,6 +1066,11 @@ class RoadBookFragmentTest {
     private val timePickerCancelBLabel = "Cancel"
     private val timePickerUpdateBLabel = "OK"
     private val timePickerEraseBLabel = "Erase"
+
+    private fun injectMockLocationWithDefaultJourney() {
+        val mockClient = MockLocationClient()
+        LocationClientFactory.setMockClient(mockClient)
+    }
 
     private fun clickOnShowArchivedButton() {
         openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
@@ -1132,7 +1154,6 @@ class RoadBookFragmentTest {
         onView(withId(R.id.editTextTimestamp)).perform(click())
         onView(withText(timePickerUpdateBLabel)).perform(click())
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
-
     }
 
     private fun getRbViewModel(): RoadBookViewModel? {
@@ -1159,8 +1180,8 @@ class RoadBookFragmentTest {
         val future = CompletableFuture<List<Shift>>()
         dbShiftRef.get().addOnSuccessListener { snapshot ->
             var records : List<DestinationRecord>  = emptyList()
-            var user : User = User()
-            var date : Date = Date()
+            var user = User()
+            var date = Date()
             val shiftDb = snapshot.children.mapNotNull { shifts ->
                 shifts.children.forEach {
                     if(it.key == "records"){

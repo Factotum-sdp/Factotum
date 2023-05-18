@@ -24,6 +24,7 @@ import com.github.factotum_sdp.factotum.ui.display.utils.*
 import com.github.factotum_sdp.factotum.ui.picture.emptyFirebaseStorage
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.logout
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
@@ -32,7 +33,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import org.hamcrest.Matchers
 import org.junit.*
 import org.junit.runner.RunWith
 
@@ -73,6 +73,7 @@ class DisplayFragmentTest {
     fun tearDown() = runTest {
         launch { emptyFirebaseStorage(FirebaseStorage.getInstance().reference) }.join()
         Intents.release()
+        logout()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -183,7 +184,7 @@ class DisplayFragmentTest {
         launch { uploadImageToStorageEmulator(context, "Buhagiat", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
 
-        goToDisplayFragment();
+        goToDisplayFragment()
 
         onView(withId(R.id.recyclerView)).perform(
             RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
@@ -203,7 +204,7 @@ class DisplayFragmentTest {
         launch { uploadImageToStorageEmulator(context, "750ukPcnZS3xZKTAk6fQmj04", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
 
-        goToDisplayFragment();
+        goToDisplayFragment()
 
         onView(withId(R.id.recyclerView)).perform(
             RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(

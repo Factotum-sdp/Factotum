@@ -117,8 +117,18 @@ class MapsFragment : Fragment() {
         val bounds = LatLngBounds.Builder()
 
         for (route in routes.value.orEmpty()) {
+            route.addSrcToMap(googleMap)
             route.addDstToMap(googleMap)
+            route.drawRoute(googleMap)
             bounds.include(route.dst)
+        }
+
+        googleMap.setOnPolylineClickListener { polyline ->
+            val route = (polyline.tag as Route)
+            googleMap.clear()
+            route.addDstToMap(googleMap)
+            route.addSrcToMap(googleMap)
+            route.drawRoute(googleMap)
         }
 
         val padding = ZOOM_PADDING // offset from edges of the map in pixels

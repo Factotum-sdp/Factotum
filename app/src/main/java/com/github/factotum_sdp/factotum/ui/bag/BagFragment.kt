@@ -28,7 +28,7 @@ class BagFragment: Fragment() {
             adapter.submitList(it)
         }
 
-        adapter.submitList(listOf(Package("packID#1", "X17", "Buhagiat", null, "")))
+        //adapter.submitList(listOf(Package("packID#1", "X17", "Buhagiat", null, "")))
 
         val packagesRecyclerView: RecyclerView = view.findViewById(R.id.packagesRecyclerView)
         packagesRecyclerView.adapter = adapter

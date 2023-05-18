@@ -16,13 +16,17 @@ import java.util.*
  * The RoadBook ViewModel
  * holds an observable list of DestinationRecord which can evolve dynamically
  *
- * @param _dbRef The database root reference to register RoadBook data
+ * @param roadBookRepository: RoadBookRepository The data source for the RoadBook
+ * @param shiftRepository: ShiftRepository The data source for registering the shift feed-back
  */
 class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
                         private val shiftRepository: ShiftRepository) : ViewModel() {
 
     private val _recordsList: MutableLiveData<DRecordList> = MutableLiveData(DRecordList())
     val recordsListState: LiveData<DRecordList> = _recordsList
+    val timestampedRecords = recordsListState.map { recordsList ->
+        recordsList.timestampedSet()
+    }.distinctUntilChanged()
 
     private val clientOccurrences = HashMap<String, Int>()
     private lateinit var preferencesRepository: RoadBookPreferencesRepository
@@ -128,7 +132,19 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
     fun fetchBackBackUps(){
         runBlocking {
             val lastBackUp = roadBookRepository.getLastBackUp()
-            _recordsList.value = DRecordList(allRecords = lastBackUp, showArchived = currentDRecList().showArchived)
+            val timestamped = buildSet {
+                lastBackUp.forEach { record ->
+                    record.timeStamp?.let {
+                        add(record)
+                    }
+                }
+            }
+            _recordsList.value =
+                DRecordList(
+                    allRecords = lastBackUp,
+                    showArchived = currentDRecList().showArchived,
+                    timestamped = timestamped
+                )
         }
     }
 
@@ -280,13 +296,18 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
                 )
             )
         }
-        _recordsList.value = DRecordList(allRecords = newList, showArchived = currentDRecList().showArchived)
+        _recordsList.value =
+            DRecordList(
+                allRecords = newList,
+                showArchived = currentDRecList().showArchived,
+                timestamped = setOf(ls.first())
+            )
     }
 
     /**
      * Clear all records
      */
-    fun clearAllRecords(){
+    fun clearAllRecords() {
         _recordsList.value =
             DRecordList(
                 allRecords = emptyList(),

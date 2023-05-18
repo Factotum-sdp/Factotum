@@ -29,6 +29,7 @@ import com.github.factotum_sdp.factotum.repositories.ShiftRepository
 import com.github.factotum_sdp.factotum.repositories.ShiftRepository.Companion.DELIVERY_LOG_DB_PATH
 import com.github.factotum_sdp.factotum.roadBookDataStore
 import com.github.factotum_sdp.factotum.shiftDataStore
+import com.github.factotum_sdp.factotum.ui.bag.BagViewModel
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.ui.settings.SettingsViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -67,6 +68,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private var usePreferences = false
     private val userViewModel: UserViewModel by activityViewModels()
     private val contactsViewModel : ContactsViewModel by activityViewModels()
+    private val bagViewModel: BagViewModel by activityViewModels()
 
     private lateinit var currentContacts: List<Contact>
 
@@ -82,6 +84,10 @@ class RoadBookFragment : Fragment(), MenuProvider {
         // and update the displayed RecyclerView accordingly
         rbViewModel.recordsListState.observe(viewLifecycleOwner) {
             adapter.submitList(it)
+        }
+
+        rbViewModel.timestampedRecords.observe(viewLifecycleOwner) {
+            bagViewModel.setTimestamped(it)
         }
 
         // Set events that triggers change in the Roadoook ViewModel

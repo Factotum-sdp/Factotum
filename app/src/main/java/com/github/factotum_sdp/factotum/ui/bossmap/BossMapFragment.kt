@@ -2,6 +2,7 @@ package com.github.factotum_sdp.factotum.ui.bossmap
 
 import android.app.AlertDialog
 import android.content.Context
+impor
 import android.graphics.Bitmap
 import android.graphics.Bitmap.createScaledBitmap
 import android.graphics.BitmapFactory

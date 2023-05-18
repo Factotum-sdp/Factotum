@@ -17,8 +17,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
-import com.github.factotum_sdp.factotum.models.User
 import com.github.factotum_sdp.factotum.databinding.FragmentLoginBinding
+import com.github.factotum_sdp.factotum.models.User
 import com.google.android.material.snackbar.Snackbar
 
 
@@ -45,7 +45,7 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val logVMFact = LoginViewModel.LoginViewModelFactory(userViewModel)
+        val logVMFact = LoginViewModel.LoginViewModelFactory(requireContext())
         viewModel =
             ViewModelProvider(this, logVMFact)[LoginViewModel::class.java]
         
@@ -58,6 +58,8 @@ class LoginFragment : Fragment() {
 
         // Observe the login result and show it in a snackbar
         observeAuthResult(loadingProgressBar)
+
+        viewModel.checkIfCachedUser()
 
         val afterTextChangedListener =
             createTextWatcher(viewModel, emailEditText, passwordEditText)

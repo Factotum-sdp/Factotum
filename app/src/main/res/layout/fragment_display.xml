@@ -5,7 +5,18 @@
     android:id="@+id/fragment_display_directors_parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.display.DisplayFragment">
+    tools:context=".ui.display.DisplayFragment"
+    tools:ignore="ExtraText">
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
@@ -25,4 +36,5 @@
         android:text="@string/refresh"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

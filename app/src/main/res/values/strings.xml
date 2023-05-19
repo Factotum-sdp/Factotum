@@ -169,4 +169,6 @@
     <string name="decline_end_shift">Not now</string>
     <string name="invalid_client_id_snack_bar">Invalid Client ID, please correct it</string>
     <string name="invalid_client_id_text">Invalid Client ID</string>
+    <string name="menu_date_picker">date_picker</string>
+    <string name="menu_loading_bar">menu_loading_bar</string>
 </resources>

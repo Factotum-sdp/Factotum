@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum.ui.display.data.boss
+package com.github.factotum_sdp.factotum.ui.display.data.courier_boss
 
 import androidx.room.Dao
 import androidx.room.Delete

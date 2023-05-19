@@ -10,6 +10,8 @@ import com.github.factotum_sdp.factotum.ui.display.data.client.CachedPhoto
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -56,7 +58,6 @@ class ClientDisplayViewModel(
         return photoLiveData
     }
 
-
     private fun updateImages() {
         _isLoading.value = true
         viewModelScope.launch {
@@ -72,7 +73,6 @@ class ClientDisplayViewModel(
         }
     }
 
-
     private suspend fun updateCachedPhotos(folderName: String, remotePhotos: List<StorageReference>) {
         withContext(Dispatchers.IO) {
             val remotePhotoPaths = remotePhotos.map { it.path }
@@ -81,11 +81,18 @@ class ClientDisplayViewModel(
             val photosToDelete = cachedPhotos.filter { it.path !in remotePhotoPaths }
             cachedPhotoDao.deleteAll(photosToDelete)
 
-            cachedPhotoDao.insertAll(*remotePhotos.map { photo ->
-                val url = photo.downloadUrl.await().toString()
-                val dateSortKey = getDateFromRef(photo).time
-                CachedPhoto(photo.path, folderName, url, dateSortKey)
-            }.toTypedArray())
+            withContext(Dispatchers.Default) {
+                val deferreds = remotePhotos.map { photo ->
+                    async {
+                        val url = photo.downloadUrl.await().toString()
+                        val dateSortKey = getDateFromRef(photo).time
+                        CachedPhoto(photo.path, folderName, url, dateSortKey)
+                    }
+                }
+
+                val newCachedPhotos = deferreds.awaitAll().toTypedArray()
+                cachedPhotoDao.insertAll(*newCachedPhotos)
+            }
         }
 
         displayCachedPhotos(folderName)
@@ -113,29 +120,20 @@ class ClientDisplayViewModel(
     }
 
     fun filterImagesByDate(date: Date) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val folderName = _folderName.value ?: return@launch
-            val cachedPhotos = withContext(Dispatchers.IO) {
-                cachedPhotoDao.getAllByFolderName(folderName)
-            }
+            val cal = Calendar.getInstance().apply { time = date }
+            val startOfDay = cal.apply { set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0) }.timeInMillis
+            val endOfDay = cal.apply { set(Calendar.HOUR_OF_DAY, 23); set(Calendar.MINUTE, 59); set(Calendar.SECOND, 59); set(Calendar.MILLISECOND, 999) }.timeInMillis
+            val cachedPhotos = cachedPhotoDao.getAllByFolderNameAndDay(folderName, startOfDay, endOfDay)
             val storageReferences = cachedPhotos.map {
                 storage.getReference(it.path)
-            }.filter { isSameDay(getDateFromRef(it), date) }
+            }
 
-            _photoReferences.postValue(storageReferences)
+            withContext(Dispatchers.Main) {
+                _photoReferences.postValue(storageReferences)
+            }
         }
-    }
-
-    private fun isSameDay(date1: Date, date2: Date): Boolean {
-        val cal1 = Calendar.getInstance()
-        cal1.time = date1
-
-        val cal2 = Calendar.getInstance()
-        cal2.time = date2
-
-        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
-                cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH) &&
-                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
     }
 
     private fun getDateFromRef(ref: StorageReference): Date {

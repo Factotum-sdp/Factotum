@@ -6,6 +6,7 @@ import android.icu.util.Calendar
 import android.icu.util.GregorianCalendar
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -101,8 +102,9 @@ class DisplayFragment : Fragment(), MenuProvider {
         return true
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
+    override fun onDestroy() {
+        super.onDestroy()
+        onBackPressedCallback.remove()
         _binding = null
     }
 
@@ -234,23 +236,26 @@ class DisplayFragment : Fragment(), MenuProvider {
 
     }
 
+
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            if (userRole.value == Role.BOSS || userRole.value == Role.COURIER
-                && userFolder.value != userID.value) {
+            val currentUser = userID.value
+            val currentRole = userRole.value
+            val currentFolder = userFolder.value
 
+            if ((currentRole == Role.BOSS || currentRole == Role.COURIER) && currentFolder != currentUser) {
                 userFolder.value = userID.value
+
                 setupCourierBossUI()
                 observeCourierBossFolders()
             }
-
-            // Fix a glitch where the client could go to the RoadBook by
-            // pressing the back button
-            else if (userRole.value == Role.BOSS || userRole.value == Role.COURIER) {
-                findNavController().navigate(R.id.roadBookFragment)
+            else if (currentRole == Role.BOSS || currentRole == Role.COURIER) {
+                isEnabled = false
+                requireActivity().onBackPressedDispatcher.onBackPressed()
             }
         }
     }
+
 
     //================================================================
     // Sharing

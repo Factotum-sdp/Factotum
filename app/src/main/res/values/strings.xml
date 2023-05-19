@@ -176,4 +176,5 @@
     <string name="package_name_hint">Package name</string>
     <string name="package_recipient_hint">Recipient</string>
     <string name="package_notes_hint">Package notes</string>
+    <string name="confirm_label_pack_creation_dialog">Confirm</string>
 </resources>

@@ -26,7 +26,7 @@
             android:background="@drawable/cardview_clickable_background">
 
             <ImageView
-                android:id="@+id/packageScheduleSendIcon"
+                android:id="@+id/packageIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/schedule_send"
@@ -49,7 +49,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
-                android:id="@+id/packageIcon"
+                android:id="@+id/packageScheduleSendIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"

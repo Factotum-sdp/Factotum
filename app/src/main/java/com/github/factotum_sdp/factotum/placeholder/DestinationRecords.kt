@@ -41,7 +41,7 @@ object DestinationRecords {
                     null,
                     0,
                     1,
-                    arrayListOf(Action.DELIVER, Action.CONTACT),
+                    arrayListOf(Action.CONTACT),
                     ""
                 ),
                 DestinationRecord(

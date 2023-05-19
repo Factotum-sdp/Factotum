@@ -9,7 +9,6 @@ import android.widget.EditText
 import androidx.fragment.app.Fragment
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
-import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookViewModel
 import java.util.Date
 
 class PackageCreationDialogBuilder(
@@ -35,7 +34,7 @@ class PackageCreationDialogBuilder(
         recipientTextInput = dialogView.findViewById(R.id.autoCompleteRecipientClientID)
         notesView = dialogView.findViewById(R.id.editTextPackageNotes)
 
-        setTitle("New package from $fromDestID")
+        setTitle(DIALOG_TITLE_PREFIX + fromClientID)
         setIcon(R.drawable.pack_icon)
         setCancelable(false)
         setView(dialogView)
@@ -45,7 +44,7 @@ class PackageCreationDialogBuilder(
         setClientIDsAdapter()
         setClientIDFieldCheck()
 
-        setPositiveButton("Confirm") { _, _ ->
+        setPositiveButton(context.getString(R.string.confirm_label_pack_creation_dialog)) { _, _ ->
             bagViewModel.newPackage(
                 fromDestID,
                 takenAt,
@@ -90,5 +89,9 @@ class PackageCreationDialogBuilder(
     private fun isValidClientID(possibleClientID: String): Boolean {
         val currentContacts = contactsViewModel.contacts.value ?: emptyList()
         return currentContacts.any { c -> c.username == possibleClientID }
+    }
+
+    companion object {
+        const val DIALOG_TITLE_PREFIX = "New package from"
     }
 }

@@ -7,27 +7,36 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.models.Package
+import com.github.factotum_sdp.factotum.models.DestinationRecord.Companion.timeStampFormat
+import com.github.factotum_sdp.factotum.models.Pack
 import com.google.android.material.textview.MaterialTextView
 
-class PackagesAdapter: ListAdapter<Package, PackagesAdapter.PackageViewHolder>(FlowerDiffCallback) {
+class PackagesAdapter: ListAdapter<Pack, PackagesAdapter.PackageViewHolder>(FlowerDiffCallback) {
 
     class PackageViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
-        private val packageTextView: MaterialTextView = itemView.findViewById(R.id.packageItemView)
-        private var currentPackage: Package? = null
+        private val textView: MaterialTextView = itemView.findViewById(R.id.packageItemView)
+        private var currentPackage: Pack? = null
 
         /* Bind flower name and image. */
-        fun bind(pack: Package) {
+        fun bind(pack: Pack) {
             currentPackage = pack
 
-            packageTextView.text =
+
+            textView.text =
                 buildString {
-                    append(pack.packageID)
+                    append(pack.name)
                     append(" |  ")
                     append(pack.senderID)
                     append(" -> ")
-                    append(pack.receiverID)
+                    append(pack.recipientID)
+                    append("\n")
+                    append("Taken at : ")
+                    append(timeStampFormat(pack.takenAt))
+                    append("\n")
+                    append("Delivered at : ")
+                    val arrivalTimeString = pack.deliveredAt?.let { timeStampFormat(it) } ?: ""
+                    append(arrivalTimeString)
                 }
         }
     }
@@ -43,12 +52,12 @@ class PackagesAdapter: ListAdapter<Package, PackagesAdapter.PackageViewHolder>(F
         holder.bind(flower)
     }
 
-    object FlowerDiffCallback : DiffUtil.ItemCallback<Package>() {
-        override fun areItemsTheSame(oldItem: Package, newItem: Package): Boolean {
+    object FlowerDiffCallback : DiffUtil.ItemCallback<Pack>() {
+        override fun areItemsTheSame(oldItem: Pack, newItem: Pack): Boolean {
             return oldItem == newItem
         }
 
-        override fun areContentsTheSame(oldItem: Package, newItem: Package): Boolean {
+        override fun areContentsTheSame(oldItem: Pack, newItem: Pack): Boolean {
             return oldItem.packageID == newItem.packageID
         }
     }

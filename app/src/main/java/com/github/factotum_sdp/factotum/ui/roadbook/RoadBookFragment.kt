@@ -20,6 +20,8 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.models.Contact
+import com.github.factotum_sdp.factotum.models.DestinationRecord.Action.PICK
+import com.github.factotum_sdp.factotum.models.DestinationRecord.Action.DELIVER
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
 import com.github.factotum_sdp.factotum.models.Shift
 import com.github.factotum_sdp.factotum.preferencesDataStore
@@ -30,6 +32,7 @@ import com.github.factotum_sdp.factotum.repositories.ShiftRepository.Companion.D
 import com.github.factotum_sdp.factotum.roadBookDataStore
 import com.github.factotum_sdp.factotum.shiftDataStore
 import com.github.factotum_sdp.factotum.ui.bag.BagViewModel
+import com.github.factotum_sdp.factotum.ui.bag.PackageCreationDialogBuilder
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.ui.settings.SettingsViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -70,6 +73,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private val contactsViewModel : ContactsViewModel by activityViewModels()
     private val bagViewModel: BagViewModel by activityViewModels()
 
+    private var timestampedIDs: Map<String, Date> = mapOf()
     private lateinit var currentContacts: List<Contact>
 
     override fun onCreateView(
@@ -87,7 +91,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         }
 
         rbViewModel.timestampedRecords.observe(viewLifecycleOwner) {
-            bagViewModel.setTimestamped(it)
+            handleTimestampChange(it)
         }
 
         // Set events that triggers change in the Roadoook ViewModel
@@ -106,6 +110,46 @@ class RoadBookFragment : Fragment(), MenuProvider {
         return view
     }
 
+    private fun handleTimestampChange(newTimestampedID: Map<String, Date>) {
+        if(timestampedIDs.size == newTimestampedID.size) {
+            val changedIDs = timestampedIDs.filter { newTimestampedID.getValue(it.key) != it.value }
+                changedIDs.forEach {
+                bagViewModel.adjustTimestampOf(it.value, it.key)
+            }
+        } else if(timestampedIDs.size < newTimestampedID.size) {
+            val newIDs = newTimestampedID.keys.subtract(timestampedIDs.keys)
+            newIDs.forEach {
+                handleNewTimestampedRecord(it,newTimestampedID.getValue(it))
+            }
+        } else { // some timestamp has been removed
+            val removedIDs = timestampedIDs.keys.subtract(newTimestampedID.keys)
+            removedIDs.forEach {
+                bagViewModel.removedDestinationRecord(it)
+            }
+        }
+
+        timestampedIDs = newTimestampedID
+    }
+
+    private fun handleNewTimestampedRecord(destID: String, timestamp: Date) {
+        val record = rbViewModel.recordsListState.value?.getDestinationRecordFromID(destID)
+        record?.actions?.forEach {
+            if(it == DELIVER) {
+                bagViewModel.arrivedOnDestinationRecord(destID, record.clientID, timestamp)
+            }
+            if(it == PICK) {
+                PackageCreationDialogBuilder(
+                    requireContext(),
+                    this,
+                    destID,
+                    record.clientID,
+                    timestamp,
+                    bagViewModel,
+                    contactsViewModel
+                ).show()
+            }
+        }
+    }
     override fun onPause() {
         rbViewModel.backUp()
         saveButtonStates()

@@ -180,6 +180,10 @@ class DRecordEditDialogBuilder(
         waitingTimeView.setText(rec.waitingTime.toString())
         rateView.setText(rec.rate.toString())
         actionsView.setText(rec.actions.toString().removePrefix("[").removeSuffix("]"))
+        rec.timeStamp?.let {// if timestamped then can't edit actions done in place
+            actionsView.isEnabled = false
+            actionsView.isFocusable = false
+        }
         notesView.setText(rec.notes)
     }
 

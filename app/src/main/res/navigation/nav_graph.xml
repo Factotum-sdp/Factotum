@@ -125,7 +125,7 @@
     <fragment
         android:id="@+id/bagFragment"
         android:name="com.github.factotum_sdp.factotum.ui.bag.BagFragment"
-        android:label="BagFragment"
+        android:label="Bag"
         tools:layout="@layout/fragment_bag" />
     <fragment
         android:id="@+id/bossMapFragment"

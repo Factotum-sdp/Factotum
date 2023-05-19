@@ -6,11 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.models.Package
-import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookViewAdapter
 
 class BagFragment: Fragment() {
 
@@ -25,7 +22,7 @@ class BagFragment: Fragment() {
         val adapter = PackagesAdapter()
 
         bagViewModel.packages.observe(viewLifecycleOwner) {
-            adapter.submitList(it)
+            adapter.submitList(it.toList())
         }
 
         //adapter.submitList(listOf(Package("packID#1", "X17", "Buhagiat", null, "")))

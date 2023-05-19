@@ -55,6 +55,10 @@ class DRecordList(
         }
     }
 
+    fun getDestinationRecordFromID(destID: String): DestinationRecord {
+        return this[getIndexOf(destID)]
+    }
+
     /**
      * Get the next destination to deliver
      *
@@ -180,8 +184,12 @@ class DRecordList(
                 timestamped.minus(oldRecord)
             } else if(oldRecord.timeStamp == null && newRecord.timeStamp != null) {
                 timestamped.plus(newRecord)
-            } else {
-                timestamped
+            } else { // if timestamp doesn't move update the timestamped if already here
+                if(timestamped.contains(oldRecord)) {
+                    timestamped.minus(oldRecord).plus(newRecord)
+                } else {
+                    timestamped
+                }
             }
         }
         return result

@@ -31,8 +31,7 @@
             android:id="@+id/refresh_button"
             android:icon="@drawable/refresh"
             android:title="@string/refresh_button"
-            app:showAsAction="always"
-            tools:ignore="AlwaysShowAction" />
+            app:showAsAction="always"/>
         <item
             android:id="@+id/bag_button"
             android:icon="@drawable/back_pack"

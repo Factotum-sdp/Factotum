@@ -25,7 +25,7 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
     private val _recordsList: MutableLiveData<DRecordList> = MutableLiveData(DRecordList())
     val recordsListState: LiveData<DRecordList> = _recordsList
     val timestampedRecords = recordsListState.map { recordsList ->
-        recordsList.timestampedSet()
+        recordsList.timestampedSet().associate { it.destID to it.timeStamp!! }
     }.distinctUntilChanged()
 
     private val clientOccurrences = HashMap<String, Int>()

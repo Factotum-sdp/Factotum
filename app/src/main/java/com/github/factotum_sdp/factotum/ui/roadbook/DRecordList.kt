@@ -55,6 +55,12 @@ class DRecordList(
         }
     }
 
+    /**
+     * Get a DestinationRecord from its ID
+     *
+     * @param destID: String
+     * @return DestinationRecord
+     */
     fun getDestinationRecordFromID(destID: String): DestinationRecord {
         return this[getIndexOf(destID)]
     }
@@ -72,25 +78,49 @@ class DRecordList(
         }
     }
 
+    /**
+     * Get the timestamped DestinationRecord's Set
+     * @return Set<DestinationRecord>
+     */
     fun timestampedSet(): Set<DestinationRecord> {
         return timestamped
     }
 
-    // append the record, for sure not archived
-    fun addRecord(record: DestinationRecord): DRecordList {
+    /**
+     * Add the specified DestinationRecord at the end of this List<DestinationRecord>
+     *
+     * @param record: DestinationRecord
+     * @return DRecordList
+     */
+    fun addRecord(record: DestinationRecord): DRecordList { // for sure not archived
         return DRecordList(allRecords.plus(record), archived, computeTimestampedOnAdd(record), showArchived)
     }
 
+    /**
+     * Remove the DestinationRecord at the specified position in this List<DestinationRecord>
+     *
+     * @param pos: Int The index of the DestinationRecord to remove
+     */
     fun removeRecordAt(pos: Int): DRecordList {
         val recordToRemove = this[pos]
         val newTimestamped = computeTimeStampedOnRemove(recordToRemove)
 
         if (archivedSet.contains(recordToRemove)) {
-            return DRecordList(allRecords.minus(recordToRemove), archived.minus(recordToRemove), newTimestamped, showArchived)
+            return DRecordList(
+                allRecords.minus(recordToRemove),
+                archived.minus(recordToRemove),
+                newTimestamped, showArchived)
         }
         return DRecordList(allRecords.minus(recordToRemove), archived, newTimestamped, showArchived)
     }
 
+    /**
+     * Replace the DestinationRecord at "pos" by the given "newRecord"
+     * in this List<DestinationRecord>
+     *
+     * @param pos: Int
+     * @param newRecord: DestinationRecord
+     */
     fun editRecordAt(pos: Int, newRecord: DestinationRecord): DRecordList {
         val oldRecord = this[pos]
         val newTimestamped = computeTimestampedOnEdit(oldRecord, newRecord)
@@ -167,6 +197,7 @@ class DRecordList(
     private fun computeTimestampedOnAdd(recordToAdd: DestinationRecord): Set<DestinationRecord> {
         return recordToAdd.timeStamp?.let { timestamped.plus(recordToAdd) } ?: timestamped
     }
+
     private fun computeTimeStampedOnRemove(recordToRemove: DestinationRecord): Set<DestinationRecord> {
         return recordToRemove.timeStamp?.let {
             timestamped.minus(recordToRemove)

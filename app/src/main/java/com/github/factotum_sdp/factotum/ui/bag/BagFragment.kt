@@ -9,6 +9,10 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
 
+/**
+ * The "bag" Fragment
+ * Showing on screen all the packets delivered or currently delivered during a Shift
+ */
 class BagFragment: Fragment() {
 
     private val bagViewModel: BagViewModel by activityViewModels()
@@ -19,13 +23,11 @@ class BagFragment: Fragment() {
     ): View? {
 
         val view = inflater.inflate(R.layout.fragment_bag, container, false)
-        val adapter = PackagesAdapter()
+        val adapter = BagAdapter()
 
         bagViewModel.packages.observe(viewLifecycleOwner) {
             adapter.submitList(it.toList())
         }
-
-        //adapter.submitList(listOf(Package("packID#1", "X17", "Buhagiat", null, "")))
 
         val packagesRecyclerView: RecyclerView = view.findViewById(R.id.packagesRecyclerView)
         packagesRecyclerView.adapter = adapter

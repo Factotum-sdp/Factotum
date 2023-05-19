@@ -3,24 +3,41 @@ package com.github.factotum_sdp.factotum.ui.bag
 import android.app.AlertDialog
 import android.content.Context
 import android.view.View
-import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.ui.dialog.ClientIDViewValidation
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import java.util.Date
 
-class PackageCreationDialogBuilder(
+/**
+ * That Class represent a DialogBuilder specifically designed to build a custom
+ * Dialog for some Package creation.
+ *
+ * Calling the inherited show() method will call create() and make the new custom concrete AlertDialog desired
+ *
+ * @param context: Context The Context wherein this DialogBuilder is instantiated
+ * @param host: Fragment The Fragment which will hold the AlertDialog
+ * @param fromDestID: String The DestinationRecord ID of the pack to create sender
+ * @param fromClientID: String The clientID of the pack to create sender
+ * @param takenAt: Date The time the pack to create has been taken
+ * @param bagViewModel: BagViewModel
+ * @param contactsViewModel: ContactViewModel The ContactsViewModel needed for ClientIDViewValidation interface
+ *
+ * @constructor : Constructs the PackCreationDialogBuilder
+ */
+class PackCreationDialogBuilder(
     context: Context,
-    private val host: Fragment,
+    override val host: Fragment,
     private val fromDestID: String,
     private val fromClientID: String,
     private val takenAt: Date,
     private val bagViewModel: BagViewModel,
-    private val contactsViewModel: ContactsViewModel
+    override val contactsViewModel: ContactsViewModel
 ) :
-    AlertDialog.Builder(context) {
+    AlertDialog.Builder(context),
+    ClientIDViewValidation {
 
     private val nameView: EditText
     private val recipientTextInput: AutoCompleteTextView
@@ -40,6 +57,10 @@ class PackageCreationDialogBuilder(
         setView(dialogView)
     }
 
+    override fun clientIDInputView(): AutoCompleteTextView {
+        return recipientTextInput
+    }
+
     override fun create(): AlertDialog {
         setClientIDsAdapter()
         setClientIDFieldCheck()
@@ -56,39 +77,6 @@ class PackageCreationDialogBuilder(
         }
 
         return super.create()
-    }
-
-    // Here we will need to get the clients IDs through a ViewModel instance
-    // initiated in the mainActivity and representing all the clients
-    private fun setClientIDsAdapter() {
-        recipientTextInput.threshold = 1
-        contactsViewModel.contacts.observe(host.viewLifecycleOwner) { it ->
-            val clientIDsAdapter = ArrayAdapter(
-                host.requireContext(),
-                R.layout.pop_auto_complete_client_id,
-                it.map { it.username }
-            )
-            recipientTextInput.setAdapter(clientIDsAdapter)
-        }
-    }
-
-    private fun setClientIDFieldCheck() {
-        recipientTextInput.validator = object : AutoCompleteTextView.Validator {
-            override fun isValid(text: CharSequence): Boolean {
-                val possibleClientID = text.toString().trim()
-                return isValidClientID(possibleClientID)
-            }
-
-            override fun fixText(invalidText: CharSequence): CharSequence {
-                // If .isValid() returns false then the code comes here
-                return host.requireContext().getString(R.string.invalid_client_id_text)
-            }
-        }
-    }
-
-    private fun isValidClientID(possibleClientID: String): Boolean {
-        val currentContacts = contactsViewModel.contacts.value ?: emptyList()
-        return currentContacts.any { c -> c.username == possibleClientID }
     }
 
     companion object {

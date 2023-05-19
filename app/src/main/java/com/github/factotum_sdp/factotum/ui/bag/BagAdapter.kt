@@ -12,15 +12,28 @@ import com.github.factotum_sdp.factotum.models.DestinationRecord.Companion.timeS
 import com.github.factotum_sdp.factotum.models.Pack
 import com.google.android.material.textview.MaterialTextView
 
-class PackagesAdapter: ListAdapter<Pack, PackagesAdapter.PackageViewHolder>(PackDiffCallback) {
+/**
+ * Bag Adapter
+ *
+ * Adapts a List<Pack> to display it in a recyclerView
+ */
+class BagAdapter: ListAdapter<Pack, BagAdapter.PackViewHolder>(PackDiffCallback) {
 
-    class PackageViewHolder(itemView: View) :
+    /**
+     * The PackageViewHolder
+     *
+     * Holds a specific view corresponding to a current "package" state
+     *
+     * @property itemView: View
+     */
+    class PackViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
+
         private val textView: MaterialTextView = itemView.findViewById(R.id.packageItemView)
         private val icon: ImageView = itemView.findViewById(R.id.packageIcon)
         private var currentPackage: Pack? = null
 
-        /* Bind flower name and image. */
+        /* Bind the pack to the textView */
         fun bind(pack: Pack) {
             currentPackage = pack
 
@@ -46,16 +59,17 @@ class PackagesAdapter: ListAdapter<Pack, PackagesAdapter.PackageViewHolder>(Pack
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PackageViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PackViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.package_item, parent, false)
-        return PackageViewHolder(view)
+        return PackViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: PackageViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: PackViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
+    /** DiffUtil callback needed to computer if a this displayed list has to be updated */
     object PackDiffCallback : DiffUtil.ItemCallback<Pack>() {
         override fun areItemsTheSame(oldItem: Pack, newItem: Pack): Boolean {
             return oldItem == newItem

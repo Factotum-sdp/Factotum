@@ -7,12 +7,26 @@ import com.github.factotum_sdp.factotum.models.Pack
 import java.util.Date
 import java.util.HashMap
 
+/**
+ * The "bag" viewModel which represents the current state
+ * of the packages delivered or currently delivered
+ */
 class BagViewModel: ViewModel() {
     private val _packages = MutableLiveData<List<Pack>>(listOf())
     val packages: LiveData<List<Pack>> = _packages
 
     private val packageOccurrences = HashMap<Pair<String, String>, Int>()
 
+    /**
+     * Create a new Package in the current stored packages
+     *
+     * @param startingRecordID: String The destID from where the new package is taken
+     * @param takenAt: Date The timestamp when the package has been taken
+     * @param name: String The name of the new package
+     * @param senderID: String The sender's clientID
+     * @param recipientID: String The recipient's clientID
+     * @param notes: String
+     */
     fun newPackage(startingRecordID: String, takenAt: Date, name: String,
                    senderID: String, recipientID: String, notes: String) {
         val pack = Pack(
@@ -29,6 +43,13 @@ class BagViewModel: ViewModel() {
         _packages.postValue(currentPackages().plus(pack))
     }
 
+    /**
+     * Set the current packages state according to an arrival on a certain DestinationRecord
+     *
+     * @param destID: String The destID of the arrival DestinationRecord
+     * @param clientID: String The clientID of the corresponding DestinationRecord
+     * @param arrivalTime: Date The arrival time at the DestinationRecord's place
+     */
     fun arrivedOnDestinationRecord(destID: String, clientID: String, arrivalTime: Date) {
         val updated = currentPackages().map {
             if(it.recipientID == clientID) {
@@ -40,7 +61,11 @@ class BagViewModel: ViewModel() {
         _packages.postValue(updated)
     }
 
-    /** Remove package or unmark the destination related to a dest record */
+    /**
+     * Set the current packages state according to the event of a removed DestinationRecord
+     *
+     * @param destID: String The DestinationRecord's destID
+     */
     fun removedDestinationRecord(destID: String) {
         val updated = currentPackages().mapNotNull {
             if(it.startingRecordID == destID) {
@@ -54,6 +79,12 @@ class BagViewModel: ViewModel() {
         _packages.postValue(updated)
     }
 
+    /**
+     * Set the current packages state according to a DestinationRecord's timestamp modification
+     *
+     * @param timestamp: Date
+     * @param destID: String
+     */
     fun adjustTimestampOf(timestamp: Date, destID: String) {
         val updated = currentPackages().map {
             if(it.startingRecordID == destID) {

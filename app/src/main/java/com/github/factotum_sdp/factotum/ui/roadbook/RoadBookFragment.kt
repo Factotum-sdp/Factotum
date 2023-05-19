@@ -32,7 +32,7 @@ import com.github.factotum_sdp.factotum.repositories.ShiftRepository.Companion.D
 import com.github.factotum_sdp.factotum.roadBookDataStore
 import com.github.factotum_sdp.factotum.shiftDataStore
 import com.github.factotum_sdp.factotum.ui.bag.BagViewModel
-import com.github.factotum_sdp.factotum.ui.bag.PackageCreationDialogBuilder
+import com.github.factotum_sdp.factotum.ui.bag.PackCreationDialogBuilder
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.ui.settings.SettingsViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -138,7 +138,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
                 bagViewModel.arrivedOnDestinationRecord(destID, record.clientID, timestamp)
             }
             if(it == PICK) {
-                PackageCreationDialogBuilder(
+                PackCreationDialogBuilder(
                     requireContext(),
                     this,
                     destID,
@@ -267,6 +267,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         )
         loadPreferencesButtonState(defaultPreferences)
     }
+
     private fun loadPreferencesButtonState(preferences: RoadBookPreferences) {
         dragAndDropButton.isChecked = preferences.enableReordering
         swipeLeftButton.isChecked = preferences.enableArchivingAndDeletion
@@ -397,7 +398,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
                 return swipeFlags
             }
-
         }
         return itemTHCallback
     }

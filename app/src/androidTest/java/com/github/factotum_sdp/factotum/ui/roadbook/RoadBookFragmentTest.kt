@@ -36,8 +36,8 @@ import com.github.factotum_sdp.factotum.repositories.ShiftRepository
 import com.github.factotum_sdp.factotum.repositories.ShiftRepository.Companion.DELIVERY_LOG_DB_PATH
 import com.github.factotum_sdp.factotum.roadBookDataStore
 import com.github.factotum_sdp.factotum.shiftDataStore
-import com.github.factotum_sdp.factotum.ui.bag.PackageCreationDialogBuilder
-import com.github.factotum_sdp.factotum.ui.bag.PackagesAdapter
+import com.github.factotum_sdp.factotum.ui.bag.PackCreationDialogBuilder
+import com.github.factotum_sdp.factotum.ui.bag.BagAdapter
 import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookFragment.Companion.ROADBOOK_DB_PATH
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeLeftTheRecordAt
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightTheRecordAt
@@ -1061,7 +1061,7 @@ class RoadBookFragmentTest {
             )
 
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
-        onView(withText(PackageCreationDialogBuilder.DIALOG_TITLE_PREFIX + clientID)).check(
+        onView(withText(PackCreationDialogBuilder.DIALOG_TITLE_PREFIX + clientID)).check(
             doesNotExist()
         )
     }
@@ -1083,7 +1083,7 @@ class RoadBookFragmentTest {
         onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
 
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
-        onView(withText(PackageCreationDialogBuilder.DIALOG_TITLE_PREFIX + clientID)).check(
+        onView(withText(PackCreationDialogBuilder.DIALOG_TITLE_PREFIX + clientID)).check(
             matches(isDisplayed())
         )
     }
@@ -1119,7 +1119,7 @@ class RoadBookFragmentTest {
         onView(withText(startsWith(packageName))).check(matches(isDisplayed()))
         onView(withText(containsString(clientID))).check(matches(isDisplayed()))
         onView(withText(containsString(recipientID))).check(matches(isDisplayed()))
-        onView(withText(containsString(PackagesAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
+        onView(withText(containsString(BagAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
             doesNotExist()
         )
     }
@@ -1169,7 +1169,7 @@ class RoadBookFragmentTest {
         onView(withText(startsWith(packageName))).check(matches(isDisplayed()))
         onView(withText(containsString(clientID))).check(matches(isDisplayed()))
         onView(withText(containsString(recipientID))).check(matches(isDisplayed()))
-        onView(withText(containsString(PackagesAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
+        onView(withText(containsString(BagAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
             matches(isDisplayed())
         )
     }
@@ -1212,7 +1212,7 @@ class RoadBookFragmentTest {
         onView(withText(startsWith(packageName))).check(matches(isDisplayed()))
         onView(withText(containsString(clientID))).check(matches(isDisplayed()))
         onView(withText(containsString(recipientID))).check(matches(isDisplayed()))
-        onView(withText(containsString(PackagesAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
+        onView(withText(containsString(BagAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
             doesNotExist()
         )
     }
@@ -1269,7 +1269,7 @@ class RoadBookFragmentTest {
         onView(withText(startsWith(packageName))).check(matches(isDisplayed()))
         onView(withText(containsString(clientID))).check(matches(isDisplayed()))
         onView(withText(containsString(recipientID))).check(matches(isDisplayed()))
-        onView(withText(containsString(PackagesAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
+        onView(withText(containsString(BagAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
             doesNotExist()
         )
     }
@@ -1314,8 +1314,6 @@ class RoadBookFragmentTest {
 
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
 
-
-
         swipeRightTheRecordAt(1)
         onView(withId(R.id.editTextTimestamp)).perform(click())
         onView(withText(timePickerEraseBLabel)).perform(click())
@@ -1326,7 +1324,7 @@ class RoadBookFragmentTest {
         onView(withText(startsWith(packageName))).check(doesNotExist())
         onView(withText(containsString(clientID))).check(doesNotExist())
         onView(withText(containsString(recipientID))).check(doesNotExist())
-        onView(withText(containsString(PackagesAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
+        onView(withText(containsString(BagAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
             doesNotExist()
         )
     }

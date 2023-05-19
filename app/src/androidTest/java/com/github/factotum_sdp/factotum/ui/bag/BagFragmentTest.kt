@@ -1,9 +1,7 @@
 package com.github.factotum_sdp.factotum.ui.bag
 
-
 import android.Manifest
 import androidx.test.espresso.Espresso.onView
-
 import androidx.test.espresso.action.*
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
@@ -20,7 +18,6 @@ import com.github.factotum_sdp.factotum.models.User
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder.USER_COURIER
 import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookViewAdapter
-
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightTheRecordAt
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
@@ -33,7 +30,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
-
 
 
 @RunWith(AndroidJUnit4::class)
@@ -335,9 +331,119 @@ class BagFragmentTest {
         )
     }
 
-    // Tests :
-    // un - timestamp a record delete package if sender / remove arrivaltimestamp if destination
-    // Change clientID do the same thing, and update if it is another record to be delivered
+    @Test
+    fun getOutTimestampOfADeliveredPlaceRemoveTimestampInBag() {
+        val clientID = DestinationRecords.RECORDS[1].clientID
+        swipeRightTheRecordAt(1)
+
+        onView(withId(R.id.multiAutoCompleteActions))
+            .perform(
+                click(),
+                clearText(),
+                typeText("pick, contact"),
+                closeSoftKeyboard()
+            )
+
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        val packageName = "Gold bottle"
+        val recipientID = "X17"
+        onView(withId(R.id.editTextPackageName)).perform(click(),  typeText(packageName), closeSoftKeyboard())
+        onView(withId(R.id.autoCompleteRecipientClientID)).perform(click(), typeText("$recipientID "), closeSoftKeyboard())
+        onView(withId(R.id.editTextPackageNotes)).perform(click(), typeText("It is soon the end of SDP"), closeSoftKeyboard())
+
+        onView(withText(R.string.confirm_label_pack_creation_dialog)).perform(click())
+
+        swipeRightTheRecordAt(2)
+
+        onView(withId(R.id.multiAutoCompleteActions))
+            .perform(
+                click(),
+                clearText(),
+                typeText("deliver, contact"),
+                closeSoftKeyboard()
+            )
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+
+
+        swipeRightTheRecordAt(2)
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerEraseBLabel)).perform(click())
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        onView(withId(R.id.bag_button)).perform(click())
+
+        onView(withText(startsWith(packageName))).check(matches(isDisplayed()))
+        onView(withText(containsString(clientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(recipientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(PackagesAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
+            doesNotExist()
+        )
+    }
+
+    @Test
+    fun getOutTimestampOfAPickPlaceRemovePacketFromThereInBag() {
+        val clientID = DestinationRecords.RECORDS[1].clientID
+        swipeRightTheRecordAt(1)
+
+        onView(withId(R.id.multiAutoCompleteActions))
+            .perform(
+                click(),
+                clearText(),
+                typeText("pick, contact"),
+                closeSoftKeyboard()
+            )
+
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        val packageName = "Gold bottle"
+        val recipientID = "X17"
+        onView(withId(R.id.editTextPackageName)).perform(click(),  typeText(packageName), closeSoftKeyboard())
+        onView(withId(R.id.autoCompleteRecipientClientID)).perform(click(), typeText("$recipientID "), closeSoftKeyboard())
+        onView(withId(R.id.editTextPackageNotes)).perform(click(), typeText("It is soon the end of SDP"), closeSoftKeyboard())
+
+        onView(withText(R.string.confirm_label_pack_creation_dialog)).perform(click())
+
+        swipeRightTheRecordAt(2)
+
+        onView(withId(R.id.multiAutoCompleteActions))
+            .perform(
+                click(),
+                clearText(),
+                typeText("deliver, contact"),
+                closeSoftKeyboard()
+            )
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+
+
+        swipeRightTheRecordAt(1)
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerEraseBLabel)).perform(click())
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        onView(withId(R.id.bag_button)).perform(click())
+
+        onView(withText(startsWith(packageName))).check(doesNotExist())
+        onView(withText(containsString(clientID))).check(doesNotExist())
+        onView(withText(containsString(recipientID))).check(doesNotExist())
+        onView(withText(containsString(PackagesAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
+            doesNotExist()
+        )
+    }
 
     private fun scrollToLastPosition() {
         onView(withId(R.id.list)).perform(
@@ -347,4 +453,5 @@ class BagFragmentTest {
     }
 
     private val timePickerUpdateBLabel = "OK"
+    private val timePickerEraseBLabel = "Erase"
 }

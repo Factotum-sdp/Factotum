@@ -7,7 +7,7 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Package name">
+        android:hint="@string/package_name_hint">
 
         <EditText
             android:id="@+id/editTextPackageName"
@@ -21,7 +21,7 @@
         android:id="@+id/recipientClientIDTextInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Recipient">
+        android:hint="@string/package_recipient_hint">
 
         <AutoCompleteTextView
                 android:id="@+id/autoCompleteRecipientClientID"
@@ -34,7 +34,7 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Package notes">
+        android:hint="@string/package_notes_hint">
 
         <EditText
             android:id="@+id/editTextPackageNotes"

@@ -173,4 +173,7 @@
     <string name="bag_button">BagButton</string>
     <string name="location_switch">LocationSwitch</string>
     <string name="package_schedule_icon">package schedule icon</string>
+    <string name="package_name_hint">Package name</string>
+    <string name="package_recipient_hint">Recipient</string>
+    <string name="package_notes_hint">Package notes</string>
 </resources>

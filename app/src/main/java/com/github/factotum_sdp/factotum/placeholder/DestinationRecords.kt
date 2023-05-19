@@ -32,7 +32,7 @@ object DestinationRecords {
                     null,
                     0,
                     1,
-                    arrayListOf(Action.PICK, Action.PICK, Action.RELAY),
+                    arrayListOf(Action.RELAY),
                     ""
                 ),
                 DestinationRecord(
@@ -50,7 +50,7 @@ object DestinationRecords {
                     null,
                     0,
                     1,
-                    arrayListOf(Action.PICK, Action.DELIVER)
+                    arrayListOf()
                 )
             )
         )
@@ -63,7 +63,7 @@ object DestinationRecords {
                     null,
                     0,
                     1,
-                    arrayListOf(Action.PICK, Action.DELIVER),
+                    arrayListOf(Action.CONTACT, Action.RELAY),
                     ""
                 )
             )

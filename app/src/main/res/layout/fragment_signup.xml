@@ -20,7 +20,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/textView7"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -29,14 +29,14 @@
             android:text="@string/welcome_text"
             android:textSize="20sp" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:text="@string/full_name_text" />
 
-        <EditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/username"
             android:layout_width="337dp"
             android:layout_height="55dp"
@@ -46,14 +46,14 @@
             android:inputType="textPersonName"
             android:selectAllOnFocus="true" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:text="@string/e_mail_address_text" />
 
-        <EditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/email"
             android:layout_width="337dp"
             android:layout_height="55dp"
@@ -63,14 +63,14 @@
             android:inputType="textEmailAddress"
             android:selectAllOnFocus="true" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/textView3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:text="@string/password_text" />
 
-        <EditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/password"
             android:layout_width="337dp"
             android:layout_height="55dp"
@@ -83,7 +83,7 @@
             android:selectAllOnFocus="true" />
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
             android:layout_width="280dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
@@ -92,18 +92,20 @@
             <AutoCompleteTextView
                 android:id="@+id/role"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:inputType="none" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <ProgressBar
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
             android:id="@+id/loading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:visibility="gone" />
+            android:visibility="gone"
+            app:indicatorColor="@color/indigo_500" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/signup"
             style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="280dp"

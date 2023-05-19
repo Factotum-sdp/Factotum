@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum.ui.display.boss
+package com.github.factotum_sdp.factotum.ui.display.courier_boss
 
 import android.content.Context
 import androidx.lifecycle.LiveData
@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.factotum_sdp.factotum.ui.display.data.AppDatabase
-import com.github.factotum_sdp.factotum.ui.display.data.boss.CachedFolder
+import com.github.factotum_sdp.factotum.ui.display.data.courier_boss.CachedFolder
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageException
 import com.google.firebase.storage.StorageReference
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
-class BossDisplayViewModel(context: Context) : ViewModel() {
+class CourierBossDisplayViewModel(context: Context) : ViewModel() {
     private val _folderReferences = MutableLiveData<List<StorageReference>>()
     val folderReferences: LiveData<List<StorageReference>>
         get() = _folderReferences

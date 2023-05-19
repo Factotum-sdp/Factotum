@@ -20,6 +20,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
+
 class ClientDisplayViewModel(
     private val _folderName: MutableLiveData<String>,
     context: Context
@@ -77,28 +78,21 @@ class ClientDisplayViewModel(
 
             cachedPhotoDao.insertAll(*remotePhotos.map { photo ->
                 val url = photo.downloadUrl.await().toString()
-                CachedPhoto(photo.path, folderName, url)
+                val dateSortKey = getDateFromRef(photo).time
+                CachedPhoto(photo.path, folderName, url, dateSortKey)
             }.toTypedArray())
         }
 
-        val updatedCachedPhotos = withContext(Dispatchers.IO) {
-            cachedPhotoDao.getAllByFolderName(folderName)
-        }
-        val updatedStorageReferences = updatedCachedPhotos.map {
-            storage.getReference(it.path)
-        }.sortedWith { date1, date2 -> getDateFromRef(date2).compareTo(getDateFromRef(date1)) }
-
-        _photoReferences.postValue(updatedStorageReferences)
+        displayCachedPhotos(folderName)  // After updating, display the updated photos
     }
 
     private suspend fun displayCachedPhotos(folderName: String) {
         val cachedPhotos = withContext(Dispatchers.IO) {
-            cachedPhotoDao.getAllByFolderName(folderName)
+            cachedPhotoDao.getAllByFolderNameSortedByDate(folderName)
         }
         val storageReferences = cachedPhotos.map {
             storage.getReference(it.path)
-        }.sortedWith { date1, date2 -> getDateFromRef(date2).compareTo(getDateFromRef(date1)) }
-
+        }
 
         _photoReferences.postValue(storageReferences)
     }
@@ -122,9 +116,6 @@ class ClientDisplayViewModel(
             val storageReferences = cachedPhotos.map {
                 storage.getReference(it.path)
             }.filter { isSameDay(getDateFromRef(it), date) }
-                .sortedWith {  date1, date2 -> getDateFromRef(date2).compareTo(getDateFromRef(date1)) }
-
-            Log.d("ClientDisplayViewModel", "filterImagesByDate: $storageReferences")
 
             _photoReferences.postValue(storageReferences)
         }

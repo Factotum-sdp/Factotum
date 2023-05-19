@@ -12,7 +12,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.MenuProvider
@@ -28,9 +27,9 @@ import com.github.factotum_sdp.factotum.databinding.FragmentDisplayBinding
 import com.github.factotum_sdp.factotum.models.Contact
 import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
-import com.github.factotum_sdp.factotum.ui.display.boss.BossDisplayViewModel
-import com.github.factotum_sdp.factotum.ui.display.boss.BossDisplayViewModelFactory
-import com.github.factotum_sdp.factotum.ui.display.boss.BossFolderAdapter
+import com.github.factotum_sdp.factotum.ui.display.courier_boss.CourierBossDisplayViewModel
+import com.github.factotum_sdp.factotum.ui.display.courier_boss.CourierBossDisplayViewModelFactory
+import com.github.factotum_sdp.factotum.ui.display.courier_boss.CourierBossFolderAdapter
 import com.github.factotum_sdp.factotum.ui.display.client.ClientDisplayViewModel
 import com.github.factotum_sdp.factotum.ui.display.client.ClientDisplayViewModelFactory
 import com.github.factotum_sdp.factotum.ui.display.client.ClientPhotoAdapter
@@ -41,7 +40,7 @@ class DisplayFragment : Fragment(), MenuProvider {
     private lateinit var calendarButton: MenuItem
 
     private val clientViewModel: ClientDisplayViewModel by viewModels{ ClientDisplayViewModelFactory(userFolder, requireContext()) }
-    private val bossViewModel: BossDisplayViewModel by viewModels{ BossDisplayViewModelFactory(requireContext()) }
+    private val courierBossDisplayViewModel : CourierBossDisplayViewModel by viewModels{ CourierBossDisplayViewModelFactory(requireContext()) }
     private val userViewModel: UserViewModel by activityViewModels()
     private val contactsViewModel: ContactsViewModel by activityViewModels()
     private var _binding: FragmentDisplayBinding? = null
@@ -125,12 +124,12 @@ class DisplayFragment : Fragment(), MenuProvider {
     private fun setupUIBasedOnUserRole() {
         when (userRole.value) {
             Role.BOSS -> {
-                observeBossFolders()
-                setupBossUI()
+                observeCourierBossFolders()
+                setupCourierBossUI()
             }
-            Role.CLIENT -> {
-                observeClientPhotos()
-                setupClientUI()
+            Role.COURIER -> {
+                observeCourierBossFolders()
+                setupCourierBossUI()
             }
             else -> {
                 observeClientPhotos()
@@ -151,21 +150,21 @@ class DisplayFragment : Fragment(), MenuProvider {
     // Boss UI
     //================================================================
 
-    private fun observeBossFolders() {
-        bossViewModel.folderReferences.observe(viewLifecycleOwner) { folderReferences ->
-            (binding.recyclerView.adapter as? BossFolderAdapter)?.submitList(folderReferences)
+    private fun observeCourierBossFolders() {
+        courierBossDisplayViewModel.folderReferences.observe(viewLifecycleOwner) { folderReferences ->
+            (binding.recyclerView.adapter as? CourierBossFolderAdapter)?.submitList(folderReferences)
         }
     }
 
-    private fun setupBossUI() {
-        bossViewModel.refreshFolders()
+    private fun setupCourierBossUI() {
+        courierBossDisplayViewModel.refreshFolders()
         calendarButton.isVisible = false
 
         binding.refreshButton.setOnClickListener {
-            bossViewModel.refreshFolders()
+            courierBossDisplayViewModel.refreshFolders()
         }
 
-        val bossFolderAdapter = BossFolderAdapter(
+        val courierBossFolderAdapter = CourierBossFolderAdapter(
             onCardClick = { clientFolder ->
                 userFolder.value = clientFolder.value
                 observeClientPhotos()
@@ -175,7 +174,7 @@ class DisplayFragment : Fragment(), MenuProvider {
 
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = bossFolderAdapter
+            adapter = courierBossFolderAdapter
         }
 
     }
@@ -219,10 +218,12 @@ class DisplayFragment : Fragment(), MenuProvider {
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            if (userRole.value == Role.BOSS && userFolder.value != userID.value) {
+            if (userRole.value == Role.BOSS || userRole.value == Role.COURIER
+                && userFolder.value != userID.value) {
+
                 userFolder.value = userID.value
-                setupBossUI()
-                observeBossFolders()
+                setupCourierBossUI()
+                observeCourierBossFolders()
             } else {
                 isEnabled = false
                 requireActivity().onBackPressedDispatcher.onBackPressed()

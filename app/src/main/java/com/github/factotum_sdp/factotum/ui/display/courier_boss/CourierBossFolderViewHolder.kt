@@ -1,11 +1,11 @@
-package com.github.factotum_sdp.factotum.ui.display.boss
+package com.github.factotum_sdp.factotum.ui.display.courier_boss
 
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.databinding.DisplayItemFolderBinding
 import com.google.firebase.storage.StorageReference
 
-class BossFolderViewHolder(
+class CourierBossFolderViewHolder(
     private val binding: DisplayItemFolderBinding,
     private val onCardClick: (MutableLiveData<String>) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {

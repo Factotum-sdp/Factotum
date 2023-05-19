@@ -7,5 +7,6 @@ import androidx.room.PrimaryKey
 data class CachedPhoto(
     @PrimaryKey val path: String,
     val folderName: String,
-    val url: String
+    val url: String,
+    val dateSortKey : Long
 )

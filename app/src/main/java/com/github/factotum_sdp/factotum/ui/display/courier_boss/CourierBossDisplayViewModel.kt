@@ -39,8 +39,8 @@ class CourierBossDisplayViewModel(context: Context) : ViewModel() {
             if (remoteFolders != null) {
                 updateCachedFolders(remoteFolders)
             }
+            _isLoading.value = false
         }
-        _isLoading.value = false
     }
 
     private suspend fun updateCachedFolders(remoteFolders: List<StorageReference>) {

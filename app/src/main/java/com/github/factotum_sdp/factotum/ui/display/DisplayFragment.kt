@@ -20,6 +20,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MutableLiveData
+import androidx.navigation.Navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
@@ -59,7 +61,7 @@ class DisplayFragment : Fragment(), MenuProvider {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
+        requireActivity().addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.STARTED)
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             onBackPressedCallback
@@ -154,6 +156,14 @@ class DisplayFragment : Fragment(), MenuProvider {
         courierBossDisplayViewModel.folderReferences.observe(viewLifecycleOwner) { folderReferences ->
             (binding.recyclerView.adapter as? CourierBossFolderAdapter)?.submitList(folderReferences)
         }
+
+        courierBossDisplayViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            if (isLoading) {
+                binding.progressBar.visibility = View.VISIBLE
+            } else {
+                binding.progressBar.visibility = View.GONE
+            }
+        }
     }
 
     private fun setupCourierBossUI() {
@@ -186,6 +196,14 @@ class DisplayFragment : Fragment(), MenuProvider {
     private fun observeClientPhotos() {
         clientViewModel.photoReferences.observe(viewLifecycleOwner) { photoReferences ->
             (binding.recyclerView.adapter as? ClientPhotoAdapter)?.submitList(photoReferences)
+        }
+
+        clientViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            if (isLoading) {
+                binding.progressBar.visibility = View.VISIBLE
+            } else {
+                binding.progressBar.visibility = View.GONE
+            }
         }
     }
 
@@ -224,9 +242,12 @@ class DisplayFragment : Fragment(), MenuProvider {
                 userFolder.value = userID.value
                 setupCourierBossUI()
                 observeCourierBossFolders()
-            } else {
-                isEnabled = false
-                requireActivity().onBackPressedDispatcher.onBackPressed()
+            }
+
+            // Fix a glitch where the client could go to the RoadBook by
+            // pressing the back button
+            if (userRole.value == Role.BOSS || userRole.value == Role.COURIER) {
+                findNavController().navigate(R.id.roadBookFragment)
             }
         }
     }

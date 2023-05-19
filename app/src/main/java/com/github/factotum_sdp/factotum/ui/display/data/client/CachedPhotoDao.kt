@@ -11,7 +11,6 @@ interface CachedPhotoDao {
     @Query("SELECT * FROM cached_photo WHERE folderName = :folderName")
     fun getAllByFolderName(folderName: String): List<CachedPhoto>
 
-
     @Query("SELECT * FROM cached_photo WHERE folderName = :folderName ORDER BY dateSortKey DESC")
     suspend fun getAllByFolderNameSortedByDate(folderName: String): List<CachedPhoto>
 

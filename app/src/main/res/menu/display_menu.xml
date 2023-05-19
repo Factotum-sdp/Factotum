@@ -5,10 +5,10 @@
     <group
         android:checkableBehavior="all"
         android:menuCategory="alternative">
-    <item
-        android:id="@+id/menu_date_picker"
-        android:icon="@android:drawable/ic_menu_today"
-        android:title="@string/menu_date_picker"
-        app:showAsAction="always" />
+        <item
+            android:id="@+id/menu_date_picker"
+            android:icon="@android:drawable/ic_menu_today"
+            android:title="@string/menu_date_picker"
+            app:showAsAction="always" />
     </group>
 </menu>

@@ -17,6 +17,8 @@ import kotlinx.coroutines.withContext
 
 class CourierBossDisplayViewModel(context: Context) : ViewModel() {
     private val _folderReferences = MutableLiveData<List<StorageReference>>()
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> = _isLoading
     val folderReferences: LiveData<List<StorageReference>>
         get() = _folderReferences
 
@@ -29,6 +31,7 @@ class CourierBossDisplayViewModel(context: Context) : ViewModel() {
     fun refreshFolders() { updateFolders() }
 
     private fun updateFolders() {
+        _isLoading.value = true
         viewModelScope.launch {
             displayCachedFolders()
 
@@ -37,6 +40,7 @@ class CourierBossDisplayViewModel(context: Context) : ViewModel() {
                 updateCachedFolders(remoteFolders)
             }
         }
+        _isLoading.value = false
     }
 
     private suspend fun updateCachedFolders(remoteFolders: List<StorageReference>) {

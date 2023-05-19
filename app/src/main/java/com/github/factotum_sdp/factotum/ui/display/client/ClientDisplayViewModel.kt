@@ -1,7 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.display.client
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -29,6 +28,8 @@ class ClientDisplayViewModel(
     private val dateFormat = SimpleDateFormat("dd-MM-yyyy_HH-mm-ss", Locale.getDefault())
 
     private val _photoReferences = MutableLiveData<List<StorageReference>>()
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> = _isLoading
     val photoReferences: LiveData<List<StorageReference>> = _photoReferences
     val folderName: LiveData<String> = _folderName
 
@@ -55,7 +56,9 @@ class ClientDisplayViewModel(
         return photoLiveData
     }
 
+
     private fun updateImages() {
+        _isLoading.value = true
         viewModelScope.launch {
             val folderName = _folderName.value ?: return@launch
 
@@ -65,8 +68,10 @@ class ClientDisplayViewModel(
             if (remotePhotos != null) {
                 updateCachedPhotos(folderName, remotePhotos)
             }
+            _isLoading.value = false
         }
     }
+
 
     private suspend fun updateCachedPhotos(folderName: String, remotePhotos: List<StorageReference>) {
         withContext(Dispatchers.IO) {
@@ -83,7 +88,7 @@ class ClientDisplayViewModel(
             }.toTypedArray())
         }
 
-        displayCachedPhotos(folderName)  // After updating, display the updated photos
+        displayCachedPhotos(folderName)
     }
 
     private suspend fun displayCachedPhotos(folderName: String) {

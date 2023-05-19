@@ -246,7 +246,7 @@ class DisplayFragment : Fragment(), MenuProvider {
 
             // Fix a glitch where the client could go to the RoadBook by
             // pressing the back button
-            if (userRole.value == Role.BOSS || userRole.value == Role.COURIER) {
+            else if (userRole.value == Role.BOSS || userRole.value == Role.COURIER) {
                 findNavController().navigate(R.id.roadBookFragment)
             }
         }

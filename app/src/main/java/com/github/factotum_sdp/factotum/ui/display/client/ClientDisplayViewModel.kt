@@ -12,6 +12,7 @@ import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -73,7 +74,7 @@ class ClientDisplayViewModel(
         }
     }
 
-    private suspend fun updateCachedPhotos(folderName: String, remotePhotos: List<StorageReference>) {
+    private suspend fun updateCachedPhotos(folderName: String, remotePhotos: List<CachedPhoto>) {
         withContext(Dispatchers.IO) {
             val remotePhotoPaths = remotePhotos.map { it.path }
             val cachedPhotos = cachedPhotoDao.getAllByFolderName(folderName)
@@ -81,18 +82,7 @@ class ClientDisplayViewModel(
             val photosToDelete = cachedPhotos.filter { it.path !in remotePhotoPaths }
             cachedPhotoDao.deleteAll(photosToDelete)
 
-            withContext(Dispatchers.Default) {
-                val deferreds = remotePhotos.map { photo ->
-                    async {
-                        val url = photo.downloadUrl.await().toString()
-                        val dateSortKey = getDateFromRef(photo).time
-                        CachedPhoto(photo.path, folderName, url, dateSortKey)
-                    }
-                }
-
-                val newCachedPhotos = deferreds.awaitAll().toTypedArray()
-                cachedPhotoDao.insertAll(*newCachedPhotos)
-            }
+            cachedPhotoDao.insertAll(*remotePhotos.toTypedArray())
         }
 
         displayCachedPhotos(folderName)
@@ -109,11 +99,22 @@ class ClientDisplayViewModel(
         _photoReferences.postValue(storageReferences)
     }
 
-    private suspend fun fetchRemotePhotos(folderName: String): List<StorageReference>? {
+    private suspend fun fetchRemotePhotos(folderName: String): List<CachedPhoto>? {
         return try {
             val folderReference = storage.reference.child(folderName)
             val photosListResult = folderReference.listAll().await()
-            photosListResult.items
+
+            val deferredPhotos = photosListResult.items.map { photoReference ->
+                coroutineScope {
+                    async {
+                        val url = photoReference.downloadUrl.await().toString()
+                        val dateSortKey = getDateFromRef(photoReference).time
+                        CachedPhoto(photoReference.path, folderName, url, dateSortKey)
+                    }
+                }
+            }
+
+            deferredPhotos.awaitAll()
         } catch (e: Exception) {
             null
         }

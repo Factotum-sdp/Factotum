@@ -1,18 +1,19 @@
+
 <resources>
-    <!-- Base application theme. -->
+    <!-- Base application theme for dark mode. -->
     <style name="Theme.Factotum" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_200</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorPrimary">@color/indigo_200</item>
+        <item name="colorPrimaryVariant">@color/indigo_500</item>
         <item name="colorOnPrimary">@color/black</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_200</item>
+        <item name="colorSecondary">@color/light_blue_a200</item>
+        <item name="colorSecondaryVariant">@color/light_blue_a400</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
-        <item name="cardViewStrokeColor">@color/cardview_stroke_color_dark_mode</item>
+        <item name="cardViewStrokeColor">@color/light_blue_a200</item>
     </style>
 
     <style name="DialogAnimLeftToRight">

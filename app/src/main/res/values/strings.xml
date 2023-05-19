@@ -171,4 +171,9 @@
     <string name="invalid_client_id_text">Invalid Client ID</string>
     <string name="menu_date_picker">date_picker</string>
     <string name="menu_loading_bar">menu_loading_bar</string>
+    <string name="content_description_media">content_description_media</string>
+    <string name="title">title\n</string>
+    <string name="secondary_text">secondary_text</string>
+    <string name="folders">Folders</string>
+    <string name="photos">Photos</string>
 </resources>

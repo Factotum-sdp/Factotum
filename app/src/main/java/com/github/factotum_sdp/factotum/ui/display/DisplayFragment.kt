@@ -15,6 +15,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -36,11 +37,14 @@ import com.github.factotum_sdp.factotum.ui.display.courier_boss.CourierBossFolde
 import com.github.factotum_sdp.factotum.ui.display.client.ClientDisplayViewModel
 import com.github.factotum_sdp.factotum.ui.display.client.ClientDisplayViewModelFactory
 import com.github.factotum_sdp.factotum.ui.display.client.ClientPhotoAdapter
+import com.google.android.material.datepicker.MaterialDatePicker
+import java.util.Date
 
 class DisplayFragment : Fragment(), MenuProvider {
 
     private lateinit var displayMenu : Menu
     private lateinit var calendarButton: MenuItem
+    private lateinit var refreshButton: MenuItem
 
     private val clientViewModel: ClientDisplayViewModel by viewModels{ ClientDisplayViewModelFactory(userFolder, requireContext()) }
     private val courierBossDisplayViewModel : CourierBossDisplayViewModel by viewModels{ CourierBossDisplayViewModelFactory(requireContext()) }
@@ -67,6 +71,7 @@ class DisplayFragment : Fragment(), MenuProvider {
             viewLifecycleOwner,
             onBackPressedCallback
         )
+
     }
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -75,25 +80,34 @@ class DisplayFragment : Fragment(), MenuProvider {
 
         calendarButton = menu.findItem(R.id.menu_date_picker)
         calendarButton.setOnMenuItemClickListener {
-            showDatePickerDialog()
+            showMaterialDatePickerDialog()
             true
         }
+
+        refreshButton = menu.findItem(R.id.menu_refresh)
 
         setupObservers()
     }
 
-    private fun showDatePickerDialog() {
-        val c = Calendar.getInstance()
-        val year = c.get(Calendar.YEAR)
-        val month = c.get(Calendar.MONTH)
-        val day = c.get(Calendar.DAY_OF_MONTH)
+    private fun showMaterialDatePickerDialog() {
+        val calendar = Calendar.getInstance()
+        val currentDate = calendar.timeInMillis
 
-        val dpd = DatePickerDialog(requireContext(), { _, year, monthOfYear, dayOfMonth ->
-            val selectedDate = GregorianCalendar(year, monthOfYear, dayOfMonth).time
+        val datePicker = MaterialDatePicker.Builder.datePicker()
+            .setTitleText("Select date")
+            .setSelection(currentDate)
+            .build()
+
+        datePicker.addOnPositiveButtonClickListener { selection ->
+            // The selection returns a Long value representing the selected date
+            val selectedDate = Date(selection)
             clientViewModel.filterImagesByDate(selectedDate)
-        }, year, month, day)
-        dpd.show()
+        }
+
+        datePicker.show(parentFragmentManager, "MATERIAL_DATE_PICKER")
     }
+
+
 
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         if (menuItem.itemId == android.R.id.home) {
@@ -171,9 +185,11 @@ class DisplayFragment : Fragment(), MenuProvider {
     private fun setupCourierBossUI() {
         courierBossDisplayViewModel.refreshFolders()
         calendarButton.isVisible = false
+        (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.folders)
 
-        binding.refreshButton.setOnClickListener {
+        refreshButton.setOnMenuItemClickListener { menuItem ->
             courierBossDisplayViewModel.refreshFolders()
+            true
         }
 
         val courierBossFolderAdapter = CourierBossFolderAdapter(
@@ -212,9 +228,11 @@ class DisplayFragment : Fragment(), MenuProvider {
     private fun setupClientUI() {
         clientViewModel.refreshImages()
         calendarButton.isVisible = true
+        (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.photos)
 
-        binding.refreshButton.setOnClickListener {
+        refreshButton.setOnMenuItemClickListener { menuItem ->
             clientViewModel.refreshImages()
+            true
         }
 
         val clientPhotoAdapter = ClientPhotoAdapter(

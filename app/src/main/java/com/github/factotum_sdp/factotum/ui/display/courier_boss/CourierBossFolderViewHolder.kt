@@ -12,7 +12,7 @@ class CourierBossFolderViewHolder(
 
     fun bind(storageReference: StorageReference) {
         // Set the text of the TextView to the photo date, hour, and minute
-        binding.displayItemView.text = storageReference.name
+        binding.displayItemView.text = storageReference.name.replaceFirstChar { it.uppercase() }
 
         binding.cardView.setOnClickListener {
            //Do Nothing for now

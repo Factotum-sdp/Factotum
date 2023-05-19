@@ -3,6 +3,7 @@ package com.github.factotum_sdp.factotum.ui.display.client
 import android.net.Uri
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.github.factotum_sdp.factotum.databinding.DisplayItemPictureBinding
 
 class ClientPhotoViewHolder(
@@ -30,6 +31,10 @@ class ClientPhotoViewHolder(
     fun bind(photoName : String, url: String?) {
         this.url = url
         binding.displayItemView.text = extractNewName(photoName)
+
+        Glide.with(binding.root)
+            .load(url)
+            .into(binding.displayItemPicture)
     }
 
     fun hideShareButton() {

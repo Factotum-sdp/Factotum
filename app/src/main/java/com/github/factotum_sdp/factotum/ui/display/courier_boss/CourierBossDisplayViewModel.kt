@@ -16,6 +16,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.util.Locale
 
 class CourierBossDisplayViewModel(context: Context) : ViewModel() {
     private val _folderReferences = MutableLiveData<List<StorageReference>>()
@@ -55,7 +56,7 @@ class CourierBossDisplayViewModel(context: Context) : ViewModel() {
 
             val deferreds = remoteFolders.map { folder ->
                 async {
-                    val name = folder.name
+                    val name = folder.name.lowercase(Locale.getDefault())
                     CachedFolder(folder.path, name)
                 }
             }

@@ -64,7 +64,6 @@ class PackCreationDialogBuilder(
     override fun create(): AlertDialog {
         setClientIDsAdapter()
         setClientIDFieldCheck()
-
         setPositiveButton(context.getString(R.string.confirm_label_pack_creation_dialog)) { _, _ ->
             bagViewModel.newPackage(
                 fromDestID,

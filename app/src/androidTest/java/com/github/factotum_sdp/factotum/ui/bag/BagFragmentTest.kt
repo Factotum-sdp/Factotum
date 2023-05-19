@@ -140,9 +140,12 @@ class BagFragmentTest {
 
         val packageName = "Gold bottle"
         val recipientID = "X17"
-        onView(withId(R.id.editTextPackageName)).perform(click(),  typeText(packageName), closeSoftKeyboard())
-        onView(withId(R.id.autoCompleteRecipientClientID)).perform(click(), typeText("$recipientID "), closeSoftKeyboard())
-        onView(withId(R.id.editTextPackageNotes)).perform(click(), typeText("It is soon the end of SDP"), closeSoftKeyboard())
+        onView(withId(R.id.editTextPackageName))
+            .perform(click(),  typeText(packageName), closeSoftKeyboard())
+        onView(withId(R.id.autoCompleteRecipientClientID))
+            .perform(click(), typeText("$recipientID "), closeSoftKeyboard())
+        onView(withId(R.id.editTextPackageNotes))
+            .perform(click(), typeText("It is soon the end of SDP"), closeSoftKeyboard())
 
         onView(withText(R.string.confirm_label_pack_creation_dialog)).perform(click())
 

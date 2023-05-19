@@ -16,7 +16,6 @@ import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
  */
 interface ClientIDViewValidation {
 
-
     val host: Fragment
     val contactsViewModel: ContactsViewModel
 

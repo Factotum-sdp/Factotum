@@ -204,7 +204,7 @@ class RoadBookFragmentTest {
     }
 
     // ============================================================================================
-    // ================================== RoadBook Back-up Tests ================================
+    // ================================== RoadBook Back-up Tests ==================================
     @Test
     fun roadBookIsBackedUpCorrectlyWhenOnline() {
         val db = FirebaseInstance.getDatabase()
@@ -865,7 +865,7 @@ class RoadBookFragmentTest {
             .check(doesNotExist())
     }
 
-    /*
+
     @Test
     fun recordStayArchivedAfterNavigation() {
         onView((withText(DestinationRecords.RECORDS[0].destID)))
@@ -883,8 +883,9 @@ class RoadBookFragmentTest {
         // Check that the record is still not there
         onView((withText(DestinationRecords.RECORDS[0].destID)))
             .check(doesNotExist())
-    }*/
+    }
 
+    /*
     @Test
     fun stayArchivedAfterNavigationWithShowArchived() {
         // Enable showArchived
@@ -903,7 +904,7 @@ class RoadBookFragmentTest {
         // Check that the record is still archived
         onView(allOf(withId(R.id.archivedIcon), withEffectiveVisibility(Visibility.VISIBLE)))
             .check(matches(isDisplayed()))
-    }
+    }*/
 
     // Check that moving somewhere else in the app keep the sharedPref alive.
     @Test
@@ -1257,8 +1258,6 @@ class RoadBookFragmentTest {
 
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
 
-
-
         swipeRightTheRecordAt(2)
         onView(withId(R.id.editTextTimestamp)).perform(click())
         onView(withText(timePickerEraseBLabel)).perform(click())
@@ -1326,6 +1325,106 @@ class RoadBookFragmentTest {
         onView(withText(containsString(recipientID))).check(doesNotExist())
         onView(withText(containsString(BagAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
             doesNotExist()
+        )
+    }
+
+    @Test
+    fun timestampInBagAreModifiedOnDepartureTimestampEditInRoadBook() {
+        val clientID = DestinationRecords.RECORDS[1].clientID
+        swipeRightTheRecordAt(1)
+
+        onView(withId(R.id.multiAutoCompleteActions))
+            .perform(
+                click(),
+                clearText(),
+                typeText("pick, contact"),
+                closeSoftKeyboard()
+            )
+
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        val packageName = "Gold bottle"
+        val recipientID = "X17"
+        onView(withId(R.id.editTextPackageName)).perform(click(),  typeText(packageName), closeSoftKeyboard())
+        onView(withId(R.id.autoCompleteRecipientClientID)).perform(click(), typeText("$recipientID "), closeSoftKeyboard())
+        onView(withId(R.id.editTextPackageNotes)).perform(click(), typeText("It is soon the end of SDP"), closeSoftKeyboard())
+
+        onView(withText(R.string.confirm_label_pack_creation_dialog)).perform(click())
+
+        swipeRightTheRecordAt(1)
+
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker again
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        onView(withId(R.id.bag_button)).perform(click())
+
+        onView(withText(startsWith(packageName))).check(matches(isDisplayed()))
+        onView(withText(containsString(clientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(recipientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(BagAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
+            doesNotExist()
+        )
+    }
+
+    @Test
+    fun timestampInBagAreModifiedOnArrivalTimestampEditInRoadBook() {
+        val clientID = DestinationRecords.RECORDS[1].clientID
+        swipeRightTheRecordAt(1)
+
+        onView(withId(R.id.multiAutoCompleteActions))
+            .perform(
+                click(),
+                clearText(),
+                typeText("pick, contact"),
+                closeSoftKeyboard()
+            )
+
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        val packageName = "Gold bottle"
+        val recipientID = "X17"
+        onView(withId(R.id.editTextPackageName)).perform(click(),  typeText(packageName), closeSoftKeyboard())
+        onView(withId(R.id.autoCompleteRecipientClientID)).perform(click(), typeText("$recipientID "), closeSoftKeyboard())
+        onView(withId(R.id.editTextPackageNotes)).perform(click(), typeText("It is soon the end of SDP"), closeSoftKeyboard())
+
+        onView(withText(R.string.confirm_label_pack_creation_dialog)).perform(click())
+
+        swipeRightTheRecordAt(2)
+
+        onView(withId(R.id.multiAutoCompleteActions))
+            .perform(
+                click(),
+                clearText(),
+                typeText("deliver, contact"),
+                closeSoftKeyboard()
+            )
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        swipeRightTheRecordAt(2)
+
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        onView(withId(R.id.bag_button)).perform(click())
+
+        onView(withText(startsWith(packageName))).check(matches(isDisplayed()))
+        onView(withText(containsString(clientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(recipientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(BagAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
+            matches(isDisplayed())
         )
     }
 

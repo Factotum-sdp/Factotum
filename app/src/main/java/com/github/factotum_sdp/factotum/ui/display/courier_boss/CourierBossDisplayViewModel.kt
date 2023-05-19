@@ -11,6 +11,8 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageException
 import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -45,15 +47,21 @@ class CourierBossDisplayViewModel(context: Context) : ViewModel() {
 
     private suspend fun updateCachedFolders(remoteFolders: List<StorageReference>) {
         withContext(Dispatchers.IO) {
-            cachedFolderDao.insertAll(*remoteFolders.map { folder ->
-                CachedFolder(folder.path)
-            }.toTypedArray())
-
             val cachedFolders = cachedFolderDao.getAll()
             val remoteFolderPaths = remoteFolders.map { it.path }
             val foldersToDelete = cachedFolders.filter { it.path !in remoteFolderPaths }
 
             cachedFolderDao.deleteAll(foldersToDelete)
+
+            val deferreds = remoteFolders.map { folder ->
+                async {
+                    val name = folder.name
+                    CachedFolder(folder.path, name)
+                }
+            }
+
+            val newCachedFolders = deferreds.awaitAll().toTypedArray()
+            cachedFolderDao.insertAll(*newCachedFolders)
         }
 
         val updatedCachedFolders = withContext(Dispatchers.IO) {

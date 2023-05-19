@@ -9,7 +9,7 @@ import com.github.factotum_sdp.factotum.ui.display.data.courier_boss.CachedFolde
 import com.github.factotum_sdp.factotum.ui.display.data.client.CachedPhoto
 import com.github.factotum_sdp.factotum.ui.display.data.client.CachedPhotoDao
 
-@Database(entities = [CachedFolder::class, CachedPhoto::class], version = 1, exportSchema = false)
+@Database(entities = [CachedFolder::class, CachedPhoto::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun cachedFolderDao(): CachedFolderDao
     abstract fun cachedPhotoDao(): CachedPhotoDao

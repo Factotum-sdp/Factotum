@@ -8,8 +8,8 @@ import androidx.room.Query
 
 @Dao
 interface CachedFolderDao {
-    @Query("SELECT * FROM cached_folders")
-    fun getAll(): List<CachedFolder>
+    @Query("SELECT * FROM folder ORDER BY name ASC")
+    suspend fun getAll(): List<CachedFolder>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg folders: CachedFolder)

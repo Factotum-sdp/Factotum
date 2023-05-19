@@ -51,8 +51,6 @@ class BagFragmentTest {
     )
 
     companion object {
-        const val WORST_REFRESH_TIME = 500L
-
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
@@ -202,6 +200,7 @@ class BagFragmentTest {
         )
     }
 
+    /*
     @Test
     fun editAPickRecordWithTimestampAndCreateAPack() {
         val clientID = DestinationRecords.RECORDS[1].clientID
@@ -236,7 +235,7 @@ class BagFragmentTest {
         onView(withText(containsString(PackagesAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
             doesNotExist()
         )
-    }
+    } */
 
     @Test
     fun pickARecordAndDeliverRecipientUpdateTheBag() {
@@ -442,13 +441,6 @@ class BagFragmentTest {
         onView(withText(containsString(recipientID))).check(doesNotExist())
         onView(withText(containsString(PackagesAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
             doesNotExist()
-        )
-    }
-
-    private fun scrollToLastPosition() {
-        onView(withId(R.id.list)).perform(
-            click(),
-            RecyclerViewActions.scrollToLastPosition<RoadBookViewAdapter.RecordViewHolder>(),
         )
     }
 

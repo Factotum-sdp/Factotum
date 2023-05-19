@@ -36,6 +36,8 @@ import com.github.factotum_sdp.factotum.repositories.ShiftRepository
 import com.github.factotum_sdp.factotum.repositories.ShiftRepository.Companion.DELIVERY_LOG_DB_PATH
 import com.github.factotum_sdp.factotum.roadBookDataStore
 import com.github.factotum_sdp.factotum.shiftDataStore
+import com.github.factotum_sdp.factotum.ui.bag.PackageCreationDialogBuilder
+import com.github.factotum_sdp.factotum.ui.bag.PackagesAdapter
 import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookFragment.Companion.ROADBOOK_DB_PATH
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeLeftTheRecordAt
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightTheRecordAt
@@ -1041,6 +1043,293 @@ class RoadBookFragmentTest {
     }
 
     // Test with another record on top the timestamp is never done
+
+    // ============================================================================================
+    // ===================================== Bag edition tests ====================================
+
+    @Test
+    fun editARecordWithPickAndNoTimestampDoesNotShowCreatePackDialog() {
+        val clientID = DestinationRecords.RECORDS[1].clientID
+        swipeRightTheRecordAt(1)
+
+        onView(withId(R.id.multiAutoCompleteActions))
+            .perform(
+                click(),
+                clearText(),
+                typeText("pick, contact"),
+                closeSoftKeyboard()
+            )
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+        onView(withText(PackageCreationDialogBuilder.DIALOG_TITLE_PREFIX + clientID)).check(
+            doesNotExist()
+        )
+    }
+
+    @Test
+    fun editARecordWithPickAnTimestampShowsCreatePackDialog() {
+        val clientID = DestinationRecords.RECORDS[1].clientID
+        swipeRightTheRecordAt(1)
+
+        onView(withId(R.id.multiAutoCompleteActions))
+            .perform(
+                click(),
+                clearText(),
+                typeText("pick, contact"),
+                closeSoftKeyboard()
+            )
+
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+        onView(withText(PackageCreationDialogBuilder.DIALOG_TITLE_PREFIX + clientID)).check(
+            matches(isDisplayed())
+        )
+    }
+
+    @Test
+    fun editAPickRecordWithTimestampAndCreateAPack() {
+        val clientID = DestinationRecords.RECORDS[1].clientID
+        swipeRightTheRecordAt(1)
+
+        onView(withId(R.id.multiAutoCompleteActions))
+            .perform(
+                click(),
+                clearText(),
+                typeText("pick, contact"),
+                closeSoftKeyboard()
+            )
+
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        val packageName = "Gold bottle"
+        val recipientID = "X17"
+        onView(withId(R.id.editTextPackageName)).perform(click(),  typeText(packageName), closeSoftKeyboard())
+        onView(withId(R.id.autoCompleteRecipientClientID)).perform(click(), typeText("$recipientID "), closeSoftKeyboard())
+        onView(withId(R.id.editTextPackageNotes)).perform(click(), typeText("It is soon the end of SDP"), closeSoftKeyboard())
+
+        onView(withText(R.string.confirm_label_pack_creation_dialog)).perform(click())
+
+        onView(withId(R.id.bag_button)).perform(click())
+
+        onView(withText(startsWith(packageName))).check(matches(isDisplayed()))
+        onView(withText(containsString(clientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(recipientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(PackagesAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
+            doesNotExist()
+        )
+    }
+
+    @Test
+    fun pickARecordAndDeliverRecipientUpdateTheBag() {
+        val clientID = DestinationRecords.RECORDS[1].clientID
+        swipeRightTheRecordAt(1)
+
+        onView(withId(R.id.multiAutoCompleteActions))
+            .perform(
+                click(),
+                clearText(),
+                typeText("pick, contact"),
+                closeSoftKeyboard()
+            )
+
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        val packageName = "Gold bottle"
+        val recipientID = "X17"
+        onView(withId(R.id.editTextPackageName)).perform(click(),  typeText(packageName), closeSoftKeyboard())
+        onView(withId(R.id.autoCompleteRecipientClientID)).perform(click(), typeText("$recipientID "), closeSoftKeyboard())
+        onView(withId(R.id.editTextPackageNotes)).perform(click(), typeText("It is soon the end of SDP"), closeSoftKeyboard())
+
+        onView(withText(R.string.confirm_label_pack_creation_dialog)).perform(click())
+
+        swipeRightTheRecordAt(2)
+
+        onView(withId(R.id.multiAutoCompleteActions))
+            .perform(
+                click(),
+                clearText(),
+                typeText("deliver, contact"),
+                closeSoftKeyboard()
+            )
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        onView(withId(R.id.bag_button)).perform(click())
+
+        onView(withText(startsWith(packageName))).check(matches(isDisplayed()))
+        onView(withText(containsString(clientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(recipientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(PackagesAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
+            matches(isDisplayed())
+        )
+    }
+
+    @Test
+    fun pickARecordAndArriveAtRecipientButWithNoDeliverActionDoesNotUpdateTheBag() {
+        val clientID = DestinationRecords.RECORDS[1].clientID
+        swipeRightTheRecordAt(1)
+
+        onView(withId(R.id.multiAutoCompleteActions))
+            .perform(
+                click(),
+                clearText(),
+                typeText("pick, contact"),
+                closeSoftKeyboard()
+            )
+
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        val packageName = "Gold bottle"
+        val recipientID = "X17"
+        onView(withId(R.id.editTextPackageName)).perform(click(),  typeText(packageName), closeSoftKeyboard())
+        onView(withId(R.id.autoCompleteRecipientClientID)).perform(click(), typeText("$recipientID "), closeSoftKeyboard())
+        onView(withId(R.id.editTextPackageNotes)).perform(click(), typeText("It is soon the end of SDP"), closeSoftKeyboard())
+
+        onView(withText(R.string.confirm_label_pack_creation_dialog)).perform(click())
+
+        swipeRightTheRecordAt(2)
+
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        onView(withId(R.id.bag_button)).perform(click())
+
+        onView(withText(startsWith(packageName))).check(matches(isDisplayed()))
+        onView(withText(containsString(clientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(recipientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(PackagesAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
+            doesNotExist()
+        )
+    }
+
+    @Test
+    fun getOutTimestampOfADeliveredPlaceRemoveTimestampInBag() {
+        val clientID = DestinationRecords.RECORDS[1].clientID
+        swipeRightTheRecordAt(1)
+
+        onView(withId(R.id.multiAutoCompleteActions))
+            .perform(
+                click(),
+                clearText(),
+                typeText("pick, contact"),
+                closeSoftKeyboard()
+            )
+
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        val packageName = "Gold bottle"
+        val recipientID = "X17"
+        onView(withId(R.id.editTextPackageName)).perform(click(),  typeText(packageName), closeSoftKeyboard())
+        onView(withId(R.id.autoCompleteRecipientClientID)).perform(click(), typeText("$recipientID "), closeSoftKeyboard())
+        onView(withId(R.id.editTextPackageNotes)).perform(click(), typeText("It is soon the end of SDP"), closeSoftKeyboard())
+
+        onView(withText(R.string.confirm_label_pack_creation_dialog)).perform(click())
+
+        swipeRightTheRecordAt(2)
+
+        onView(withId(R.id.multiAutoCompleteActions))
+            .perform(
+                click(),
+                clearText(),
+                typeText("deliver, contact"),
+                closeSoftKeyboard()
+            )
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+
+
+        swipeRightTheRecordAt(2)
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerEraseBLabel)).perform(click())
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        onView(withId(R.id.bag_button)).perform(click())
+
+        onView(withText(startsWith(packageName))).check(matches(isDisplayed()))
+        onView(withText(containsString(clientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(recipientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(PackagesAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
+            doesNotExist()
+        )
+    }
+
+    @Test
+    fun getOutTimestampOfAPickPlaceRemovePacketFromThereInBag() {
+        val clientID = DestinationRecords.RECORDS[1].clientID
+        swipeRightTheRecordAt(1)
+
+        onView(withId(R.id.multiAutoCompleteActions))
+            .perform(
+                click(),
+                clearText(),
+                typeText("pick, contact"),
+                closeSoftKeyboard()
+            )
+
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        val packageName = "Gold bottle"
+        val recipientID = "X17"
+        onView(withId(R.id.editTextPackageName)).perform(click(),  typeText(packageName), closeSoftKeyboard())
+        onView(withId(R.id.autoCompleteRecipientClientID)).perform(click(), typeText("$recipientID "), closeSoftKeyboard())
+        onView(withId(R.id.editTextPackageNotes)).perform(click(), typeText("It is soon the end of SDP"), closeSoftKeyboard())
+
+        onView(withText(R.string.confirm_label_pack_creation_dialog)).perform(click())
+
+        swipeRightTheRecordAt(2)
+
+        onView(withId(R.id.multiAutoCompleteActions))
+            .perform(
+                click(),
+                clearText(),
+                typeText("deliver, contact"),
+                closeSoftKeyboard()
+            )
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+
+
+        swipeRightTheRecordAt(1)
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerEraseBLabel)).perform(click())
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        onView(withId(R.id.bag_button)).perform(click())
+
+        onView(withText(startsWith(packageName))).check(doesNotExist())
+        onView(withText(containsString(clientID))).check(doesNotExist())
+        onView(withText(containsString(recipientID))).check(doesNotExist())
+        onView(withText(containsString(PackagesAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
+            doesNotExist()
+        )
+    }
 
 
     // ============================================================================================

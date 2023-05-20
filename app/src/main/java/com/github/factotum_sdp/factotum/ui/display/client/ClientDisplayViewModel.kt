@@ -15,8 +15,10 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+
 
 class ClientDisplayViewModel(
     private val _folderName: MutableLiveData<String>,
@@ -26,6 +28,8 @@ class ClientDisplayViewModel(
     private val dateFormat = SimpleDateFormat("dd-MM-yyyy_HH-mm-ss", Locale.getDefault())
 
     private val _photoReferences = MutableLiveData<List<StorageReference>>()
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> = _isLoading
     val photoReferences: LiveData<List<StorageReference>> = _photoReferences
     val folderName: LiveData<String> = _folderName
 
@@ -52,7 +56,9 @@ class ClientDisplayViewModel(
         return photoLiveData
     }
 
+
     private fun updateImages() {
+        _isLoading.value = true
         viewModelScope.launch {
             val folderName = _folderName.value ?: return@launch
 
@@ -62,8 +68,10 @@ class ClientDisplayViewModel(
             if (remotePhotos != null) {
                 updateCachedPhotos(folderName, remotePhotos)
             }
+            _isLoading.value = false
         }
     }
+
 
     private suspend fun updateCachedPhotos(folderName: String, remotePhotos: List<StorageReference>) {
         withContext(Dispatchers.IO) {
@@ -75,27 +83,21 @@ class ClientDisplayViewModel(
 
             cachedPhotoDao.insertAll(*remotePhotos.map { photo ->
                 val url = photo.downloadUrl.await().toString()
-                CachedPhoto(photo.path, folderName, url)
+                val dateSortKey = getDateFromRef(photo).time
+                CachedPhoto(photo.path, folderName, url, dateSortKey)
             }.toTypedArray())
         }
 
-        val updatedCachedPhotos = withContext(Dispatchers.IO) {
-            cachedPhotoDao.getAllByFolderName(folderName)
-        }
-        val updatedStorageReferences = updatedCachedPhotos.map {
-            storage.getReference(it.path)
-        }.sortedByDescending { getDateFromRef(it) }
-
-        _photoReferences.postValue(updatedStorageReferences)
+        displayCachedPhotos(folderName)
     }
 
     private suspend fun displayCachedPhotos(folderName: String) {
         val cachedPhotos = withContext(Dispatchers.IO) {
-            cachedPhotoDao.getAllByFolderName(folderName)
+            cachedPhotoDao.getAllByFolderNameSortedByDate(folderName)
         }
         val storageReferences = cachedPhotos.map {
             storage.getReference(it.path)
-        }.sortedByDescending { getDateFromRef(it) }
+        }
 
         _photoReferences.postValue(storageReferences)
     }
@@ -110,8 +112,34 @@ class ClientDisplayViewModel(
         }
     }
 
+    fun filterImagesByDate(date: Date) {
+        viewModelScope.launch {
+            val folderName = _folderName.value ?: return@launch
+            val cachedPhotos = withContext(Dispatchers.IO) {
+                cachedPhotoDao.getAllByFolderName(folderName)
+            }
+            val storageReferences = cachedPhotos.map {
+                storage.getReference(it.path)
+            }.filter { isSameDay(getDateFromRef(it), date) }
+
+            _photoReferences.postValue(storageReferences)
+        }
+    }
+
+    private fun isSameDay(date1: Date, date2: Date): Boolean {
+        val cal1 = Calendar.getInstance()
+        cal1.time = date1
+
+        val cal2 = Calendar.getInstance()
+        cal2.time = date2
+
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH) &&
+                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
+    }
+
     private fun getDateFromRef(ref: StorageReference): Date {
-        val dateString = ref.name.substringAfterLast("_").substringBeforeLast(".")
+        val dateString = ref.name.substringAfter("_").substringBeforeLast(".")
         return try {
             dateFormat.parse(dateString) as Date
         } catch (e: ParseException) {
@@ -119,5 +147,3 @@ class ClientDisplayViewModel(
         }
     }
 }
-
-

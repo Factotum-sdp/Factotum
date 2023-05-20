@@ -1,8 +1,10 @@
 package com.github.factotum_sdp.factotum.models
 
+import android.graphics.Color
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PolylineOptions
 
 /**
  * Class that represents a route
@@ -39,7 +41,20 @@ class Route(srcLat: Double, srcLon: Double, dstLat: Double, dstLon: Double) {
     }
 
     /**
-     * Adds a route to the map
+     * Adds a src to the map
+     *
+     *  @param googleMap : map to which the route is added
+     */
+    fun addSrcToMap(googleMap: GoogleMap) {
+        googleMap.addMarker(
+            MarkerOptions()
+                .position(this.src)
+                .title("Source of $id")
+        )
+    }
+
+    /**
+     * Adds a dst to the map
      *
      *@param googleMap : map to which the route is added
      * @param src : boolean if we want to show the route source
@@ -51,6 +66,22 @@ class Route(srcLat: Double, srcLon: Double, dstLat: Double, dstLon: Double) {
                 .position(this.dst)
                 .title("Destination of $id")
         )
+    }
+
+    /**
+     * Draws the route on the map
+     *
+     * @param googleMap : map to which the route is added
+     */
+    fun drawRoute(googleMap: GoogleMap) {
+        val polyline = googleMap.addPolyline(
+            PolylineOptions()
+                .add(src, dst)
+                .width(15f)
+                .color(Color.RED)
+                .clickable(true)
+        )
+        polyline.tag = this
     }
 
 }

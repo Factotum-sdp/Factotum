@@ -54,7 +54,7 @@ class BagFragmentTest {
         }
     }
 
-    private val courier = User(USER_COURIER.name, USER_COURIER.email, USER_COURIER.role)
+    private val courier = User(USER_COURIER.uid, USER_COURIER.name, USER_COURIER.email, USER_COURIER.role)
 
     @Before
     fun toRoadBookFragment() {

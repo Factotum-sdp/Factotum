@@ -177,4 +177,6 @@
     <string name="package_recipient_hint">Recipient</string>
     <string name="package_notes_hint">Package notes</string>
     <string name="confirm_label_pack_creation_dialog">Confirm</string>
+    <string name="menu_date_picker">date_picker</string>
+    <string name="menu_loading_bar">menu_loading_bar</string>
 </resources>

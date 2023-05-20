@@ -7,6 +7,7 @@ import android.content.ServiceConnection
 import android.location.Location
 import android.os.IBinder
 import androidx.activity.ComponentActivity
+import com.github.factotum_sdp.factotum.data.LocationClient
 import com.github.factotum_sdp.factotum.services.LocationService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,6 +27,8 @@ class LocationTrackingHandler {
 
     private val _isTrackingEnabled = MutableStateFlow(false)
     private val _currentLocation = MutableStateFlow<Location?>(null)
+
+    private var mockLocationClient: LocationClient? = null
 
     /**
      * The StateFlow<Location?> giving the current location when the tracking is enabled

@@ -2,7 +2,7 @@ package com.github.factotum_sdp.factotum.placeholder
 
 import com.github.factotum_sdp.factotum.models.DestinationRecord
 import com.github.factotum_sdp.factotum.models.DestinationRecord.Action
-import java.util.*
+import java.util.Calendar
 
 /**
  * Temporary PlaceHolder for some DestinationRecord synthetic data

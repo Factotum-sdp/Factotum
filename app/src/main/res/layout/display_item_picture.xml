@@ -39,12 +39,19 @@
             android:padding="16dp">
 
             <!-- Title, secondary and supporting text -->
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/displayItemView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="24sp"
+                android:textSize="22sp"
                 android:textAppearance="?attr/textAppearanceTitleMedium" />
+            <!-- Secondary text -->
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/displayItemSecondaryView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textAppearance="?attr/textAppearanceSubtitle1" />
         </LinearLayout>
 
         <!-- Buttons -->
@@ -54,13 +61,14 @@
             android:layout_margin="8dp">
 
             <com.google.android.material.button.MaterialButton
-                style="@style/Widget.Material3.Button"
+                style="@style/Widget.Material3.Button.Icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/share"
                 android:textSize="20sp"
                 android:id="@+id/shareButton"
-                android:layout_alignParentEnd="true" />
+                android:layout_alignParentEnd="true"
+                app:icon="@android:drawable/ic_menu_share" />
         </RelativeLayout>
 
     </LinearLayout>

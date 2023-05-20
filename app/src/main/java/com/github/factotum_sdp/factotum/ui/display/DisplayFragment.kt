@@ -278,9 +278,8 @@ class DisplayFragment : Fragment(), MenuProvider {
     //================================================================
     // Sharing
     //================================================================
-
     private fun shareImage(uri: Uri) {
-        contactsViewModel.contacts.observe(viewLifecycleOwner) { contacts ->
+        contactsViewModel.contacts.value?.let { contacts ->
             val phone = getUserContactPhone(contacts)
             shareViaAppropriateChannel(phone, "Here is your delivery: $uri")
         }

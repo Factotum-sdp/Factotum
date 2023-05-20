@@ -98,7 +98,7 @@
     <string name="rb_label_dragdrop"><![CDATA[Drag & Drop]]></string>
     <string name="edit_dialog_cancel_b">Cancel</string>
     <string name="edit_dialog_update_b">Confirm</string>
-    <string name="menu_view_proof_picture">View Proof Pictures</string>
+    <string name="menu_view_proof_picture">Proof Photos</string>
     <string name="refresh">Refresh</string>
     <string name="hint_dialog_client_id">Client ID</string>
     <string name="hint_dialog_timestamp">Timestamp</string>

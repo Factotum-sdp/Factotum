@@ -182,7 +182,7 @@ class MainActivityTest {
         onView(withText("RoadBook")).check(matches(isDisplayed()))
         onView(withText("Directory")).check(matches(isDisplayed()))
         onView(withText("Maps")).check(matches(isDisplayed()))
-        onView(withText("View Proof Pictures")).check(matches(isDisplayed()))
+        onView(withText("Proof Photos")).check(matches(isDisplayed()))
     }
 
     @Test
@@ -194,7 +194,7 @@ class MainActivityTest {
         onView(withText("RoadBook")).check(doesNotExist())
         onView(withText("Directory")).check(doesNotExist())
         onView(withText("Maps")).check(doesNotExist())
-        onView(withText("View Proof Pictures")).check(matches(isDisplayed()))
+        onView(withText("Proof Photos")).check(matches(isDisplayed()))
     }
 
     // Work when executing the scenario manually but emulators issues make it fails in the connectedCheck

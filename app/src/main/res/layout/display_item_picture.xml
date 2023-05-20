@@ -43,14 +43,14 @@
                 android:id="@+id/displayItemView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="22sp"
+                android:textSize="20.5sp"
                 android:textAppearance="?attr/textAppearanceTitleMedium" />
             <!-- Secondary text -->
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/displayItemSecondaryView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
+                android:textSize="16.5sp"
                 android:textAppearance="?attr/textAppearanceSubtitle1" />
         </LinearLayout>
 

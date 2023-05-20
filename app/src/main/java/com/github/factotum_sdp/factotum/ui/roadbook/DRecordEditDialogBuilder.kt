@@ -1,22 +1,15 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
+import android.app.AlertDialog
+import android.app.TimePickerDialog
 import android.content.Context
 import android.content.DialogInterface
-import android.graphics.Rect
-import android.os.Build
 import android.view.ContextThemeWrapper
 import android.view.View
-import android.view.ViewTreeObserver
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.EditText
-import android.widget.LinearLayout
 import android.widget.MultiAutoCompleteTextView
-import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -25,15 +18,14 @@ import com.github.factotum_sdp.factotum.models.DestinationRecord
 import com.github.factotum_sdp.factotum.models.DestinationRecord.Companion.parseActions
 import com.github.factotum_sdp.factotum.models.DestinationRecord.Companion.parseTimestamp
 import com.github.factotum_sdp.factotum.models.DestinationRecord.Companion.parseWaitTimeOrRate
+import com.github.factotum_sdp.factotum.ui.dialog.ClientIDViewValidation
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.timepicker.MaterialTimePicker
-import com.google.android.material.timepicker.TimeFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-private const val PADDING_AMOUNT = 32
+
+private const val ERASE_B_LABEL = "Erase"
 
 /**
  * That Class represent a DialogBuilder specifically designed to build a custom
@@ -49,19 +41,20 @@ private const val PADDING_AMOUNT = 32
  * @param host: Fragment The Fragment which will hold the AlertDialog
  * @param rbViewModel: RoadBookViewModel The RoadBookViewModel storing the observable data of each DestinationRecord
  * @param rbRecyclerView: RecyclerView The RecyclerView as optimization to notify the screen representation when there is no edit changes,
+ * @param contactsViewModel: ContactViewModel The ContactsViewModel needed for ClientIDViewValidation Interface
  * thus avoiding posting any useless value in the RoadBookViewModel
  *
- * @constructor : Constructs the DRecordAlertDialogBuilder
+ * @constructor : Constructs the DRecordEditDialogBuilder
  */
 class DRecordEditDialogBuilder(
     context: Context?,
-    private val host: Fragment,
+    override val host: Fragment,
     private val rbViewModel: RoadBookViewModel,
     private val rbRecyclerView: RecyclerView,
-    private val contactsViewModel: ContactsViewModel
+    override val contactsViewModel: ContactsViewModel
 ) :
-    MaterialAlertDialogBuilder(
-        ContextThemeWrapper(context, R.style.Theme_Factotum_Dialog)) {
+    AlertDialog.Builder(ContextThemeWrapper(context, android.R.style.Theme_Holo_Dialog)),
+    ClientIDViewValidation {
 
     private val clientIDView: AutoCompleteTextView
     private val timestampView: EditText
@@ -69,13 +62,10 @@ class DRecordEditDialogBuilder(
     private val rateView: EditText
     private val actionsView: MultiAutoCompleteTextView
     private val notesView: EditText
-    private val dialogView: View
 
     init {
         val inflater = host.requireActivity().layoutInflater
-        dialogView = inflater.inflate(R.layout.edit_record_custom_dialog, null)
-        dialogView.setPadding(PADDING_AMOUNT)
-        setTitle(R.string.create_new_record)
+        val dialogView = inflater.inflate(R.layout.edit_record_custom_dialog, null)
         setCancelable(false)
         setView(dialogView)
 
@@ -87,7 +77,10 @@ class DRecordEditDialogBuilder(
         notesView = dialogView.findViewById(R.id.editTextNotes)
     }
 
-    @RequiresApi(Build.VERSION_CODES.R)
+    override fun clientIDInputView(): AutoCompleteTextView {
+        return clientIDView
+    }
+
     override fun create(): AlertDialog {
         setClientIDsAdapter()
         setTimestampTimePicker()
@@ -96,8 +89,6 @@ class DRecordEditDialogBuilder(
 
         return super.create()
     }
-
-
 
     /**
      * Call it to build a custom AlertDialog with all the fields empty
@@ -196,6 +187,10 @@ class DRecordEditDialogBuilder(
         waitingTimeView.setText(rec.waitingTime.toString())
         rateView.setText(rec.rate.toString())
         actionsView.setText(rec.actions.toString().removePrefix("[").removeSuffix("]"))
+        rec.timeStamp?.let {// if timestamped then can't edit actions done in place
+            actionsView.isEnabled = false
+            actionsView.isFocusable = false
+        }
         notesView.setText(rec.notes)
     }
 
@@ -207,44 +202,28 @@ class DRecordEditDialogBuilder(
         setPositiveButton(host.getString(R.string.edit_dialog_update_b), onPositiveButton)
     }
 
-    // Here we will need to get the clients IDs through a ViewModel instance
-    // initiated in the mainActivity and representing all the clients
-    private fun setClientIDsAdapter() {
-        clientIDView.threshold = 1
-        contactsViewModel.contacts.observe(host.viewLifecycleOwner) { it ->
-            val clientIDsAdapter = ArrayAdapter(
-                host.requireContext(),
-                R.layout.pop_auto_complete_client_id,
-                it.map { it.username }
-            )
-            clientIDView.setAdapter(clientIDsAdapter)
-        }
-    }
-
     // A TimePicker Dialog to set the timestamp EditText field
     private fun setTimestampTimePicker() {
         val focusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
-                val picker = MaterialTimePicker.Builder()
-                    .setTimeFormat(TimeFormat.CLOCK_24H)
-                    .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
-                    .setHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY))
-                    .setMinute(Calendar.getInstance().get(Calendar.MINUTE))
-                    .setTitleText("Select Time")
-                    .build()
+                val tp = TimePickerDialog(
+                    context,
+                    {   // OnSetListener argument
+                            _, hourOfDay, minutes ->
+                        val cal = Calendar.getInstance()
+                        cal.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                        cal.set(Calendar.MINUTE, minutes)
 
-                picker.addOnPositiveButtonClickListener {
-                    val cal = Calendar.getInstance()
-                    cal.set(Calendar.HOUR_OF_DAY, picker.hour)
-                    cal.set(Calendar.MINUTE, picker.minute)
-
-                    timestampView.setText(SimpleDateFormat.getTimeInstance().format(cal.time))
-                }
-
-                picker.addOnNegativeButtonClickListener {
+                        timestampView.setText(SimpleDateFormat.getTimeInstance().format(cal.time))
+                    },
+                    Calendar.getInstance().get(Calendar.HOUR_OF_DAY),
+                    Calendar.getInstance().get(Calendar.MINUTE),
+                    false
+                )
+                tp.setButton(DialogInterface.BUTTON_NEUTRAL, ERASE_B_LABEL) { _, _ ->
                     timestampView.setText("") // Empty string converted to null for the timestamp ViewModel data
                 }
-                picker.show(host.parentFragmentManager, "MATERIAL_TIME_PICKER")
+                tp.show()
             }
         }
         timestampView.onFocusChangeListener = focusChangeListener
@@ -259,24 +238,5 @@ class DRecordEditDialogBuilder(
         actionsView.setAdapter(actionsAdapter)
         actionsView.setTokenizer(MultiAutoCompleteTextView.CommaTokenizer())
         actionsView.threshold = 1
-    }
-
-    private fun setClientIDFieldCheck() {
-        clientIDView.validator = object : AutoCompleteTextView.Validator {
-            override fun isValid(text: CharSequence): Boolean {
-                val possibleClientID = text.toString().trim()
-                return isValidClientID(possibleClientID)
-            }
-
-            override fun fixText(invalidText: CharSequence): CharSequence {
-                // If .isValid() returns false then the code comes here
-                return context.getString(R.string.invalid_client_id_text)
-            }
-        }
-    }
-
-    private fun isValidClientID(possibleClientID: String): Boolean {
-        val currentContacts = contactsViewModel.contacts.value ?: emptyList()
-        return currentContacts.any { c -> c.username == possibleClientID }
     }
 }

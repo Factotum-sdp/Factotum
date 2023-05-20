@@ -24,6 +24,7 @@ private fun displayedRecords(
 class DRecordList(
     private val allRecords: List<DestinationRecord> = listOf(),
     private val archived: List<DestinationRecord> = listOf(),
+    private val timestamped: Set<DestinationRecord> = setOf(),
     val showArchived: Boolean = false
 ) : List<DestinationRecord> by displayedRecords(allRecords, archived, showArchived) {
 
@@ -55,6 +56,16 @@ class DRecordList(
     }
 
     /**
+     * Get a DestinationRecord from its ID
+     *
+     * @param destID: String
+     * @return DestinationRecord
+     */
+    fun getDestinationRecordFromID(destID: String): DestinationRecord {
+        return this[getIndexOf(destID)]
+    }
+
+    /**
      * Get the next destination to deliver
      *
      * @return DestinationRecord or null when all Destination are already visited
@@ -68,8 +79,68 @@ class DRecordList(
     }
 
     /**
+     * Get the timestamped DestinationRecord's Set
+     * @return Set<DestinationRecord>
+     */
+    fun timestampedSet(): Set<DestinationRecord> {
+        return timestamped
+    }
+
+    /**
+     * Add the specified DestinationRecord at the end of this List<DestinationRecord>
+     *
+     * @param record: DestinationRecord
+     * @return DRecordList
+     */
+    fun addRecord(record: DestinationRecord): DRecordList { // for sure not archived
+        return DRecordList(allRecords.plus(record), archived, computeTimestampedOnAdd(record), showArchived)
+    }
+
+    /**
+     * Remove the DestinationRecord at the specified position in this List<DestinationRecord>
+     *
+     * @param pos: Int The index of the DestinationRecord to remove
+     */
+    fun removeRecordAt(pos: Int): DRecordList {
+        val recordToRemove = this[pos]
+        val newTimestamped = computeTimeStampedOnRemove(recordToRemove)
+
+        if (archivedSet.contains(recordToRemove)) {
+            return DRecordList(
+                allRecords.minus(recordToRemove),
+                archived.minus(recordToRemove),
+                newTimestamped, showArchived)
+        }
+        return DRecordList(allRecords.minus(recordToRemove), archived, newTimestamped, showArchived)
+    }
+
+    /**
+     * Replace the DestinationRecord at "pos" by the given "newRecord"
+     * in this List<DestinationRecord>
+     *
+     * @param pos: Int
+     * @param newRecord: DestinationRecord
+     */
+    fun editRecordAt(pos: Int, newRecord: DestinationRecord): DRecordList {
+        val oldRecord = this[pos]
+        val newTimestamped = computeTimestampedOnEdit(oldRecord, newRecord)
+
+        val posInAll = allRecords.indexOfFirst { it.destID == oldRecord.destID }
+        if(archivedSet.contains(oldRecord)) {
+            val posInArchived = archived.indexOfFirst { it.destID == oldRecord.destID }
+            return DRecordList(
+                replaceRecordAt(posInAll, newRecord, allRecords),
+                replaceRecordAt(posInArchived, newRecord, archived),
+                newTimestamped,
+                showArchived
+            )
+        }
+        return DRecordList(replaceRecordAt(posInAll, newRecord, allRecords), archived, newTimestamped)
+    }
+
+    /**
      * Update the current main List (this) in an immutable way,
-     * keeping all the others current settings.
+     * Only use that method when records are not edited, or removed in "ls".
      *
      * @param ls: List<DestinationRecord> The new list to replace the current (this) main List
      * @return a new DRecordList with the main List updated
@@ -80,7 +151,7 @@ class DRecordList(
                 ls
             else
                 archived.plus(ls)
-        return DRecordList(allRecs, archived, showArchived)
+        return DRecordList(allRecs, archived, timestamped, showArchived)
     }
 
     /**
@@ -90,7 +161,7 @@ class DRecordList(
      * @return a new DRecordList with the specified record added to the archived records
      */
     fun archiveRecord(index: Int): DRecordList {
-        return DRecordList(allRecords, archived.plus(this[index]), showArchived)
+        return DRecordList(allRecords, archived.plus(this[index]), timestamped, showArchived)
     }
 
     /**
@@ -100,7 +171,7 @@ class DRecordList(
      * @return a new DRecordList containing with the specified record out of the archived records
      */
     fun unarchiveRecord(index: Int): DRecordList {
-        return DRecordList(allRecords, archived.minus(this[index]), showArchived)
+        return DRecordList(allRecords, archived.minus(this[index]), timestamped, showArchived)
     }
 
     /**
@@ -109,7 +180,7 @@ class DRecordList(
      * @return a new DRecordList with the main (this) list displaying all the records
      */
     fun withArchived(): DRecordList {
-        return DRecordList(allRecords, archived, true)
+        return DRecordList(allRecords, archived, timestamped, true)
     }
 
     /**
@@ -118,6 +189,48 @@ class DRecordList(
      * @return a new DRecordList with the main (this) list displaying only the non-archived records
      */
     fun withoutArchived(): DRecordList {
-        return DRecordList(allRecords, archived, false)
+        return DRecordList(allRecords, archived, timestamped, false)
+    }
+
+
+    /** Helpers : */
+    private fun computeTimestampedOnAdd(recordToAdd: DestinationRecord): Set<DestinationRecord> {
+        return recordToAdd.timeStamp?.let { timestamped.plus(recordToAdd) } ?: timestamped
+    }
+
+    private fun computeTimeStampedOnRemove(recordToRemove: DestinationRecord): Set<DestinationRecord> {
+        return recordToRemove.timeStamp?.let {
+            timestamped.minus(recordToRemove)
+        } ?: timestamped
+    }
+
+    private fun computeTimestampedOnEdit(oldRecord: DestinationRecord, newRecord: DestinationRecord)
+    : Set<DestinationRecord> {
+        var result: Set<DestinationRecord>
+        if(oldRecord.destID != newRecord.destID) {
+            result = computeTimeStampedOnRemove(oldRecord)
+            result = newRecord.timeStamp?.let { result.plus(newRecord) } ?: result
+        } else {
+            result = if(oldRecord.timeStamp != null && newRecord.timeStamp == null) {
+                timestamped.minus(oldRecord)
+            } else if(oldRecord.timeStamp == null && newRecord.timeStamp != null) {
+                timestamped.plus(newRecord)
+            } else { // if timestamp doesn't move update the timestamped if already here
+                if(timestamped.contains(oldRecord)) {
+                    timestamped.minus(oldRecord).plus(newRecord)
+                } else {
+                    timestamped
+                }
+            }
+        }
+        return result
+    }
+
+    private fun replaceRecordAt(pos: Int, record: DestinationRecord,
+                                records: List<DestinationRecord>): List<DestinationRecord> {
+        val ls = arrayListOf<DestinationRecord>()
+        ls.addAll(records)
+        ls[pos] = record
+        return ls
     }
 }

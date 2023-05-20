@@ -1,8 +1,10 @@
 package com.github.factotum_sdp.factotum.ui.display.client
 
 import android.net.Uri
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.ListAdapter
 import com.github.factotum_sdp.factotum.databinding.DisplayItemPictureBinding
@@ -23,6 +25,7 @@ class ClientPhotoAdapter(
         return ClientPhotoViewHolder(binding, onShareClick, onCardClick)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: ClientPhotoViewHolder, position: Int) {
         val pictureReference : StorageReference = getItem(position)
 

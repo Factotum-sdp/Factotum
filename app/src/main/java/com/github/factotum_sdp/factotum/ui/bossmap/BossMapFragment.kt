@@ -185,12 +185,16 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
 
 
     private fun calculateMedianLocation(): LatLng {
-        val courierLocations = viewModel.courierLocations.value ?: emptyList()
-        val deliveryLocations = viewModel.deliveriesStatus.value ?: emptyList()
+        val courierLocations: List<CourierLocation> = viewModel.courierLocations.value ?: emptyList()
+        val deliveryStatus: Map<String, List<DeliveryStatus>> = viewModel.deliveriesStatus.value ?: emptyMap()
 
         val courierLatLngs = courierLocations.map { LatLng(it.latitude!!, it.longitude!!) }
-        val deliveryLatLngs = deliveryLocations.filter { it.latitude != null && it.longitude != null }
-            .map { LatLng(it.latitude!!, it.longitude!!) }
+        val deliveryLatLngs = deliveryStatus.flatMap {
+                it.value
+                    .filter { it.latitude != null && it.longitude != null }
+                    .map { LatLng(it.latitude!!, it.longitude!!) }
+        }
+
 
         val locations = if (courierLocations.isNotEmpty()) {
             courierLatLngs + deliveryLatLngs

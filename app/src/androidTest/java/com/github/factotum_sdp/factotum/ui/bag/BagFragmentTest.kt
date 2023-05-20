@@ -58,7 +58,6 @@ class BagFragmentTest {
 
     @Before
     fun toRoadBookFragment() {
-
         // Ensure "use RoadBook preferences" is disabled
         PreferencesSetting.setRoadBookPrefs(testRule)
 

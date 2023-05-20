@@ -1109,28 +1109,10 @@ class RoadBookFragmentTest {
     @Test
     fun editAPickRecordWithTimestampAndCreateAPack() {
         val clientID = DestinationRecords.RECORDS[1].clientID
-        swipeRightTheRecordAt(1)
-
-        onView(withId(R.id.multiAutoCompleteActions))
-            .perform(
-                click(),
-                clearText(),
-                typeText("pick, contact"),
-                closeSoftKeyboard()
-            )
-
-        onView(withId(R.id.editTextTimestamp)).perform(click())
-        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
-
-        onView(withText(R.string.edit_dialog_update_b)).perform(click())
-
         val packageName = "Gold bottle"
         val recipientID = "X17"
-        onView(withId(R.id.editTextPackageName)).perform(click(),  typeText(packageName), closeSoftKeyboard())
-        onView(withId(R.id.autoCompleteRecipientClientID)).perform(click(), typeText("$recipientID "), closeSoftKeyboard())
-        onView(withId(R.id.editTextPackageNotes)).perform(click(), typeText("It is soon the end of SDP"), closeSoftKeyboard())
 
-        onView(withText(R.string.confirm_label_pack_creation_dialog)).perform(click())
+        addNonDeliveredPackageInBag(1, packageName, recipientID)
 
         onView(withId(R.id.bag_button)).perform(click())
 
@@ -1145,42 +1127,10 @@ class RoadBookFragmentTest {
     @Test
     fun pickARecordAndDeliverRecipientUpdateTheBag() {
         val clientID = DestinationRecords.RECORDS[1].clientID
-        swipeRightTheRecordAt(1)
-
-        onView(withId(R.id.multiAutoCompleteActions))
-            .perform(
-                click(),
-                clearText(),
-                typeText("pick, contact"),
-                closeSoftKeyboard()
-            )
-
-        onView(withId(R.id.editTextTimestamp)).perform(click())
-        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
-
-        onView(withText(R.string.edit_dialog_update_b)).perform(click())
-
         val packageName = "Gold bottle"
         val recipientID = "X17"
-        onView(withId(R.id.editTextPackageName)).perform(click(),  typeText(packageName), closeSoftKeyboard())
-        onView(withId(R.id.autoCompleteRecipientClientID)).perform(click(), typeText("$recipientID "), closeSoftKeyboard())
-        onView(withId(R.id.editTextPackageNotes)).perform(click(), typeText("It is soon the end of SDP"), closeSoftKeyboard())
 
-        onView(withText(R.string.confirm_label_pack_creation_dialog)).perform(click())
-
-        swipeRightTheRecordAt(2)
-
-        onView(withId(R.id.multiAutoCompleteActions))
-            .perform(
-                click(),
-                clearText(),
-                typeText("deliver, contact"),
-                closeSoftKeyboard()
-            )
-        onView(withId(R.id.editTextTimestamp)).perform(click())
-        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
-
-        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+        addDeliveredPackageInBag(1, packageName, recipientID, 2)
 
         onView(withId(R.id.bag_button)).perform(click())
 
@@ -1195,28 +1145,10 @@ class RoadBookFragmentTest {
     @Test
     fun pickARecordAndArriveAtRecipientButWithNoDeliverActionDoesNotUpdateTheBag() {
         val clientID = DestinationRecords.RECORDS[1].clientID
-        swipeRightTheRecordAt(1)
-
-        onView(withId(R.id.multiAutoCompleteActions))
-            .perform(
-                click(),
-                clearText(),
-                typeText("pick, contact"),
-                closeSoftKeyboard()
-            )
-
-        onView(withId(R.id.editTextTimestamp)).perform(click())
-        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
-
-        onView(withText(R.string.edit_dialog_update_b)).perform(click())
-
         val packageName = "Gold bottle"
         val recipientID = "X17"
-        onView(withId(R.id.editTextPackageName)).perform(click(),  typeText(packageName), closeSoftKeyboard())
-        onView(withId(R.id.autoCompleteRecipientClientID)).perform(click(), typeText("$recipientID "), closeSoftKeyboard())
-        onView(withId(R.id.editTextPackageNotes)).perform(click(), typeText("It is soon the end of SDP"), closeSoftKeyboard())
 
-        onView(withText(R.string.confirm_label_pack_creation_dialog)).perform(click())
+        addNonDeliveredPackageInBag(1, packageName, recipientID)
 
         swipeRightTheRecordAt(2)
 
@@ -1237,43 +1169,10 @@ class RoadBookFragmentTest {
 
     @Test
     fun getOutTimestampOfADeliveredPlaceRemoveTimestampInBag() {
-        val clientID = DestinationRecords.RECORDS[1].clientID
-        swipeRightTheRecordAt(1)
-
-        onView(withId(R.id.multiAutoCompleteActions))
-            .perform(
-                click(),
-                clearText(),
-                typeText("pick, contact"),
-                closeSoftKeyboard()
-            )
-
-        onView(withId(R.id.editTextTimestamp)).perform(click())
-        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
-
-        onView(withText(R.string.edit_dialog_update_b)).perform(click())
-
         val packageName = "Gold bottle"
         val recipientID = "X17"
-        onView(withId(R.id.editTextPackageName)).perform(click(),  typeText(packageName), closeSoftKeyboard())
-        onView(withId(R.id.autoCompleteRecipientClientID)).perform(click(), typeText("$recipientID "), closeSoftKeyboard())
-        onView(withId(R.id.editTextPackageNotes)).perform(click(), typeText("It is soon the end of SDP"), closeSoftKeyboard())
-
-        onView(withText(R.string.confirm_label_pack_creation_dialog)).perform(click())
-
-        swipeRightTheRecordAt(2)
-
-        onView(withId(R.id.multiAutoCompleteActions))
-            .perform(
-                click(),
-                clearText(),
-                typeText("deliver, contact"),
-                closeSoftKeyboard()
-            )
-        onView(withId(R.id.editTextTimestamp)).perform(click())
-        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
-
-        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+        val clientID = DestinationRecords.RECORDS[1].clientID
+        addDeliveredPackageInBag(1, packageName, recipientID, 2)
 
         swipeRightTheRecordAt(2)
         onView(withId(R.id.editTextTimestamp)).perform(click())
@@ -1293,42 +1192,8 @@ class RoadBookFragmentTest {
     @Test
     fun getOutTimestampOfAPickPlaceRemovePacketFromThereInBag() {
         val clientID = DestinationRecords.RECORDS[1].clientID
-        swipeRightTheRecordAt(1)
-
-        onView(withId(R.id.multiAutoCompleteActions))
-            .perform(
-                click(),
-                clearText(),
-                typeText("pick, contact"),
-                closeSoftKeyboard()
-            )
-
-        onView(withId(R.id.editTextTimestamp)).perform(click())
-        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
-
-        onView(withText(R.string.edit_dialog_update_b)).perform(click())
-
         val packageName = "Gold bottle"
         val recipientID = "X17"
-        onView(withId(R.id.editTextPackageName)).perform(click(),  typeText(packageName), closeSoftKeyboard())
-        onView(withId(R.id.autoCompleteRecipientClientID)).perform(click(), typeText("$recipientID "), closeSoftKeyboard())
-        onView(withId(R.id.editTextPackageNotes)).perform(click(), typeText("It is soon the end of SDP"), closeSoftKeyboard())
-
-        onView(withText(R.string.confirm_label_pack_creation_dialog)).perform(click())
-
-        swipeRightTheRecordAt(2)
-
-        onView(withId(R.id.multiAutoCompleteActions))
-            .perform(
-                click(),
-                clearText(),
-                typeText("deliver, contact"),
-                closeSoftKeyboard()
-            )
-        onView(withId(R.id.editTextTimestamp)).perform(click())
-        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
-
-        onView(withText(R.string.edit_dialog_update_b)).perform(click())
 
         swipeRightTheRecordAt(1)
         onView(withId(R.id.editTextTimestamp)).perform(click())
@@ -1348,28 +1213,10 @@ class RoadBookFragmentTest {
     @Test
     fun timestampInBagAreModifiedOnDepartureTimestampEditInRoadBook() {
         val clientID = DestinationRecords.RECORDS[1].clientID
-        swipeRightTheRecordAt(1)
-
-        onView(withId(R.id.multiAutoCompleteActions))
-            .perform(
-                click(),
-                clearText(),
-                typeText("pick, contact"),
-                closeSoftKeyboard()
-            )
-
-        onView(withId(R.id.editTextTimestamp)).perform(click())
-        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
-
-        onView(withText(R.string.edit_dialog_update_b)).perform(click())
-
         val packageName = "Gold bottle"
         val recipientID = "X17"
-        onView(withId(R.id.editTextPackageName)).perform(click(),  typeText(packageName), closeSoftKeyboard())
-        onView(withId(R.id.autoCompleteRecipientClientID)).perform(click(), typeText("$recipientID "), closeSoftKeyboard())
-        onView(withId(R.id.editTextPackageNotes)).perform(click(), typeText("It is soon the end of SDP"), closeSoftKeyboard())
 
-        onView(withText(R.string.confirm_label_pack_creation_dialog)).perform(click())
+        addNonDeliveredPackageInBag(1, packageName, recipientID)
 
         swipeRightTheRecordAt(1)
 
@@ -1391,42 +1238,9 @@ class RoadBookFragmentTest {
     @Test
     fun timestampInBagAreModifiedOnArrivalTimestampEditInRoadBook() {
         val clientID = DestinationRecords.RECORDS[1].clientID
-        swipeRightTheRecordAt(1)
-
-        onView(withId(R.id.multiAutoCompleteActions))
-            .perform(
-                click(),
-                clearText(),
-                typeText("pick, contact"),
-                closeSoftKeyboard()
-            )
-
-        onView(withId(R.id.editTextTimestamp)).perform(click())
-        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
-
-        onView(withText(R.string.edit_dialog_update_b)).perform(click())
-
         val packageName = "Gold bottle"
         val recipientID = "X17"
-        onView(withId(R.id.editTextPackageName)).perform(click(),  typeText(packageName), closeSoftKeyboard())
-        onView(withId(R.id.autoCompleteRecipientClientID)).perform(click(), typeText("$recipientID "), closeSoftKeyboard())
-        onView(withId(R.id.editTextPackageNotes)).perform(click(), typeText("It is soon the end of SDP"), closeSoftKeyboard())
-
-        onView(withText(R.string.confirm_label_pack_creation_dialog)).perform(click())
-
-        swipeRightTheRecordAt(2)
-
-        onView(withId(R.id.multiAutoCompleteActions))
-            .perform(
-                click(),
-                clearText(),
-                typeText("deliver, contact"),
-                closeSoftKeyboard()
-            )
-        onView(withId(R.id.editTextTimestamp)).perform(click())
-        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
-
-        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+        addDeliveredPackageInBag(1, packageName, recipientID, 2)
 
         swipeRightTheRecordAt(2)
 
@@ -1443,6 +1257,51 @@ class RoadBookFragmentTest {
         onView(withText(containsString(BagAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
             matches(isDisplayed())
         )
+    }
+
+    private fun addNonDeliveredPackageInBag(senderDestIDPos: Int, packageName: String, recipientID: String ) {
+        swipeRightTheRecordAt(senderDestIDPos)
+
+        onView(withId(R.id.multiAutoCompleteActions))
+            .perform(
+                click(),
+                clearText(),
+                typeText("pick, contact"),
+                closeSoftKeyboard()
+            )
+
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        onView(withId(R.id.editTextPackageName))
+            .perform(click(),  typeText(packageName), closeSoftKeyboard())
+        onView(withId(R.id.autoCompleteRecipientClientID))
+            .perform(click(), typeText("$recipientID "), closeSoftKeyboard())
+        onView(withId(R.id.editTextPackageNotes))
+            .perform(click(), typeText("It is soon the end of SDP"), closeSoftKeyboard())
+
+        onView(withText(R.string.confirm_label_pack_creation_dialog)).perform(click())
+    }
+
+    private fun addDeliveredPackageInBag(senderDestIDPos: Int, packageName: String,
+                                         recipientID: String, arrivalDestIDPos: Int) {
+        addNonDeliveredPackageInBag(senderDestIDPos, packageName, recipientID)
+
+        swipeRightTheRecordAt(arrivalDestIDPos)
+
+        onView(withId(R.id.multiAutoCompleteActions))
+            .perform(
+                click(),
+                clearText(),
+                typeText("deliver, contact"),
+                closeSoftKeyboard()
+            )
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
     }
 
     // ============================================================================================

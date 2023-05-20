@@ -1,6 +1,5 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
-import android.app.AlertDialog
 import android.app.TimePickerDialog
 import android.content.Context
 import android.content.DialogInterface
@@ -10,6 +9,7 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.EditText
 import android.widget.MultiAutoCompleteTextView
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -20,12 +20,16 @@ import com.github.factotum_sdp.factotum.models.DestinationRecord.Companion.parse
 import com.github.factotum_sdp.factotum.models.DestinationRecord.Companion.parseWaitTimeOrRate
 import com.github.factotum_sdp.factotum.ui.dialog.ClientIDViewValidation
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.TimeFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
 
 private const val ERASE_B_LABEL = "Erase"
+private const val PADDING_AMOUNT = 32
 
 /**
  * That Class represent a DialogBuilder specifically designed to build a custom
@@ -53,7 +57,7 @@ class DRecordEditDialogBuilder(
     private val rbRecyclerView: RecyclerView,
     override val contactsViewModel: ContactsViewModel
 ) :
-    AlertDialog.Builder(ContextThemeWrapper(context, android.R.style.Theme_Holo_Dialog)),
+    MaterialAlertDialogBuilder(ContextThemeWrapper(context, R.style.Theme_Factotum_Dialog)),
     ClientIDViewValidation {
 
     private val clientIDView: AutoCompleteTextView
@@ -66,6 +70,8 @@ class DRecordEditDialogBuilder(
     init {
         val inflater = host.requireActivity().layoutInflater
         val dialogView = inflater.inflate(R.layout.edit_record_custom_dialog, null)
+        dialogView.setPadding(PADDING_AMOUNT, PADDING_AMOUNT, PADDING_AMOUNT, PADDING_AMOUNT)
+        setTitle(R.string.create_new_record)
         setCancelable(false)
         setView(dialogView)
 
@@ -206,24 +212,26 @@ class DRecordEditDialogBuilder(
     private fun setTimestampTimePicker() {
         val focusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
-                val tp = TimePickerDialog(
-                    context,
-                    {   // OnSetListener argument
-                            _, hourOfDay, minutes ->
-                        val cal = Calendar.getInstance()
-                        cal.set(Calendar.HOUR_OF_DAY, hourOfDay)
-                        cal.set(Calendar.MINUTE, minutes)
+                val picker = MaterialTimePicker.Builder()
+                    .setTimeFormat(TimeFormat.CLOCK_24H)
+                    .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
+                    .setHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY))
+                    .setMinute(Calendar.getInstance().get(Calendar.MINUTE))
+                    .setTitleText("Select Time")
+                    .build()
 
-                        timestampView.setText(SimpleDateFormat.getTimeInstance().format(cal.time))
-                    },
-                    Calendar.getInstance().get(Calendar.HOUR_OF_DAY),
-                    Calendar.getInstance().get(Calendar.MINUTE),
-                    false
-                )
-                tp.setButton(DialogInterface.BUTTON_NEUTRAL, ERASE_B_LABEL) { _, _ ->
-                    timestampView.setText("") // Empty string converted to null for the timestamp ViewModel data
+                picker.addOnPositiveButtonClickListener {
+                    val cal = Calendar.getInstance()
+                    cal.set(Calendar.HOUR_OF_DAY, picker.hour)
+                    cal.set(Calendar.MINUTE, picker.minute)
+
+                    timestampView.setText(SimpleDateFormat.getTimeInstance().format(cal.time))
                 }
-                tp.show()
+
+                picker.addOnNegativeButtonClickListener {
+                    timestampView.setText("")
+                }
+                picker.show(host.parentFragmentManager, "MATERIAL_TIME_PICKER")
             }
         }
         timestampView.onFocusChangeListener = focusChangeListener

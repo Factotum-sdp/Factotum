@@ -21,7 +21,6 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/textView7"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="7dp"
@@ -47,7 +46,6 @@
             android:selectAllOnFocus="true" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
@@ -64,7 +62,6 @@
             android:selectAllOnFocus="true" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/textView3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"

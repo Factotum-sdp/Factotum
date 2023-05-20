@@ -58,7 +58,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp">
+            android:layout_margin="10dp">
 
             <com.google.android.material.button.MaterialButton
                 style="@style/Widget.Material3.Button.Icon"

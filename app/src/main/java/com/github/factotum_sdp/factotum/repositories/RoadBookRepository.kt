@@ -2,6 +2,7 @@ package com.github.factotum_sdp.factotum.repositories
 
 import androidx.datastore.core.DataStore
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
+import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat
 import com.github.factotum_sdp.factotum.models.DestinationRecord
 import com.github.factotum_sdp.factotum.ui.roadbook.DRecordList
 import com.google.firebase.database.DataSnapshot
@@ -31,15 +32,13 @@ import java.util.Locale
  * The first variable cache is used uniquely to avoid remoteSource update.
  * However, a second variable cache is used before fetching or update the localSource.
  */
-
-class RoadBookRepository(remoteSource: DatabaseReference,
+class RoadBookRepository(remoteSource: DatabaseReference, username: String,
                          private val localSource: DataStore<DRecordList>) {
     private var backUpRef: DatabaseReference
     private var isConnectedToRemote = false
 
     private var lastNetworkBackUp: DRecordList? = null
     private var lastLocalNetworkBackUp: DRecordList? = null
-
 
     init {
         FirebaseInstance.onConnectedStatusChanged {
@@ -55,11 +54,14 @@ class RoadBookRepository(remoteSource: DatabaseReference,
         }
 
         val date = Calendar.getInstance().time
-        val dateRef =
-            SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH).format(date)
-        backUpRef =
-            remoteSource.child(dateRef) // will add a more detailed path sooner when the User data class will be stable
+        val dateRef = SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH).format(date)
+        backUpRef = remoteSource.child(dateRef) // will add a more detailed path sooner when the User data class will be stable
+        initNetworkPathWithUser(username)
+    }
 
+    private fun initNetworkPathWithUser(username: String) {
+        val safeUsername = FirebaseStringFormat.firebaseSafeString(username)
+        backUpRef = backUpRef.child(safeUsername)
         backUpRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val records = snapshot.children.mapNotNull {
@@ -67,11 +69,9 @@ class RoadBookRepository(remoteSource: DatabaseReference,
                 }
                 lastNetworkBackUp = DRecordList(records)
             }
-
             override fun onCancelled(error: DatabaseError) {}
         })
     }
-
 
     /**
      * Send the current records data to the the remoteSource and the localSource if connected

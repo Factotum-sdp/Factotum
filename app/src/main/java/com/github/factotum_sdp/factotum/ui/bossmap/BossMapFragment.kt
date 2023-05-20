@@ -79,7 +79,7 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
         )
 
         viewModel.courierLocations.observe(viewLifecycleOwner) { locations ->
-            updateMap(locations, viewModel.deliveriesStatus.value ?: emptyList())
+            updateMap(locations, viewModel.deliveriesStatus.value ?: mapOf())
             if (!cameraPositionInitialized) {
                 val geometricMedian = calculateMedianLocation()
                 googleMap.moveCamera(
@@ -103,21 +103,29 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
 
     }
 
-    private fun updateMap(locations: List<CourierLocation>, deliveryStatus: List<DeliveryStatus>) {
+    private fun updateMap(locations: List<CourierLocation>, deliveryStatus: Map<String, List<DeliveryStatus>>) {
         googleMap.clear()
         updateMarkers(locations)
         updateDestinationMarkers(deliveryStatus)
     }
 
-    private fun updateDestinationMarkers(locations: List<DeliveryStatus>?) {
-        locations?.forEach { status ->
+    private fun updateDestinationMarkers(locations: Map<String, List<DeliveryStatus>>?) {
+        locations?.forEach { entry ->
+            val isFullyDelivered = entry.value.all { it.timeStamp != null }
+            val listOfAllDeliveryStatus = StringBuilder()
+            entry.value.forEach { status ->
+                listOfAllDeliveryStatus.append("${status.courier} : ${status.destID}\n")
+            }
+            val coordinates = LatLng(entry.value[0].latitude!!, entry.value[0].longitude!!)
             googleMap.addMarker(
                 MarkerOptions()
-                    .position(LatLng(status.latitude!!, status.longitude!!))
-                    .title(status.destID)
-                    .icon(if(status.timeStamp != null)
-                        BitmapDescriptorFactory.fromBitmap(bitmapDeliveredScaled)
-                        else BitmapDescriptorFactory.fromBitmap(bitmapNotDeliveredScaled))
+                    .position(coordinates)
+                    .title(listOfAllDeliveryStatus.toString())
+                    .icon(
+                        if (isFullyDelivered)
+                            BitmapDescriptorFactory.fromBitmap(bitmapDeliveredScaled)
+                        else BitmapDescriptorFactory.fromBitmap(bitmapNotDeliveredScaled)
+                    )
             )
         }
     }
@@ -177,12 +185,16 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
 
 
     private fun calculateMedianLocation(): LatLng {
-        val courierLocations = viewModel.courierLocations.value ?: emptyList()
-        val deliveryLocations = viewModel.deliveriesStatus.value ?: emptyList()
+        val courierLocations: List<CourierLocation> = viewModel.courierLocations.value ?: emptyList()
+        val deliveryStatus: Map<String, List<DeliveryStatus>> = viewModel.deliveriesStatus.value ?: emptyMap()
 
         val courierLatLngs = courierLocations.map { LatLng(it.latitude!!, it.longitude!!) }
-        val deliveryLatLngs = deliveryLocations.filter { it.latitude != null && it.longitude != null }
-            .map { LatLng(it.latitude!!, it.longitude!!) }
+        val deliveryLatLngs = deliveryStatus.flatMap {
+                it.value
+                    .filter { it.latitude != null && it.longitude != null }
+                    .map { LatLng(it.latitude!!, it.longitude!!) }
+        }
+
 
         val locations = if (courierLocations.isNotEmpty()) {
             courierLatLngs + deliveryLatLngs

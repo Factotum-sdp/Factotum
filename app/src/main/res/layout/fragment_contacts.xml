@@ -11,8 +11,9 @@
         android:id="@+id/contacts_search_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:iconifiedByDefault="false"
-        android:queryHint="Search contacts..." />
+        android:layout_margin="12dp"
+        android:hint="@string/searchbar_hint" />
+
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -37,7 +38,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@android:drawable/ic_input_add" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/empty_contacts_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

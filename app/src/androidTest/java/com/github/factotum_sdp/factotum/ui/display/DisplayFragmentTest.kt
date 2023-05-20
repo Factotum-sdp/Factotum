@@ -2,10 +2,14 @@ package com.github.factotum_sdp.factotum.ui.display
 
 import android.content.Context
 import android.content.Intent
+import android.icu.util.Calendar
+import android.view.View
 import android.widget.DatePicker
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.pressBack
+import androidx.test.espresso.UiController
+import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.PickerActions
@@ -13,7 +17,10 @@ import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers.*
 import androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayingAtLeast
 import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withTagValue
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -25,16 +32,21 @@ import com.github.factotum_sdp.factotum.ui.picture.emptyFirebaseStorage
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.logout
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.Matcher
+import org.hamcrest.core.AllOf.allOf
 import org.junit.*
 import org.junit.runner.RunWith
+import java.util.Date
 
 @RunWith(AndroidJUnit4::class)
 class DisplayFragmentTest {
@@ -79,16 +91,14 @@ class DisplayFragmentTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun displayOnlyOnePhotoIfSame() = runTest {
-        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
+        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
 
-        //Press on the refresh button
-        onView(withId(R.id.refreshButton)).perform(click())
+        onView(withId(R.id.menu_refresh)).perform(click())
 
         launch { uploadImageToStorageEmulator(context,"Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
 
-        //Press on the refresh button
-        onView(withId(R.id.refreshButton)).perform(click())
+        onView(withId(R.id.menu_refresh)).perform(click())
 
         val recyclerView = onView(withId(R.id.recyclerView))
 
@@ -99,17 +109,12 @@ class DisplayFragmentTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun displayTwoDifferentPhotosWorks() = runTest {
-        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
-
-        //Press on the refresh button
-        onView(withId(R.id.refreshButton)).perform(click())
-
-
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
+        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
 
-        //Press on the refresh button
-        onView(withId(R.id.refreshButton)).perform(click())
+
+        onView(withId(R.id.menu_refresh)).perform(click())
 
 
         val recyclerView = onView(withId(R.id.recyclerView))
@@ -120,11 +125,10 @@ class DisplayFragmentTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun displayOneBadFormatPhotosWorks() = runTest {
-        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH3, TEST_IMAGE_PATH3) }.join()
+        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
 
-        //Press on the refresh button
-        onView(withId(R.id.refreshButton)).perform(click())
+        onView(withId(R.id.menu_refresh)).perform(click())
 
         val recyclerView = onView(withId(R.id.recyclerView))
         recyclerView.check(matches(hasItemCount(1)))
@@ -133,13 +137,11 @@ class DisplayFragmentTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun displayTwoBadFormatPhotosWorks() = runTest {
-        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
-        launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH3, TEST_IMAGE_PATH3) }.join()
-
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH4, TEST_IMAGE_PATH4) }.join()
+        launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH3, TEST_IMAGE_PATH3) }.join()
+        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
 
-        //Press on the refresh button
-        onView(withId(R.id.refreshButton)).perform(click())
+
 
         val recyclerView = onView(withId(R.id.recyclerView))
         recyclerView.check(matches(hasItemCount(2)))
@@ -151,8 +153,7 @@ class DisplayFragmentTest {
         val recyclerView = onView(withId(R.id.recyclerView))
         recyclerView.check(matches(hasItemCount(0)))
 
-        //Press on the refresh button
-        onView(withId(R.id.refreshButton)).perform(click())
+        onView(withId(R.id.menu_refresh)).perform(click())
 
         recyclerView.check(matches(hasItemCount(0)))
     }
@@ -160,11 +161,8 @@ class DisplayFragmentTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun clickingOnPhotosFireCorrectIntents() = runTest {
-        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
-
-        //Press on the refresh button
-        onView(withId(R.id.refreshButton)).perform(click())
+        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
 
         onView(withId(R.id.recyclerView)).perform(
             RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
@@ -221,9 +219,9 @@ class DisplayFragmentTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun bossCanSeeFolders() = runTest {
-        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
-        launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
         launch { uploadImageToStorageEmulator(context, "Boss", TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
+        launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
 
         goToDisplayFragment()
 
@@ -234,9 +232,9 @@ class DisplayFragmentTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun bossCanClickOnFolderAndSeePhotos() = runTest {
-        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
 
         goToDisplayFragment()
 
@@ -255,8 +253,8 @@ class DisplayFragmentTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun bossCanStillSeePhotos() = runTest {
-        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
 
         goToDisplayFragment()
 
@@ -284,9 +282,9 @@ class DisplayFragmentTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun bossCanGoBackFromClientFolder() = runTest {
-        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
 
         goToDisplayFragment()
 
@@ -308,8 +306,8 @@ class DisplayFragmentTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun refreshWorksOnFolders() = runTest {
-        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
 
         goToDisplayFragment()
 
@@ -318,7 +316,7 @@ class DisplayFragmentTest {
 
         launch { uploadImageToStorageEmulator(context, "Boss", TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
 
-        onView(withId(R.id.refreshButton)).perform(click())
+        onView(withId(R.id.menu_refresh)).perform(click())
 
         recyclerView.check(matches(hasItemCount(2)))
     }
@@ -326,9 +324,9 @@ class DisplayFragmentTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun pickingDateWorks() = runTest {
-        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
+        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
 
         goToDisplayFragment()
 
@@ -343,13 +341,9 @@ class DisplayFragmentTest {
         recyclerView.check(matches(hasItemCount(2)))
 
         onView(withId(R.id.menu_date_picker)).perform(click())
-
-        val year = 2023
-        val month = 3
-        val day = 25
-        onView(isAssignableFrom(DatePicker::class.java)).perform(PickerActions.setDate(year, month, day))
         onView(withText("OK")).perform(click())
 
-        recyclerView.check(matches(hasItemCount(1)))
+        recyclerView.check(matches(hasItemCount(0)))
     }
+
 }

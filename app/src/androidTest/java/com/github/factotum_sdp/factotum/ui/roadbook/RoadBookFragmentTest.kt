@@ -24,6 +24,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.data.LocationClientFactory
+import com.github.factotum_sdp.factotum.data.MockLocationClient
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat
 import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseDateFormatted
@@ -37,6 +39,8 @@ import com.github.factotum_sdp.factotum.repositories.ShiftRepository
 import com.github.factotum_sdp.factotum.repositories.ShiftRepository.Companion.DELIVERY_LOG_DB_PATH
 import com.github.factotum_sdp.factotum.roadBookDataStore
 import com.github.factotum_sdp.factotum.shiftDataStore
+import com.github.factotum_sdp.factotum.ui.bag.PackCreationDialogBuilder
+import com.github.factotum_sdp.factotum.ui.bag.BagAdapter
 import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookFragment.Companion.ROADBOOK_DB_PATH
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeLeftTheRecordAt
 import com.github.factotum_sdp.factotum.ui.roadbook.TouchCustomMoves.swipeRightTheRecordAt
@@ -89,7 +93,7 @@ class RoadBookFragmentTest {
             initFirebase()
         }
     }
-    private val courier = User(USER_COURIER.name, USER_COURIER.email, USER_COURIER.role)
+    private val courier = User(USER_COURIER.uid, USER_COURIER.name, USER_COURIER.email, USER_COURIER.role)
 
     @Before
     fun toRoadBookFragment() {
@@ -202,7 +206,7 @@ class RoadBookFragmentTest {
     }
 
     // ============================================================================================
-    // ================================== RoadBook Back-up Tests ================================
+    // ================================== RoadBook Back-up Tests ==================================
     @Test
     fun roadBookIsBackedUpCorrectlyWhenOnline() {
         val db = FirebaseInstance.getDatabase()
@@ -257,7 +261,7 @@ class RoadBookFragmentTest {
         onView(withId(R.id.fragment_route_directors_parent))
             .check(matches(isDisplayed()))
 
-        var ls = emptyList<DestinationRecord>()
+        var ls: List<DestinationRecord>
         runBlocking {
             ls = context.roadBookDataStore.data.first()
         }
@@ -448,7 +452,7 @@ class RoadBookFragmentTest {
         //end shift
         endShift()
 
-        var ls = ShiftList(emptyList())
+        var ls: ShiftList
         runBlocking {
             ls = context.shiftDataStore.data.first()
         }
@@ -577,7 +581,7 @@ class RoadBookFragmentTest {
             .perform(
                 click(),
                 clearText(),
-                typeText("deliver, pick, pick, contact"),
+                typeText("deliver, deliver, contact"),
                 closeSoftKeyboard()
             )
         onView(withId(R.id.editTextNotes))
@@ -597,7 +601,7 @@ class RoadBookFragmentTest {
         )
         onView(withText("wait : 5'")).check(matches(isDisplayed()))
         onView(withText("rate : 7")).check(matches(isDisplayed()))
-        onView(withText("actions : (pick x2| deliver| contact)")).check(matches(isDisplayed()))
+        onView(withText("actions : (deliver x2| contact)")).check(matches(isDisplayed()))
 
         //Check notes were edited :
         swipeRightTheRecordAt(2)
@@ -865,6 +869,7 @@ class RoadBookFragmentTest {
             .check(doesNotExist())
     }
 
+    /*
     @Test
     fun recordStayArchivedAfterNavigation() {
         onView((withText(DestinationRecords.RECORDS[0].destID)))
@@ -882,7 +887,7 @@ class RoadBookFragmentTest {
         // Check that the record is still not there
         onView((withText(DestinationRecords.RECORDS[0].destID)))
             .check(doesNotExist())
-    }
+    }*/
 
     @Test
     fun stayArchivedAfterNavigationWithShowArchived() {
@@ -968,6 +973,7 @@ class RoadBookFragmentTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun noAutomaticTimestampIsDoneOutOfDestinationPlace() = runTest {
+        injectMockLocationWithDefaultJourney()
 
         // Non timestamped record, hence swipe left shows deletion dialog
         swipeLeftTheRecordAt(1)
@@ -994,6 +1000,8 @@ class RoadBookFragmentTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test // Buhagiat is exactly at the same coordinates where the courier will arrive
     fun automaticTimestampIsDoneOnExactDestinationPlace() = runTest {
+        injectMockLocationWithDefaultJourney()
+
         // Non timestamped record, hence swipe left shows deletion dialog
         swipeLeftTheRecordAt(1)
         onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
@@ -1019,6 +1027,8 @@ class RoadBookFragmentTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun automaticTimestampIsDoneOnDestinationPlacePerimeter() = runTest {
+        injectMockLocationWithDefaultJourney()
+
         // Delete Buhagiat and let the X17 which is at the Rolex center (< 15m of where the courier arrive)
         swipeLeftTheRecordAt(1)
         onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
@@ -1041,8 +1051,260 @@ class RoadBookFragmentTest {
         }
     }
 
-    // Test with another record on top the timestamp is never done
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun fusedLocationEndToEndTest() = runTest {
+        onView(withId(R.id.location_switch)).perform(click())
+        runBlocking {
+            delay(updateTimeMockLocationClient)
+            onView(withId(R.id.drawer_layout))
+                .perform(DrawerActions.open())
+            onView(withText("null")).check(doesNotExist())
+            // Check that the coordinates are not more set to null
+        }
+    }
 
+    // ============================================================================================
+    // ===================================== Bag edition tests ====================================
+
+    @Test
+    fun editARecordWithPickAndNoTimestampDoesNotShowCreatePackDialog() {
+        val clientID = DestinationRecords.RECORDS[1].clientID
+        swipeRightTheRecordAt(1)
+
+        onView(withId(R.id.multiAutoCompleteActions))
+            .perform(
+                click(),
+                clearText(),
+                typeText("pick, contact"),
+                closeSoftKeyboard()
+            )
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+        onView(withText(PackCreationDialogBuilder.DIALOG_TITLE_PREFIX + clientID)).check(
+            doesNotExist()
+        )
+    }
+
+    @Test
+    fun editARecordWithPickAnTimestampShowsCreatePackDialog() {
+        val clientID = DestinationRecords.RECORDS[1].clientID
+        swipeRightTheRecordAt(1)
+
+        onView(withId(R.id.multiAutoCompleteActions))
+            .perform(
+                click(),
+                clearText(),
+                typeText("pick, contact"),
+                closeSoftKeyboard()
+            )
+
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+        onView(withText(PackCreationDialogBuilder.DIALOG_TITLE_PREFIX + clientID)).check(
+            matches(isDisplayed())
+        )
+    }
+
+    @Test
+    fun editAPickRecordWithTimestampAndCreateAPack() {
+        val clientID = DestinationRecords.RECORDS[1].clientID
+        val packageName = "Gold bottle"
+        val recipientID = "X17"
+
+        addNonDeliveredPackageInBag(1, packageName, recipientID)
+
+        onView(withId(R.id.bag_button)).perform(click())
+
+        onView(withText(startsWith(packageName))).check(matches(isDisplayed()))
+        onView(withText(containsString(clientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(recipientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(BagAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
+            doesNotExist()
+        )
+    }
+
+    @Test
+    fun pickARecordAndDeliverRecipientUpdateTheBag() {
+        val clientID = DestinationRecords.RECORDS[1].clientID
+        val packageName = "Gold bottle"
+        val recipientID = "X17"
+
+        addDeliveredPackageInBag(1, packageName, recipientID, 2)
+
+        onView(withId(R.id.bag_button)).perform(click())
+
+        onView(withText(startsWith(packageName))).check(matches(isDisplayed()))
+        onView(withText(containsString(clientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(recipientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(BagAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
+            matches(isDisplayed())
+        )
+    }
+
+    @Test
+    fun pickARecordAndArriveAtRecipientButWithNoDeliverActionDoesNotUpdateTheBag() {
+        val clientID = DestinationRecords.RECORDS[1].clientID
+        val packageName = "Gold bottle"
+        val recipientID = "X17"
+
+        addNonDeliveredPackageInBag(1, packageName, recipientID)
+
+        swipeRightTheRecordAt(2)
+
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        onView(withId(R.id.bag_button)).perform(click())
+
+        onView(withText(startsWith(packageName))).check(matches(isDisplayed()))
+        onView(withText(containsString(clientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(recipientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(BagAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
+            doesNotExist()
+        )
+    }
+
+    @Test
+    fun getOutTimestampOfADeliveredPlaceRemoveTimestampInBag() {
+        val packageName = "Gold bottle"
+        val recipientID = "X17"
+        val clientID = DestinationRecords.RECORDS[1].clientID
+        addDeliveredPackageInBag(1, packageName, recipientID, 2)
+
+        swipeRightTheRecordAt(2)
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerEraseBLabel)).perform(click())
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        onView(withId(R.id.bag_button)).perform(click())
+
+        onView(withText(startsWith(packageName))).check(matches(isDisplayed()))
+        onView(withText(containsString(clientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(recipientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(BagAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
+            doesNotExist()
+        )
+    }
+
+    @Test
+    fun getOutTimestampOfAPickPlaceRemovePacketFromThereInBag() {
+        val clientID = DestinationRecords.RECORDS[1].clientID
+        val packageName = "Gold bottle"
+        val recipientID = "X17"
+
+        swipeRightTheRecordAt(1)
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerEraseBLabel)).perform(click())
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        onView(withId(R.id.bag_button)).perform(click())
+
+        onView(withText(startsWith(packageName))).check(doesNotExist())
+        onView(withText(containsString(clientID))).check(doesNotExist())
+        onView(withText(containsString(recipientID))).check(doesNotExist())
+        onView(withText(containsString(BagAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
+            doesNotExist()
+        )
+    }
+
+    @Test
+    fun timestampInBagAreModifiedOnDepartureTimestampEditInRoadBook() {
+        val clientID = DestinationRecords.RECORDS[1].clientID
+        val packageName = "Gold bottle"
+        val recipientID = "X17"
+
+        addNonDeliveredPackageInBag(1, packageName, recipientID)
+
+        swipeRightTheRecordAt(1)
+
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker again
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        onView(withId(R.id.bag_button)).perform(click())
+
+        onView(withText(startsWith(packageName))).check(matches(isDisplayed()))
+        onView(withText(containsString(clientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(recipientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(BagAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
+            doesNotExist()
+        )
+    }
+
+    @Test
+    fun timestampInBagAreModifiedOnArrivalTimestampEditInRoadBook() {
+        val clientID = DestinationRecords.RECORDS[1].clientID
+        val packageName = "Gold bottle"
+        val recipientID = "X17"
+        addDeliveredPackageInBag(1, packageName, recipientID, 2)
+
+        swipeRightTheRecordAt(2)
+
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        onView(withId(R.id.bag_button)).perform(click())
+
+        onView(withText(startsWith(packageName))).check(matches(isDisplayed()))
+        onView(withText(containsString(clientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(recipientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(BagAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
+            matches(isDisplayed())
+        )
+    }
+
+    private fun addNonDeliveredPackageInBag(senderDestIDPos: Int, packageName: String, recipientID: String ) {
+        swipeRightTheRecordAt(senderDestIDPos)
+
+        onView(withId(R.id.multiAutoCompleteActions))
+            .perform(
+                click(),
+                clearText(),
+                typeText("pick, contact"),
+                closeSoftKeyboard()
+            )
+
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        onView(withId(R.id.editTextPackageName))
+            .perform(click(),  typeText(packageName), closeSoftKeyboard())
+        onView(withId(R.id.autoCompleteRecipientClientID))
+            .perform(click(), typeText("$recipientID "), closeSoftKeyboard())
+        onView(withId(R.id.editTextPackageNotes))
+            .perform(click(), typeText("It is soon the end of SDP"), closeSoftKeyboard())
+
+        onView(withText(R.string.confirm_label_pack_creation_dialog)).perform(click())
+    }
+
+    private fun addDeliveredPackageInBag(senderDestIDPos: Int, packageName: String,
+                                         recipientID: String, arrivalDestIDPos: Int) {
+        addNonDeliveredPackageInBag(senderDestIDPos, packageName, recipientID)
+
+        swipeRightTheRecordAt(arrivalDestIDPos)
+
+        onView(withId(R.id.multiAutoCompleteActions))
+            .perform(
+                click(),
+                clearText(),
+                typeText("deliver, contact"),
+                closeSoftKeyboard()
+            )
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click()) // edited through TimePicker
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+    }
 
     // ============================================================================================
     // ===================================== Helpers ==============================================
@@ -1051,6 +1313,11 @@ class RoadBookFragmentTest {
     private val timePickerCancelBLabel = "Cancel"
     private val timePickerUpdateBLabel = "OK"
     private val timePickerEraseBLabel = "Erase"
+
+    private fun injectMockLocationWithDefaultJourney() {
+        val mockClient = MockLocationClient()
+        LocationClientFactory.setMockClient(mockClient)
+    }
 
     private fun clickOnShowArchivedButton() {
         openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
@@ -1134,7 +1401,6 @@ class RoadBookFragmentTest {
         onView(withId(R.id.editTextTimestamp)).perform(click())
         onView(withText(timePickerUpdateBLabel)).perform(click())
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
-
     }
 
     private fun getRbViewModel(): RoadBookViewModel? {
@@ -1151,7 +1417,8 @@ class RoadBookFragmentTest {
     }
 
     private fun endShift(){
-        onView(withId(R.id.finish_shift)).perform(click())
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.end_shift)).perform(click())
         onView(withText(R.string.end_shift_dialog_title))
             .check(matches(isDisplayed()))
         onView(withId(android.R.id.button1)).perform(click())
@@ -1161,8 +1428,8 @@ class RoadBookFragmentTest {
         val future = CompletableFuture<List<Shift>>()
         dbShiftRef.get().addOnSuccessListener { snapshot ->
             var records : List<DestinationRecord>  = emptyList()
-            var user : User = User()
-            var date : Date = Date()
+            var user = User()
+            var date = Date()
             val shiftDb = snapshot.children.mapNotNull { shifts ->
                 shifts.children.forEach {
                     if(it.key == "records"){

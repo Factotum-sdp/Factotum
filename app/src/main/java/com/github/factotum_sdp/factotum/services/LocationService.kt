@@ -15,19 +15,15 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.LocationClient
-import com.github.factotum_sdp.factotum.data.MockLocationClient
+import com.github.factotum_sdp.factotum.data.LocationClientFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 private const val CHANNEL_ID = "factotum_location_service"
 private const val CHANNEL_NAME = "Factotum Live Location Service"
@@ -43,24 +39,20 @@ private const val UPDATE_INTERVAL = 1000L
  * A service is needed to keep a high location update rate whenever
  * the app is in the background.
  */
-class LocationService : Service() {
+class LocationService() : Service() {
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var onLocationUpdateEvent: ((location: Location) -> Unit)? = null
     private val binder = LocalBinder()
-    private lateinit var locationClient: LocationClient
+    private var locationClient: LocationClient? = null
 
-    override fun onBind(p0: Intent?): IBinder? {
+    override fun onBind(p0: Intent?): IBinder {
         return binder
     }
 
     override fun onCreate() {
         super.onCreate()
-        locationClient = MockLocationClient()
-            /*FusedLocationClient(
-            applicationContext,
-            LocationServices.getFusedLocationProviderClient(applicationContext)
-        )*/
+        locationClient = LocationClientFactory.provideLocationClient(applicationContext)
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -121,7 +113,7 @@ class LocationService : Service() {
                 .setOngoing(true)
                 .setContentText(getString(R.string.loc_service_notification_message))
 
-        locationClient
+        locationClient!!
             .getLocationUpdates(interval)
             .catch { e -> e.printStackTrace() }
             .onStart { onFirstLocationChange(service, notification) }

@@ -14,16 +14,20 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.data.LocationClientFactory
+import com.github.factotum_sdp.factotum.data.MockLocationClient
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.logout
 import com.google.android.gms.maps.CameraUpdate
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import org.junit.After
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
@@ -53,12 +57,19 @@ class BossMapFragmentTest {
         @BeforeClass
         fun setUpClass() {
             initFirebase()
+            logout()
         }
+    }
+
+    @After
+    fun tearDown() {
+        logout()
     }
 
 
     @Test
     fun testBossMapFragmentWorksProperly(): Unit = runBlocking {
+        LocationClientFactory.setMockClient(MockLocationClient())
         GeneralUtils.fillUserEntryAndEnterTheApp("courier@gmail.com", "123456")
 
         activateLocation()

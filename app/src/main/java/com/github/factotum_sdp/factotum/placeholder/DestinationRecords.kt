@@ -2,7 +2,7 @@ package com.github.factotum_sdp.factotum.placeholder
 
 import com.github.factotum_sdp.factotum.models.DestinationRecord
 import com.github.factotum_sdp.factotum.models.DestinationRecord.Action
-import java.util.*
+import java.util.Calendar
 
 /**
  * Temporary PlaceHolder for some DestinationRecord synthetic data
@@ -32,7 +32,7 @@ object DestinationRecords {
                     null,
                     0,
                     1,
-                    arrayListOf(Action.PICK, Action.PICK, Action.RELAY),
+                    arrayListOf(Action.RELAY),
                     ""
                 ),
                 DestinationRecord(
@@ -41,7 +41,7 @@ object DestinationRecords {
                     null,
                     0,
                     1,
-                    arrayListOf(Action.DELIVER, Action.CONTACT),
+                    arrayListOf(Action.CONTACT),
                     ""
                 ),
                 DestinationRecord(
@@ -50,7 +50,7 @@ object DestinationRecords {
                     null,
                     0,
                     1,
-                    arrayListOf(Action.PICK, Action.DELIVER)
+                    arrayListOf()
                 )
             )
         )
@@ -63,7 +63,7 @@ object DestinationRecords {
                     null,
                     0,
                     1,
-                    arrayListOf(Action.PICK, Action.DELIVER),
+                    arrayListOf(Action.CONTACT, Action.RELAY),
                     ""
                 )
             )

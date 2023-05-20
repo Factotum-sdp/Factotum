@@ -50,8 +50,8 @@ class BossMapViewModel : ViewModel() {
         fetchDeliveryState()
     }
 
-    private fun fetchLocationsAndUpdateMarkers() {
-        database.child(DestinationRecord.timeStampFormat(Date())).addListenerForSingleValueEvent(object : ValueEventListener {
+        private fun fetchLocationsAndUpdateMarkers() {
+        database.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val locations = snapshot.children.mapNotNull { child ->
                     val uid = child.key ?: "Unknown"

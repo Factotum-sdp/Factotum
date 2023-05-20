@@ -16,13 +16,17 @@ import java.util.*
  * The RoadBook ViewModel
  * holds an observable list of DestinationRecord which can evolve dynamically
  *
- * @param _dbRef The database root reference to register RoadBook data
+ * @param roadBookRepository: RoadBookRepository The data source for the RoadBook
+ * @param shiftRepository: ShiftRepository The data source for registering the shift feed-back
  */
 class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
                         private val shiftRepository: ShiftRepository) : ViewModel() {
 
     private val _recordsList: MutableLiveData<DRecordList> = MutableLiveData(DRecordList())
     val recordsListState: LiveData<DRecordList> = _recordsList
+    val timestampedRecords = recordsListState.map { recordsList ->
+        recordsList.timestampedSet().associate { it.destID to it.timeStamp!! }
+    }.distinctUntilChanged()
 
     private val clientOccurrences = HashMap<String, Int>()
     private lateinit var preferencesRepository: RoadBookPreferencesRepository
@@ -77,8 +81,8 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
      *
      */
     fun logShift(shift: Shift){
-        val shift = Shift(Date(), shift.user, currentDRecList())
-        shiftRepository?.logShift(shift)
+        val createdShift = Shift(Date(), shift.user, currentDRecList())
+        shiftRepository.logShift(createdShift)
     }
 
     /**
@@ -114,11 +118,9 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
             record.actions,
             record.notes
         )
-        val ls = arrayListOf<DestinationRecord>()
-        ls.addAll(_recordsList.value as Collection<DestinationRecord>)
-        ls[currentDRecList().getIndexOf(record.destID)] = newRec
+        val pos = currentDRecList().getIndexOf(record.destID)
 
-        _recordsList.postValue(currentDRecList().replaceDisplayedList(ls))
+        _recordsList.postValue(currentDRecList().editRecordAt(pos, newRec))
     }
 
     /**
@@ -130,7 +132,19 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
     fun fetchBackBackUps(){
         runBlocking {
             val lastBackUp = roadBookRepository.getLastBackUp()
-            _recordsList.value = DRecordList(allRecords = lastBackUp, showArchived = currentDRecList().showArchived)
+            val timestamped = buildSet {
+                lastBackUp.forEach { record ->
+                    record.timeStamp?.let {
+                        add(record)
+                    }
+                }
+            }
+            _recordsList.value =
+                DRecordList(
+                    allRecords = lastBackUp,
+                    showArchived = currentDRecList().showArchived,
+                    timestamped = timestamped
+                )
         }
     }
 
@@ -162,12 +176,9 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
         clientID: String, timeStamp: Date?, waitingTime: Int,
         rate: Int, actions: List<DestinationRecord.Action>, notes: String
     ) {
-        val newList = arrayListOf<DestinationRecord>()
-        newList.addAll(_recordsList.value as Collection<DestinationRecord>)
         val destID = computeDestID(clientID)
         val rec = DestinationRecord(destID, clientID, timeStamp, waitingTime, rate, actions, notes)
-        newList.add(rec)
-        _recordsList.value = currentDRecList().replaceDisplayedList(newList)
+        _recordsList.value = currentDRecList().addRecord(rec)
     }
 
     /**
@@ -176,10 +187,7 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
      * @param pos: Int Index of the target record to delete
      */
     fun deleteRecordAt(pos: Int) {
-        val newList = arrayListOf<DestinationRecord>()
-        newList.addAll(currentDRecList() as Collection<DestinationRecord>)
-        newList.removeAt(pos)
-        _recordsList.value = currentDRecList().replaceDisplayedList(newList)
+        _recordsList.value = currentDRecList().removeRecordAt(pos)
     }
 
     /**
@@ -206,11 +214,8 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
         }
         val newRec =
             DestinationRecord(destID, clientID, timeStamp, waitingTime, rate, actions, notes)
-        val ls = arrayListOf<DestinationRecord>()
-        ls.addAll(_recordsList.value as Collection<DestinationRecord>)
-        ls[pos] = newRec
         if (currentRec != newRec) {
-            _recordsList.value = currentDRecList().replaceDisplayedList(ls)
+            _recordsList.value = currentDRecList().editRecordAt(pos, newRec)
             return true
         }
         // Prefer to be explicit with a boolean value, for the front-end to know it has to refresh, or act accordingly.
@@ -291,13 +296,18 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
                 )
             )
         }
-        _recordsList.value = currentDRecList().replaceDisplayedList(newList)
+        _recordsList.value =
+            DRecordList(
+                allRecords = newList,
+                showArchived = currentDRecList().showArchived,
+                timestamped = setOf(ls.first())
+            )
     }
 
     /**
      * Clear all records
      */
-    fun clearAllRecords(){
+    fun clearAllRecords() {
         _recordsList.value =
             DRecordList(
                 allRecords = emptyList(),
@@ -319,7 +329,8 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
 
     // Factory needed to assign a value at construction time to the class attribute
     @Suppress("UNCHECKED_CAST")
-    class RoadBookViewModelFactory(private val repository: RoadBookRepository, private val shiftRepository: ShiftRepository) :
+    class RoadBookViewModelFactory(private val repository: RoadBookRepository,
+                                   private val shiftRepository: ShiftRepository) :
         ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(RoadBookViewModel::class.java))

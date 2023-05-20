@@ -8,12 +8,14 @@
 
 
     <LinearLayout
+        android:id="@+id/dialog_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <com.google.android.material.textfield.TextInputLayout
             style="?attr/textInputFilledStyle"
+            android:id="@+id/clientIDTextInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"

@@ -228,8 +228,7 @@ class DisplayFragment : Fragment(), MenuProvider {
     private fun setupClientUI() {
         clientViewModel.refreshImages()
         calendarButton.isVisible = true
-        val clientName = userFolder.value?.replaceFirstChar {  it.uppercase() }
-        (activity as AppCompatActivity).supportActionBar?.title = clientName
+        (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.photos)
 
         refreshButton.setOnMenuItemClickListener { menuItem ->
             clientViewModel.refreshImages()

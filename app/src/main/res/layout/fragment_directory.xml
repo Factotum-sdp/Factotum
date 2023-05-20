@@ -9,6 +9,7 @@
     tools:context=".ui.directory.DirectoryFragment">
 
     <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/text_slideshow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="12dp"

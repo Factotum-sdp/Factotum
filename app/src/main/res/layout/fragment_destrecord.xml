@@ -6,6 +6,7 @@
 
     <com.google.android.material.card.MaterialCardView
         style="?attr/materialCardViewElevatedStyle"
+        android:id="@+id/fragment_destrecord_directors_parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="12dp"

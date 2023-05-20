@@ -30,7 +30,9 @@
             android:title="@string/application_settings" />
     </group>
 
-    <group android:checkableBehavior="none">
+    <group
+        android:id="@+id/menu_bottom"
+        android:checkableBehavior="none">
         <item
             android:id="@+id/signoutButton"
             android:icon="@drawable/ic_menu_logout"

@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.models.DestinationRecord.Companion.timeStampFormat
 import com.github.factotum_sdp.factotum.models.Pack
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.textview.MaterialTextView
 
 /**
@@ -17,7 +18,7 @@ import com.google.android.material.textview.MaterialTextView
  *
  * Adapts a List<Pack> to display it in a recyclerView
  */
-class BagAdapter: ListAdapter<Pack, BagAdapter.PackViewHolder>(PackDiffCallback) {
+class BagAdapter(private val onClick: (Pack) -> Unit): ListAdapter<Pack, BagAdapter.PackViewHolder>(PackDiffCallback) {
 
     /**
      * The PackageViewHolder
@@ -26,12 +27,20 @@ class BagAdapter: ListAdapter<Pack, BagAdapter.PackViewHolder>(PackDiffCallback)
      *
      * @property itemView: View
      */
-    class PackViewHolder(itemView: View) :
+    class PackViewHolder(itemView: View, val onClick: (Pack) -> Unit) :
         RecyclerView.ViewHolder(itemView) {
 
         private val textView: MaterialTextView = itemView.findViewById(R.id.packageItemView)
+        private val cardView: MaterialCardView = itemView.findViewById(R.id.packageCardView)
         private val icon: ImageView = itemView.findViewById(R.id.packageIcon)
+        private val notesIndicator: ImageView = itemView.findViewById(R.id.isAnnotatedIcon)
         private var currentPackage: Pack? = null
+
+        init {
+            cardView.setOnClickListener {
+                currentPackage?.let { onClick(it) }
+            }
+        }
 
         /* Bind the pack to the textView */
         fun bind(pack: Pack) {
@@ -39,6 +48,10 @@ class BagAdapter: ListAdapter<Pack, BagAdapter.PackViewHolder>(PackDiffCallback)
 
             pack.deliveredAt?.let {
                 icon.setImageResource(R.drawable.send)
+            }
+
+            if (pack.notes.isNotBlank()) {
+                notesIndicator.visibility = View.VISIBLE
             }
 
             textView.text =
@@ -62,7 +75,7 @@ class BagAdapter: ListAdapter<Pack, BagAdapter.PackViewHolder>(PackDiffCallback)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PackViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.package_item, parent, false)
-        return PackViewHolder(view)
+        return PackViewHolder(view, onClick)
     }
 
     override fun onBindViewHolder(holder: PackViewHolder, position: Int) {

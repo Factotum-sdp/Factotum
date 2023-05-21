@@ -185,7 +185,7 @@ class BagFragmentTest {
         val packageName = "Gold bottle"
         val recipientID = "X17"
         val notes = "It is the end of SDP"
-        val edition = " edited"
+        val newNotes = " edited"
 
         createAPackWithNotes(clientID, packageName, recipientID, notes)
 
@@ -194,12 +194,12 @@ class BagFragmentTest {
         onView(withId(R.id.packageCardView)).perform(click())
 
         // Edit notes
-        onView(withId(R.id.postEditTextPackageNotes)).perform(typeText(edition))
+        onView(withId(R.id.postEditTextPackageNotes)).perform(clearText(), typeText(newNotes))
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
 
         // Check notes are updated
         onView(withId(R.id.packageCardView)).perform(click())
-        onView(withText(notes + edition)).check(matches(isDisplayed()))
+        onView(withText(newNotes)).check(matches(isDisplayed()))
     }
 
     @Test
@@ -209,7 +209,7 @@ class BagFragmentTest {
         val packageName = "Gold bottle"
         val recipientID = "X17"
         val notes = "It is the end of SDP"
-        val edition = " edited"
+        val newNotes = "edited"
 
         createAPackWithNotes(clientID, packageName, recipientID, notes)
 
@@ -218,12 +218,12 @@ class BagFragmentTest {
         onView(withId(R.id.packageCardView)).perform(click())
 
         // Edit notes but then cancel
-        onView(withId(R.id.postEditTextPackageNotes)).perform(typeText(edition))
+        onView(withId(R.id.postEditTextPackageNotes)).perform(clearText(),  typeText(newNotes))
         onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
 
         // Check notes are NOT updated
         onView(withId(R.id.packageCardView)).perform(click())
-        onView(withText(notes + edition)).check(doesNotExist())
+        onView(withText(newNotes)).check(doesNotExist())
     }
 
     private fun createAPackWithNotes(clientID: String, packageName: String, recipientID: String, notes: String) {

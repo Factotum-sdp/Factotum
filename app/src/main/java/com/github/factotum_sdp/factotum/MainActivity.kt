@@ -253,7 +253,14 @@ class MainActivity : AppCompatActivity() {
                             else -> R.id.mapsFragment
                         }
                     }
-                    destination?.let { findNavController(R.id.nav_host_fragment_content_main).navigate(it) }
+                    destination?.let {
+                        val navController = findNavController(R.id.nav_host_fragment_content_main)
+                        val navOptions = NavOptions.Builder()
+                            .setPopUpTo(navController.graph.startDestinationId, true)
+                            .setLaunchSingleTop(true)
+                            .build()
+                        navController.navigate(it, null,  navOptions)
+                    }
                     binding.drawerLayout.closeDrawers()
                     true
                 }

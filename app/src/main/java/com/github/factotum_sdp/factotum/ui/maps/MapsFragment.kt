@@ -14,6 +14,8 @@ import androidx.lifecycle.LiveData
 import com.github.factotum_sdp.factotum.databinding.FragmentMapsBinding
 import com.github.factotum_sdp.factotum.hasLocationPermission
 import com.github.factotum_sdp.factotum.models.Route
+import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
+import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
@@ -39,6 +41,8 @@ class MapsFragment : Fragment() {
 
     private var _binding: FragmentMapsBinding? = null
     private val viewModel: MapsViewModel by activityViewModels()
+    private val rbViewModel: RoadBookViewModel by activityViewModels()
+    private val contactsViewModel : ContactsViewModel by activityViewModels()
     private lateinit var mMap: GoogleMap
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -66,6 +70,22 @@ class MapsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setMapProperties()
+
+    }
+
+    private fun getDestinationsFromRoadbook() : List<Route> {
+        val destinations = mutableListOf<Route>()
+        rbViewModel.recordsListState.value?.let { records ->
+            records.forEach { record ->
+                val contact = contactsViewModel.contacts.value?.first{ it.username == record.clientID }
+                if(contact?.latitude != null && contact.longitude != null){
+                    val route = Route(0.0, 0.0, contact.latitude, contact.longitude)
+                    destinations.add(route)
+                }
+            }
+
+        }
+        return destinations
 
     }
 
@@ -114,7 +134,8 @@ class MapsFragment : Fragment() {
         }
         else {
             // places markers on the map and centers the camera
-            placeMarkers(viewModel.routesState.value, googleMap)
+            val destinations = getDestinationsFromRoadbook()
+            placeMarkers(destinations, googleMap)
         }
         // Add zoom controls to the map
         googleMap.uiSettings.isZoomControlsEnabled = true

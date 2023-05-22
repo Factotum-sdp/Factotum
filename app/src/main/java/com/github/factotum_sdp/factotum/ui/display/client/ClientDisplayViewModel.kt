@@ -10,13 +10,18 @@ import com.github.factotum_sdp.factotum.ui.display.data.client.CachedPhoto
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+
 
 class ClientDisplayViewModel(
     private val _folderName: MutableLiveData<String>,
@@ -26,6 +31,8 @@ class ClientDisplayViewModel(
     private val dateFormat = SimpleDateFormat("dd-MM-yyyy_HH-mm-ss", Locale.getDefault())
 
     private val _photoReferences = MutableLiveData<List<StorageReference>>()
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> = _isLoading
     val photoReferences: LiveData<List<StorageReference>> = _photoReferences
     val folderName: LiveData<String> = _folderName
 
@@ -53,6 +60,7 @@ class ClientDisplayViewModel(
     }
 
     private fun updateImages() {
+        _isLoading.value = true
         viewModelScope.launch {
             val folderName = _folderName.value ?: return@launch
 
@@ -62,10 +70,11 @@ class ClientDisplayViewModel(
             if (remotePhotos != null) {
                 updateCachedPhotos(folderName, remotePhotos)
             }
+            _isLoading.value = false
         }
     }
 
-    private suspend fun updateCachedPhotos(folderName: String, remotePhotos: List<StorageReference>) {
+    private suspend fun updateCachedPhotos(folderName: String, remotePhotos: List<CachedPhoto>) {
         withContext(Dispatchers.IO) {
             val remotePhotoPaths = remotePhotos.map { it.path }
             val cachedPhotos = cachedPhotoDao.getAllByFolderName(folderName)
@@ -73,45 +82,63 @@ class ClientDisplayViewModel(
             val photosToDelete = cachedPhotos.filter { it.path !in remotePhotoPaths }
             cachedPhotoDao.deleteAll(photosToDelete)
 
-            cachedPhotoDao.insertAll(*remotePhotos.map { photo ->
-                val url = photo.downloadUrl.await().toString()
-                CachedPhoto(photo.path, folderName, url)
-            }.toTypedArray())
+            cachedPhotoDao.insertAll(*remotePhotos.toTypedArray())
         }
 
-        val updatedCachedPhotos = withContext(Dispatchers.IO) {
-            cachedPhotoDao.getAllByFolderName(folderName)
-        }
-        val updatedStorageReferences = updatedCachedPhotos.map {
-            storage.getReference(it.path)
-        }.sortedByDescending { getDateFromRef(it) }
-
-        _photoReferences.postValue(updatedStorageReferences)
+        displayCachedPhotos(folderName)
     }
 
     private suspend fun displayCachedPhotos(folderName: String) {
         val cachedPhotos = withContext(Dispatchers.IO) {
-            cachedPhotoDao.getAllByFolderName(folderName)
+            cachedPhotoDao.getAllByFolderNameSortedByDate(folderName)
         }
         val storageReferences = cachedPhotos.map {
             storage.getReference(it.path)
-        }.sortedByDescending { getDateFromRef(it) }
+        }
 
         _photoReferences.postValue(storageReferences)
     }
 
-    private suspend fun fetchRemotePhotos(folderName: String): List<StorageReference>? {
+    private suspend fun fetchRemotePhotos(folderName: String): List<CachedPhoto>? {
         return try {
             val folderReference = storage.reference.child(folderName)
             val photosListResult = folderReference.listAll().await()
-            photosListResult.items
+
+            val deferredPhotos = photosListResult.items.map { photoReference ->
+                coroutineScope {
+                    async {
+                        val url = photoReference.downloadUrl.await().toString()
+                        val dateSortKey = getDateFromRef(photoReference).time
+                        CachedPhoto(photoReference.path, folderName, url, dateSortKey)
+                    }
+                }
+            }
+
+            deferredPhotos.awaitAll()
         } catch (e: Exception) {
             null
         }
     }
 
+    fun filterImagesByDate(date: Date) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val folderName = _folderName.value ?: return@launch
+            val cal = Calendar.getInstance().apply { time = date }
+            val startOfDay = cal.apply { set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0) }.timeInMillis
+            val endOfDay = cal.apply { set(Calendar.HOUR_OF_DAY, 23); set(Calendar.MINUTE, 59); set(Calendar.SECOND, 59); set(Calendar.MILLISECOND, 999) }.timeInMillis
+            val cachedPhotos = cachedPhotoDao.getAllByFolderNameAndDay(folderName, startOfDay, endOfDay)
+            val storageReferences = cachedPhotos.map {
+                storage.getReference(it.path)
+            }
+
+            withContext(Dispatchers.Main) {
+                _photoReferences.postValue(storageReferences)
+            }
+        }
+    }
+
     private fun getDateFromRef(ref: StorageReference): Date {
-        val dateString = ref.name.substringAfterLast("_").substringBeforeLast(".")
+        val dateString = ref.name.substringAfter("_").substringBeforeLast(".")
         return try {
             dateFormat.parse(dateString) as Date
         } catch (e: ParseException) {
@@ -119,5 +146,3 @@ class ClientDisplayViewModel(
         }
     }
 }
-
-

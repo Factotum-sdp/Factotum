@@ -1,17 +1,28 @@
 package com.github.factotum_sdp.factotum.ui.display
 
+import android.app.DatePickerDialog
 import android.content.Intent
+import android.icu.util.Calendar
+import android.icu.util.GregorianCalendar
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MutableLiveData
+import androidx.navigation.Navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
@@ -19,17 +30,20 @@ import com.github.factotum_sdp.factotum.databinding.FragmentDisplayBinding
 import com.github.factotum_sdp.factotum.models.Contact
 import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
-import com.github.factotum_sdp.factotum.ui.display.boss.BossDisplayViewModel
-import com.github.factotum_sdp.factotum.ui.display.boss.BossDisplayViewModelFactory
-import com.github.factotum_sdp.factotum.ui.display.boss.BossFolderAdapter
+import com.github.factotum_sdp.factotum.ui.display.courier_boss.CourierBossDisplayViewModel
+import com.github.factotum_sdp.factotum.ui.display.courier_boss.CourierBossDisplayViewModelFactory
+import com.github.factotum_sdp.factotum.ui.display.courier_boss.CourierBossFolderAdapter
 import com.github.factotum_sdp.factotum.ui.display.client.ClientDisplayViewModel
 import com.github.factotum_sdp.factotum.ui.display.client.ClientDisplayViewModelFactory
 import com.github.factotum_sdp.factotum.ui.display.client.ClientPhotoAdapter
 
-class DisplayFragment : Fragment() {
+class DisplayFragment : Fragment(), MenuProvider {
+
+    private lateinit var displayMenu : Menu
+    private lateinit var calendarButton: MenuItem
 
     private val clientViewModel: ClientDisplayViewModel by viewModels{ ClientDisplayViewModelFactory(userFolder, requireContext()) }
-    private val bossViewModel: BossDisplayViewModel by viewModels{ BossDisplayViewModelFactory(requireContext()) }
+    private val courierBossDisplayViewModel : CourierBossDisplayViewModel by viewModels{ CourierBossDisplayViewModelFactory(requireContext()) }
     private val userViewModel: UserViewModel by activityViewModels()
     private val contactsViewModel: ContactsViewModel by activityViewModels()
     private var _binding: FragmentDisplayBinding? = null
@@ -43,20 +57,54 @@ class DisplayFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentDisplayBinding.inflate(inflater, container, false)
-        setupObservers()
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.STARTED)
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             onBackPressedCallback
         )
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
+    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+        menuInflater.inflate(R.menu.display_menu, menu)
+        displayMenu = menu
+
+        calendarButton = menu.findItem(R.id.menu_date_picker)
+        calendarButton.setOnMenuItemClickListener {
+            showDatePickerDialog()
+            true
+        }
+
+        setupObservers()
+    }
+
+    private fun showDatePickerDialog() {
+        val c = Calendar.getInstance()
+        val year = c.get(Calendar.YEAR)
+        val month = c.get(Calendar.MONTH)
+        val day = c.get(Calendar.DAY_OF_MONTH)
+
+        val dpd = DatePickerDialog(requireContext(), { _, year, monthOfYear, dayOfMonth ->
+            val selectedDate = GregorianCalendar(year, monthOfYear, dayOfMonth).time
+            clientViewModel.filterImagesByDate(selectedDate)
+        }, year, month, day)
+        dpd.show()
+    }
+
+    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+        if (menuItem.itemId == android.R.id.home) {
+            return false
+        }
+        return true
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        onBackPressedCallback.remove()
         _binding = null
     }
 
@@ -80,12 +128,12 @@ class DisplayFragment : Fragment() {
     private fun setupUIBasedOnUserRole() {
         when (userRole.value) {
             Role.BOSS -> {
-                observeBossFolders()
-                setupBossUI()
+                observeCourierBossFolders()
+                setupCourierBossUI()
             }
-            Role.CLIENT -> {
-                observeClientPhotos()
-                setupClientUI()
+            Role.COURIER -> {
+                observeCourierBossFolders()
+                setupCourierBossUI()
             }
             else -> {
                 observeClientPhotos()
@@ -106,17 +154,26 @@ class DisplayFragment : Fragment() {
     // Boss UI
     //================================================================
 
-    private fun observeBossFolders() {
-        bossViewModel.folderReferences.observe(viewLifecycleOwner) { folderReferences ->
-            (binding.recyclerView.adapter as? BossFolderAdapter)?.submitList(folderReferences)
+    private fun observeCourierBossFolders() {
+        courierBossDisplayViewModel.folderReferences.observe(viewLifecycleOwner) { folderReferences ->
+            (binding.recyclerView.adapter as? CourierBossFolderAdapter)?.submitList(folderReferences)
+        }
+
+        courierBossDisplayViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            if (isLoading) {
+                binding.progressBar.visibility = View.VISIBLE
+            } else {
+                binding.progressBar.visibility = View.GONE
+            }
         }
     }
 
-    private fun setupBossUI() {
-        bossViewModel.refreshFolders()
+    private fun setupCourierBossUI() {
+        courierBossDisplayViewModel.refreshFolders()
+        calendarButton.isVisible = false
 
         binding.refreshButton.setOnClickListener {
-            bossViewModel.refreshFolders()
+            courierBossDisplayViewModel.refreshFolders()
         }
         val proofPicture = arguments?.getString("ProofPicture")
         proofPicture?.let { seeProofPicture ->
@@ -125,8 +182,8 @@ class DisplayFragment : Fragment() {
             observeClientPhotos()
             setupClientUI()
         } ?: run {
-            val bossFolderAdapter =
-                BossFolderAdapter(
+            val courierBossFolderAdapter =
+                CourierBossFolderAdapter(
                     onCardClick = { clientFolder ->
                         userFolder.value = clientFolder.value
                         observeClientPhotos()
@@ -134,11 +191,11 @@ class DisplayFragment : Fragment() {
                     }
                 )
 
-            binding.recyclerView.apply {
-                layoutManager = LinearLayoutManager(context)
-                adapter = bossFolderAdapter
-            }
+        binding.recyclerView.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = courierBossFolderAdapter
         }
+    }
 
     }
 
@@ -150,10 +207,19 @@ class DisplayFragment : Fragment() {
         clientViewModel.photoReferences.observe(viewLifecycleOwner) { photoReferences ->
             (binding.recyclerView.adapter as? ClientPhotoAdapter)?.submitList(photoReferences)
         }
+
+        clientViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            if (isLoading) {
+                binding.progressBar.visibility = View.VISIBLE
+            } else {
+                binding.progressBar.visibility = View.GONE
+            }
+        }
     }
 
     private fun setupClientUI() {
         clientViewModel.refreshImages()
+        calendarButton.isVisible = true
 
         binding.refreshButton.setOnClickListener {
             clientViewModel.refreshImages()
@@ -175,20 +241,29 @@ class DisplayFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
             adapter = clientPhotoAdapter
         }
+
     }
+
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            if (userRole.value == Role.BOSS && userFolder.value != userID.value) {
+            val currentUser = userID.value
+            val currentRole = userRole.value
+            val currentFolder = userFolder.value
+
+            if ((currentRole == Role.BOSS || currentRole == Role.COURIER) && currentFolder != currentUser) {
                 userFolder.value = userID.value
-                setupBossUI()
-                observeBossFolders()
-            } else {
+
+                setupCourierBossUI()
+                observeCourierBossFolders()
+            }
+            else if (currentRole == Role.BOSS || currentRole == Role.COURIER) {
                 isEnabled = false
                 requireActivity().onBackPressedDispatcher.onBackPressed()
             }
         }
     }
+
 
     //================================================================
     // Sharing

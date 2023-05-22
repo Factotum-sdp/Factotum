@@ -32,15 +32,16 @@ import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.gson.Gson
 
-private const val ZOOM_LEVEL_CITY = 14f
+private const val ZOOM_LEVEL_CITY = 13f
 private const val SCALE_FACTOR_ICON = 0.7f
+private const val FACTOR_DARKER_COLOR = 0.7f
 private const val MAIL_BOX_SIZE = 100
 private const val MAILBOX_TITLE = "Mailbox"
 
 class BossMapFragment : Fragment(), OnMapReadyCallback {
 
-    private val viewModel: BossMapViewModel by viewModels()
     private var cameraPositionInitialized = false
+    private val viewModel: BossMapViewModel by viewModels()
     private val contactsViewModel: ContactsViewModel by activityViewModels()
     private lateinit var mapView: MapView
     private lateinit var googleMap: GoogleMap
@@ -85,7 +86,7 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
         viewModel.courierLocations.observe(viewLifecycleOwner) { locations ->
             updateMap(locations, viewModel.deliveriesStatus.value ?: mapOf())
             if (!cameraPositionInitialized) {
-                val geometricMedian = calculateGeometricMedian(locations)
+                val geometricMedian = calculateMedianLocation()
                 googleMap.moveCamera(
                     CameraUpdateFactory.newLatLngZoom(
                         geometricMedian,
@@ -98,12 +99,12 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
         }
 
         viewModel.deliveriesStatus.observe(viewLifecycleOwner) { deliveryStatus ->
-                updateMap(viewModel.courierLocations.value ?: emptyList(), deliveryStatus)
-            }
+            updateMap(viewModel.courierLocations.value ?: emptyList(), deliveryStatus)
+        }
 
         contactsViewModel.contacts.observe(viewLifecycleOwner) {
-                viewModel.updateContacts(it)
-            }
+            viewModel.updateContacts(it)
+        }
         googleMap.setOnMarkerClickListener { marker ->
             marker.title?.let { title ->
                 if (title.startsWith(MAILBOX_TITLE)) {
@@ -208,38 +209,46 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
     private fun colorForUid(uid: String): Int {
         val uidHashed = uid.hashCode()
 
-        val red = uidHashed and 0x00FF0000 shr 16
-        val green = uidHashed and 0x0000FF00 shr 8
-        val blue = uidHashed and 0x000000FF
+        var red = uidHashed and 0x00FF0000 shr 16
+        var green = uidHashed and 0x0000FF00 shr 8
+        var blue = uidHashed and 0x000000FF
+
+        red = (red * FACTOR_DARKER_COLOR).toInt()
+        green = (green * FACTOR_DARKER_COLOR).toInt()
+        blue = (blue * FACTOR_DARKER_COLOR).toInt()
 
         return Color.rgb(red, green, blue)
     }
 
-    // Geometric Median approximation by taking the point with the smallest sum of distances to all
-    // locations. Why this choice ? Because it's really less biases than the arithmetic mean or
-    // the general median to outliers. See : https://www.youtube.com/watch?v=iy2RZbq7Kn4
-    // even if still biases to malicious actors but doesn't matter here.
-    private fun calculateGeometricMedian(locations: List<CourierLocation>): LatLng {
-        var minSumDistance = Double.MAX_VALUE
-        var geometricMedian = LatLng(0.0, 0.0)
 
-        for (location1 in locations) {
-            var sumDistance = 0.0
-            for (location2 in locations) {
-                val distance = Math.sqrt(
-                    Math.pow(location1.latitude!! - location2.latitude!!, 2.0) +
-                            Math.pow(location1.longitude!! - location2.longitude!!, 2.0)
-                )
-                sumDistance += distance
-            }
+    private fun calculateMedianLocation(): LatLng {
+        val courierLocations: List<CourierLocation> = viewModel.courierLocations.value ?: emptyList()
+        val deliveryStatus: Map<String, List<DeliveryStatus>> = viewModel.deliveriesStatus.value ?: emptyMap()
 
-            if (sumDistance < minSumDistance) {
-                minSumDistance = sumDistance
-                geometricMedian = LatLng(location1.latitude!!, location1.longitude!!)
-            }
+        val courierLatLngs = courierLocations.map { LatLng(it.latitude!!, it.longitude!!) }
+        val deliveryLatLngs = deliveryStatus.flatMap {
+                it.value
+                    .filter { it.latitude != null && it.longitude != null }
+                    .map { LatLng(it.latitude!!, it.longitude!!) }
         }
 
-        return geometricMedian
+
+        val locations = if (courierLocations.isNotEmpty()) {
+            courierLatLngs + deliveryLatLngs
+        } else {
+            deliveryLatLngs
+        }
+        return if (locations.isNotEmpty()) {
+            val sortedLatitudes = locations.map { it.latitude }.sorted()
+            val sortedLongitudes = locations.map { it.longitude }.sorted()
+
+            val medianLatitude = sortedLatitudes[sortedLatitudes.size / 2]
+            val medianLongitude = sortedLongitudes[sortedLongitudes.size / 2]
+
+            LatLng(medianLatitude, medianLongitude)
+        } else {
+            LatLng(0.0, 0.0)
+        }
     }
 
     override fun onResume() {

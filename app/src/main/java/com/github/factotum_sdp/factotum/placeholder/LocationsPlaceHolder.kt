@@ -5,13 +5,6 @@ import java.util.Calendar
 
 object LocationsPlaceHolder {
 
-    val ROLEX_CENTER = Location("fake").apply {
-        latitude = 46.517733
-        longitude = 6.569090
-        time = Calendar.getInstance().timeInMillis
-        accuracy = 10.0f
-    }
-
     val PELICAN = Location("fake").apply {
         latitude = 46.514044
         longitude = 6.572233

@@ -31,11 +31,11 @@ class BossMapViewModel : ViewModel() {
     private val handler = Handler(Looper.getMainLooper())
 
     private val _courierLocations = MutableLiveData<List<CourierLocation>>()
-    private val _deliveriesStatus = MutableLiveData<List<DeliveryStatus>>()
+    private val _deliveriesStatus = MutableLiveData<Map<String,List<DeliveryStatus>>>()
     private val _contacts = MutableLiveData<List<Contact>>()
 
     val courierLocations: LiveData<List<CourierLocation>> get() = _courierLocations
-    val deliveriesStatus : LiveData<List<DeliveryStatus>> get() = _deliveriesStatus
+    val deliveriesStatus : LiveData<Map<String,List<DeliveryStatus>>> get() = _deliveriesStatus
 
 
     private val fetchDataRunnable = object : Runnable {
@@ -50,8 +50,8 @@ class BossMapViewModel : ViewModel() {
         fetchDeliveryState()
     }
 
-    private fun fetchLocationsAndUpdateMarkers() {
-        database.child(DestinationRecord.timeStampFormat(Date())).addListenerForSingleValueEvent(object : ValueEventListener {
+        private fun fetchLocationsAndUpdateMarkers() {
+        database.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val locations = snapshot.children.mapNotNull { child ->
                     val uid = child.key ?: "Unknown"
@@ -73,26 +73,32 @@ class BossMapViewModel : ViewModel() {
     private fun fetchDeliveryState(){
         roadbookDbRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
+                val mapCourierDeliveryStatus = mutableMapOf<String,MutableList<DeliveryStatus>>()
                 val date = Calendar.getInstance().time
                 val dateRef = SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH).format(date)
-                val dStatus = snapshot.child(dateRef).children.mapNotNull {
-                    val record = it.getValue(DestinationRecord::class.java)
-                    val client = _contacts.value?.find { contact -> contact.username == record?.clientID }
-                    if (client?.latitude != null && client.longitude != null) {
-                        DeliveryStatus(
-                            destID = record?.destID ?: "",
-                            clientID = record?.clientID ?: "",
-                            timeStamp = record?.timeStamp,
-                            addressName = client.addressName,
-                            latitude = client.latitude,
-                            longitude = client.longitude
-                        )
-                    } else {
-                        null
-                    }
+                snapshot.child(dateRef).children.forEach { user ->
+                    user.key?.let { username ->
+                        user.children.forEach {
+                            val record = it.getValue(DestinationRecord::class.java)
+                            val client = _contacts.value?.find { contact -> contact.username == record?.clientID }
+                            if (client?.latitude != null && client.longitude != null) {
+                                val dStatus = DeliveryStatus(
+                                    courier = username,
+                                    destID = record?.destID ?: "",
+                                    clientID = record?.clientID ?: "",
+                                    timeStamp = record?.timeStamp,
+                                    addressName = client.addressName,
+                                    latitude = client.latitude,
+                                    longitude = client.longitude
+                                )
+                                mapCourierDeliveryStatus[client.username]?.add(dStatus) ?: run {
+                                    mapCourierDeliveryStatus[client.username] = mutableListOf(dStatus)
+                                }
+                            }
+                        }
+                    } ?: Log.e("BossMapViewModel: ", "onDataChange: user.key is null")
                 }
-                _deliveriesStatus.value = dStatus
-                Log.d("BossMapViewModel: ", "onDataChange: $dStatus")
+                _deliveriesStatus.value = mapCourierDeliveryStatus
             }
             override fun onCancelled(error: DatabaseError) {
                 Log.e("BossMapViewModel: ", "onCancelled: $error")

@@ -33,6 +33,9 @@
         <action
             android:id="@+id/action_roadBookFragment_to_DRecordDetailsFragment"
             app:destination="@id/dRecordDetailsFragment" />
+        <action
+            android:id="@+id/action_roadBookFragment_to_BagFragment"
+            app:destination="@id/bagFragment"/>
     </fragment>
     <fragment
         android:id="@+id/dRecordDetailsFragment"
@@ -123,6 +126,11 @@
         android:name="com.github.factotum_sdp.factotum.ui.settings.SettingsFragment"
         android:label="SettingsFragment"
         tools:layout="@layout/fragment_settings" />
+    <fragment
+        android:id="@+id/bagFragment"
+        android:name="com.github.factotum_sdp.factotum.ui.bag.BagFragment"
+        android:label="Bag"
+        tools:layout="@layout/fragment_bag" />
     <fragment
         android:id="@+id/bossMapFragment"
         android:name="com.github.factotum_sdp.factotum.ui.bossmap.BossMapFragment"

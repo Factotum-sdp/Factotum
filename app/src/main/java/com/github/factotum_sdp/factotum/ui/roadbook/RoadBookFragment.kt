@@ -13,12 +13,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.models.Contact
+import com.github.factotum_sdp.factotum.models.DestinationRecord.Action.PICK
+import com.github.factotum_sdp.factotum.models.DestinationRecord.Action.DELIVER
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
 import com.github.factotum_sdp.factotum.models.Shift
 import com.github.factotum_sdp.factotum.preferencesDataStore
@@ -28,12 +31,15 @@ import com.github.factotum_sdp.factotum.repositories.ShiftRepository
 import com.github.factotum_sdp.factotum.repositories.ShiftRepository.Companion.DELIVERY_LOG_DB_PATH
 import com.github.factotum_sdp.factotum.roadBookDataStore
 import com.github.factotum_sdp.factotum.shiftDataStore
+import com.github.factotum_sdp.factotum.ui.bag.BagViewModel
+import com.github.factotum_sdp.factotum.ui.bag.PackCreationDialogBuilder
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.ui.settings.SettingsViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.*
 
 private const val ON_DESTINATION_RADIUS = 15.0
+private const val NO_USER_FOR_DB_PATH = "no_user"
 
 /**
  * A fragment representing a RoadBook which is a list of DestinationRecord
@@ -46,6 +52,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         RoadBookViewModel.RoadBookViewModelFactory(
             RoadBookRepository(
                 FirebaseInstance.getDatabase().reference.child(ROADBOOK_DB_PATH),
+                userViewModel.loggedInUser.value?.name ?: NO_USER_FOR_DB_PATH,
                 requireContext().roadBookDataStore
             ),
             ShiftRepository(
@@ -66,7 +73,9 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private var usePreferences = false
     private val userViewModel: UserViewModel by activityViewModels()
     private val contactsViewModel : ContactsViewModel by activityViewModels()
+    private val bagViewModel: BagViewModel by activityViewModels()
 
+    private var timestampedIDs: Map<String, Date> = mapOf()
     private lateinit var currentContacts: List<Contact>
 
     override fun onCreateView(
@@ -83,7 +92,11 @@ class RoadBookFragment : Fragment(), MenuProvider {
             adapter.submitList(it)
         }
 
-        // Set events that triggers change in the Roadoook ViewModel
+        rbViewModel.timestampedRecords.observe(viewLifecycleOwner) {
+            handleTimestampChange(it)
+        }
+
+        // Set events that triggers change in the RoadBook ViewModel
         setRoadBookEvents(rbViewModel, view)
 
         // Set up the RoadBook RecyclerView
@@ -99,6 +112,46 @@ class RoadBookFragment : Fragment(), MenuProvider {
         return view
     }
 
+    private fun handleTimestampChange(newTimestampedID: Map<String, Date>) {
+        if(timestampedIDs.size == newTimestampedID.size) {
+            val changedIDs = timestampedIDs.filter { newTimestampedID.getValue(it.key) != it.value }
+                changedIDs.forEach {
+                bagViewModel.adjustTimestampOf(it.value, it.key)
+            }
+        } else if(timestampedIDs.size < newTimestampedID.size) {
+            val newIDs = newTimestampedID.keys.subtract(timestampedIDs.keys)
+            newIDs.forEach {
+                handleNewTimestampedRecord(it,newTimestampedID.getValue(it))
+            }
+        } else { // some timestamp has been removed
+            val removedIDs = timestampedIDs.keys.subtract(newTimestampedID.keys)
+            removedIDs.forEach {
+                bagViewModel.removedDestinationRecord(it)
+            }
+        }
+
+        timestampedIDs = newTimestampedID
+    }
+
+    private fun handleNewTimestampedRecord(destID: String, timestamp: Date) {
+        val record = rbViewModel.recordsListState.value?.getDestinationRecordFromID(destID)
+        record?.actions?.forEach {
+            if(it == DELIVER) {
+                bagViewModel.arrivedOnDestinationRecord(destID, record.clientID, timestamp)
+            }
+            if(it == PICK) {
+                PackCreationDialogBuilder(
+                    requireContext(),
+                    this,
+                    destID,
+                    record.clientID,
+                    timestamp,
+                    bagViewModel,
+                    contactsViewModel
+                ).show()
+            }
+        }
+    }
     override fun onPause() {
         rbViewModel.backUp()
         saveButtonStates()
@@ -198,6 +251,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         }
         setLiveLocationSwitch(fragMenu)
         setRefreshButtonListener(fragMenu)
+        setBagButtonListener(fragMenu)
         setEndShiftButtonListener(fragMenu)
 
         // Only at menu initialization
@@ -215,6 +269,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         )
         loadPreferencesButtonState(defaultPreferences)
     }
+
     private fun loadPreferencesButtonState(preferences: RoadBookPreferences) {
         dragAndDropButton.isChecked = preferences.enableReordering
         swipeLeftButton.isChecked = preferences.enableArchivingAndDeletion
@@ -262,6 +317,14 @@ class RoadBookFragment : Fragment(), MenuProvider {
         val refreshButton = menu.findItem(R.id.refresh_button)
         refreshButton.setOnMenuItemClickListener {
             rbRecyclerView.adapter?.notifyDataSetChanged()
+            true
+        }
+    }
+
+    private fun setBagButtonListener(menu: Menu) {
+        val bagButton = menu.findItem(R.id.bag_button)
+        bagButton.setOnMenuItemClickListener {
+            this.findNavController().navigate(R.id.bagFragment)
             true
         }
     }
@@ -337,7 +400,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
                 return swipeFlags
             }
-
         }
         return itemTHCallback
     }
@@ -359,7 +421,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     }
 
     companion object {
-        const val ROADBOOK_DB_PATH = "Sheet-shift"
+        const val ROADBOOK_DB_PATH = "Sheet-shift" //change to "Sheet-shift2" for manual testing
         const val DEST_ID_NAV_ARG_KEY = "destID"
     }
 

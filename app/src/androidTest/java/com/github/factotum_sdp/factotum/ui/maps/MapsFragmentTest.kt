@@ -21,9 +21,13 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
+import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
+import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.injectBossAsLoggedInUser
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.logout
 import com.google.android.gms.maps.SupportMapFragment
 import junit.framework.TestCase.assertTrue
 import org.hamcrest.CoreMatchers.allOf
@@ -52,12 +56,11 @@ class MapsFragmentTest {
 
     companion object {
 
-        const val FIRST_ROUTE_NAME_PREFIX = "BC"
-
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
             initFirebase()
+            logout()
         }
     }
 
@@ -68,11 +71,16 @@ class MapsFragmentTest {
 
     @Before
     fun setUp() {
-        injectBossAsLoggedInUser(testRule)
+        GeneralUtils.fillUserEntryAndEnterTheApp(UsersPlaceHolder.USER_COURIER.email, UsersPlaceHolder.USER_COURIER.password)
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.mapsFragment))
             .perform(click())
+    }
+
+    @After
+    fun tearDown() {
+        logout()
     }
 
 

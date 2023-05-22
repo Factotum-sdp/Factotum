@@ -219,6 +219,7 @@ class MainActivityTest {
         onView(withText("Helen Bates (COURIER)")).check(matches(isDisplayed()))
     }
 
+    @Test
     fun signUpFormWithAllFieldsAndClickAndLogin() {
         onView(withId(R.id.signup)).perform(click())
         onView(withId(R.id.name)).perform(typeText("Name"))
@@ -245,16 +246,20 @@ class MainActivityTest {
                 )
             )
         }
-        GeneralUtils.fillUserEntryAndEnterTheApp("email2@gmail.com", "123456")
-
-        FirebaseAuth.AuthStateListener { firebaseAuth ->
-            if (firebaseAuth.currentUser != null) {
-                onView(withId(R.id.fragment_roadbook_directors_parent)).check(
-                    matches(
-                        isDisplayed()
-                    )
+        onView(withId(R.id.email)).perform(typeText("email2@gmail.com"))
+        onView(withId(R.id.fragment_login_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.password)).perform(typeText("123456"))
+        onView(withId(R.id.fragment_login_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
+        FirebaseAuth.AuthStateListener {
+            onView(withId(R.id.fragment_roadbook_directors_parent)).check(
+                matches(
+                    isDisplayed()
                 )
-            }
+            )
         }
     }
 }

@@ -93,7 +93,20 @@
         "super_client": "",
         "surname": "QG",
         "username": "QG"
-        }    
+        },
+        "used": {
+            "addressName": "Lausanne, Switzerland",
+            "details": "",
+            "latitude": 46.5196535,
+            "longitude": 6.6322734,
+            "name": "Used",
+            "phone": "07828833499",
+            "profile_pic_id": 2131165334,
+            "role": "BOSS",
+            "super_client": "",
+            "surname": "Used",
+            "username": "used"
+            }      
     },
     "profile-dispatch": {
         "9Q9PdkiVQKwgHcuEGyshqXyXHrHT": {

@@ -22,6 +22,7 @@ import com.github.factotum_sdp.factotum.databinding.FragmentSignupBinding
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getAuth
 import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.models.User
+import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookViewModel
 import com.google.android.material.snackbar.Snackbar
 
 class SignUpFragment : Fragment() {
@@ -232,6 +233,10 @@ class SignUpFragment : Fragment() {
 
     private fun showSignUpFailed(@StringRes errorString: Int) {
         Snackbar.make(requireView(), errorString, Snackbar.LENGTH_SHORT).show()
+    }
+
+    fun getSignUpViewModelForTest(): SignUpViewModel {
+        return viewModel
     }
 
     override fun onDestroyView() {

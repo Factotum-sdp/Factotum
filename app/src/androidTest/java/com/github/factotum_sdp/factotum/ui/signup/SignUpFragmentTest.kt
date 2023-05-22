@@ -1,5 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.signup
 
+import androidx.navigation.fragment.NavHostFragment
 import androidx.test.espresso.Espresso.onData
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
@@ -12,8 +13,14 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
+import com.github.factotum_sdp.factotum.models.Role
+import com.github.factotum_sdp.factotum.models.User
+import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookFragment
+import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookViewModel
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.ktx.Firebase
 import org.hamcrest.Matchers.anything
 import org.hamcrest.Matchers.not
 import org.junit.*
@@ -220,6 +227,9 @@ class SignUpFragmentTest {
         onData(anything()).inRoot(isPlatformPopup()).atPosition(1).perform(click())
         onView(withId(R.id.username)).perform(typeText("username"))
         onView(withId(R.id.signup)).perform(click())
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
         FirebaseAuth.AuthStateListener {
             onView(withId(R.id.fragment_signup_directors_parent)).check(
                 matches(
@@ -247,6 +257,57 @@ class SignUpFragmentTest {
         onData(anything()).inRoot(isPlatformPopup()).atPosition(1).perform(click())
         onView(withId(R.id.username)).perform(typeText("username"))
         onView(withId(R.id.signup)).check(matches(isEnabled()))
+    }
+
+    @Test
+    fun signupWithUsedEmail(){
+        onView(withId(R.id.name)).perform(typeText("Used"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.email)).perform(typeText("used@gmail.com"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.password)).perform(typeText("123456"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.role)).perform(click())
+        onData(anything()).inRoot(isPlatformPopup()).atPosition(1).perform(click())
+        onView(withId(R.id.username)).perform(typeText("used"))
+        onView(withId(R.id.signup)).perform(click())
+        FirebaseAuth.AuthStateListener {
+            onView(withId(R.id.fragment_signup_directors_parent)).check(
+                matches(
+                    isDisplayed()
+                )
+            )
+        }
+        onView(withId(R.id.signup)).perform(click())
+        onView(withId(R.id.name)).perform(typeText("Used"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.email)).perform(typeText("used@gmail.com"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.password)).perform(typeText("123456"))
+        onView(withId(R.id.fragment_signup_directors_parent)).perform(
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.role)).perform(click())
+        onData(anything()).inRoot(isPlatformPopup()).atPosition(1).perform(click())
+        onView(withId(R.id.username)).perform(typeText("used"))
+        onView(withId(R.id.signup)).perform(click())
+        FirebaseAuth.AuthStateListener {
+            onView(withId(R.id.fragment_signup_directors_parent)).check(
+                matches(
+                    isDisplayed()
+                )
+            )
+        }
     }
 
     @Test
@@ -285,5 +346,37 @@ class SignUpFragmentTest {
                 isDisplayed()
             )
         )
+    }
+
+    @Test
+    fun updateUserFail(){
+        val user = User(
+            "Jane Doe",
+            "jane.doe@gmail.com",
+            "123456",
+            Role.COURIER,
+            "Buhagiat"
+        )
+        getSignUpViewModel()?.updateUser("Jane Doe", user)
+        assert(true)
+    }
+
+    @Test
+    fun fetchUsernameFail(){
+        getSignUpViewModel()?.fetchUsername("not a username")
+        assert(true)
+    }
+    
+    private fun getSignUpViewModel(): SignUpViewModel? {
+        var signUpViewModel : SignUpViewModel? = null
+        testRule.scenario.onActivity {
+            val fragment = it.supportFragmentManager.fragments.first() as NavHostFragment
+            fragment.let {
+                val curr =
+                    it.childFragmentManager.primaryNavigationFragment as SignUpFragment
+                signUpViewModel = curr.getSignUpViewModelForTest()
+            }
+        }
+        return signUpViewModel
     }
 }

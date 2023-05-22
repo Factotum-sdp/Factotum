@@ -80,8 +80,8 @@ class MainActivity : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.roadBookFragment, R.id.directoryFragment,
-                R.id.loginFragment, R.id.routeFragment,
-                R.id.displayFragment,R.id.bossMapFragment,
+                R.id.loginFragment,
+                R.id.displayFragment,R.id.mapsFragment,
                 R.id.settingsFragment
             ), drawerLayout
         )
@@ -165,17 +165,14 @@ class MainActivity : AppCompatActivity() {
             Role.CLIENT -> {
                 navMenu.findItem(R.id.roadBookFragment).isVisible = false
                 navMenu.findItem(R.id.directoryFragment).isVisible = false
-                navMenu.findItem(R.id.routeFragment).isVisible = false
+                navMenu.findItem(R.id.mapsFragment).isVisible = false
                 navMenu.findItem(R.id.settingsFragment).isVisible = false
-                navMenu.findItem(R.id.bossMapFragment).isVisible = false
-            }
-            Role.COURIER -> {
                 navMenu.findItem(R.id.bossMapFragment).isVisible = false
             }
             else -> {
                 navMenu.findItem(R.id.roadBookFragment).isVisible = true
                 navMenu.findItem(R.id.directoryFragment).isVisible = true
-                navMenu.findItem(R.id.routeFragment).isVisible = true
+                navMenu.findItem(R.id.mapsFragment).isVisible = true
                 navMenu.findItem(R.id.displayFragment).isVisible = true
                 navMenu.findItem(R.id.settingsFragment).isVisible = true
             }
@@ -246,6 +243,18 @@ class MainActivity : AppCompatActivity() {
                     login.logout()
                     finish()
                     startActivity(intent)
+                    true
+                }
+
+                R.id.mapsFragment -> {
+                    val destination = user.loggedInUser.value?.role?.let { role ->
+                        when (role) {
+                            Role.BOSS -> R.id.bossMapFragment
+                            else -> R.id.mapsFragment
+                        }
+                    }
+                    destination?.let { findNavController(R.id.nav_host_fragment_content_main).navigate(it) }
+                    binding.drawerLayout.closeDrawers()
                     true
                 }
                 else -> {

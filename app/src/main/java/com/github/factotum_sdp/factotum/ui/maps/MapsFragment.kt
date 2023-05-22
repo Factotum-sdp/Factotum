@@ -34,6 +34,7 @@ class MapsFragment : Fragment() {
         const val IN_NAV_PAGER = "nav_pager"
         const val ROUTE_NAV_KEY = "route"
         const val DRAW_ROUTE = "draw_route"
+        const val MAPS_PKG = "com.google.android.apps.maps"
     }
 
     private var _binding: FragmentMapsBinding? = null

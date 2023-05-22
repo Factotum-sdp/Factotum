@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum.ui.bossmap
+package com.github.factotum_sdp.factotum.ui.maps
 
 import android.os.Handler
 import android.os.Looper
@@ -19,7 +19,6 @@ import com.google.firebase.database.ValueEventListener
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Date
 import java.util.Locale
 
 private const val WAIT_TIME_LOCATION_UPDATE = 15000L

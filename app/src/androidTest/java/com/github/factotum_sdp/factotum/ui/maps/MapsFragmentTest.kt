@@ -123,7 +123,7 @@ class MapsFragmentTest {
         intended(
             allOf(
                 hasAction(Intent.ACTION_VIEW),
-                toPackage(RouteFragment.MAPS_PKG)
+                toPackage(MapsFragment.MAPS_PKG)
             )
         )
         Intents.release()

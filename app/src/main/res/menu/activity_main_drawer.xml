@@ -17,6 +17,11 @@
             android:icon="@android:drawable/ic_dialog_map"
             android:title="@string/menu_maps" />
         <item
+            android:id="@+id/bossMapFragment"
+            android:icon="@android:drawable/ic_dialog_map"
+            android:title="@string/menu_maps" />
+            />
+        <item
             android:id="@+id/displayFragment"
             android:icon="@drawable/ic_menu_gallery"
             android:title="@string/menu_view_proof_picture" />

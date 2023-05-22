@@ -22,7 +22,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
@@ -104,9 +103,10 @@ class MainActivityTest {
 
     @Test
     fun clickOnMapsMenuItemLeadsToCorrectFragment() {
+        GeneralUtils.fillUserEntryAndEnterTheApp("courier@gmail.com", "123456")
         clickOnAMenuItemLeadsCorrectly(
-            R.id.routeFragment,
-            R.id.fragment_route_directors_parent
+            R.id.mapsFragment,
+            R.id.fragment_maps_directors_parent
         )
     }
 
@@ -144,7 +144,13 @@ class MainActivityTest {
 
         navigateToAndPressBackLeadsToRB(R.id.directoryFragment)
         navigateToAndPressBackLeadsToRB(R.id.displayFragment)
-        navigateToAndPressBackLeadsToRB(R.id.routeFragment)
+        navigateToAndPressBackLeadsToRB(R.id.bossMapFragment)
+
+    }
+    @Test
+    fun pressingBackOnAMenuFragmentLeadsToRBFragmentAsCourier() {
+        GeneralUtils.fillUserEntryAndEnterTheApp("courier@gmail.com", "123456")
+        navigateToAndPressBackLeadsToRB(R.id.mapsFragment)
     }
 
 

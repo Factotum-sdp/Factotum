@@ -150,10 +150,15 @@ class RoadBookFragment : Fragment(), MenuProvider {
             }
         }
     }
+
     override fun onPause() {
         rbViewModel.backUp()
-        saveButtonStates()
         super.onPause()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        saveButtonStates()
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -402,21 +407,27 @@ class RoadBookFragment : Fragment(), MenuProvider {
         return itemTHCallback
     }
 
+
     private fun isDragAndDropEnabled(): Boolean {
-        return dragAndDropButton.isChecked
+        return if(::dragAndDropButton.isInitialized) dragAndDropButton.isChecked else false
     }
+
     private fun isTouchClickEnabled(): Boolean {
-        return touchClickButton.isChecked
+        return if(::touchClickButton.isInitialized) touchClickButton.isChecked else false
     }
+
     private fun isSwipeLeftEnabled(): Boolean {
-        return swipeLeftButton.isChecked
+        return if(::swipeLeftButton.isInitialized) swipeLeftButton.isChecked else false
     }
+
     private fun isSwipeRightEnabled(): Boolean {
-        return swipeRightButton.isChecked
+        return if(::swipeRightButton.isInitialized) swipeRightButton.isChecked else false
     }
+
     private fun isShowArchivedEnabled(): Boolean {
-        return showArchivedButton.isChecked
+        return if(::showArchivedButton.isInitialized) showArchivedButton.isChecked else false
     }
+
 
     companion object {
         const val ROADBOOK_DB_PATH = "Sheet-shift"

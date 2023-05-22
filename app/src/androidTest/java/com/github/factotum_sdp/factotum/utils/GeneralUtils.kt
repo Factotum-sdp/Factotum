@@ -64,6 +64,7 @@ class GeneralUtils {
             onView(withId(R.id.fragment_login_directors_parent)).perform(
                 closeSoftKeyboard()
             )
+
             onView(withId(R.id.password))
                 .perform(typeText(password))
             onView(withId(R.id.fragment_login_directors_parent)).perform(

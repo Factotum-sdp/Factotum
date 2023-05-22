@@ -65,16 +65,19 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
      * @param preferences: RoadBookPreferences
      */
     fun updateRoadBookPreferences(preferences: RoadBookPreferences) {
-        viewModelScope.launch {
-            preferences.apply {
-                preferencesRepository.updateReordering(enableReordering)
-                preferencesRepository.updateDeletionOrArchiving(enableArchivingAndDeletion)
-                preferencesRepository.updateEdition(enableEdition)
-                preferencesRepository.updateDetailsAccess(enableDetailsAccess)
-                preferencesRepository.updateShowArchived(showArchived)
+        if (::preferencesRepository.isInitialized) {
+            viewModelScope.launch {
+                preferences.apply {
+                    preferencesRepository.updateReordering(enableReordering)
+                    preferencesRepository.updateDeletionOrArchiving(enableArchivingAndDeletion)
+                    preferencesRepository.updateEdition(enableEdition)
+                    preferencesRepository.updateDetailsAccess(enableDetailsAccess)
+                    preferencesRepository.updateShowArchived(showArchived)
+                }
             }
         }
     }
+
 
     /**
      * Log the current deliveries to the database if

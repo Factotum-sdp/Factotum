@@ -194,7 +194,7 @@ class RoadBookFragmentTest {
         onView(withId(R.id.editTextTimestamp)).perform(click())
         onView(withText(timePickerCancelBLabel)).perform(click())
 
-        onView(withId(R.id.editTextTimestamp)).perform(typeText("2222"))
+        onView(withId(R.id.editTextTimestamp)).perform(typeText("2222"), closeSoftKeyboard())
         onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
 
         onView(withId(R.id.list)).perform(
@@ -481,7 +481,7 @@ class RoadBookFragmentTest {
     fun editARecordDestIDWorks() {
         val newClientID = DestinationRecords.RECORDS[1].clientID
         swipeRightTheRecordAt(2)
-        onView(withId(R.id.autoCompleteClientID)).perform(clearText()).perform(typeText(newClientID))
+        onView(withId(R.id.autoCompleteClientID)).perform(clearText()).perform(typeText(newClientID), closeSoftKeyboard())
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
         onView((withText("$newClientID#2"))).check(matches(isDisplayed()))
     }
@@ -512,7 +512,8 @@ class RoadBookFragmentTest {
             swipeRightTheRecordAt(3) // edit one record displayed below which has another clientID
             onView(withId(R.id.autoCompleteClientID)).perform(
                 clearText(),
-                typeText(clientID)
+                typeText(clientID),
+                closeSoftKeyboard()
             ) // set for the same client that different record
             onView(withText(R.string.edit_dialog_update_b)).perform(click())
             delay(WORST_REFRESH_TIME)
@@ -588,7 +589,7 @@ class RoadBookFragmentTest {
         // Confirm edition :
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
 
-        // Check edited record is corretly displayed :
+        // Check edited record is correctly displayed :
         onView(withText("$newRecordClientID#1")).check(matches(isDisplayed()))
 
         eraseFirstRecTimestamp() // For having no ambiguity btw Timestamp on screen
@@ -609,14 +610,15 @@ class RoadBookFragmentTest {
     private fun eraseFirstRecTimestamp() {
         swipeRightTheRecordAt(0)
         onView(withId(R.id.editTextTimestamp)).perform(click())
-        onView(withText(timePickerEraseBLabel)).perform(click())
+        onView(withText(timePickerCancelBLabel)).perform(click())
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
     }
 
     @Test
     fun cancelOnRecordEditionWorks() {
         swipeRightTheRecordAt(2)
-        onView(withId(R.id.autoCompleteClientID)).perform(click(), clearText(), typeText(newRecordClientID))
+        onView(withId(R.id.autoCompleteClientID)).perform(click(), clearText(),
+            typeText(newRecordClientID), closeSoftKeyboard())
         onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
         // Same record is displayed, without the edited text happened to his destRecordID
         onView((withText(DestinationRecords.RECORDS[2].destID))).check(matches(isDisplayed()))
@@ -1176,7 +1178,7 @@ class RoadBookFragmentTest {
 
         swipeRightTheRecordAt(2)
         onView(withId(R.id.editTextTimestamp)).perform(click())
-        onView(withText(timePickerEraseBLabel)).perform(click())
+        onView(withText(timePickerCancelBLabel)).perform(click())
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
 
         onView(withId(R.id.bag_button)).perform(click())
@@ -1197,7 +1199,7 @@ class RoadBookFragmentTest {
 
         swipeRightTheRecordAt(1)
         onView(withId(R.id.editTextTimestamp)).perform(click())
-        onView(withText(timePickerEraseBLabel)).perform(click())
+        onView(withText(timePickerCancelBLabel)).perform(click())
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
 
         onView(withId(R.id.bag_button)).perform(click())
@@ -1310,7 +1312,6 @@ class RoadBookFragmentTest {
     // Set by defaults by the TimePicker Instance, not stored in String Ressources
     private val timePickerCancelBLabel = "Cancel"
     private val timePickerUpdateBLabel = "OK"
-    private val timePickerEraseBLabel = "Erase"
 
     private fun injectMockLocationWithDefaultJourney() {
         val mockClient = MockLocationClient()

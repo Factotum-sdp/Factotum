@@ -43,6 +43,8 @@ class DRecordDetailsFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_drecord_details, container, false)
 
         val destID = arguments?.getString(RoadBookFragment.DEST_ID_NAV_ARG_KEY) ?: "UNKNOWN"
+
+        Log.d("DRecordDetailsFragment", "DestID: $destID")
         rbViewModel.recordsListState.value?.let {
             rec = it.first { d -> d.destID == destID }
         }
@@ -82,6 +84,12 @@ class DRecordDetailsFragment : Fragment() {
             putBoolean(IS_SUB_FRAGMENT_NAV_KEY, true)
         }
 
+        val pictureFragment = PictureFragment::class.java.newInstance()
+        pictureFragment.arguments = Bundle().apply {
+            putString("clientID", rec.clientID)
+            putString("destID", rec.destID)
+        }
+
         contactsViewModel.contacts.value?.apply {
             try {
                 val currentContact = first { c -> c.username == rec.clientID }
@@ -104,7 +112,7 @@ class DRecordDetailsFragment : Fragment() {
         adapter.addFragment(DRecordInfoFragment(rec))
         adapter.addFragment(MapsFragment())
         adapter.addFragment(detailsFragment)
-        adapter.addFragment(PictureFragment(rec.clientID))
+        adapter.addFragment(pictureFragment)
 
         viewPager.adapter = adapter
     }

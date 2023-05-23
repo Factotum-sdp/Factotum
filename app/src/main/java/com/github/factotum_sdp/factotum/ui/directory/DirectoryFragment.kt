@@ -62,6 +62,7 @@ class DirectoryFragment : Fragment() {
             view.findViewById<RecyclerView>(R.id.contacts_recycler_view) // connect the recycler view to the layout
         val searchView =
             view.findViewById<SearchView>(R.id.contacts_search_view) // connect the search view to the layout
+        searchView.isIconifiedByDefault = false //make the search view always expanded
 
         //the recycler is just the way we chose to represent the list of contacts
         recycler.apply {

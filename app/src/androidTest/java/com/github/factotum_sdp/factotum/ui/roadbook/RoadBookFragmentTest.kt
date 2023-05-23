@@ -995,7 +995,7 @@ class RoadBookFragmentTest {
 
             // Disable location
             onView(withId(R.id.location_switch)).perform(click())
-            onView(withId(R.id.refresh_button)).perform(click())
+            onView(withId(R.id.menu_refresh_icon)).perform(click())
         }
     }
 
@@ -1022,7 +1022,7 @@ class RoadBookFragmentTest {
 
             // Disable location
             onView(withId(R.id.location_switch)).perform(click())
-            onView(withId(R.id.refresh_button)).perform(click())
+            onView(withId(R.id.menu_refresh_icon)).perform(click())
         }
     }
 
@@ -1049,7 +1049,7 @@ class RoadBookFragmentTest {
 
             // Disable location
             onView(withId(R.id.location_switch)).perform(click())
-            onView(withId(R.id.refresh_button)).perform(click())
+            onView(withId(R.id.menu_refresh_icon)).perform(click())
         }
     }
 

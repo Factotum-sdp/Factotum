@@ -94,11 +94,11 @@ class DisplayFragmentTest {
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
         GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
 
-        onView(withId(R.id.menu_refresh)).perform(click())
+        onView(withId(R.id.menu_refresh_icon)).perform(click())
 
         launch { uploadImageToStorageEmulator(context,"Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
 
-        onView(withId(R.id.menu_refresh)).perform(click())
+        onView(withId(R.id.menu_refresh_icon)).perform(click())
 
         val recyclerView = onView(withId(R.id.recyclerView))
 
@@ -114,7 +114,7 @@ class DisplayFragmentTest {
         GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
 
 
-        onView(withId(R.id.menu_refresh)).perform(click())
+        onView(withId(R.id.menu_refresh_icon)).perform(click())
 
 
         val recyclerView = onView(withId(R.id.recyclerView))
@@ -128,7 +128,7 @@ class DisplayFragmentTest {
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH3, TEST_IMAGE_PATH3) }.join()
         GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
 
-        onView(withId(R.id.menu_refresh)).perform(click())
+        onView(withId(R.id.menu_refresh_icon)).perform(click())
 
         val recyclerView = onView(withId(R.id.recyclerView))
         recyclerView.check(matches(hasItemCount(1)))
@@ -153,7 +153,7 @@ class DisplayFragmentTest {
         val recyclerView = onView(withId(R.id.recyclerView))
         recyclerView.check(matches(hasItemCount(0)))
 
-        onView(withId(R.id.menu_refresh)).perform(click())
+        onView(withId(R.id.menu_refresh_icon)).perform(click())
 
         recyclerView.check(matches(hasItemCount(0)))
     }
@@ -316,7 +316,7 @@ class DisplayFragmentTest {
 
         launch { uploadImageToStorageEmulator(context, "Boss", TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
 
-        onView(withId(R.id.menu_refresh)).perform(click())
+        onView(withId(R.id.menu_refresh_icon)).perform(click())
 
         recyclerView.check(matches(hasItemCount(2)))
     }

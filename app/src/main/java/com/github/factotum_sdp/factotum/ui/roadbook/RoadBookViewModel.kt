@@ -1,5 +1,7 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.*
 import com.github.factotum_sdp.factotum.models.DestinationRecord
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
@@ -31,8 +33,23 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
     private val clientOccurrences = HashMap<String, Int>()
     private lateinit var preferencesRepository: RoadBookPreferencesRepository
 
+    private val handler = Handler(Looper.getMainLooper())
+    private val fetchDataRunnable = object : Runnable {
+        override fun run() {
+            roadBookRepository.setBackUp(currentDRecList())
+            handler.postDelayed(this, WAIT_TIME_BACK_UP_UPDATE)
+        }
+    }
+
     init {
         addDemoRecords(DestinationRecords.RECORDS)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        if(withTimedBackUp) {
+            handler.removeCallbacks(fetchDataRunnable)
+        }
     }
 
     /**
@@ -90,6 +107,15 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
      */
     fun backUp() {
         roadBookRepository.setBackUp(currentDRecList())
+    }
+
+    /**
+     * Launch the Runnable routine to achieve timed back-ups of the RoadBook
+     */
+    fun launchRunnableBackUp() {
+        if(withTimedBackUp) {
+            handler.post(fetchDataRunnable)
+        }
     }
 
     /**

@@ -78,21 +78,27 @@ class BossMapViewModel : ViewModel() {
                 snapshot.child(dateRef).children.forEach { user ->
                     user.key?.let { username ->
                         user.children.forEach {
-                            val record = it.getValue(DestinationRecord::class.java)
-                            val client = _contacts.value?.find { contact -> contact.username == record?.clientID }
-                            if (client?.latitude != null && client.longitude != null) {
-                                val dStatus = DeliveryStatus(
-                                    courier = username,
-                                    destID = record?.destID ?: "",
-                                    clientID = record?.clientID ?: "",
-                                    timeStamp = record?.timeStamp,
-                                    addressName = client.addressName,
-                                    latitude = client.latitude,
-                                    longitude = client.longitude
-                                )
-                                mapCourierDeliveryStatus[client.username]?.add(dStatus) ?: run {
-                                    mapCourierDeliveryStatus[client.username] = mutableListOf(dStatus)
+                            try {
+                                val record = it.getValue(DestinationRecord::class.java)
+                                val client =
+                                    _contacts.value?.find { contact -> contact.username == record?.clientID }
+                                if (client?.latitude != null && client.longitude != null) {
+                                    val dStatus = DeliveryStatus(
+                                        courier = username,
+                                        destID = record?.destID ?: "",
+                                        clientID = record?.clientID ?: "",
+                                        timeStamp = record?.timeStamp,
+                                        addressName = client.addressName,
+                                        latitude = client.latitude,
+                                        longitude = client.longitude
+                                    )
+                                    mapCourierDeliveryStatus[client.username]?.add(dStatus) ?: run {
+                                        mapCourierDeliveryStatus[client.username] =
+                                            mutableListOf(dStatus)
+                                    }
                                 }
+                            } catch (e: Exception) {
+                                Log.e("BossMapViewModel: ", "onDataChange: $e")
                             }
                         }
                     } ?: Log.e("BossMapViewModel: ", "onDataChange: user.key is null")

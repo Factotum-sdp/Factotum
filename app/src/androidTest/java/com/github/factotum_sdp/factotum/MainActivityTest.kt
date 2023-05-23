@@ -16,6 +16,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.logout
@@ -50,6 +51,16 @@ class MainActivityTest {
         @JvmStatic
         fun setUpDatabase() = runTest {
             initFirebase()
+        }
+
+        @BeforeClass
+        @JvmStatic
+        fun dismissANRSystemDialog() {
+            val device = UiDevice.getInstance(getInstrumentation())
+            val waitButton = device.findObject(UiSelector().textContains("wait"))
+            if (waitButton.exists()) {
+                waitButton.click()
+            }
         }
     }
 

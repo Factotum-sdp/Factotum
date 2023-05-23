@@ -12,7 +12,9 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
@@ -35,6 +37,16 @@ class SignUpFragmentTest {
         @JvmStatic
         fun setUpAuth() {
             initFirebase()
+        }
+
+        @BeforeClass
+        @JvmStatic
+        fun dismissANRSystemDialog() {
+            val device = UiDevice.getInstance(getInstrumentation())
+            val waitButton = device.findObject(UiSelector().textContains("wait"))
+            if (waitButton.exists()) {
+                waitButton.click()
+            }
         }
     }
 

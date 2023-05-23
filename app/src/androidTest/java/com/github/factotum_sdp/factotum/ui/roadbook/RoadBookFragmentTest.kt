@@ -21,7 +21,10 @@ import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.GrantPermissionRule
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.LocationClientFactory
@@ -91,6 +94,16 @@ class RoadBookFragmentTest {
         @JvmStatic
         fun setUpDatabase() {
             initFirebase()
+        }
+
+        @BeforeClass
+        @JvmStatic
+        fun dismissANRSystemDialog() {
+            val device = UiDevice.getInstance(getInstrumentation())
+            val waitButton = device.findObject(UiSelector().textContains("wait"))
+            if (waitButton.exists()) {
+                waitButton.click()
+            }
         }
     }
     private val courier = User(USER_COURIER.uid, USER_COURIER.name, USER_COURIER.email, USER_COURIER.role)

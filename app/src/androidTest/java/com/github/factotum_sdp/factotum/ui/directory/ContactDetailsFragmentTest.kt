@@ -13,6 +13,7 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
@@ -61,6 +62,16 @@ class ContactDetailsFragmentTest {
             createRandomContacts(1)
             currContact = randomContacts[0]
             logout()
+        }
+
+        @BeforeClass
+        @JvmStatic
+        fun dismissANRSystemDialog() {
+            val device = UiDevice.getInstance(getInstrumentation())
+            val waitButton = device.findObject(UiSelector().textContains("wait"))
+            if (waitButton.exists()) {
+                waitButton.click()
+            }
         }
     }
 

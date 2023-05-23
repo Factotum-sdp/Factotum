@@ -7,6 +7,7 @@ import java.util.Date
 import kotlin.test.assertEquals
 
 class FirebaseStringFormatTest {
+
     @Test
     fun firebaseSafeString() {
         val testString = "test.string#with\$all[the]characters/"

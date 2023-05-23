@@ -46,6 +46,18 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
+                android:id="@+id/isAnnotatedIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="@string/notes_presence_indicator"
+                android:src="@drawable/ic_info"
+                app:layout_constraintBottom_toBottomOf="@+id/packageItemView"
+                app:layout_constraintEnd_toStartOf="@id/packageScheduleSendIcon"
+                app:layout_constraintTop_toTopOf="@+id/packageItemView"
+                android:visibility="invisible"/>
+
+            <ImageView
                 android:id="@+id/packageScheduleSendIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

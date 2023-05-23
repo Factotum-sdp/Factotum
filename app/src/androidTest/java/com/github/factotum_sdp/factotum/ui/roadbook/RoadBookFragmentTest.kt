@@ -27,6 +27,7 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.LocationClientFactory
 import com.github.factotum_sdp.factotum.data.MockLocationClient
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
+import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat
 import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseDateFormatted
 import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseSafeString
 import com.github.factotum_sdp.factotum.models.DestinationRecord
@@ -96,14 +97,13 @@ class RoadBookFragmentTest {
 
     @Before
     fun toRoadBookFragment() {
+        GeneralUtils.injectLoggedInUser(testRule, courier)
         // Ensure "use RoadBook preferences" is disabled
         PreferencesSetting.setRoadBookPrefs(testRule)
-
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))
             .perform(click())
-        GeneralUtils.injectLoggedInUser(testRule, courier)
     }
 
     @After
@@ -214,6 +214,7 @@ class RoadBookFragmentTest {
         val ref = db.reference
             .child(ROADBOOK_DB_PATH)
             .child(SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH).format(date))
+            .child(firebaseSafeString(courier.name))
 
         // Add 1 record
         newRecord()
@@ -276,6 +277,7 @@ class RoadBookFragmentTest {
         val ref = db.reference
             .child("Sheet-shift")
             .child(SimpleDateFormat.getDateInstance().format(date))
+            .child(firebaseSafeString(courier.name))
 
         // Our target value to fetch
         // is represented as a List<String> in Firebase

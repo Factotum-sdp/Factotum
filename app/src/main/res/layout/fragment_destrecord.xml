@@ -9,7 +9,7 @@
         android:id="@+id/fragment_destrecord_directors_parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="12dp"
+        android:layout_margin="6dp"
         app:shapeAppearance="@style/ShapeAppearance.Material3.MediumComponent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

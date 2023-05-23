@@ -68,7 +68,7 @@ class DRecordDetailsFragment : Fragment() {
     enum class TabFragment(val iconID: Int) {
         INFO(R.drawable.ic_info),
         MAPS(R.drawable.ic_map),
-        CONTACT(R.drawable.contact_image),
+        CONTACT(R.drawable.ic_contact),
         PICTURE(R.drawable.ic_menu_camera)
     }
 

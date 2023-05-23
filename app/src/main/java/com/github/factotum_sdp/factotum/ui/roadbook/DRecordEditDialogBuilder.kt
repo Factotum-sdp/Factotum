@@ -1,8 +1,8 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
-import android.app.TimePickerDialog
 import android.content.Context
 import android.content.DialogInterface
+import android.text.Editable
 import android.view.ContextThemeWrapper
 import android.view.View
 import android.widget.ArrayAdapter
@@ -22,13 +22,13 @@ import com.github.factotum_sdp.factotum.ui.dialog.ClientIDViewValidation
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
 
-private const val ERASE_B_LABEL = "Erase"
 private const val PADDING_AMOUNT = 32
 
 /**
@@ -66,10 +66,11 @@ class DRecordEditDialogBuilder(
     private val rateView: EditText
     private val actionsView: MultiAutoCompleteTextView
     private val notesView: EditText
+    private val dialogView : View
 
     init {
         val inflater = host.requireActivity().layoutInflater
-        val dialogView = inflater.inflate(R.layout.edit_record_custom_dialog, null)
+        dialogView = inflater.inflate(R.layout.edit_record_custom_dialog, null)
         dialogView.setPadding(PADDING_AMOUNT, PADDING_AMOUNT, PADDING_AMOUNT, PADDING_AMOUNT)
         setTitle(R.string.create_new_record)
         setCancelable(false)
@@ -92,6 +93,8 @@ class DRecordEditDialogBuilder(
         setTimestampTimePicker()
         setActionsAdapter()
         setClientIDFieldCheck()
+
+
 
         return super.create()
     }

@@ -188,4 +188,5 @@
     <string name="searchbar_hint">Search for contacts…</string>
     <string name="create_new_record">Create new destination record</string>
     <string name="login_menu_title">Access your Factotum account</string>
+    <string name="bag_edit_dialog_title">Edit notes</string>
 </resources>

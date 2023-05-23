@@ -240,7 +240,7 @@ class ContactCreationFragment : Fragment() {
                         role = spinner.selectedItem.toString(),
                         name = name.text.toString(),
                         surname = surname.text.toString(),
-                        profile_pic_id = R.drawable.contact_image,
+                        profile_pic_id = R.drawable.ic_contact,
                         addressName = address.addressName,
                         latitude = address.coordinates?.latitude,
                         longitude = address.coordinates?.longitude,

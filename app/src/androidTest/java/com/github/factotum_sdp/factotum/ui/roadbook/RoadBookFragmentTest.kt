@@ -222,9 +222,9 @@ class RoadBookFragmentTest {
         // Navigate out of the RoadBookFragment
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
-        onView(withId(R.id.routeFragment))
+        onView(withId(R.id.mapsFragment))
             .perform(click())
-        onView(withId(R.id.fragment_route_directors_parent))
+        onView(withId(R.id.fragment_maps_directors_parent))
             .check(matches(isDisplayed()))
 
         // Our target value to fetch
@@ -256,9 +256,9 @@ class RoadBookFragmentTest {
         // Navigate out of the RoadBookFragment
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
-        onView(withId(R.id.routeFragment))
+        onView(withId(R.id.mapsFragment))
             .perform(click())
-        onView(withId(R.id.fragment_route_directors_parent))
+        onView(withId(R.id.fragment_maps_directors_parent))
             .check(matches(isDisplayed()))
 
         var ls: List<DestinationRecord>
@@ -290,7 +290,7 @@ class RoadBookFragmentTest {
             .perform(click())
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
-        onView(withId(R.id.routeFragment)).perform(click())
+        onView(withId(R.id.mapsFragment)).perform(click())
 
         ref.get().addOnSuccessListener { snapshot ->
             val records = snapshot.children.mapNotNull {
@@ -312,7 +312,7 @@ class RoadBookFragmentTest {
         // Navigate out of the RoadBookFragment
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
-        onView(withId(R.id.routeFragment)).perform(click())
+        onView(withId(R.id.mapsFragment)).perform(click())
 
         var fromLocal: List<DestinationRecord>
         val context = ApplicationProvider.getApplicationContext<Context>().applicationContext
@@ -1328,9 +1328,9 @@ class RoadBookFragmentTest {
     private fun navigateOutsideAndComeBack() {
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
-        onView(withId(R.id.routeFragment))
+        onView(withId(R.id.mapsFragment))
             .perform(click())
-        onView(withId(R.id.fragment_route_directors_parent))
+        onView(withId(R.id.fragment_maps_directors_parent))
             .check(matches(isDisplayed()))
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())

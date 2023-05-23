@@ -1,5 +1,6 @@
 package com.github.factotum_sdp.factotum
 
+import android.Manifest
 import android.view.Gravity
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.pressBack
@@ -13,6 +14,7 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
@@ -22,7 +24,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
@@ -34,6 +35,13 @@ class MainActivityTest {
     @get:Rule
     var testRule = ActivityScenarioRule(
         MainActivity::class.java
+    )
+
+
+    @get:Rule
+    val permission = GrantPermissionRule.grant(
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION
     )
 
     companion object {
@@ -104,9 +112,10 @@ class MainActivityTest {
 
     @Test
     fun clickOnMapsMenuItemLeadsToCorrectFragment() {
+        GeneralUtils.fillUserEntryAndEnterTheApp("courier@gmail.com", "123456")
         clickOnAMenuItemLeadsCorrectly(
-            R.id.routeFragment,
-            R.id.fragment_route_directors_parent
+            R.id.mapsFragment,
+            R.id.fragment_maps_directors_parent
         )
     }
 
@@ -144,7 +153,13 @@ class MainActivityTest {
 
         navigateToAndPressBackLeadsToRB(R.id.directoryFragment)
         navigateToAndPressBackLeadsToRB(R.id.displayFragment)
-        navigateToAndPressBackLeadsToRB(R.id.routeFragment)
+        navigateToAndPressBackLeadsToRB(R.id.bossMapFragment)
+
+    }
+    @Test
+    fun pressingBackOnAMenuFragmentLeadsToRBFragmentAsCourier() {
+        GeneralUtils.fillUserEntryAndEnterTheApp("courier@gmail.com", "123456")
+        navigateToAndPressBackLeadsToRB(R.id.mapsFragment)
     }
 
 

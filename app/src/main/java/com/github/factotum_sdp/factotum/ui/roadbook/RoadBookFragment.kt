@@ -23,8 +23,8 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.models.Contact
-import com.github.factotum_sdp.factotum.models.DestinationRecord.Action.PICK
 import com.github.factotum_sdp.factotum.models.DestinationRecord.Action.DELIVER
+import com.github.factotum_sdp.factotum.models.DestinationRecord.Action.PICK
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
 import com.github.factotum_sdp.factotum.models.Shift
 import com.github.factotum_sdp.factotum.preferencesDataStore

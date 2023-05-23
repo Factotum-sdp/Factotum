@@ -1,18 +1,18 @@
 package com.github.factotum_sdp.factotum.ui.display
 
-import android.app.DatePickerDialog
+import android.animation.ObjectAnimator
 import android.content.Intent
 import android.icu.util.Calendar
-import android.icu.util.GregorianCalendar
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.LinearInterpolator
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
@@ -22,8 +22,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MutableLiveData
-import androidx.navigation.Navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
@@ -31,20 +29,22 @@ import com.github.factotum_sdp.factotum.databinding.FragmentDisplayBinding
 import com.github.factotum_sdp.factotum.models.Contact
 import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
-import com.github.factotum_sdp.factotum.ui.display.courier_boss.CourierBossDisplayViewModel
-import com.github.factotum_sdp.factotum.ui.display.courier_boss.CourierBossDisplayViewModelFactory
-import com.github.factotum_sdp.factotum.ui.display.courier_boss.CourierBossFolderAdapter
 import com.github.factotum_sdp.factotum.ui.display.client.ClientDisplayViewModel
 import com.github.factotum_sdp.factotum.ui.display.client.ClientDisplayViewModelFactory
 import com.github.factotum_sdp.factotum.ui.display.client.ClientPhotoAdapter
+import com.github.factotum_sdp.factotum.ui.display.courier_boss.CourierBossDisplayViewModel
+import com.github.factotum_sdp.factotum.ui.display.courier_boss.CourierBossDisplayViewModelFactory
+import com.github.factotum_sdp.factotum.ui.display.courier_boss.CourierBossFolderAdapter
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.util.Date
+
+private const val ANIMATION_DURATION = 400L
 
 class DisplayFragment : Fragment(), MenuProvider {
 
     private lateinit var displayMenu : Menu
     private lateinit var calendarButton: MenuItem
-    private lateinit var refreshButton: MenuItem
+    private lateinit var refreshButton: ImageView
 
     private val clientViewModel: ClientDisplayViewModel by viewModels{ ClientDisplayViewModelFactory(userFolder, requireContext()) }
     private val courierBossDisplayViewModel : CourierBossDisplayViewModel by viewModels{ CourierBossDisplayViewModelFactory(requireContext()) }
@@ -84,9 +84,19 @@ class DisplayFragment : Fragment(), MenuProvider {
             true
         }
 
-        refreshButton = menu.findItem(R.id.menu_refresh)
+        val menuRefresh = menu.findItem(R.id.menu_refresh)
+        refreshButton = menuRefresh.actionView as ImageView
+        refreshButton.setImageResource(R.drawable.refresh)
 
         setupObservers()
+    }
+
+
+    private fun rotateRefreshButton(view: ImageView) {
+        val rotation = ObjectAnimator.ofFloat(view, "rotation", 0f, 360f)
+        rotation.duration = ANIMATION_DURATION
+        rotation.interpolator = LinearInterpolator()
+        rotation.start()
     }
 
     private fun showMaterialDatePickerDialog() {
@@ -187,9 +197,9 @@ class DisplayFragment : Fragment(), MenuProvider {
         calendarButton.isVisible = false
         (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.folders)
 
-        refreshButton.setOnMenuItemClickListener { menuItem ->
+        refreshButton.setOnClickListener { menuItem ->
+            rotateRefreshButton(menuItem as ImageView)
             courierBossDisplayViewModel.refreshFolders()
-            true
         }
 
         val courierBossFolderAdapter = CourierBossFolderAdapter(
@@ -231,9 +241,9 @@ class DisplayFragment : Fragment(), MenuProvider {
         val clientName = userFolder.value?.replaceFirstChar { it.uppercase() }
         (activity as AppCompatActivity).supportActionBar?.title = clientName
 
-        refreshButton.setOnMenuItemClickListener { menuItem ->
+        refreshButton.setOnClickListener { menuItem ->
+            rotateRefreshButton(menuItem as ImageView)
             clientViewModel.refreshImages()
-            true
         }
 
         val clientPhotoAdapter = ClientPhotoAdapter(

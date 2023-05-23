@@ -86,7 +86,7 @@
     <string name="sign_out">Sign Out</string>
 
     <!-- Strings related to signup -->
-    <string name="welcome_text">Welcome</string>
+    <string name="create_new_account">Create New Account</string>
     <string name="full_name_text">Full Name</string>
     <string name="create_account_text">Create Account</string>
     <string name="select_role_text">Select Role</string>
@@ -173,7 +173,7 @@
     <string name="bag_button">BagButton</string>
     <string name="location_switch">LocationSwitch</string>
     <string name="package_schedule_icon">package schedule icon</string>
-    <string name="package_name_hint">Package name</string>
+    <string name="package_name_hint">Package Name</string>
     <string name="package_recipient_hint">Recipient</string>
     <string name="package_notes_hint">Package notes</string>
     <string name="confirm_label_pack_creation_dialog">Confirm</string>
@@ -185,8 +185,9 @@
     <string name="secondary_text">secondary_text</string>
     <string name="folders">Folders</string>
     <string name="photos">Photos</string>
-    <string name="searchbar_hint">Search for contacts…</string>
-    <string name="create_new_record">Create new destination record</string>
-    <string name="login_menu_title">Access your Factotum account</string>
-    <string name="bag_edit_dialog_title">Edit notes</string>
+    <string name="searchbar_hint">Search for Contacts…</string>
+    <string name="create_new_record">Create New Destination Record</string>
+    <string name="login_menu_title">Login to your Factotum Account</string>
+    <string name="bag_edit_dialog_title">Edit Notes</string>
+    <string name="sign_in">Sign-In</string>
 </resources>

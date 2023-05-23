@@ -13,8 +13,8 @@
             app:showAsAction="ifRoom" />
         <item
             android:id="@+id/menu_refresh"
-            android:icon="@drawable/refresh"
             android:title="@string/refresh"
+            app:actionLayout="@layout/refresh_action_view"
             app:showAsAction="always" />
     </group>
 </menu>

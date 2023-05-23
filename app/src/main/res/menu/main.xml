@@ -31,6 +31,7 @@
             android:id="@+id/refresh_button"
             android:icon="@drawable/refresh"
             android:title="@string/refresh_button"
+            app:actionLayout="@layout/refresh_action_view"
             app:showAsAction="always"/>
         <item
             android:id="@+id/bag_button"

@@ -1,11 +1,14 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.view.animation.LinearInterpolator
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.view.MenuProvider
@@ -40,6 +43,7 @@ import java.util.*
 
 private const val ON_DESTINATION_RADIUS = 15.0
 private const val NO_USER_FOR_DB_PATH = "no_user"
+private const val ANIMATION_DURATION = 400L
 
 /**
  * A fragment representing a RoadBook which is a list of DestinationRecord
@@ -319,11 +323,19 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun setRefreshButtonListener(menu: Menu) {
-        val refreshButton = menu.findItem(R.id.refresh_button)
-        refreshButton.setOnMenuItemClickListener {
+        val menuRefresh = menu.findItem(R.id.refresh_button)
+        val refreshButton = menuRefresh.actionView as ImageView
+        refreshButton.setOnClickListener {
+            rotateRefreshButton(refreshButton)
             rbRecyclerView.adapter?.notifyDataSetChanged()
-            true
         }
+    }
+
+    private fun rotateRefreshButton(view: ImageView) {
+        val rotation = ObjectAnimator.ofFloat(view, "rotation", 0f, 360f)
+        rotation.duration = ANIMATION_DURATION
+        rotation.interpolator = LinearInterpolator()
+        rotation.start()
     }
 
     private fun setBagButtonListener(menu: Menu) {

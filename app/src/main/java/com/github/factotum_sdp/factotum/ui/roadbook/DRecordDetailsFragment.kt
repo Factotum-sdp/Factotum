@@ -86,6 +86,10 @@ class DRecordDetailsFragment : Fragment() {
         val mapsFragment = MapsFragment()
         contactsViewModel.contacts.value?.apply {
             try {
+                val bundle = Bundle().apply {
+                    putBoolean(MapsFragment.IN_NAV_PAGER, true)
+                    putBoolean(MapsFragment.DRAW_ROUTE, false)
+                }
                 val currentContact = first { c -> c.username == rec.clientID }
                 if (currentContact.hasCoordinates()) {
                     val route = Route(
@@ -95,13 +99,10 @@ class DRecordDetailsFragment : Fragment() {
                         currentContact.longitude ?: 0.0
                     )
                     val routeJson = Gson().toJson(route)
-                    mapsFragment.arguments = Bundle().apply {
-                        putBoolean(MapsFragment.IN_NAV_PAGER, true)
-                        putBoolean(MapsFragment.DRAW_ROUTE, false)
-                        putString(MapsFragment.ROUTE_NAV_KEY, routeJson)
-                    }
-
+                    bundle.putString(MapsFragment.ROUTE_NAV_KEY, routeJson)
                 }
+                mapsFragment.arguments = bundle
+
             } catch (e: NoSuchElementException) {
                 // Handle the exception here
                 Log.e("Error", "Could not find contact with ID ${rec.clientID}")

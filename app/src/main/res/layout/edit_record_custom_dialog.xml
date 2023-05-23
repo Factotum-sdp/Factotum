@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/scrollView"
     android:layout_width="match_parent"
@@ -19,7 +20,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:hint="@string/hint_dialog_client_id">
+            android:hint="@string/hint_dialog_client_id"
+            app:endIconMode="clear_text">
 
             <AutoCompleteTextView
                 style="@style/Widget.MaterialComponents.AutoCompleteTextView.FilledBox"
@@ -35,7 +37,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:hint="@string/hint_dialog_timestamp">
+            android:hint="@string/hint_dialog_timestamp"
+            app:endIconMode="clear_text">
 
             <com.google.android.material.textfield.TextInputEditText
                 style="@style/Widget.MaterialComponents.AutoCompleteTextView.FilledBox"
@@ -52,7 +55,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:hint="@string/hint_dialog_waiting_time">
+            android:hint="@string/hint_dialog_waiting_time"
+            app:endIconMode="clear_text">
 
             <com.google.android.material.textfield.TextInputEditText
                 style="@style/Widget.MaterialComponents.AutoCompleteTextView.FilledBox"
@@ -69,7 +73,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:hint="@string/hint_dialog_rate">
+            android:hint="@string/hint_dialog_rate"
+            app:endIconMode="clear_text">
 
             <com.google.android.material.textfield.TextInputEditText
                 style="@style/Widget.MaterialComponents.AutoCompleteTextView.FilledBox"
@@ -86,7 +91,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:hint="@string/hint_dialog_actions">
+            android:hint="@string/hint_dialog_actions"
+            app:endIconMode="clear_text">
 
             <MultiAutoCompleteTextView
                 style="@style/Widget.MaterialComponents.AutoCompleteTextView.FilledBox"
@@ -101,7 +107,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:hint="@string/hint_dialog_notes">
+            android:hint="@string/hint_dialog_notes"
+            app:endIconMode="clear_text">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextNotes"

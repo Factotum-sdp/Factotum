@@ -368,8 +368,7 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
     companion object {
         const val WAIT_TIME_BACK_UP_UPDATE = 15000L
         var withTimedBackUp = true
-        fun setTimedBackUp(isEnabled: Boolean) {
-            // Testing purpose
+        fun setTimedBackUp(isEnabled: Boolean) { // For testing purpose
             withTimedBackUp = isEnabled
         }
     }

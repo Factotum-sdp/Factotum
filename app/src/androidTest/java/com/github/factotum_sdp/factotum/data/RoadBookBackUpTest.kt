@@ -1,6 +1,5 @@
 package com.github.factotum_sdp.factotum.data
 
-import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.contrib.DrawerActions
@@ -14,7 +13,6 @@ import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat
 import com.github.factotum_sdp.factotum.models.DestinationRecord
 import com.github.factotum_sdp.factotum.models.User
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
-import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder.USER_COURIER
 import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookFragment
 import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookViewModel

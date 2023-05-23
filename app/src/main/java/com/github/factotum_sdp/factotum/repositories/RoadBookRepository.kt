@@ -2,7 +2,6 @@ package com.github.factotum_sdp.factotum.repositories
 
 import androidx.datastore.core.DataStore
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
-import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat
 import com.github.factotum_sdp.factotum.models.DestinationRecord
 import com.github.factotum_sdp.factotum.ui.roadbook.DRecordList
 import com.google.firebase.database.DataSnapshot

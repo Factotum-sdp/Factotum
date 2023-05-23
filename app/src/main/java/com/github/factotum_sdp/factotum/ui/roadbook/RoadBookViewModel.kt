@@ -338,4 +338,13 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
             throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
+
+    companion object {
+        const val WAIT_TIME_BACK_UP_UPDATE = 15000L
+        var withTimedBackUp = true
+        fun setTimedBackUp(isEnabled: Boolean) {
+            // Testing purpose
+            withTimedBackUp = isEnabled
+        }
+    }
 }

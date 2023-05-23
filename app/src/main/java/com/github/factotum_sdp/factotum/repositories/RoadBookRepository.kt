@@ -32,97 +32,15 @@ import java.util.Locale
  * However, a second variable cache is used before fetching or update the localSource.
  */
 class RoadBookRepository(remoteSource: DatabaseReference, username: String,
-                         private val localSource: DataStore<DRecordList>) {
-    private var backUpRef: DatabaseReference
-    private var isConnectedToRemote = false
-
-    private var lastNetworkBackUp: DRecordList? = null
-    private var lastLocalNetworkBackUp: DRecordList? = null
-
-    init {
-        FirebaseInstance.onConnectedStatusChanged {
-            if (it) {
-                CoroutineScope(Dispatchers.IO).launch {
-                    // Always synchronize the network back-up when connection is back
-                    setNetworkBackUp(getLastLocalBackUp())
-                }
-            }
-            // Ensure that if first cache is set the Data is already on the remoteSource,
-            // and can block unuseful additional remote updates in setBackUp()
-            isConnectedToRemote = it
+                         localSource: DataStore<DRecordList>): BackUpRepository<DRecordList>(remoteSource, username, localSource) {
+    override fun extractFromSnapshot(snapshot: DataSnapshot): DRecordList {
+        val records = snapshot.children.mapNotNull {
+            it.getValue(DestinationRecord::class.java)
         }
-
-        val date = Calendar.getInstance().time
-        val dateRef = SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH).format(date)
-        backUpRef = remoteSource.child(dateRef) // will add a more detailed path sooner when the User data class will be stable
-        initNetworkPathWithUser(username)
+        return DRecordList(records)
     }
 
-    private fun initNetworkPathWithUser(username: String) {
-        backUpRef = backUpRef.child(username)
-        backUpRef.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val records = snapshot.children.mapNotNull {
-                    it.getValue(DestinationRecord::class.java)
-                }
-                lastNetworkBackUp = DRecordList(records)
-            }
-            override fun onCancelled(error: DatabaseError) {}
-        })
+    override fun setBackUp(data: DRecordList) {
+        super.setBackUp(data.withArchived())
     }
-
-    /**
-     * Send the current records data to the the remoteSource and the localSource if connected
-     * Only in the localSource otherwise
-     *
-     * @param records: DRecordList
-     */
-    fun setBackUp(records: DRecordList) {
-        val allRecords = records.withArchived()
-        if(allRecords.isNotEmpty() && allRecords != lastNetworkBackUp) {
-            CoroutineScope(Dispatchers.Default).launch {
-                if (isConnectedToRemote) {
-                    setNetworkBackUp(allRecords)
-                    setLocalBackUp(allRecords)
-                } else {
-                    setLocalBackUp(allRecords)
-                }
-            }
-        }
-    }
-
-    /**
-     * Get the last available back-up
-     *
-     * Which is the last network written variable if the remote is connected,
-     * otherwise it is fetch from the local source.
-     *
-     * @return the DRecordList back-up
-     */
-    suspend fun getLastBackUp(): DRecordList {
-        if(isConnectedToRemote) {
-            lastNetworkBackUp?.let {
-                return it
-            }
-        }
-        return getLastLocalBackUp()
-    }
-
-    private fun setNetworkBackUp(records: DRecordList) {
-        backUpRef.setValue(records)
-    }
-
-    private suspend fun setLocalBackUp(records: DRecordList) {
-        if(lastLocalNetworkBackUp != records) {
-            localSource.updateData {
-                lastNetworkBackUp = records
-                records
-            }
-        }
-    }
-
-    private suspend fun getLastLocalBackUp(): DRecordList {
-        return lastLocalNetworkBackUp ?: localSource.data.first()
-    }
-
 }

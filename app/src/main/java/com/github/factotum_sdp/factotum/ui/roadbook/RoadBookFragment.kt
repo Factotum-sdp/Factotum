@@ -52,7 +52,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         RoadBookViewModel.RoadBookViewModelFactory(
             RoadBookRepository(
                 FirebaseInstance.getDatabase().reference.child(ROADBOOK_DB_PATH),
-                userViewModel.loggedInUser.value?.name ?: NO_USER_FOR_DB_PATH,
+                FirebaseInstance.getUsernameForDBPath(),
                 requireContext().roadBookDataStore
             ),
             ShiftRepository(

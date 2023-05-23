@@ -32,12 +32,15 @@ class LoginViewModel (context: Context): ViewModel() {
 
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 
-    fun checkIfCachedUser() {
+    fun checkIfCachedUser(): User? {
         val user = loginRepository.getLoggedInUser()
         if (user != null) {
             _loginResult.value = LoginResult(success = user.uid)
             _retrieveUsersResult.value = RetrieveUserResult(success = user)
+            return user
+
         }
+        return null
     }
 
     /**

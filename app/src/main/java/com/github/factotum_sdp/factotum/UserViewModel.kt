@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
+import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.models.User
 import com.github.factotum_sdp.factotum.ui.roadbook.LocationTrackingHandler
 
@@ -37,6 +38,7 @@ class UserViewModel : ViewModel() {
      * @param loggedInUser: User
      */
     fun setLoggedInUser(loggedInUser: User) {
+        FirebaseInstance.setUsernameForDBPath(loggedInUser.name)
         _loggedInUser.postValue(loggedInUser)
     }
 }

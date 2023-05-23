@@ -60,8 +60,7 @@ class RoadBookRepository(remoteSource: DatabaseReference, username: String,
     }
 
     private fun initNetworkPathWithUser(username: String) {
-        val safeUsername = FirebaseStringFormat.firebaseSafeString(username)
-        backUpRef = backUpRef.child(safeUsername)
+        backUpRef = backUpRef.child(username)
         backUpRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val records = snapshot.children.mapNotNull {

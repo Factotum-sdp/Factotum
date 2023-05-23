@@ -98,7 +98,7 @@ class ContactDetailsFragment : Fragment() {
         contactName.text = contact.name
         contactSurname.text = contact.surname
         contactRole.text = contact.role
-        contactImage.setImageResource(contact.profile_pic_id)
+        contactImage.setImageResource(R.mipmap.ic_profile_pic_round)
         contactPhone.text = contact.phone
         contactAddress.text = contact.addressName
         contactDetails.text = contact.details

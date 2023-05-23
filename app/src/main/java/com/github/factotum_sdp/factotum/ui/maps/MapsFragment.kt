@@ -14,11 +14,14 @@ import androidx.lifecycle.LiveData
 import com.github.factotum_sdp.factotum.databinding.FragmentMapsBinding
 import com.github.factotum_sdp.factotum.hasLocationPermission
 import com.github.factotum_sdp.factotum.models.Route
+import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
+import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.gson.Gson
 
 
 /**
@@ -30,10 +33,16 @@ class MapsFragment : Fragment() {
         private val EPFL_LOC = LatLng(46.520536, 6.568318)
         private const val ZOOM_PADDING = 100
         private const val minZoom = 6.0f
+        const val IN_NAV_PAGER = "nav_pager"
+        const val ROUTE_NAV_KEY = "route"
+        const val DRAW_ROUTE = "draw_route"
+        const val MAPS_PKG = "com.google.android.apps.maps"
     }
 
     private var _binding: FragmentMapsBinding? = null
     private val viewModel: MapsViewModel by activityViewModels()
+    private val rbViewModel: RoadBookViewModel by activityViewModels()
+    private val contactsViewModel : ContactsViewModel by activityViewModels()
     private lateinit var mMap: GoogleMap
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -61,6 +70,22 @@ class MapsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setMapProperties()
+
+    }
+
+    private fun getDestinationsFromRoadbook() : List<Route> {
+        val destinations = mutableListOf<Route>()
+        rbViewModel.recordsListState.value?.let { records ->
+            records.forEach { record ->
+                val contact = contactsViewModel.contacts.value?.first{ it.username == record.clientID }
+                if(contact?.latitude != null && contact.longitude != null){
+                    val route = Route(0.0, 0.0, contact.latitude, contact.longitude)
+                    destinations.add(route)
+                }
+            }
+
+        }
+        return destinations
 
     }
 
@@ -100,9 +125,18 @@ class MapsFragment : Fragment() {
         // clears map from previous markers
         googleMap.clear()
 
-        // places markers on the map and centers the camera
-        placeMarkers(viewModel.routesState, googleMap)
-
+        if (arguments?.getBoolean(IN_NAV_PAGER) == true) {
+            val route = arguments?.getString(ROUTE_NAV_KEY)?.let { Gson().fromJson(it, Route::class.java) }
+            val drawRoute = arguments?.getBoolean(DRAW_ROUTE) ?: true
+            route?.let {
+                placeMarkers(listOf(it), googleMap, drawRoute)
+            }
+        }
+        else {
+            // places markers on the map and centers the camera
+            val destinations = getDestinationsFromRoadbook()
+            placeMarkers(destinations, googleMap)
+        }
         // Add zoom controls to the map
         googleMap.uiSettings.isZoomControlsEnabled = true
 
@@ -113,13 +147,13 @@ class MapsFragment : Fragment() {
         googleMap.setMinZoomPreference(minZoom)
     }
 
-    private fun placeMarkers(routes: LiveData<List<Route>>, googleMap: GoogleMap) {
+    private fun placeMarkers(routes: List<Route>?, googleMap: GoogleMap, drawRoutes : Boolean = true) {
         val bounds = LatLngBounds.Builder()
 
-        for (route in routes.value.orEmpty()) {
+        for (route in routes.orEmpty()) {
             route.addSrcToMap(googleMap)
             route.addDstToMap(googleMap)
-            route.drawRoute(googleMap)
+            if (drawRoutes) route.drawRoute(googleMap)
             bounds.include(route.dst)
         }
 
@@ -133,7 +167,7 @@ class MapsFragment : Fragment() {
 
         val padding = ZOOM_PADDING // offset from edges of the map in pixels
 
-        val cuf = routes.value?.takeIf { it.isNotEmpty() }
+        val cuf = routes?.takeIf { it.isNotEmpty() }
             ?.run { CameraUpdateFactory.newLatLngBounds(bounds.build(), padding) }
             ?: CameraUpdateFactory.newLatLngZoom(EPFL_LOC, 8f)
 

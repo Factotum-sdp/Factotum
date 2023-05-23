@@ -22,8 +22,8 @@ import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.models.Route
 import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment.Companion.IS_SUB_FRAGMENT_NAV_KEY
 import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment.Companion.USERNAME_NAV_KEY
+import com.github.factotum_sdp.factotum.ui.maps.MapsFragment
 import com.github.factotum_sdp.factotum.ui.maps.MapsViewModel
-import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
 
 class ContactDetailsFragment : Fragment() {
     private lateinit var currentContact: Contact
@@ -141,7 +141,7 @@ class ContactDetailsFragment : Fragment() {
                 val uri =
                     Uri.parse("google.navigation:q=${currentContact.latitude},${currentContact.longitude}&mode=b")
                 val intent = Intent(Intent.ACTION_VIEW, uri)
-                intent.setPackage(RouteFragment.MAPS_PKG)
+                intent.setPackage(MapsFragment.MAPS_PKG)
                 requireContext().startActivity(intent)
             } else {
                 coordinatesError()

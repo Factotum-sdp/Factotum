@@ -40,12 +40,12 @@ class LoginFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
+        (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.sign_in)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.sign_in)
 
         val logVMFact = LoginViewModel.LoginViewModelFactory(requireContext())
         viewModel =

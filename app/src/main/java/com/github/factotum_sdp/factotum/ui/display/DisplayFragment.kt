@@ -117,8 +117,6 @@ class DisplayFragment : Fragment(), MenuProvider {
         datePicker.show(parentFragmentManager, "MATERIAL_DATE_PICKER")
     }
 
-
-
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         if (menuItem.itemId == android.R.id.home) {
             return false
@@ -177,7 +175,6 @@ class DisplayFragment : Fragment(), MenuProvider {
     //================================================================
     // Boss UI
     //================================================================
-
     private fun observeCourierBossFolders() {
         courierBossDisplayViewModel.folderReferences.observe(viewLifecycleOwner) { folderReferences ->
             (binding.recyclerView.adapter as? CourierBossFolderAdapter)?.submitList(folderReferences)
@@ -220,7 +217,6 @@ class DisplayFragment : Fragment(), MenuProvider {
     //================================================================
     // Client UI
     //================================================================
-
     private fun observeClientPhotos() {
         clientViewModel.photoReferences.observe(viewLifecycleOwner) { photoReferences ->
             (binding.recyclerView.adapter as? ClientPhotoAdapter)?.submitList(photoReferences)
@@ -262,9 +258,7 @@ class DisplayFragment : Fragment(), MenuProvider {
             layoutManager = LinearLayoutManager(context)
             adapter = clientPhotoAdapter
         }
-
     }
-
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {

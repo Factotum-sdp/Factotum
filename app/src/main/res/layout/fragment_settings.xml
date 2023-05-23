@@ -15,14 +15,14 @@
             android:orientation="horizontal"
             android:padding="16dp">
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/save_roadbook_preferences"
                 android:textSize="18sp" />
 
-            <CheckBox
+            <com.google.android.material.checkbox.MaterialCheckBox
                 android:id="@+id/save_roadbook_preferences"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
@@ -35,18 +35,19 @@
             android:padding="16dp"
             >
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/load_road_book_back_up"
                 android:textSize="18sp" />
 
-            <CheckBox
+            <com.google.android.material.checkbox.MaterialCheckBox
                 android:id="@+id/load_roadbook_backup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -54,14 +55,14 @@
             android:padding="16dp"
             >
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/delete_all_roadbook"
                 android:textSize="18sp" />
 
-            <CheckBox
+            <com.google.android.material.checkbox.MaterialCheckBox
                 android:id="@+id/delete_all_roadbook"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />

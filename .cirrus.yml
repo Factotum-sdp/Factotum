@@ -19,6 +19,7 @@ check_android_task:
   create_avd_script: echo no | avdmanager create avd --force
       --name emulator
       --package "system-images;android-33;google_apis;x86_64"
+      --device "pixel_4"
   start_avd_background_script: $ANDROID_HOME/emulator/emulator
       -avd emulator
       -no-audio
@@ -27,8 +28,6 @@ check_android_task:
       -no-snapshot
       -no-window
       -camera-back emulated
-      -skin 1080x1920
-      -dpi-device 400
   build_script: |
     chmod +x gradlew
     echo MAPS_API_KEY=$MAPS_API_KEY >> local.properties

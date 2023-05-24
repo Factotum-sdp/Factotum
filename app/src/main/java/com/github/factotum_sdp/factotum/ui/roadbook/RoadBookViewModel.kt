@@ -33,13 +33,7 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
     private val clientOccurrences = HashMap<String, Int>()
     private lateinit var preferencesRepository: RoadBookPreferencesRepository
 
-    private val handler = Handler(Looper.getMainLooper())
-    private val fetchDataRunnable = object : Runnable {
-        override fun run() {
-            roadBookRepository.setBackUp(currentDRecList())
-            handler.postDelayed(this, WAIT_TIME_BACK_UP_UPDATE)
-        }
-    }
+
 
     init {
         addDemoRecords(DestinationRecords.RECORDS)
@@ -47,9 +41,7 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
 
     override fun onCleared() {
         super.onCleared()
-        if(withTimedBackUp) {
-            handler.removeCallbacks(fetchDataRunnable)
-        }
+        roadBookRepository.clearRunnableBackUp()
     }
 
     /**
@@ -113,9 +105,7 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
      * Launch the Runnable routine to achieve timed back-ups of the RoadBook
      */
     fun launchRunnableBackUp() {
-        if(withTimedBackUp) {
-            handler.post(fetchDataRunnable)
-        }
+        roadBookRepository.launchRunnableBackUp()
     }
 
     /**
@@ -362,14 +352,6 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
             if (modelClass.isAssignableFrom(RoadBookViewModel::class.java))
                 return RoadBookViewModel(repository, shiftRepository) as T
             throw IllegalArgumentException("Unknown ViewModel class")
-        }
-    }
-
-    companion object {
-        const val WAIT_TIME_BACK_UP_UPDATE = 15000L
-        var withTimedBackUp = true
-        fun setTimedBackUp(isEnabled: Boolean) { // For testing purpose
-            withTimedBackUp = isEnabled
         }
     }
 }

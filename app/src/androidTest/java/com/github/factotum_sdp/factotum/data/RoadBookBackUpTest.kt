@@ -14,6 +14,7 @@ import com.github.factotum_sdp.factotum.models.DestinationRecord
 import com.github.factotum_sdp.factotum.models.User
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder.USER_COURIER
+import com.github.factotum_sdp.factotum.repositories.BackUpRepository
 import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookFragment
 import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookViewModel
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
@@ -85,7 +86,7 @@ class RoadBookBackUpTest {
             .perform(ViewActions.click())
 
         runBlocking {
-            delay(RoadBookViewModel.WAIT_TIME_BACK_UP_UPDATE * 2)
+            delay(BackUpRepository.WAIT_TIME_BACK_UP_UPDATE * 2)
         }
 
         // Set value event listener

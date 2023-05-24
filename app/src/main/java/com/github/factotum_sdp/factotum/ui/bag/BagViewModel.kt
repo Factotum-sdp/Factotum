@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.github.factotum_sdp.factotum.models.Bag
 import com.github.factotum_sdp.factotum.models.Pack
 import com.github.factotum_sdp.factotum.repositories.BagRepository
+import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookViewModel
 import com.google.firebase.database.DatabaseReference
 import java.util.Date
 import java.util.HashMap
@@ -118,6 +119,11 @@ class BagViewModel(private val repository: BagRepository): ViewModel() {
         _packages.value?.let {
             repository.setBackUp(Bag(it))
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        repository.clearRunnableBackUp()
     }
 
     private fun currentPackages(): List<Pack> {

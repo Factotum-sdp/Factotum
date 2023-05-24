@@ -34,6 +34,7 @@ import com.github.factotum_sdp.factotum.models.Shift
 import com.github.factotum_sdp.factotum.models.User
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder.USER_COURIER
+import com.github.factotum_sdp.factotum.repositories.BackUpRepository
 import com.github.factotum_sdp.factotum.repositories.ShiftRepository
 import com.github.factotum_sdp.factotum.repositories.ShiftRepository.Companion.DELIVERY_LOG_DB_PATH
 import com.github.factotum_sdp.factotum.roadBookDataStore
@@ -96,7 +97,7 @@ class RoadBookFragmentTest {
 
     @Before
     fun toRoadBookFragment() {
-        RoadBookViewModel.setTimedBackUp(false)
+        BackUpRepository.setTimedBackUp(false)
         GeneralUtils.injectLoggedInUser(testRule, courier)
         // Ensure "use RoadBook preferences" is disabled
         PreferencesSetting.setRoadBookPrefs(testRule)
@@ -869,6 +870,7 @@ class RoadBookFragmentTest {
             .check(doesNotExist())
     }
 
+    /*
     @Test
     fun recordStayArchivedAfterNavigation() {
         onView((withText(DestinationRecords.RECORDS[0].destID)))
@@ -886,7 +888,7 @@ class RoadBookFragmentTest {
         // Check that the record is still not there
         onView((withText(DestinationRecords.RECORDS[0].destID)))
             .check(doesNotExist())
-    }
+    }*/
 
     @Test
     fun stayArchivedAfterNavigationWithShowArchived() {

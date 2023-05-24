@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
+import com.github.factotum_sdp.factotum.bagDataStore
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.models.Contact
 import com.github.factotum_sdp.factotum.models.DestinationRecord.Action.DELIVER
@@ -28,6 +29,7 @@ import com.github.factotum_sdp.factotum.models.DestinationRecord.Action.PICK
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
 import com.github.factotum_sdp.factotum.models.Shift
 import com.github.factotum_sdp.factotum.preferencesDataStore
+import com.github.factotum_sdp.factotum.repositories.BagRepository
 import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
 import com.github.factotum_sdp.factotum.repositories.RoadBookRepository
 import com.github.factotum_sdp.factotum.repositories.ShiftRepository
@@ -43,7 +45,6 @@ import java.util.*
 
 private const val ON_DESTINATION_RADIUS = 15.0
 private const val ANIMATION_DURATION = 400L
-private const val NO_USER_FOR_DB_PATH = "no_user"
 
 /**
  * A fragment representing a RoadBook which is a list of DestinationRecord
@@ -77,8 +78,15 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private var usePreferences = false
     private val userViewModel: UserViewModel by activityViewModels()
     private val contactsViewModel : ContactsViewModel by activityViewModels()
-    private val bagViewModel: BagViewModel by activityViewModels()
-
+    private val bagViewModel: BagViewModel by activityViewModels {
+        BagViewModel.BagViewModelFactory(
+            BagRepository(
+                FirebaseInstance.getDatabase().reference.child(BAG_DB_PATH),
+                FirebaseInstance.getUsernameForDBPath(),
+                requireContext().bagDataStore
+            )
+        )
+    }
     private var timestampedIDs: Map<String, Date> = mapOf()
     private lateinit var currentContacts: List<Contact>
 
@@ -93,10 +101,15 @@ class RoadBookFragment : Fragment(), MenuProvider {
         // Observe the RoadBook ViewModel, to detect data changes
         // and update the displayed RecyclerView accordingly
         rbViewModel.recordsListState.observe(viewLifecycleOwner) {
+            rbViewModel.backUp()
             adapter.submitList(it)
         }
 
         rbViewModel.timestampedRecords.observe(viewLifecycleOwner) {
+            if(bagViewModel.isPackUpdateBlocked()) {
+                timestampedIDs = it
+                bagViewModel.allowPackUpdate()
+            }
             handleTimestampChange(it)
         }
 
@@ -129,11 +142,8 @@ class RoadBookFragment : Fragment(), MenuProvider {
             }
         } else { // some timestamp has been removed
             val removedIDs = timestampedIDs.keys.subtract(newTimestampedID.keys)
-            removedIDs.forEach {
-                bagViewModel.removedDestinationRecord(it)
-            }
+            bagViewModel.removedDestinationRecords(removedIDs)
         }
-
         timestampedIDs = newTimestampedID
     }
 
@@ -156,20 +166,11 @@ class RoadBookFragment : Fragment(), MenuProvider {
             }
         }
     }
-
-    override fun onResume() {
-        rbViewModel.launchRunnableBackUp()
-        super.onResume()
-    }
-
     override fun onPause() {
         rbViewModel.backUp()
-        super.onPause()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
+        bagViewModel.backUp()
         saveButtonStates()
-        super.onSaveInstanceState(outState)
+        super.onPause()
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -426,31 +427,26 @@ class RoadBookFragment : Fragment(), MenuProvider {
         return itemTHCallback
     }
 
-
     private fun isDragAndDropEnabled(): Boolean {
-        return if(::dragAndDropButton.isInitialized) dragAndDropButton.isChecked else false
+        return dragAndDropButton.isChecked
     }
-
     private fun isTouchClickEnabled(): Boolean {
-        return if(::touchClickButton.isInitialized) touchClickButton.isChecked else false
+        return touchClickButton.isChecked
     }
-
     private fun isSwipeLeftEnabled(): Boolean {
-        return if(::swipeLeftButton.isInitialized) swipeLeftButton.isChecked else false
+        return swipeLeftButton.isChecked
     }
-
     private fun isSwipeRightEnabled(): Boolean {
-        return if(::swipeRightButton.isInitialized) swipeRightButton.isChecked else false
+        return swipeRightButton.isChecked
     }
-
     private fun isShowArchivedEnabled(): Boolean {
-        return if(::showArchivedButton.isInitialized) showArchivedButton.isChecked else false
+        return showArchivedButton.isChecked
     }
-
 
     companion object {
-        const val ROADBOOK_DB_PATH = "Sheet-shift" //change to "Sheet-shift2" for manual testing
+        const val ROADBOOK_DB_PATH = "Sheet-shift"
         const val DEST_ID_NAV_ARG_KEY = "destID"
+        const val BAG_DB_PATH = "Bag-shift"
     }
 
     /** Only use that access for testing purpose */
@@ -487,4 +483,5 @@ class RoadBookFragment : Fragment(), MenuProvider {
             rbViewModel.hideArchivedRecords()
         rbRecyclerView.adapter!!.notifyDataSetChanged()
     }
+
 }

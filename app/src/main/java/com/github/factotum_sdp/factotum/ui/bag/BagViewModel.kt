@@ -3,7 +3,11 @@ package com.github.factotum_sdp.factotum.ui.bag
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.github.factotum_sdp.factotum.models.Bag
 import com.github.factotum_sdp.factotum.models.Pack
+import com.github.factotum_sdp.factotum.repositories.BagRepository
+import kotlinx.coroutines.runBlocking
 import java.util.Date
 import java.util.HashMap
 
@@ -11,11 +15,13 @@ import java.util.HashMap
  * The "bag" viewModel which represents the current state
  * of the packages delivered or currently delivered
  */
-class BagViewModel: ViewModel() {
+class BagViewModel(private val repository: BagRepository): ViewModel() {
     private val _packages = MutableLiveData<List<Pack>>(listOf())
     val packages: LiveData<List<Pack>> = _packages
 
     private val packageOccurrences = HashMap<Pair<String, String>, Int>()
+    private var blockPackUpdate = false
+
 
     /**
      * Create a new Package in the current stored packages
@@ -40,7 +46,7 @@ class BagViewModel: ViewModel() {
             deliveredAt = null,
             notes = notes
         )
-        _packages.postValue(currentPackages().plus(pack))
+        updatePackages(currentPackages().plus(pack))
     }
 
     /**
@@ -58,7 +64,7 @@ class BagViewModel: ViewModel() {
                 it
             }
         }
-        _packages.postValue(updated)
+        updatePackages(updated)
     }
 
     /**
@@ -66,17 +72,17 @@ class BagViewModel: ViewModel() {
      *
      * @param destID: String The DestinationRecord's destID
      */
-    fun removedDestinationRecord(destID: String) {
+    fun removedDestinationRecords(destIDs: Set<String>) {
         val updated = currentPackages().mapNotNull {
-            if(it.startingRecordID == destID) {
+            if(destIDs.contains(it.startingRecordID)) {
                 null// filter out the pack with their startingDRecord deleted
-            } else if (it.arrivalRecordID == destID) {
+            } else if (destIDs.contains(it.arrivalRecordID)) {
                 it.copy(deliveredAt = null)
             } else {
                 it
             }
         }
-        _packages.postValue(updated)
+        updatePackages(updated)
     }
 
     /**
@@ -95,7 +101,7 @@ class BagViewModel: ViewModel() {
                 it
             }
         }
-        _packages.postValue(updated)
+        updatePackages(updated)
     }
 
     /**
@@ -105,9 +111,46 @@ class BagViewModel: ViewModel() {
      * @param notes: String
      */
     fun updateNotesOf(packageID: String, notes: String) {
-        _packages.value = currentPackages().map {
+        val updated = currentPackages().map {
             if(it.packageID == packageID) it.copy(notes = notes) else it
         }
+        updatePackages(updated)
+    }
+
+    /**
+     * Triggers a back-up of the current Bag state
+     */
+    fun backUp() {
+        _packages.value?.let {
+            repository.setBackUp(Bag(it))
+        }
+    }
+
+    /**
+     * Load the last back-up available into the packages liveData
+     */
+    fun fetchBackBackUp() {
+        runBlocking {
+            val lastBackUp = repository.getLastBackUp()
+            updatePackages(lastBackUp)
+        }
+    }
+
+    fun isPackUpdateBlocked(): Boolean {
+        return blockPackUpdate
+    }
+
+    fun blockPackUpdate() {
+        blockPackUpdate = true
+    }
+
+    fun allowPackUpdate() {
+        blockPackUpdate = false
+    }
+
+    private fun updatePackages(updated: List<Pack>) {
+        _packages.value = updated
+        repository.setBackUp(Bag(updated))
     }
 
     private fun currentPackages(): List<Pack> {
@@ -120,5 +163,15 @@ class BagViewModel: ViewModel() {
             ++occ
         }
         return "${senderID}To${recipientID}#$occ"
+    }
+
+    // Factory needed to assign a value at construction time to the class attribute
+    class BagViewModelFactory(private val _repository: BagRepository) :
+        ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return modelClass
+                .getConstructor(BagRepository::class.java)
+                .newInstance(_repository)
+        }
     }
 }

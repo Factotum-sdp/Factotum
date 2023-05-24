@@ -8,9 +8,11 @@ import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -41,7 +43,7 @@ private const val MAILBOX_TITLE = "Mailbox"
 class BossMapFragment : Fragment(), OnMapReadyCallback {
 
     private var cameraPositionInitialized = false
-    private val viewModel: BossMapViewModel by viewModels()
+    private val bossMapViewModel: BossMapViewModel by viewModels()
     private val contactsViewModel: ContactsViewModel by activityViewModels()
     private lateinit var mapView: MapView
     private lateinit var googleMap: GoogleMap
@@ -83,8 +85,8 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
             )
         )
 
-        viewModel.courierLocations.observe(viewLifecycleOwner) { locations ->
-            updateMap(locations, viewModel.deliveriesStatus.value ?: mapOf())
+        bossMapViewModel.courierLocations.observe(viewLifecycleOwner) { locations ->
+            updateMap(locations, bossMapViewModel.deliveriesStatus.value ?: mapOf())
             if (!cameraPositionInitialized) {
                 val geometricMedian = calculateMedianLocation()
                 googleMap.moveCamera(
@@ -98,18 +100,18 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-        viewModel.deliveriesStatus.observe(viewLifecycleOwner) { deliveryStatus ->
-            updateMap(viewModel.courierLocations.value ?: emptyList(), deliveryStatus)
+        bossMapViewModel.deliveriesStatus.observe(viewLifecycleOwner) { deliveryStatus ->
+            updateMap(bossMapViewModel.courierLocations.value ?: emptyList(), deliveryStatus)
         }
 
         contactsViewModel.contacts.observe(viewLifecycleOwner) {
-            viewModel.updateContacts(it)
+            bossMapViewModel.updateContacts(it)
         }
         googleMap.setOnMarkerClickListener { marker ->
             marker.title?.let { title ->
                 if (title.startsWith(MAILBOX_TITLE)) {
                     val mailboxNumber = title.split(" ")[1]
-                    val deliveryStatus = viewModel.deliveriesStatus.value?.get(mailboxNumber) ?: emptyList()
+                    val deliveryStatus = bossMapViewModel.deliveriesStatus.value?.get(mailboxNumber) ?: emptyList()
                     showDeliveryInfos(Pair(mailboxNumber, deliveryStatus))
                 }
             }
@@ -143,6 +145,7 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
 
     private fun showDeliveryInfos(deliveryStatus: Pair<String, List<DeliveryStatus>>){
         val deliveryInfos = StringBuilder()
+        val client = deliveryStatus.second[0].clientID
         deliveryStatus.second.forEach {status ->
             deliveryInfos.append("${status.courier} : ${status.timeStamp ?: "not delivered"}\n")
         }
@@ -154,11 +157,18 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
             }
             .setNegativeButton("History"){ dialog, _ ->
                 val bundle = Bundle()
-                val jsonStatus = Gson().toJson(deliveryStatus.second) //TODO : changer pas list de delivery status history
-                bundle.putString("History", jsonStatus)
-                findNavController()
-                    .navigate(R.id.action_bossMapFragment_to_deliveryHistoryFragment, bundle)
-                dialog.dismiss()
+                if (bossMapViewModel.history.value != null) {
+                    val jsonStatus =
+                        Gson().toJson(bossMapViewModel.history.value!![client])
+                    Log.d("History", jsonStatus)
+                    bundle.putString("History", jsonStatus)
+                    findNavController()
+                        .navigate(R.id.action_bossMapFragment_to_deliveryHistoryFragment, bundle)
+                    dialog.dismiss()
+                } else {
+                    Toast.makeText(requireContext(), "No history available", Toast.LENGTH_SHORT)
+                        .show()
+                }
             }
             .setNeutralButton("Proof Pictures"){ dialog, _ ->
                 val bundle = bundleOf("ProofPicture" to deliveryStatus.first)
@@ -222,8 +232,8 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
 
 
     private fun calculateMedianLocation(): LatLng {
-        val courierLocations: List<CourierLocation> = viewModel.courierLocations.value ?: emptyList()
-        val deliveryStatus: Map<String, List<DeliveryStatus>> = viewModel.deliveriesStatus.value ?: emptyMap()
+        val courierLocations: List<CourierLocation> = bossMapViewModel.courierLocations.value ?: emptyList()
+        val deliveryStatus: Map<String, List<DeliveryStatus>> = bossMapViewModel.deliveriesStatus.value ?: emptyMap()
 
         val courierLatLngs = courierLocations.map { LatLng(it.latitude!!, it.longitude!!) }
         val deliveryLatLngs = deliveryStatus.flatMap {

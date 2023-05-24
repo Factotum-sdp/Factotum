@@ -98,6 +98,18 @@ class BagViewModel: ViewModel() {
         _packages.postValue(updated)
     }
 
+    /**
+     * Update the specified pack notes
+     *
+     * @param packageID: String the pack identifier
+     * @param notes: String
+     */
+    fun updateNotesOf(packageID: String, notes: String) {
+        _packages.value = currentPackages().map {
+            if(it.packageID == packageID) it.copy(notes = notes) else it
+        }
+    }
+
     private fun currentPackages(): List<Pack> {
         return _packages.value!!
     }

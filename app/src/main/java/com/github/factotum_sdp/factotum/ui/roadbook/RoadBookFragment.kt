@@ -20,8 +20,8 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.models.Contact
-import com.github.factotum_sdp.factotum.models.DestinationRecord.Action.PICK
 import com.github.factotum_sdp.factotum.models.DestinationRecord.Action.DELIVER
+import com.github.factotum_sdp.factotum.models.DestinationRecord.Action.PICK
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
 import com.github.factotum_sdp.factotum.models.Shift
 import com.github.factotum_sdp.factotum.preferencesDataStore
@@ -420,7 +420,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     }
 
     companion object {
-        const val ROADBOOK_DB_PATH = "Sheet-shift2" //change to "Sheet-shift2" for manual testing
+        const val ROADBOOK_DB_PATH = "Sheet-shift" //change to "Sheet-shift2" for manual testing
         const val DEST_ID_NAV_ARG_KEY = "destID"
     }
 

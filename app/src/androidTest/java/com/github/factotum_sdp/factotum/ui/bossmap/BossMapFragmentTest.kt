@@ -3,7 +3,9 @@ package com.github.factotum_sdp.factotum.ui.bossmap
 import android.Manifest
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions.open
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -97,8 +99,40 @@ class BossMapFragmentTest {
         assert(mailboxBuaghiat != null)
         val mailboxX17 = device.findObject(By.descContains("Mailbox"))
         assert(mailboxX17 != null)
-
     }
+
+    @Test
+    fun testGoesToPictureFragment(){
+        GeneralUtils.fillUserEntryAndEnterTheApp(UsersPlaceHolder.USER_BOSS.email, UsersPlaceHolder.USER_BOSS.password)
+        goToBossMapFragment()
+        val cuf = CameraUpdateFactory.newLatLng(LatLng(46.517719,6.569090))
+        moveMapCamera(testRule, cuf)
+        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        val mailboxBuaghiat = device.wait(Until.findObject(By.descContains("Mailbox")), 5000L)
+        mailboxBuaghiat.click()
+        device.wait(Until.findObject(By.textContains("Delivery status")), 5000L)
+        onView(withId(android.R.id.button3)).perform(click())
+        onView(withId(R.id.fragment_display_directors_parent)).check(matches(isDisplayed()))
+        device.pressBack()
+        device.pressBack()
+    }
+
+    @Test
+    fun testGoesToHistoryFragment(){
+        GeneralUtils.fillUserEntryAndEnterTheApp(UsersPlaceHolder.USER_BOSS.email, UsersPlaceHolder.USER_BOSS.password)
+        goToBossMapFragment()
+        val cuf = CameraUpdateFactory.newLatLng(LatLng(46.517719,6.569090))
+        moveMapCamera(testRule, cuf)
+        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        val mailboxBuaghiat = device.wait(Until.findObject(By.descContains("Mailbox")), 5000L)
+        mailboxBuaghiat.click()
+        device.wait(Until.findObject(By.textContains("Delivery status")), 5000L)
+        onView(withId(android.R.id.button2)).perform(click())
+        onView(withId(R.id.fragment_history_directors_parent)).check(matches(isDisplayed()))
+        device.pressBack()
+    }
+
+
 
     private fun goToBossMapFragment() {
         onView(withId(R.id.drawer_layout))
@@ -127,6 +161,5 @@ class BossMapFragmentTest {
             }
         }
         latch.await(1L, TimeUnit.SECONDS)
-
     }
 }

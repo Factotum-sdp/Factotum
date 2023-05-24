@@ -26,7 +26,6 @@ class DeliveryHistoryFragment : Fragment() {
         val jsonDelivery = arguments?.getString("History") ?: ""
         val deliveries = Gson().fromJson(jsonDelivery, Array<DeliveryStatus>::class.java)
         list = deliveries.toList()
-        columnCount = deliveries.size
 
     }
 
@@ -35,16 +34,10 @@ class DeliveryHistoryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_delivery_history_list, container, false)
-
         // Set the adapter
         if (view is RecyclerView) {
-            with(view) {
-                layoutManager = when {
-                    columnCount <= 1 -> LinearLayoutManager(context)
-                    else -> GridLayoutManager(context, columnCount)
-                }
-                adapter = MyDeliveryHistoryRecyclerViewAdapter(list)
-            }
+            view.layoutManager = LinearLayoutManager(context)
+            view.adapter = MyDeliveryHistoryRecyclerViewAdapter(list)
         }
         return view
     }

@@ -15,7 +15,6 @@ import com.github.factotum_sdp.factotum.models.User
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder.USER_COURIER
 import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookFragment
-import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookViewModel
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.PreferencesSetting
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -47,6 +46,8 @@ class RoadBookBackUpTest {
         fun setUpDatabase() {
             GeneralUtils.initFirebase()
         }
+
+        const val SHORT_NETWORK_DELAY = 2000L
     }
     private val courier =
         User(USER_COURIER.uid, USER_COURIER.name, USER_COURIER.email, USER_COURIER.role)
@@ -86,7 +87,7 @@ class RoadBookBackUpTest {
             .perform(ViewActions.click())
 
         runBlocking {
-            delay(RoadBookViewModel.WAIT_TIME_BACK_UP_UPDATE * 2)
+            delay(SHORT_NETWORK_DELAY)
         }
 
         // Set value event listener

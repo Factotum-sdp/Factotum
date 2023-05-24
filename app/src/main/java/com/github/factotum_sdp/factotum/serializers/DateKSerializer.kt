@@ -16,24 +16,30 @@ import java.util.Locale.ENGLISH
 /**
  * This class is used to serialize and deserialize java.util.Date
  */
-object DateKSerializer : KSerializer<Date?> {
+object DateKSerializer: KSerializer<Date> {
     override val descriptor: SerialDescriptor
         get() = PrimitiveSerialDescriptor("java.util.Date", PrimitiveKind.STRING)
 
-    override fun deserialize(decoder: Decoder): Date? {
+    override fun deserialize(decoder: Decoder): Date {
         val format = decoder.decodeString()
         return try {
-            SimpleDateFormat.getDateTimeInstance(DEFAULT, DEFAULT, ENGLISH).parse(format)
+            SimpleDateFormat.getDateTimeInstance(
+                DEFAULT,
+                DEFAULT,
+                ENGLISH
+            ).parse(format) as Date
         } catch (e: ParseException) {
             Log.e("DateKSerializer", "Failed to parse date: $format")
-            null
+            Date()
         }
     }
 
-    override fun serialize(encoder: Encoder, value: Date?) {
-        value?.let {
-            val format = SimpleDateFormat.getDateTimeInstance(DEFAULT, DEFAULT, ENGLISH).format(value)
+    override fun serialize(encoder: Encoder, value: Date) {
+            val format = SimpleDateFormat.getDateTimeInstance(
+                DEFAULT,
+                DEFAULT,
+                ENGLISH
+            ).format(value)
             encoder.encodeString(format)
-        } ?: encoder.encodeString("_")
     }
 }

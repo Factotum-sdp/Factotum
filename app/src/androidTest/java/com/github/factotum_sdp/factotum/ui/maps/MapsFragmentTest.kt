@@ -55,7 +55,6 @@ class MapsFragmentTest {
     )
 
     companion object {
-
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {

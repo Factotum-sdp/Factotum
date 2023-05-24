@@ -43,7 +43,6 @@ import java.util.*
 
 private const val ON_DESTINATION_RADIUS = 15.0
 private const val NO_USER_FOR_DB_PATH = "no_user"
-private const val ANIMATION_DURATION = 400L
 
 /**
  * A fragment representing a RoadBook which is a list of DestinationRecord
@@ -56,7 +55,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         RoadBookViewModel.RoadBookViewModelFactory(
             RoadBookRepository(
                 FirebaseInstance.getDatabase().reference.child(ROADBOOK_DB_PATH),
-                userViewModel.loggedInUser.value?.name ?: NO_USER_FOR_DB_PATH,
+                FirebaseInstance.getUsernameForDBPath(),
                 requireContext().roadBookDataStore
             ),
             ShiftRepository(
@@ -155,6 +154,11 @@ class RoadBookFragment : Fragment(), MenuProvider {
                 ).show()
             }
         }
+    }
+
+    override fun onResume() {
+        rbViewModel.launchRunnableBackUp()
+        super.onResume()
     }
 
     override fun onPause() {

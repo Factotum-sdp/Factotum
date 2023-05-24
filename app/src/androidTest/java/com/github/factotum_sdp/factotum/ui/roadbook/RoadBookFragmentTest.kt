@@ -30,7 +30,6 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.LocationClientFactory
 import com.github.factotum_sdp.factotum.data.MockLocationClient
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
-import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat
 import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseDateFormatted
 import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseSafeString
 import com.github.factotum_sdp.factotum.models.DestinationRecord
@@ -110,6 +109,7 @@ class RoadBookFragmentTest {
 
     @Before
     fun toRoadBookFragment() {
+        RoadBookViewModel.setTimedBackUp(false)
         GeneralUtils.injectLoggedInUser(testRule, courier)
         // Ensure "use RoadBook preferences" is disabled
         PreferencesSetting.setRoadBookPrefs(testRule)

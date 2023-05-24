@@ -61,7 +61,9 @@ class LoginFragment : Fragment() {
         // Observe the login result and show it in a snackbar
         observeAuthResult(loadingProgressBar)
 
-        viewModel.checkIfCachedUser()
+        viewModel.checkIfCachedUser()?.let {
+            userViewModel.setLoggedInUser(it)
+        }
 
         val afterTextChangedListener =
             createTextWatcher(viewModel, emailEditText, passwordEditText)

@@ -3,21 +3,25 @@ package com.github.factotum_sdp.factotum.ui.bag
 import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.models.Pack
-import kotlinx.serialization.descriptors.buildSerialDescriptor
 
 /**
  * The "bag" Fragment
  * Showing on screen all the packets delivered or currently delivered during a Shift
  */
-class BagFragment: Fragment() {
+class BagFragment: Fragment(), MenuProvider {
 
     private val bagViewModel: BagViewModel by activityViewModels()
 
@@ -29,7 +33,7 @@ class BagFragment: Fragment() {
         val view = inflater.inflate(R.layout.fragment_bag, container, false)
         val adapter = BagAdapter(setPackOnClickListener())
 
-        bagViewModel.packages.observe(viewLifecycleOwner) {
+        bagViewModel.displayedPackages.observe(viewLifecycleOwner) {
             adapter.submitList(it.toList())
         }
 
@@ -37,6 +41,11 @@ class BagFragment: Fragment() {
         packagesRecyclerView.adapter = adapter
 
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        requireActivity().addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     private fun setPackOnClickListener(): (Pack) -> Unit {
@@ -56,5 +65,30 @@ class BagFragment: Fragment() {
 
             builder.show()
         }
+    }
+
+    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+        menuInflater.inflate(R.menu.bag_menu, menu)
+
+        val withSendPackButton = menu.findItem(R.id.menu_filter_button)
+
+        withSendPackButton.setOnMenuItemClickListener {
+            it.isChecked = !it.isChecked
+
+            if(it.isChecked) it.setIcon(R.drawable.blue_send)
+            else it.setIcon(R.drawable.send)
+
+            bagViewModel.displayDeliveredPacks(it.isChecked)
+            true
+        }
+    }
+
+    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+        // Needed to have the onSupportNavigateUp() called
+        // when clicking on the home button after an onMenuItemSelected() override
+        if (menuItem.itemId == android.R.id.home) {
+            return false
+        }
+        return true
     }
 }

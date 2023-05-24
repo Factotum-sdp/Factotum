@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <group
+        android:checkableBehavior="all"
+        android:menuCategory="alternative">
+        <item
+            android:id="@+id/menu_filter_button"
+            android:icon="@drawable/send"
+            android:title="@string/with_send_packs_button"
+            app:showAsAction="always" />
+    </group>
+</menu>

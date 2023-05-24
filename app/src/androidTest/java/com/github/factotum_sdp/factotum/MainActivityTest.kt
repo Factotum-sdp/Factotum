@@ -51,6 +51,7 @@ class MainActivityTest {
         @JvmStatic
         fun setUpDatabase() = runTest {
             initFirebase()
+            logout()
         }
 
         @BeforeClass

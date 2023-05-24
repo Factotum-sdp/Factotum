@@ -23,6 +23,7 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.models.CourierLocation
 import com.github.factotum_sdp.factotum.models.DeliveryStatus
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
+import com.github.factotum_sdp.factotum.ui.display.DisplayFragment.Companion.PROOF_PICTURE
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
@@ -39,6 +40,11 @@ private const val SCALE_FACTOR_ICON = 0.7f
 private const val FACTOR_DARKER_COLOR = 0.7f
 private const val MAILBOX_TITLE = "Mailbox"
 
+/**
+ * A map fragment that should be available only for a boss user.
+ * It displays the locations of all couriers and mailboxes.
+ *
+ */
 class BossMapFragment : Fragment(), OnMapReadyCallback {
 
     private var cameraPositionInitialized = false
@@ -175,7 +181,7 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
                 }
             }
             .setNeutralButton("Proof Pictures"){ dialog, _ ->
-                val bundle = bundleOf("ProofPicture" to deliveryStatus.first)
+                val bundle = bundleOf(PROOF_PICTURE to deliveryStatus.first)
                 findNavController()
                     .navigate(R.id.action_bossMapFragment_to_photoProofRecapFragment, bundle)
                 dialog.dismiss()

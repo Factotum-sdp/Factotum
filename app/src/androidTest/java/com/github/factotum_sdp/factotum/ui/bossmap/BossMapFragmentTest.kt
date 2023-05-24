@@ -1,10 +1,13 @@
 package com.github.factotum_sdp.factotum.ui.bossmap
 
 import android.Manifest
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions.open
+import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
@@ -107,14 +110,11 @@ class BossMapFragmentTest {
         goToBossMapFragment()
         val cuf = CameraUpdateFactory.newLatLng(LatLng(46.517719,6.569090))
         moveMapCamera(testRule, cuf)
-        Thread.sleep(3000)
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        val mailboxBuaghiat = device.wait(Until.findObject(By.descContains("Mailbox")), 5000L)
-        mailboxBuaghiat.click()
-        Thread.sleep(3000)
+        val mailbox = device.wait(Until.findObject(By.descContains("Mailbox")), 5000L)
+        mailbox.click()
         device.wait(Until.findObject(By.textContains("Delivery status")), 5000L)
         onView(withId(android.R.id.button3)).perform(click())
-        Thread.sleep(3000)
         onView(withId(R.id.fragment_display_directors_parent)).check(matches(isDisplayed()))
         device.pressBack()
         device.pressBack()
@@ -126,15 +126,21 @@ class BossMapFragmentTest {
         goToBossMapFragment()
         val cuf = CameraUpdateFactory.newLatLng(LatLng(46.517719,6.569090))
         moveMapCamera(testRule, cuf)
-        Thread.sleep(3000)
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        val mailboxBuaghiat = device.wait(Until.findObject(By.descContains("Mailbox")), 5000L)
-        mailboxBuaghiat.click()
-        Thread.sleep(3000)
+        val mailbox = device.wait(Until.findObject(By.descContains("Mailbox")), 5000L)
+        mailbox.click()
+        device.wait(Until.findObject(By.textContains("Delivery status")), 5000L)
         onView(withId(android.R.id.button2)).perform(click())
-        Thread.sleep(3000)
         onView(withId(R.id.list)).check(matches(isDisplayed()))
         device.pressBack()
+    }
+
+    @Test
+    fun testHistoryUpdates(){
+        GeneralUtils.fillUserEntryAndEnterTheApp(UsersPlaceHolder.USER_BOSS.email, UsersPlaceHolder.USER_BOSS.password)
+        endShift()
+        goToBossMapFragment()
+
     }
 
 
@@ -155,6 +161,14 @@ class BossMapFragmentTest {
 
     private fun activateLocation() {
         onView(withId(R.id.location_switch)).perform(click())
+    }
+
+    private fun endShift(){
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(ViewMatchers.withText(R.string.end_shift)).perform(click())
+        onView(ViewMatchers.withText(R.string.end_shift_dialog_title))
+            .check(matches(isDisplayed()))
+        onView(withId(android.R.id.button1)).perform(click())
     }
 
     private fun moveMapCamera(rule: ActivityScenarioRule<MainActivity>, cuf : CameraUpdate) {

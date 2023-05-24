@@ -129,8 +129,8 @@ class BossMapFragmentTest {
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         val mailbox = device.wait(Until.findObject(By.descContains("Mailbox")), 5000L)
         mailbox.click()
-        device.wait(Until.findObject(By.textContains("Delivery status")), 5000L)
-        onView(withId(android.R.id.button2)).perform(click())
+        val history = device.wait(Until.findObject(By.textContains("History")), 5000L)
+        history.click()
         onView(withId(R.id.list)).check(matches(isDisplayed()))
         device.pressBack()
     }

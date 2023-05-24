@@ -37,7 +37,6 @@ import com.google.gson.Gson
 private const val ZOOM_LEVEL_CITY = 13f
 private const val SCALE_FACTOR_ICON = 0.7f
 private const val FACTOR_DARKER_COLOR = 0.7f
-private const val MAIL_BOX_SIZE = 100
 private const val MAILBOX_TITLE = "Mailbox"
 
 class BossMapFragment : Fragment(), OnMapReadyCallback {
@@ -47,6 +46,7 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
     private val contactsViewModel: ContactsViewModel by activityViewModels()
     private lateinit var mapView: MapView
     private lateinit var googleMap: GoogleMap
+    private var MAIL_BOX_SIZE = 100
 
 
     private lateinit var bitmapDeliveredScaled : Bitmap
@@ -60,6 +60,10 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
         mapView = view.findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
+        val displayMetrics = resources.displayMetrics
+        val screenWidth = displayMetrics.widthPixels
+        MAIL_BOX_SIZE = (screenWidth / 10 * SCALE_FACTOR_ICON).toInt()
+
 
 
         bitmapDeliveredScaled = createScaledBitmap(

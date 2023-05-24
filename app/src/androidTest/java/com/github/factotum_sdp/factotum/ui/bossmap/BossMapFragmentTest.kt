@@ -107,6 +107,7 @@ class BossMapFragmentTest {
         goToBossMapFragment()
         val cuf = CameraUpdateFactory.newLatLng(LatLng(46.517719,6.569090))
         moveMapCamera(testRule, cuf)
+        Thread.sleep(3000)
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         val mailboxBuaghiat = device.wait(Until.findObject(By.descContains("Mailbox")), 5000L)
         mailboxBuaghiat.click()

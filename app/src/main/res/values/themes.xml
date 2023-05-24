@@ -1,6 +1,6 @@
 <resources>
     <!-- Base application theme for day mode. -->
-    <style name="Theme.Factotum" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.Factotum" parent="Theme.Material3.Light.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/indigo_500</item>
         <item name="colorPrimaryVariant">@color/indigo_700</item>

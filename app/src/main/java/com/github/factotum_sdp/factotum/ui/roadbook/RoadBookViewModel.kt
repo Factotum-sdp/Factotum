@@ -33,15 +33,8 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
     private val clientOccurrences = HashMap<String, Int>()
     private lateinit var preferencesRepository: RoadBookPreferencesRepository
 
-
-
     init {
         addDemoRecords(DestinationRecords.RECORDS)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        roadBookRepository.clearRunnableBackUp()
     }
 
     /**
@@ -99,13 +92,6 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
      */
     fun backUp() {
         roadBookRepository.setBackUp(currentDRecList())
-    }
-
-    /**
-     * Launch the Runnable routine to achieve timed back-ups of the RoadBook
-     */
-    fun launchRunnableBackUp() {
-        roadBookRepository.launchRunnableBackUp { roadBookRepository.setBackUp(currentDRecList()) }
     }
 
     /**

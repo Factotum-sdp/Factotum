@@ -45,7 +45,7 @@ class BagViewModel(private val repository: BagRepository): ViewModel() {
             deliveredAt = null,
             notes = notes
         )
-        _packages.postValue(currentPackages().plus(pack))
+        updatePackages(currentPackages().plus(pack))
     }
 
     /**
@@ -63,7 +63,7 @@ class BagViewModel(private val repository: BagRepository): ViewModel() {
                 it
             }
         }
-        _packages.postValue(updated)
+        updatePackages(updated)
     }
 
     /**
@@ -81,7 +81,7 @@ class BagViewModel(private val repository: BagRepository): ViewModel() {
                 it
             }
         }
-        _packages.postValue(updated)
+        updatePackages(updated)
     }
 
     /**
@@ -100,7 +100,7 @@ class BagViewModel(private val repository: BagRepository): ViewModel() {
                 it
             }
         }
-        _packages.postValue(updated)
+        updatePackages(updated)
     }
 
     /**
@@ -110,9 +110,10 @@ class BagViewModel(private val repository: BagRepository): ViewModel() {
      * @param notes: String
      */
     fun updateNotesOf(packageID: String, notes: String) {
-        _packages.value = currentPackages().map {
+        val updated = currentPackages().map {
             if(it.packageID == packageID) it.copy(notes = notes) else it
         }
+        updatePackages(updated)
     }
 
     fun backUp() {
@@ -121,9 +122,9 @@ class BagViewModel(private val repository: BagRepository): ViewModel() {
         }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        repository.clearRunnableBackUp()
+    private fun updatePackages(updated: List<Pack>) {
+        _packages.postValue(updated)
+        repository.setBackUp(Bag(updated))
     }
 
     private fun currentPackages(): List<Pack> {

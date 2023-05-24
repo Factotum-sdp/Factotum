@@ -97,6 +97,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         // Observe the RoadBook ViewModel, to detect data changes
         // and update the displayed RecyclerView accordingly
         rbViewModel.recordsListState.observe(viewLifecycleOwner) {
+            rbViewModel.backUp()
             adapter.submitList(it)
         }
 
@@ -159,11 +160,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
                 ).show()
             }
         }
-    }
-
-    override fun onResume() {
-        rbViewModel.launchRunnableBackUp()
-        super.onResume()
     }
     override fun onPause() {
         rbViewModel.backUp()
@@ -438,6 +434,10 @@ class RoadBookFragment : Fragment(), MenuProvider {
         const val ROADBOOK_DB_PATH = "Sheet-shift"
         const val DEST_ID_NAV_ARG_KEY = "destID"
         const val BAG_DB_PATH = "Bag-shift"
+        private var backUpOnAction = false
+        fun setBackUpOnAction(enabled: Boolean) {
+            RoadBookFragment.Companion.backUpOnAction = enabled
+        }
     }
 
     /** Only use that access for testing purpose */
@@ -474,4 +474,5 @@ class RoadBookFragment : Fragment(), MenuProvider {
             rbViewModel.hideArchivedRecords()
         rbRecyclerView.adapter!!.notifyDataSetChanged()
     }
+
 }

@@ -97,8 +97,8 @@ class RoadBookFragmentTest {
 
     @Before
     fun toRoadBookFragment() {
-        BackUpRepository.setTimedBackUp(false)
         GeneralUtils.injectLoggedInUser(testRule, courier)
+        RoadBookFragment.setBackUpOnAction(false)
         // Ensure "use RoadBook preferences" is disabled
         PreferencesSetting.setRoadBookPrefs(testRule)
         onView(withId(R.id.drawer_layout))

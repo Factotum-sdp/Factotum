@@ -1,10 +1,7 @@
 package com.github.factotum_sdp.factotum.repositories
 
-import android.os.Handler
-import android.os.Looper
 import androidx.datastore.core.DataStore
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
-import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookViewModel
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -26,28 +23,6 @@ abstract class BackUpRepository<T: List<Any>>(remoteSource: DatabaseReference, u
 
     private var lastNetworkBackUp: T? = null
     private var lastLocalBackUp: T? = null
-
-    private lateinit var backUpAction: ((Unit) -> Unit)
-    private val handler = Handler(Looper.getMainLooper())
-    private val fetchDataRunnable = object : Runnable {
-        override fun run() {
-            backUpAction
-            handler.postDelayed(this, WAIT_TIME_BACK_UP_UPDATE)
-        }
-    }
-
-    fun launchRunnableBackUp(backUpAction: (Unit) -> Unit) {
-        if(withTimedBackUp) {
-            this.backUpAction = backUpAction
-            handler.post(fetchDataRunnable)
-        }
-    }
-
-    fun clearRunnableBackUp() {
-        if(withTimedBackUp) {
-            handler.removeCallbacks(fetchDataRunnable)
-        }
-    }
 
     init {
         FirebaseInstance.onConnectedStatusChanged {
@@ -131,13 +106,5 @@ abstract class BackUpRepository<T: List<Any>>(remoteSource: DatabaseReference, u
 
     private suspend fun getLastLocalBackUp(): T {
         return lastLocalBackUp ?: localSource.data.first()
-    }
-
-    companion object {
-        const val WAIT_TIME_BACK_UP_UPDATE = 15000L
-        var withTimedBackUp = true
-        fun setTimedBackUp(isEnabled: Boolean) { // For testing purpose
-            withTimedBackUp = isEnabled
-        }
     }
 }

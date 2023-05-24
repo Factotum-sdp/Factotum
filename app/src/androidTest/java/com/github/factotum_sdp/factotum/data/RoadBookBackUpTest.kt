@@ -77,10 +77,11 @@ class RoadBookBackUpTest {
         onView(ViewMatchers.withId(R.id.autoCompleteClientID))
             .perform(
                 ViewActions.click(),
-                ViewActions.typeText("${DestinationRecords.RECORD_TO_ADD.clientID} ")
+                ViewActions.typeText("${DestinationRecords.RECORD_TO_ADD.clientID} "),
+                ViewActions.closeSoftKeyboard()
             )
         onView(ViewMatchers.withId(R.id.editTextWaitingTime))
-            .perform(ViewActions.clearText(), ViewActions.typeText("7"))
+            .perform(ViewActions.clearText(), ViewActions.typeText("7"), ViewActions.closeSoftKeyboard())
         onView(ViewMatchers.withText(R.string.edit_dialog_update_b))
             .perform(ViewActions.click())
 

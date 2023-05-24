@@ -24,29 +24,17 @@ import java.io.File
 import java.util.Date
 import java.util.Locale
 
-class PictureFragment : Fragment() {
+class PictureFragment(clientID : String) : Fragment() {
 
     private var _binding: FragmentPictureBinding? = null
     private val binding get() = _binding!!
     private lateinit var photoFile: File
     private lateinit var photoUri: Uri
     private lateinit var photoName: String
-    private lateinit var folderName: String
-    private lateinit var destID: String
+    private var folderName: String = clientID
     private val storage: FirebaseStorage = FirebaseStorage.getInstance()
     private val storageRef: StorageReference = storage.reference
     private val userID : String = FirebaseAuth.getInstance().currentUser?.uid.toString()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        // Get clientId and destId from the arguments
-        val clientId = arguments?.getString("clientID") ?: ""
-        destID = arguments?.getString("destID") ?: ""
-
-        // Initialize folderName here
-        folderName = clientId.ifBlank { "default" }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -82,19 +70,15 @@ class PictureFragment : Fragment() {
         photoFile = File(tempFolder, photoName) // Create the photo file in the temporary folder
         photoUri = FileProvider.getUriForFile(requireContext(), fileProvider, photoFile)
 
-        // Launch the camera given the URI of the photo
         takePictureAndUpload.launch(photoUri)
     }
 
-    // Register an activity result launcher to take a picture and upload it to Firebase Storage
     private val takePictureAndUpload =
         registerForActivityResult(ActivityResultContracts.TakePicture()) { result ->
             if (result) {
-                // Upload photo to Firebase Storage
                 val photoRef = storageRef.child("$folderName/$photoName")
                 val uploadTask = photoRef.putFile(photoUri)
 
-                // Register observers to listen for when the upload is done or if it fails
                 uploadTask.addOnSuccessListener { photoFile.delete() }
             } else {
                 photoFile.delete()

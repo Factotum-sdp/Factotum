@@ -19,6 +19,7 @@ import com.google.firebase.database.ValueEventListener
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 private const val WAIT_TIME_LOCATION_UPDATE = 15000L

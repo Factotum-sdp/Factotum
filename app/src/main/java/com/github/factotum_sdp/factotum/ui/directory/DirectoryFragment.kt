@@ -44,7 +44,6 @@ class DirectoryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         adapter = ContactsRecyclerAdapter()
         adapter.updateContacts(viewModel.contacts.value ?: emptyList())
 

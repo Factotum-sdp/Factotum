@@ -11,7 +11,7 @@
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="google_maps">Google maps</string>
-    <string name="show_all">Show dst</string>
+    <string name="show_all">Show Destination</string>
     <string name="phone">Phone</string>
     <string name="email">Email</string>
     <string name="Set">Set</string>
@@ -37,7 +37,7 @@
     <string name="snap_text_on_rec_unarchive">Record unarchived</string>
 
     <string name="menu_maps">Maps</string>
-    <string name="run">Go To dst</string>
+    <string name="run">Go to Destination</string>
     <string name="rate_text_view">rate</string>
     <string name="wait_text_view">wait</string>
     <string name="arrival_text_view">arrival</string>
@@ -134,7 +134,7 @@
     <string name="textvlabel_notes">Notes</string>
     <string name="rb_label_show_archived">Show archived</string>
     <string name="delete_contact_button">Delete Contact</string>
-    <string name="button_modify_contact">Modify contact</string>
+    <string name="button_modify_contact">Modify Contact</string>
     <string name="form_button_update">Update Contact</string>
     <string name="form_button_create">Create Contact</string>
     <string name="contact_surname_and_name">Doe John</string>
@@ -192,4 +192,5 @@
     <string name="sign_in">Sign-In</string>
     <string name="sign_up">Sign-Up</string>
     <string name="settings">Settings</string>
+    <string name="contact_details_fragment">Contact Details</string>
 </resources>

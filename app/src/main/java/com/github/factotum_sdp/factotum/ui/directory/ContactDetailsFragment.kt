@@ -1,7 +1,11 @@
 package com.github.factotum_sdp.factotum.ui.directory
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Paint
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,6 +16,8 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
@@ -22,8 +28,8 @@ import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.models.Route
 import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment.Companion.IS_SUB_FRAGMENT_NAV_KEY
 import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment.Companion.USERNAME_NAV_KEY
+import com.github.factotum_sdp.factotum.ui.maps.MapsFragment
 import com.github.factotum_sdp.factotum.ui.maps.MapsViewModel
-import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
 
 class ContactDetailsFragment : Fragment() {
     private lateinit var currentContact: Contact
@@ -32,6 +38,8 @@ class ContactDetailsFragment : Fragment() {
     private val contactsViewModel: ContactsViewModel by activityViewModels()
     private val mapsViewModel: MapsViewModel by activityViewModels()
     private val userViewModel: UserViewModel by activityViewModels()
+
+    private val REQUEST_CALL_PERMISSION = 1
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -94,12 +102,34 @@ class ContactDetailsFragment : Fragment() {
             contactSuperClient.text = "@" + contact.super_client
         }
 
+        contactPhone.setOnClickListener {
+            val phoneNumber = contact.phone
+            if (phoneNumber.isNotEmpty()) {
+                val intent = Intent(Intent.ACTION_CALL)
+                intent.data = Uri.parse("tel:$phoneNumber")
+                if (ContextCompat.checkSelfPermission(
+                        view.context,
+                        Manifest.permission.CALL_PHONE
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    ActivityCompat.requestPermissions(
+                        view.context as Activity,
+                        arrayOf(Manifest.permission.CALL_PHONE),
+                        REQUEST_CALL_PERMISSION
+                    )
+                } else {
+                    view.context.startActivity(intent)
+                }
+            }
+        }
+
         contactUsername.text = "@" + contact.username
         contactName.text = contact.name
         contactSurname.text = contact.surname
         contactRole.text = contact.role
-        contactImage.setImageResource(contact.profile_pic_id)
+        contactImage.setImageResource(R.mipmap.ic_profile_pic_round)
         contactPhone.text = contact.phone
+        contactPhone.paintFlags = contactPhone.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         contactAddress.text = contact.addressName
         contactDetails.text = contact.details
     }
@@ -141,7 +171,7 @@ class ContactDetailsFragment : Fragment() {
                 val uri =
                     Uri.parse("google.navigation:q=${currentContact.latitude},${currentContact.longitude}&mode=b")
                 val intent = Intent(Intent.ACTION_VIEW, uri)
-                intent.setPackage(RouteFragment.MAPS_PKG)
+                intent.setPackage(MapsFragment.MAPS_PKG)
                 requireContext().startActivity(intent)
             } else {
                 coordinatesError()

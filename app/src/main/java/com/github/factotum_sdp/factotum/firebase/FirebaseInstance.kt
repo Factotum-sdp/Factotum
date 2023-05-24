@@ -12,6 +12,7 @@ import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 
 private const val TAG = "FirebaseAppInstance"
+private const val NO_USER_FOR_DB_PATH = "no_user"
 
 /**
  * The Firebase singleton instance of our App
@@ -21,6 +22,7 @@ object FirebaseInstance {
     private var database: FirebaseDatabase = Firebase.database
     private var auth: FirebaseAuth = Firebase.auth
     private val connectedRef = database.getReference(".info/connected")
+    private var usernameForDBPath: String? = null
 
     fun getDatabase(): FirebaseDatabase {
         return database
@@ -49,6 +51,14 @@ object FirebaseInstance {
                 Log.w(TAG, "Listener was cancelled at .info/connected")
             }
         })
+    }
+
+    fun getUsernameForDBPath(): String {
+        return usernameForDBPath ?: NO_USER_FOR_DB_PATH
+    }
+
+    fun setUsernameForDBPath(username: String) {
+        usernameForDBPath = FirebaseStringFormat.firebaseSafeString(username)
     }
 }
 

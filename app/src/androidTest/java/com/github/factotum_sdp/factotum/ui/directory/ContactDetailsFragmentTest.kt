@@ -23,7 +23,7 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.models.Contact
 import com.github.factotum_sdp.factotum.models.User
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
-import com.github.factotum_sdp.factotum.ui.maps.RouteFragment
+import com.github.factotum_sdp.factotum.ui.maps.MapsFragment
 import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.createRandomContacts
 import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.randomContacts
 import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.resetContact
@@ -48,7 +48,8 @@ class ContactDetailsFragmentTest {
     @get:Rule
     val permission = GrantPermissionRule.grant(
         Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.ACCESS_COARSE_LOCATION
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.CALL_PHONE
     )
 
     companion object {
@@ -187,7 +188,7 @@ class ContactDetailsFragmentTest {
         Intents.intended(
             CoreMatchers.allOf(
                 IntentMatchers.hasAction(Intent.ACTION_VIEW),
-                IntentMatchers.toPackage(RouteFragment.MAPS_PKG)
+                IntentMatchers.toPackage(MapsFragment.MAPS_PKG)
             )
         )
         Intents.release()

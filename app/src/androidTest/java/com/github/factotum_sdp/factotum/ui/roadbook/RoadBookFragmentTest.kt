@@ -27,7 +27,6 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.LocationClientFactory
 import com.github.factotum_sdp.factotum.data.MockLocationClient
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
-import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat
 import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseDateFormatted
 import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseSafeString
 import com.github.factotum_sdp.factotum.models.DestinationRecord
@@ -98,8 +97,7 @@ class RoadBookFragmentTest {
     @Before
     fun toRoadBookFragment() {
         GeneralUtils.injectLoggedInUser(testRule, courier)
-        // Ensure "use RoadBook preferences" is disabled
-        PreferencesSetting.setRoadBookPrefs(testRule)
+        PreferencesSetting.setRoadBookPrefs(testRule) // Ensure "use RoadBook preferences" is disabled
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))
@@ -222,9 +220,9 @@ class RoadBookFragmentTest {
         // Navigate out of the RoadBookFragment
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
-        onView(withId(R.id.routeFragment))
+        onView(withId(R.id.mapsFragment))
             .perform(click())
-        onView(withId(R.id.fragment_route_directors_parent))
+        onView(withId(R.id.fragment_maps_directors_parent))
             .check(matches(isDisplayed()))
 
         // Our target value to fetch
@@ -256,9 +254,9 @@ class RoadBookFragmentTest {
         // Navigate out of the RoadBookFragment
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
-        onView(withId(R.id.routeFragment))
+        onView(withId(R.id.mapsFragment))
             .perform(click())
-        onView(withId(R.id.fragment_route_directors_parent))
+        onView(withId(R.id.fragment_maps_directors_parent))
             .check(matches(isDisplayed()))
 
         var ls: List<DestinationRecord>
@@ -290,7 +288,7 @@ class RoadBookFragmentTest {
             .perform(click())
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
-        onView(withId(R.id.routeFragment)).perform(click())
+        onView(withId(R.id.mapsFragment)).perform(click())
 
         ref.get().addOnSuccessListener { snapshot ->
             val records = snapshot.children.mapNotNull {
@@ -312,7 +310,7 @@ class RoadBookFragmentTest {
         // Navigate out of the RoadBookFragment
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
-        onView(withId(R.id.routeFragment)).perform(click())
+        onView(withId(R.id.mapsFragment)).perform(click())
 
         var fromLocal: List<DestinationRecord>
         val context = ApplicationProvider.getApplicationContext<Context>().applicationContext
@@ -1327,9 +1325,9 @@ class RoadBookFragmentTest {
     private fun navigateOutsideAndComeBack() {
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
-        onView(withId(R.id.routeFragment))
+        onView(withId(R.id.mapsFragment))
             .perform(click())
-        onView(withId(R.id.fragment_route_directors_parent))
+        onView(withId(R.id.fragment_maps_directors_parent))
             .check(matches(isDisplayed()))
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())

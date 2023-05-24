@@ -1,5 +1,7 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.*
 import com.github.factotum_sdp.factotum.models.DestinationRecord
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
@@ -93,6 +95,31 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
     }
 
     /**
+     * Replace the current displayed list by the last available back up of the RoadBookRepository
+     *
+     * Note that the the back up don't take into account the archiving state, all fetched from
+     * back up records are no more archived.
+     */
+    fun fetchBackBackUps(){
+        runBlocking {
+            val lastBackUp = roadBookRepository.getLastBackUp()
+            val timestamped = buildSet {
+                lastBackUp.forEach { record ->
+                    record.timeStamp?.let {
+                        add(record)
+                    }
+                }
+            }
+            _recordsList.value =
+                DRecordList(
+                    allRecords = lastBackUp,
+                    showArchived = currentDRecList().showArchived,
+                    timestamped = timestamped
+                )
+        }
+    }
+
+    /**
      * Get the next destination to deliver
      *
      * The result is null if there is no nextDestination for the actual records state
@@ -121,31 +148,6 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
         val pos = currentDRecList().getIndexOf(record.destID)
 
         _recordsList.postValue(currentDRecList().editRecordAt(pos, newRec))
-    }
-
-    /**
-     * Replace the current displayed list by the last available back up of the RoadBookRepository
-     *
-     * Note that the the back up don't take into account the archiving state, all fetched from
-     * back up records are no more archived.
-     */
-    fun fetchBackBackUps(){
-        runBlocking {
-            val lastBackUp = roadBookRepository.getLastBackUp()
-            val timestamped = buildSet {
-                lastBackUp.forEach { record ->
-                    record.timeStamp?.let {
-                        add(record)
-                    }
-                }
-            }
-            _recordsList.value =
-                DRecordList(
-                    allRecords = lastBackUp,
-                    showArchived = currentDRecList().showArchived,
-                    timestamped = timestamped
-                )
-        }
     }
 
     /**

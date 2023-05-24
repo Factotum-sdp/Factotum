@@ -1,14 +1,12 @@
 package com.github.factotum_sdp.factotum.ui.bag
 
 import android.Manifest
-import android.view.View
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.*
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
-import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -226,6 +224,51 @@ class BagFragmentTest {
         onView(withText(newNotes)).check(doesNotExist())
     }
 
+    @Test
+    fun bagBackUpIsFetchedAndDisplayedCorrectly() {
+        val record = DestinationRecords.RECORD_TO_ADD
+        val clientID = record.clientID
+        val packageName = "Gold bottle"
+        val recipientID = "X17"
+        val notes = "It is the end of SDP"
+
+        createAPackWithNotes(clientID, packageName, recipientID, notes)
+
+        clearRoadBook()
+
+        // Go to Settings
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.settingsFragment))
+            .perform(click())
+
+        onView(withId(R.id.load_roadbook_backup)).perform(click())
+
+        // Go back RB
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.roadBookFragment))
+            .perform(click())
+
+        // Check all :
+        onView(withId(R.id.bag_button)).perform(click())
+
+        // Check indicator
+        onView(withId(R.id.isAnnotatedIcon)).check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
+
+        // Check fields
+        onView(withText(startsWith(packageName))).check(matches(isDisplayed()))
+        onView(withText(containsString(clientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(recipientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(BagAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
+            doesNotExist()
+        )
+
+        // Check text is displayed in the notes edit dialog
+        onView(withId(R.id.packageCardView)).perform(click())
+        onView(withText(notes)).check(matches(isDisplayed()))
+    }
+
     private fun createAPackWithNotes(clientID: String, packageName: String, recipientID: String, notes: String) {
         onView(withId(R.id.fab)).perform(click())
         onView(withId(R.id.autoCompleteClientID))
@@ -279,6 +322,23 @@ class BagFragmentTest {
             .perform(click(), typeText("$recipientID "), closeSoftKeyboard())
 
         onView(withText(R.string.confirm_label_pack_creation_dialog)).perform(click())
+    }
+
+    private fun clearRoadBook() {
+        // Navigate to Settings
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.settingsFragment))
+            .perform(click())
+
+        onView(withId(R.id.delete_all_roadbook)).perform(click())
+        onView(withText(R.string.positive_label_delete_all_roadbook_dialog)).perform(click())
+
+        // Back to RB
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+        onView(withId(R.id.roadBookFragment))
+            .perform(click())
     }
 
     private val timePickerUpdateBLabel = "OK"

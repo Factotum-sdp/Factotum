@@ -17,7 +17,7 @@
         android:contentDescription="@string/contact_image"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@tools:sample/avatars" />
+        tools:srcCompat="@mipmap/ic_profile_pic_round" />
 
     <LinearLayout
         android:id="@+id/name_role_layout"
@@ -129,7 +129,8 @@
             android:id="@+id/contact_phone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/contact_phone" />
+            android:text="@string/contact_phone"
+            android:autoLink="phone"/>
 
         <TextView
             android:id="@+id/details_description"

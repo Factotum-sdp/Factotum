@@ -168,8 +168,8 @@ class RoadBookFragment : Fragment(), MenuProvider {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
         saveButtonStates()
+        super.onSaveInstanceState(outState)
     }
 
     @SuppressLint("NotifyDataSetChanged")

@@ -86,7 +86,7 @@ class RoadBookBackUpTest {
             .perform(ViewActions.click())
 
         runBlocking {
-            delay(BackUpRepository.WAIT_TIME_BACK_UP_UPDATE * 2)
+            delay(BackUpRepository.WAIT_TIME_BACK_UP_UPDATE * 3)
         }
 
         // Set value event listener

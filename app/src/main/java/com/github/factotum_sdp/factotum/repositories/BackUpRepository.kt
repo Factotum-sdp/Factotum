@@ -27,16 +27,18 @@ abstract class BackUpRepository<T: List<Any>>(remoteSource: DatabaseReference, u
     private var lastNetworkBackUp: T? = null
     private var lastLocalBackUp: T? = null
 
+    private lateinit var backUpAction: ((Unit) -> Unit)
     private val handler = Handler(Looper.getMainLooper())
     private val fetchDataRunnable = object : Runnable {
         override fun run() {
-            //roadBookRepository.setBackUp(currentDRecList())
+            backUpAction
             handler.postDelayed(this, WAIT_TIME_BACK_UP_UPDATE)
         }
     }
 
-    fun launchRunnableBackUp() {
+    fun launchRunnableBackUp(backUpAction: (Unit) -> Unit) {
         if(withTimedBackUp) {
+            this.backUpAction = backUpAction
             handler.post(fetchDataRunnable)
         }
     }

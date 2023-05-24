@@ -105,7 +105,7 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
      * Launch the Runnable routine to achieve timed back-ups of the RoadBook
      */
     fun launchRunnableBackUp() {
-        roadBookRepository.launchRunnableBackUp()
+        roadBookRepository.launchRunnableBackUp { roadBookRepository.setBackUp(currentDRecList()) }
     }
 
     /**

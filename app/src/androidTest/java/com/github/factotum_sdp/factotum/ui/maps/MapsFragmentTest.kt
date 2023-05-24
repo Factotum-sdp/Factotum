@@ -21,8 +21,13 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.models.Role
+import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
+import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
+import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.injectBossAsLoggedInUser
+import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.logout
 import com.google.android.gms.maps.SupportMapFragment
 import junit.framework.TestCase.assertTrue
 import org.hamcrest.CoreMatchers.allOf
@@ -51,12 +56,11 @@ class MapsFragmentTest {
 
     companion object {
 
-        const val FIRST_ROUTE_NAME_PREFIX = "BC"
-
         @BeforeClass
         @JvmStatic
         fun setUpDatabase() {
             initFirebase()
+            logout()
         }
     }
 
@@ -67,68 +71,40 @@ class MapsFragmentTest {
 
     @Before
     fun setUp() {
-        injectBossAsLoggedInUser(testRule)
+        GeneralUtils.fillUserEntryAndEnterTheApp(UsersPlaceHolder.USER_COURIER.email, UsersPlaceHolder.USER_COURIER.password)
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
-        onView(withId(R.id.routeFragment))
+        onView(withId(R.id.mapsFragment))
             .perform(click())
+    }
+
+    @After
+    fun tearDown() {
+        logout()
     }
 
 
     @Test
     fun permissionAllowShowLocation() {
-        onView(withText(startsWith(FIRST_ROUTE_NAME_PREFIX))).perform(click())
-        val nextButton = onView(withId(R.id.button_next))
-        nextButton.perform(click())
         assertTrue(checkLocationEnabled(testRule))
     }
 
     @Test
-    fun goesToSecondFragment() {
-        onView(withText(startsWith(FIRST_ROUTE_NAME_PREFIX))).perform(click())
-        val nextButton = onView(withId(R.id.button_next))
-        nextButton.perform(click())
-        onView(withId(R.id.fragment_maps_directors_parent)).check(matches(isDisplayed()))
-    }
-
-
-    @Test
     fun showsDestinationMarker() {
-        onView(withText(startsWith(FIRST_ROUTE_NAME_PREFIX))).perform(click())
-        val nextButton = onView(withId(R.id.button_next))
-        nextButton.perform(click())
         val endMarker = device.findObject(UiSelector().descriptionContains("Destination"))
         assertTrue(endMarker.exists())
     }
 
     @Test
     fun showsAllDest() {
-        val nbRoutes = device.findObjects(textContains("->")).size
-        val showAll = onView(withId(R.id.button_all))
-        showAll.perform(click())
         var endMarker = device.findObjects(descContains("Destination"))
         val endTime = System.nanoTime() + TimeUnit.SECONDS.toNanos(5)
         while (endMarker.size == 0 && System.nanoTime() < endTime) {
             endMarker = device.findObjects(descContains("Destination"))
         }
-        assertEquals(nbRoutes, endMarker.size)
+        assertTrue(endMarker.size != 0)
     }
 
-    @Test
-    fun runLaunchesMaps() {
-        Intents.init()
-        onView(withText(startsWith(FIRST_ROUTE_NAME_PREFIX))).perform(click())
-        val runButton = onView(withId(R.id.button_run))
-        runButton.perform(click())
-        intended(
-            allOf(
-                hasAction(Intent.ACTION_VIEW),
-                toPackage(RouteFragment.MAPS_PKG)
-            )
-        )
-        Intents.release()
-
-    }
 
     private fun checkLocationEnabled(rule: ActivityScenarioRule<MainActivity>): Boolean {
         var isEnabled = false

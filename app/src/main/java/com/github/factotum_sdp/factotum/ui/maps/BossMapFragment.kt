@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum.ui.bossmap
+package com.github.factotum_sdp.factotum.ui.maps
 
 import android.app.AlertDialog
 import android.content.Context

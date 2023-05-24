@@ -17,7 +17,7 @@
         android:contentDescription="@string/contact_image"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@tools:sample/avatars" />
+        tools:srcCompat="@mipmap/ic_profile_pic_round" />
 
     <LinearLayout
         android:id="@+id/name_role_layout"

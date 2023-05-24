@@ -32,9 +32,18 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
 
     private val clientOccurrences = HashMap<String, Int>()
     private lateinit var preferencesRepository: RoadBookPreferencesRepository
+    private var blockPackUpdate = false
 
     init {
         addDemoRecords(DestinationRecords.RECORDS)
+    }
+
+    fun isBlockPackUpdateEnabled(): Boolean {
+        return blockPackUpdate
+    }
+
+    fun allowPackUpdate() {
+        blockPackUpdate = false
     }
 
     /**
@@ -132,6 +141,7 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
      * back up records are no more archived.
      */
     fun fetchBackBackUps(){
+        blockPackUpdate = true
         runBlocking {
             val lastBackUp = roadBookRepository.getLastBackUp()
             val timestamped = buildSet {

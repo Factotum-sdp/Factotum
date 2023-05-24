@@ -102,6 +102,10 @@ class RoadBookFragment : Fragment(), MenuProvider {
         }
 
         rbViewModel.timestampedRecords.observe(viewLifecycleOwner) {
+            if(rbViewModel.isBlockPackUpdateEnabled()) {
+                timestampedIDs = it
+                rbViewModel.allowPackUpdate()
+            }
             handleTimestampChange(it)
         }
 
@@ -134,11 +138,8 @@ class RoadBookFragment : Fragment(), MenuProvider {
             }
         } else { // some timestamp has been removed
             val removedIDs = timestampedIDs.keys.subtract(newTimestampedID.keys)
-            removedIDs.forEach {
-                bagViewModel.removedDestinationRecord(it)
-            }
+            bagViewModel.removedDestinationRecords(removedIDs)
         }
-
         timestampedIDs = newTimestampedID
     }
 
@@ -436,7 +437,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         const val BAG_DB_PATH = "Bag-shift"
         private var backUpOnAction = false
         fun setBackUpOnAction(enabled: Boolean) {
-            RoadBookFragment.Companion.backUpOnAction = enabled
+            backUpOnAction = enabled
         }
     }
 

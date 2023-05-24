@@ -9,6 +9,7 @@ import com.github.factotum_sdp.factotum.models.Pack
 import com.github.factotum_sdp.factotum.repositories.BagRepository
 import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookViewModel
 import com.google.firebase.database.DatabaseReference
+import kotlinx.coroutines.runBlocking
 import java.util.Date
 import java.util.HashMap
 
@@ -71,11 +72,11 @@ class BagViewModel(private val repository: BagRepository): ViewModel() {
      *
      * @param destID: String The DestinationRecord's destID
      */
-    fun removedDestinationRecord(destID: String) {
+    fun removedDestinationRecords(destIDs: Set<String>) {
         val updated = currentPackages().mapNotNull {
-            if(it.startingRecordID == destID) {
+            if(destIDs.contains(it.startingRecordID)) {
                 null// filter out the pack with their startingDRecord deleted
-            } else if (it.arrivalRecordID == destID) {
+            } else if (destIDs.contains(it.arrivalRecordID)) {
                 it.copy(deliveredAt = null)
             } else {
                 it
@@ -122,8 +123,16 @@ class BagViewModel(private val repository: BagRepository): ViewModel() {
         }
     }
 
+    fun fetchBackBackUp() {
+        runBlocking {
+            val lastBackUp = repository.getLastBackUp()
+            updatePackages(lastBackUp)
+        }
+    }
+
+
     private fun updatePackages(updated: List<Pack>) {
-        _packages.postValue(updated)
+        _packages.value = updated
         repository.setBackUp(Bag(updated))
     }
 

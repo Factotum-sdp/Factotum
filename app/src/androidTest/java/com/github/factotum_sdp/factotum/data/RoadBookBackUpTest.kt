@@ -15,7 +15,6 @@ import com.github.factotum_sdp.factotum.models.User
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder.USER_COURIER
 import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookFragment
-import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookViewModel
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.PreferencesSetting
 import kotlinx.coroutines.ExperimentalCoroutinesApi

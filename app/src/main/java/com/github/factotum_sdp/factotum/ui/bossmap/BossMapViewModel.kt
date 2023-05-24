@@ -28,16 +28,17 @@ class BossMapViewModel : ViewModel() {
 
     private val database: DatabaseReference = FirebaseInstance.getDatabase().reference.child("Location")
     private val roadbookDbRef : DatabaseReference = FirebaseInstance.getDatabase().reference.child(ROADBOOK_DB_PATH)
+    private val logsRef : DatabaseReference = FirebaseInstance.getDatabase().reference.child("Delivery-Log")
     private val handler = Handler(Looper.getMainLooper())
 
     private val _courierLocations = MutableLiveData<List<CourierLocation>>()
     private val _deliveriesStatus = MutableLiveData<Map<String,List<DeliveryStatus>>>()
     private val _contacts = MutableLiveData<List<Contact>>()
-    private val _history = MutableLiveData<List<DeliveryStatus>>()
+    private val _history = MutableLiveData<Map<String, List<DeliveryStatus>>>()
 
     val courierLocations: LiveData<List<CourierLocation>> get() = _courierLocations
     val deliveriesStatus : LiveData<Map<String,List<DeliveryStatus>>> get() = _deliveriesStatus
-    val history : LiveData<List<DeliveryStatus>> get() = _history
+    val history : LiveData<Map<String, List<DeliveryStatus>>> get() = _history
 
 
     private val fetchDataRunnable = object : Runnable {
@@ -50,10 +51,7 @@ class BossMapViewModel : ViewModel() {
     init {
         handler.post(fetchDataRunnable)
         fetchDeliveryState()
-    }
-
-    fun setHistory(history: List<DeliveryStatus>){
-        _history.value = history
+        fetchHistoryState()
     }
 
     private fun fetchLocationsAndUpdateMarkers() {
@@ -106,6 +104,44 @@ class BossMapViewModel : ViewModel() {
                 }
                 _deliveriesStatus.value = mapCourierDeliveryStatus
             }
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("BossMapViewModel: ", "onCancelled: $error")
+            }
+        })
+    }
+
+    private fun fetchHistoryState() {
+        logsRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val mapHistoryOfDeliveries = mutableMapOf<String,MutableList<DeliveryStatus>>()
+                snapshot.children.forEach { user ->
+                    user.children.forEach { date ->
+                        val timestamps = date.children.toList()
+                        if (timestamps.isNotEmpty()) {
+                            timestamps.last().child("records").children.forEach { record ->
+                                val destRecord = record.getValue(DestinationRecord::class.java)
+                                val client = _contacts.value?.find { contact -> contact.username == destRecord?.clientID }
+                                if (client?.latitude != null && client.longitude != null) {
+                                    val dStatus = DeliveryStatus(
+                                        courier = user.key ?: "",
+                                        destID = destRecord?.destID ?: "",
+                                        clientID = destRecord?.clientID ?: "",
+                                        timeStamp = destRecord?.timeStamp,
+                                        addressName = client.addressName,
+                                        latitude = client.latitude,
+                                        longitude = client.longitude
+                                    )
+                                    mapHistoryOfDeliveries[client.username]?.add(dStatus) ?: run {
+                                        mapHistoryOfDeliveries[client.username] = mutableListOf(dStatus)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                _history.value = mapHistoryOfDeliveries
+            }
+
             override fun onCancelled(error: DatabaseError) {
                 Log.e("BossMapViewModel: ", "onCancelled: $error")
             }

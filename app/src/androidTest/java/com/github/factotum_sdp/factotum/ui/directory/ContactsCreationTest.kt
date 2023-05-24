@@ -81,7 +81,6 @@ class ContactsCreationTest {
 
     @Test
     fun hasAllTheFields() {
-        onView((withId(R.id.contact_image_creation))).check(matches(isDisplayed()))
         onView((withId(R.id.contactCreationAddress))).check(matches(isDisplayed()))
         onView(withId(R.id.roles_spinner)).check(matches(isDisplayed()))
         onView(withId(R.id.editTextName)).check(matches(isDisplayed()))

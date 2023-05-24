@@ -4,6 +4,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.models.Contact
+import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import kotlinx.coroutines.CompletableDeferred
 import org.hamcrest.Description
@@ -22,8 +23,8 @@ class ContactsUtils {
             listOf("123 Fake Street", "456 Fake Street", "789 Fake Street", "123 Fake Avenue")
         private val randomPhones = listOf("123456789", "987654321", "123987456", "456789123")
         private val randomDetails = listOf("I am a boss", "I am a courier", "I am a client")
-        const val FAKE_LATITUDE = 51.5074
-        const val FAKE_LONGITUDE = 0.1278
+        private const val FAKE_LATITUDE = 51.5074
+        private const val FAKE_LONGITUDE = 0.1278
 
         private const val image = R.drawable.contact_image
 

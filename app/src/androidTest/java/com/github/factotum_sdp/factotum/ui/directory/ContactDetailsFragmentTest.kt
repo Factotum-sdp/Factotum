@@ -2,11 +2,13 @@ package com.github.factotum_sdp.factotum.ui.directory
 
 import android.Manifest
 import android.content.Intent
+import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
+import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
@@ -192,7 +194,7 @@ class ContactDetailsFragmentTest {
         Intents.init()
         onView(withId(R.id.run_button)).perform(click())
         if (LocationUtils.hasLocationPopUp()) {
-            val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+            val device = UiDevice.getInstance(getInstrumentation())
             device.findObject(UiSelector().textContains(LocationUtils.buttonTextAllow)).click()
         }
         Intents.intended(
@@ -207,7 +209,7 @@ class ContactDetailsFragmentTest {
     @Test
     fun buttonShowDestination() {
         onView(withId(R.id.show_all_button)).perform(click())
-        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        val device = UiDevice.getInstance(getInstrumentation())
         val markers = device.wait(hasObject(By.descContains("Destination")), 5000L)
         assertTrue(markers)
     }

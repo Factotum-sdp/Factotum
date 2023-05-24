@@ -154,8 +154,6 @@ class DisplayFragmentTest {
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH3, TEST_IMAGE_PATH3) }.join()
         GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
 
-
-
         val recyclerView = onView(withId(R.id.recyclerView))
         recyclerView.check(matches(hasItemCount(2)))
     }

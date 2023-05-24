@@ -1,6 +1,5 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 import com.github.factotum_sdp.factotum.models.DestinationRecord
-import java.lang.IllegalArgumentException
 import kotlinx.serialization.Serializable
 
 

@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.models.Contact
 import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment.Companion.USERNAME_NAV_KEY
+import com.google.android.material.card.MaterialCardView
 
 class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.ContactsViewHolder>(),
     Filterable {
@@ -34,9 +35,10 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
         notifyDataSetChanged()
     }
 
-    class ContactsViewHolder(itemView: View) :
+    class ContactsViewHolder(itemView : View) :
         RecyclerView.ViewHolder(itemView) { //this is the view holder for the recycler view
 
+        private val cardView: MaterialCardView
         val itemName: TextView
         val itemUsername: TextView
         val itemImage: ImageView
@@ -45,16 +47,17 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
             itemName = itemView.findViewById(R.id.contact_surname_and_name)
             itemImage = itemView.findViewById(R.id.contact_image)
             itemUsername = itemView.findViewById(R.id.contact_username)
+            cardView = itemView.findViewById(R.id.contact_card)
 
-            itemView.setOnClickListener {   //when a contact is clicked, go to the contact details fragment
-                itemView.findNavController().navigate(
-                    R.id.action_directoryFragment_to_contactDetailsFragment2,
-                    Bundle().apply {
-                        putString(
-                            USERNAME_NAV_KEY,
-                            itemUsername.text.toString().substring(1)
-                        ) // pass the id of the contact to the contact details fragment so that it can display the correct contact
-                    })
+            cardView.setOnClickListener {  // Now we're setting the click listener to the card view
+            it.findNavController().navigate(
+                R.id.action_directoryFragment_to_contactDetailsFragment2,
+                Bundle().apply {
+                    putString(
+                        USERNAME_NAV_KEY,
+                        itemUsername.text.toString().substring(1)
+                    )
+                })
             }
         }
     }

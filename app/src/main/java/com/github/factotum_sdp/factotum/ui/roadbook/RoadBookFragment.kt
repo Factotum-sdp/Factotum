@@ -42,6 +42,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.*
 
 private const val ON_DESTINATION_RADIUS = 15.0
+private const val ANIMATION_DURATION = 400L
 private const val NO_USER_FOR_DB_PATH = "no_user"
 
 /**

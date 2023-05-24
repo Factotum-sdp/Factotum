@@ -6,6 +6,13 @@ import com.github.factotum_sdp.factotum.models.Pack
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseReference
 
+/**
+ * The Bag repository
+ *
+ * In charge of being the unique place where to fetch and push Bag Data, i.e
+ * a List<Pack>.
+ *
+ */
 class BagRepository(remoteSource: DatabaseReference, username: String, localSource: DataStore<Bag>)
     : BackUpRepository<Bag>(remoteSource, username, localSource) {
 

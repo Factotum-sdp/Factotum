@@ -15,6 +15,18 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
+/**
+ * The BackUpRepository abstract class
+ *
+ * It implements the abstract logic to store some back-up about data given under the form of a List<Any>
+ *
+ * It resolves the conflict between a "remoteSource" and a "localSource" of data, and enable caching
+ * for both remote/network requests and local requests.
+ *
+ * If remoteSource is not online, we rely uniquely on the localSource, and don't use the first variable cache.
+ * The first variable cache is used uniquely to avoid remoteSource update.
+ * However, a second variable cache is used before fetching or update the localSource.
+ */
 abstract class BackUpRepository<T: List<Any>>(remoteSource: DatabaseReference, username: String,
                                               private val localSource: DataStore<T>) {
 
@@ -43,6 +55,12 @@ abstract class BackUpRepository<T: List<Any>>(remoteSource: DatabaseReference, u
         initNetworkPathWithUser(username)
     }
 
+    /**
+     * Extract a T instance from the DataSnapshot taken at the remoteSource/username Firebase node
+     *
+     * @param snapshot: DataSnapshot
+     * @return T the type parameter extending List of that class
+     */
     protected abstract fun extractFromSnapshot(snapshot: DataSnapshot): T
 
     private fun initNetworkPathWithUser(username: String) {
@@ -80,7 +98,7 @@ abstract class BackUpRepository<T: List<Any>>(remoteSource: DatabaseReference, u
      * Which is the last network written variable if the remote is connected,
      * otherwise it is fetch from the local source.
      *
-     * @return the DRecordList back-up
+     * @return T
      */
     suspend fun getLastBackUp(): T {
         if(isConnectedToRemote) {

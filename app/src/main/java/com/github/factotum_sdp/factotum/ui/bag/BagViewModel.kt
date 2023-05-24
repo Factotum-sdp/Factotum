@@ -7,8 +7,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.github.factotum_sdp.factotum.models.Bag
 import com.github.factotum_sdp.factotum.models.Pack
 import com.github.factotum_sdp.factotum.repositories.BagRepository
-import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookViewModel
-import com.google.firebase.database.DatabaseReference
 import kotlinx.coroutines.runBlocking
 import java.util.Date
 import java.util.HashMap
@@ -22,6 +20,8 @@ class BagViewModel(private val repository: BagRepository): ViewModel() {
     val packages: LiveData<List<Pack>> = _packages
 
     private val packageOccurrences = HashMap<Pair<String, String>, Int>()
+    private var blockPackUpdate = false
+
 
     /**
      * Create a new Package in the current stored packages
@@ -117,17 +117,35 @@ class BagViewModel(private val repository: BagRepository): ViewModel() {
         updatePackages(updated)
     }
 
+    /**
+     * Triggers a back-up of the current Bag state
+     */
     fun backUp() {
         _packages.value?.let {
             repository.setBackUp(Bag(it))
         }
     }
 
+    /**
+     * Load the last back-up available into the packages liveData
+     */
     fun fetchBackBackUp() {
         runBlocking {
             val lastBackUp = repository.getLastBackUp()
             updatePackages(lastBackUp)
         }
+    }
+
+    fun isPackUpdateBlocked(): Boolean {
+        return blockPackUpdate
+    }
+
+    fun blockPackUpdate() {
+        blockPackUpdate = true
+    }
+
+    fun allowPackUpdate() {
+        blockPackUpdate = false
     }
 
     private fun updatePackages(updated: List<Pack>) {

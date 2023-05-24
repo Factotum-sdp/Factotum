@@ -34,7 +34,6 @@ import com.github.factotum_sdp.factotum.models.Shift
 import com.github.factotum_sdp.factotum.models.User
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder.USER_COURIER
-import com.github.factotum_sdp.factotum.repositories.BackUpRepository
 import com.github.factotum_sdp.factotum.repositories.ShiftRepository
 import com.github.factotum_sdp.factotum.repositories.ShiftRepository.Companion.DELIVERY_LOG_DB_PATH
 import com.github.factotum_sdp.factotum.roadBookDataStore
@@ -98,9 +97,7 @@ class RoadBookFragmentTest {
     @Before
     fun toRoadBookFragment() {
         GeneralUtils.injectLoggedInUser(testRule, courier)
-        RoadBookFragment.setBackUpOnAction(false)
-        // Ensure "use RoadBook preferences" is disabled
-        PreferencesSetting.setRoadBookPrefs(testRule)
+        PreferencesSetting.setRoadBookPrefs(testRule) // Ensure "use RoadBook preferences" is disabled
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))

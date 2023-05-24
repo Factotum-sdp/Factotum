@@ -102,9 +102,9 @@ class RoadBookFragment : Fragment(), MenuProvider {
         }
 
         rbViewModel.timestampedRecords.observe(viewLifecycleOwner) {
-            if(rbViewModel.isBlockPackUpdateEnabled()) {
+            if(bagViewModel.isPackUpdateBlocked()) {
                 timestampedIDs = it
-                rbViewModel.allowPackUpdate()
+                bagViewModel.allowPackUpdate()
             }
             handleTimestampChange(it)
         }
@@ -435,10 +435,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
         const val ROADBOOK_DB_PATH = "Sheet-shift"
         const val DEST_ID_NAV_ARG_KEY = "destID"
         const val BAG_DB_PATH = "Bag-shift"
-        private var backUpOnAction = false
-        fun setBackUpOnAction(enabled: Boolean) {
-            backUpOnAction = enabled
-        }
     }
 
     /** Only use that access for testing purpose */

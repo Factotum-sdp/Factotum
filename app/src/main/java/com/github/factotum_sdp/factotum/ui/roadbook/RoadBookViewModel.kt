@@ -32,18 +32,9 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
 
     private val clientOccurrences = HashMap<String, Int>()
     private lateinit var preferencesRepository: RoadBookPreferencesRepository
-    private var blockPackUpdate = false
 
     init {
         addDemoRecords(DestinationRecords.RECORDS)
-    }
-
-    fun isBlockPackUpdateEnabled(): Boolean {
-        return blockPackUpdate
-    }
-
-    fun allowPackUpdate() {
-        blockPackUpdate = false
     }
 
     /**
@@ -104,6 +95,31 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
     }
 
     /**
+     * Replace the current displayed list by the last available back up of the RoadBookRepository
+     *
+     * Note that the the back up don't take into account the archiving state, all fetched from
+     * back up records are no more archived.
+     */
+    fun fetchBackBackUps(){
+        runBlocking {
+            val lastBackUp = roadBookRepository.getLastBackUp()
+            val timestamped = buildSet {
+                lastBackUp.forEach { record ->
+                    record.timeStamp?.let {
+                        add(record)
+                    }
+                }
+            }
+            _recordsList.value =
+                DRecordList(
+                    allRecords = lastBackUp,
+                    showArchived = currentDRecList().showArchived,
+                    timestamped = timestamped
+                )
+        }
+    }
+
+    /**
      * Get the next destination to deliver
      *
      * The result is null if there is no nextDestination for the actual records state
@@ -132,32 +148,6 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
         val pos = currentDRecList().getIndexOf(record.destID)
 
         _recordsList.postValue(currentDRecList().editRecordAt(pos, newRec))
-    }
-
-    /**
-     * Replace the current displayed list by the last available back up of the RoadBookRepository
-     *
-     * Note that the the back up don't take into account the archiving state, all fetched from
-     * back up records are no more archived.
-     */
-    fun fetchBackBackUps(){
-        blockPackUpdate = true
-        runBlocking {
-            val lastBackUp = roadBookRepository.getLastBackUp()
-            val timestamped = buildSet {
-                lastBackUp.forEach { record ->
-                    record.timeStamp?.let {
-                        add(record)
-                    }
-                }
-            }
-            _recordsList.value =
-                DRecordList(
-                    allRecords = lastBackUp,
-                    showArchived = currentDRecList().showArchived,
-                    timestamped = timestamped
-                )
-        }
     }
 
     /**

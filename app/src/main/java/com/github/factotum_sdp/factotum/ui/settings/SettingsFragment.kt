@@ -55,6 +55,7 @@ class SettingsFragment: Fragment() {
         }
         setCheckedSettingBehavior(loadRoadBookBackUp, false) {
             if(it) {
+                bagViewModel.blockPackUpdate()
                 roadBookViewModel.fetchBackBackUps()
                 bagViewModel.fetchBackBackUp()
                 snapMessage(R.string.snap_load_roadbook_backup)

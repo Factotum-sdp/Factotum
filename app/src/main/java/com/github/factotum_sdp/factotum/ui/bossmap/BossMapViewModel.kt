@@ -121,12 +121,12 @@ class BossMapViewModel : ViewModel() {
                             timestamps.last().child("records").children.forEach { record ->
                                 val destRecord = record.getValue(DestinationRecord::class.java)
                                 val client = _contacts.value?.find { contact -> contact.username == destRecord?.clientID }
-                                if (client?.latitude != null && client.longitude != null) {
+                                if (client?.latitude != null && client.longitude != null && destRecord?.timeStamp != null) {
                                     val dStatus = DeliveryStatus(
                                         courier = user.key ?: "",
-                                        destID = destRecord?.destID ?: "",
-                                        clientID = destRecord?.clientID ?: "",
-                                        timeStamp = destRecord?.timeStamp,
+                                        destID = destRecord.destID ?: "",
+                                        clientID = destRecord.clientID ?: "",
+                                        timeStamp = destRecord.timeStamp,
                                         addressName = client.addressName,
                                         latitude = client.latitude,
                                         longitude = client.longitude

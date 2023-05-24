@@ -18,15 +18,15 @@ import com.google.gson.Gson
  */
 class DeliveryHistoryFragment : Fragment() {
 
-    private var columnCount = 1
-    lateinit var list : List<DeliveryStatus>
+    private var list : List<DeliveryStatus> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val jsonDelivery = arguments?.getString("History") ?: ""
         val deliveries = Gson().fromJson(jsonDelivery, Array<DeliveryStatus>::class.java)
-        list = deliveries.toList()
-
+        if(deliveries != null) {
+            list = deliveries.toList()
+        }
     }
 
     override fun onCreateView(

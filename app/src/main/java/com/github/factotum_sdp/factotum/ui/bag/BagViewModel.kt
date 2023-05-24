@@ -130,7 +130,6 @@ class BagViewModel(private val repository: BagRepository): ViewModel() {
         }
     }
 
-
     private fun updatePackages(updated: List<Pack>) {
         _packages.value = updated
         repository.setBackUp(Bag(updated))

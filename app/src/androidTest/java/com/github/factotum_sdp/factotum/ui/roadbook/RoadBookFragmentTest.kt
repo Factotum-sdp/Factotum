@@ -869,7 +869,6 @@ class RoadBookFragmentTest {
             .check(doesNotExist())
     }
 
-    /*
     @Test
     fun recordStayArchivedAfterNavigation() {
         onView((withText(DestinationRecords.RECORDS[0].destID)))
@@ -887,7 +886,7 @@ class RoadBookFragmentTest {
         // Check that the record is still not there
         onView((withText(DestinationRecords.RECORDS[0].destID)))
             .check(doesNotExist())
-    }*/
+    }
 
     @Test
     fun stayArchivedAfterNavigationWithShowArchived() {

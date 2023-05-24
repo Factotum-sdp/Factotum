@@ -3,7 +3,11 @@ package com.github.factotum_sdp.factotum.ui.bag
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.github.factotum_sdp.factotum.models.Bag
 import com.github.factotum_sdp.factotum.models.Pack
+import com.github.factotum_sdp.factotum.repositories.BagRepository
+import com.google.firebase.database.DatabaseReference
 import java.util.Date
 import java.util.HashMap
 
@@ -11,7 +15,7 @@ import java.util.HashMap
  * The "bag" viewModel which represents the current state
  * of the packages delivered or currently delivered
  */
-class BagViewModel: ViewModel() {
+class BagViewModel(private val repository: BagRepository): ViewModel() {
     private val _packages = MutableLiveData<List<Pack>>(listOf())
     val packages: LiveData<List<Pack>> = _packages
 
@@ -110,6 +114,12 @@ class BagViewModel: ViewModel() {
         }
     }
 
+    fun backUp() {
+        _packages.value?.let {
+            repository.setBackUp(Bag(it))
+        }
+    }
+
     private fun currentPackages(): List<Pack> {
         return _packages.value!!
     }
@@ -120,5 +130,15 @@ class BagViewModel: ViewModel() {
             ++occ
         }
         return "${senderID}To${recipientID}#$occ"
+    }
+
+    // Factory needed to assign a value at construction time to the class attribute
+    class BagViewModelFactory(private val _repository: BagRepository) :
+        ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return modelClass
+                .getConstructor(BagRepository::class.java)
+                .newInstance(_repository)
+        }
     }
 }

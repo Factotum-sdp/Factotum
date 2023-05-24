@@ -96,7 +96,8 @@ class DRecordDetailsFragment : Fragment() {
                         0.0, //Should be the current location
                         0.0,
                         currentContact.latitude ?: 0.0,
-                        currentContact.longitude ?: 0.0
+                        currentContact.longitude ?: 0.0,
+                        rec.destID,
                     )
                     val routeJson = Gson().toJson(route)
                     bundle.putString(MapsFragment.ROUTE_NAV_KEY, routeJson)

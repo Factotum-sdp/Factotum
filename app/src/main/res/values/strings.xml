@@ -7,6 +7,7 @@
     <string name="maps_fragment_label">Maps</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
+    <string name="title_maps">Maps</string>
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>

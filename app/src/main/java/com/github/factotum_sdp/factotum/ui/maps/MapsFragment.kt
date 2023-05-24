@@ -2,15 +2,19 @@ package com.github.factotum_sdp.factotum.ui.maps
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
+import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.databinding.FragmentMapsBinding
 import com.github.factotum_sdp.factotum.hasLocationPermission
 import com.github.factotum_sdp.factotum.models.Route
@@ -63,6 +67,8 @@ class MapsFragment : Fragment() {
     ): View {
 
         _binding = FragmentMapsBinding.inflate(inflater, container, false)
+        val toolbar = requireActivity().findViewById<Toolbar>(R.id.toolbar)
+        toolbar.title = getString(R.string.title_maps)
         return binding.root
     }
 
@@ -79,14 +85,13 @@ class MapsFragment : Fragment() {
             records.forEach { record ->
                 val contact = contactsViewModel.contacts.value?.first{ it.username == record.clientID }
                 if(contact?.latitude != null && contact.longitude != null){
-                    val route = Route(0.0, 0.0, contact.latitude, contact.longitude)
+                    val route = Route(0.0, 0.0, contact.latitude, contact.longitude, record.clientID)
                     destinations.add(route)
                 }
             }
 
         }
         return destinations
-
     }
 
     private fun setMapProperties() {
@@ -149,6 +154,7 @@ class MapsFragment : Fragment() {
 
     private fun placeMarkers(routes: List<Route>?, googleMap: GoogleMap, drawRoutes : Boolean = true) {
         val bounds = LatLngBounds.Builder()
+
 
         for (route in routes.orEmpty()) {
             route.addSrcToMap(googleMap)

@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
+import com.github.factotum_sdp.factotum.bagDataStore
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.models.Contact
 import com.github.factotum_sdp.factotum.models.DestinationRecord.Action.DELIVER
@@ -25,6 +26,7 @@ import com.github.factotum_sdp.factotum.models.DestinationRecord.Action.PICK
 import com.github.factotum_sdp.factotum.models.RoadBookPreferences
 import com.github.factotum_sdp.factotum.models.Shift
 import com.github.factotum_sdp.factotum.preferencesDataStore
+import com.github.factotum_sdp.factotum.repositories.BagRepository
 import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
 import com.github.factotum_sdp.factotum.repositories.RoadBookRepository
 import com.github.factotum_sdp.factotum.repositories.ShiftRepository
@@ -72,8 +74,15 @@ class RoadBookFragment : Fragment(), MenuProvider {
     private var usePreferences = false
     private val userViewModel: UserViewModel by activityViewModels()
     private val contactsViewModel : ContactsViewModel by activityViewModels()
-    private val bagViewModel: BagViewModel by activityViewModels()
-
+    private val bagViewModel: BagViewModel by activityViewModels {
+        BagViewModel.BagViewModelFactory(
+            BagRepository(
+                FirebaseInstance.getDatabase().reference.child(BAG_DB_PATH),
+                FirebaseInstance.getUsernameForDBPath(),
+                requireContext().bagDataStore
+            )
+        )
+    }
     private var timestampedIDs: Map<String, Date> = mapOf()
     private lateinit var currentContacts: List<Contact>
 
@@ -88,10 +97,15 @@ class RoadBookFragment : Fragment(), MenuProvider {
         // Observe the RoadBook ViewModel, to detect data changes
         // and update the displayed RecyclerView accordingly
         rbViewModel.recordsListState.observe(viewLifecycleOwner) {
+            rbViewModel.backUp()
             adapter.submitList(it)
         }
 
         rbViewModel.timestampedRecords.observe(viewLifecycleOwner) {
+            if(bagViewModel.isPackUpdateBlocked()) {
+                timestampedIDs = it
+                bagViewModel.allowPackUpdate()
+            }
             handleTimestampChange(it)
         }
 
@@ -124,11 +138,8 @@ class RoadBookFragment : Fragment(), MenuProvider {
             }
         } else { // some timestamp has been removed
             val removedIDs = timestampedIDs.keys.subtract(newTimestampedID.keys)
-            removedIDs.forEach {
-                bagViewModel.removedDestinationRecord(it)
-            }
+            bagViewModel.removedDestinationRecords(removedIDs)
         }
-
         timestampedIDs = newTimestampedID
     }
 
@@ -151,13 +162,9 @@ class RoadBookFragment : Fragment(), MenuProvider {
             }
         }
     }
-
-    override fun onResume() {
-        rbViewModel.launchRunnableBackUp()
-        super.onResume()
-    }
     override fun onPause() {
         rbViewModel.backUp()
+        bagViewModel.backUp()
         saveButtonStates()
         super.onPause()
     }
@@ -425,8 +432,9 @@ class RoadBookFragment : Fragment(), MenuProvider {
     }
 
     companion object {
-        const val ROADBOOK_DB_PATH = "Sheet-shift" //change to "Sheet-shift2" for manual testing
+        const val ROADBOOK_DB_PATH = "Sheet-shift"
         const val DEST_ID_NAV_ARG_KEY = "destID"
+        const val BAG_DB_PATH = "Bag-shift"
     }
 
     /** Only use that access for testing purpose */
@@ -463,4 +471,5 @@ class RoadBookFragment : Fragment(), MenuProvider {
             rbViewModel.hideArchivedRecords()
         rbRecyclerView.adapter!!.notifyDataSetChanged()
     }
+
 }

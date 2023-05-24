@@ -113,8 +113,9 @@ class BossMapFragmentTest {
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         val mailbox = device.wait(Until.findObject(By.descContains("Mailbox")), 5000L)
         mailbox.click()
-        device.waitForIdle()
+        runBlocking { delay(3000) }
         onView(withId(android.R.id.button3)).perform(click())
+        runBlocking { delay(3000) }
         onView(withId(R.id.fragment_display_directors_parent)).check(matches(isDisplayed()))
         device.pressBack()
         device.pressBack()
@@ -129,8 +130,9 @@ class BossMapFragmentTest {
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         val mailbox = device.wait(Until.findObject(By.descContains("Mailbox")), 5000)
         mailbox.click()
-        device.waitForIdle()
+        runBlocking { delay(3000) }
         onView(withId(android.R.id.button2)).perform(click())
+        runBlocking { delay(3000) }
         onView(withId(R.id.list)).check(matches(isDisplayed()))
         device.pressBack()
     }
@@ -140,7 +142,6 @@ class BossMapFragmentTest {
         GeneralUtils.fillUserEntryAndEnterTheApp(UsersPlaceHolder.USER_BOSS.email, UsersPlaceHolder.USER_BOSS.password)
         endShift()
         goToBossMapFragment()
-
     }
 
 

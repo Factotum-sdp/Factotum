@@ -37,7 +37,7 @@
     <string name="snap_text_on_rec_unarchive">Record unarchived</string>
 
     <string name="menu_maps">Maps</string>
-    <string name="run">Go to Destination</string>
+    <string name="run">Go-To Destination</string>
     <string name="rate_text_view">rate</string>
     <string name="wait_text_view">wait</string>
     <string name="arrival_text_view">arrival</string>
@@ -54,9 +54,9 @@
     <string name="back_to_list_button">Back to List of Contacts</string>
     <string name="all_contact_info">All contact Info</string>
     <string name="contact_details_intro">Contact Details</string>
-    <string name="address_ex_layout">Address :</string>
-    <string name="phone_nb_ex_layout">Phone Number :</string>
-    <string name="notes_ex_layout">Notes :</string>
+    <string name="address_ex_layout">Address: </string>
+    <string name="phone_nb_ex_layout">Phone Number: </string>
+    <string name="notes_ex_layout">Notes: </string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>

@@ -133,7 +133,7 @@ class BossMapFragmentTest {
         Thread.sleep(3000)
         onView(withId(android.R.id.button2)).perform(click())
         Thread.sleep(3000)
-        onView(withId(R.id.fragment_history_directors_parent)).check(matches(isDisplayed()))
+        onView(withId(R.id.list)).check(matches(isDisplayed()))
         device.pressBack()
     }
 

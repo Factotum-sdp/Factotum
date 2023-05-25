@@ -3,6 +3,7 @@ package com.github.factotum_sdp.factotum
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
@@ -125,6 +126,7 @@ class MainActivity : AppCompatActivity() {
         val headerView = binding.navView.inflateHeaderView(R.layout.nav_header_main)
 
         // Fetch Header Views
+        val profilePicture = headerView.findViewById<ImageView>(R.id.imageView)
         val userName = headerView.findViewById<TextView>(R.id.userName)
         val email = headerView.findViewById<TextView>(R.id.textView)
 
@@ -135,6 +137,14 @@ class MainActivity : AppCompatActivity() {
             val format = "${it.name} (${it.role})"
             userName.text = format
             //email.text = it.email // Commented temporarily to show user live location
+            when (it.role) {
+                Role.CLIENT -> profilePicture.setImageResource(R.mipmap.ic_client_profile_pic_round)
+                Role.BOSS -> profilePicture.setImageResource(R.mipmap.ic_boss_profile_pic_round)
+                Role.COURIER -> profilePicture.setImageResource(R.mipmap.ic_courier_profile_pic_round)
+                else -> {
+                    profilePicture.setImageResource(R.mipmap.ic_launcher_round)
+                }
+            }
 
             // Update the menu items and navigate to the predefined fragment
             // according to the user role

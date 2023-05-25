@@ -1,15 +1,18 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
 import android.animation.ObjectAnimator
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.location.Location
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -23,6 +26,8 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.bagDataStore
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
+import com.github.factotum_sdp.factotum.hasLocationPermission
+import com.github.factotum_sdp.factotum.hasNotificationPermission
 import com.github.factotum_sdp.factotum.models.Contact
 import com.github.factotum_sdp.factotum.models.DestinationRecord.Action.DELIVER
 import com.github.factotum_sdp.factotum.models.DestinationRecord.Action.PICK
@@ -310,6 +315,46 @@ class RoadBookFragment : Fragment(), MenuProvider {
         return true
     }
 
+    private val requestNotificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            showsPermissionsAlertDialog(
+                R.drawable.green_check,
+                getString(R.string.location_permissions_enabled_message)
+            )
+        } else {
+            showsPermissionsAlertDialog(
+                R.drawable.red_cross,
+                getString(R.string.notifications_not_enabled_message)
+            )
+        }
+    }
+
+    private val requestLocationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            requireContext().hasLocationPermission()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        } else {
+            if (!isGranted) {
+                showsPermissionsAlertDialog(R.drawable.red_cross, getString(R.string.precise_location_not_enabled_message))
+            }
+        }
+    }
+
+    private fun showsPermissionsAlertDialog(iconID: Int, message: String) {
+        val builder = AlertDialog.Builder(requireContext())
+        builder
+            .setTitle(getString(R.string.live_location_service_dialog_title))
+            .setMessage(message)
+            .setIcon(iconID)
+            .show()
+    }
+
     private fun setLiveLocationSwitch(menu: Menu) {
         val locationMenu = menu.findItem(R.id.location_switch)
         val locationSwitch =
@@ -318,10 +363,14 @@ class RoadBookFragment : Fragment(), MenuProvider {
             it.isChecked = userViewModel.locationTrackingHandler.isTrackingEnabled.value
         }
         locationSwitch!!.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked)
-                userViewModel.locationTrackingHandler.startLocationService(requireContext(), requireActivity())
-            else if (lifecycle.currentState == Lifecycle.State.RESUMED && this.isVisible) {
-                userViewModel.locationTrackingHandler.stopLocationService(requireContext(), requireActivity())
+            if(!requireContext().hasLocationPermission() || !requireContext().hasNotificationPermission()) {
+                requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            } else {
+                if (isChecked)
+                    userViewModel.locationTrackingHandler.startLocationService(requireContext(), requireActivity())
+                else if (lifecycle.currentState == Lifecycle.State.RESUMED && this.isVisible) {
+                    userViewModel.locationTrackingHandler.stopLocationService(requireContext(), requireActivity())
+                }
             }
         }
     }
@@ -333,6 +382,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         refreshButton.setOnClickListener {
             rotateRefreshButton(refreshButton)
             rbRecyclerView.adapter?.notifyDataSetChanged()
+            true
         }
     }
 

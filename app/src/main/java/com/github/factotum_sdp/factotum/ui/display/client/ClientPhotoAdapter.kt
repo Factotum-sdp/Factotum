@@ -8,7 +8,7 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.ListAdapter
 import com.github.factotum_sdp.factotum.databinding.DisplayItemPictureBinding
-import com.github.factotum_sdp.factotum.models.Role
+import com.github.factotum_sdp.factotum.model.Role
 import com.github.factotum_sdp.factotum.ui.display.ReferenceDiffCallback
 import com.google.firebase.storage.StorageReference
 

@@ -1,7 +1,7 @@
 package com.github.factotum_sdp.factotum.ui.bag
 
+import android.app.AlertDialog
 import android.os.Bundle
-import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -15,8 +15,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.models.Pack
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.github.factotum_sdp.factotum.model.Pack
 
 /**
  * The "bag" Fragment

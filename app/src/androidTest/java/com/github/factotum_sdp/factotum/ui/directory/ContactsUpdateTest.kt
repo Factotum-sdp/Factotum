@@ -25,8 +25,8 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.models.AddressCoordinates
-import com.github.factotum_sdp.factotum.models.Contact
+import com.github.factotum_sdp.factotum.model.AddressCoordinates
+import com.github.factotum_sdp.factotum.model.Contact
 import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.createRandomContacts
 import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.randomContacts
 import com.github.factotum_sdp.factotum.utils.GeneralUtils

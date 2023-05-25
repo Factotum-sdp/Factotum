@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum.models
+package com.github.factotum_sdp.factotum.model
 
 /**
  * The RoadBookPreferences data model

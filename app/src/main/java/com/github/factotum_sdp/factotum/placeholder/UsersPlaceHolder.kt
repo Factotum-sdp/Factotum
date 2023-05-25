@@ -1,6 +1,6 @@
 package com.github.factotum_sdp.factotum.placeholder
 
-import com.github.factotum_sdp.factotum.models.Role
+import com.github.factotum_sdp.factotum.model.Role
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 

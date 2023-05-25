@@ -5,8 +5,8 @@ import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseDateFormatted
 import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseSafeString
 import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseTimeFormatted
-import com.github.factotum_sdp.factotum.models.Shift
-import com.github.factotum_sdp.factotum.ui.roadbook.ShiftList
+import com.github.factotum_sdp.factotum.model.Shift
+import com.github.factotum_sdp.factotum.model.ShiftList
 import com.google.firebase.database.DatabaseReference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -80,7 +80,7 @@ class ShiftRepository(private val remoteSource: DatabaseReference,
         }
     }
 
-    private suspend fun getFromLocalSource(): ShiftList{
+    private suspend fun getFromLocalSource(): ShiftList {
         return try{ localSource.data.first() }
         catch (e: Exception){
             ShiftList(emptyList())

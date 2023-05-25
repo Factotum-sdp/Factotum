@@ -20,9 +20,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
-import com.github.factotum_sdp.factotum.models.Contact
-import com.github.factotum_sdp.factotum.models.Role
-import com.github.factotum_sdp.factotum.models.Route
+import com.github.factotum_sdp.factotum.model.Contact
+import com.github.factotum_sdp.factotum.model.Role
+import com.github.factotum_sdp.factotum.model.Route
 import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment.Companion.IS_SUB_FRAGMENT_NAV_KEY
 import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment.Companion.USERNAME_NAV_KEY
 import com.github.factotum_sdp.factotum.ui.maps.MapsFragment

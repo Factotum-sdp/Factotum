@@ -1,6 +1,6 @@
 package com.github.factotum_sdp.factotum.placeholder
 
-import com.github.factotum_sdp.factotum.models.Route
+import com.github.factotum_sdp.factotum.model.Route
 
 object RouteRecords {
     val DUMMY_COURSE = arrayListOf("BC -> Satellite", "EPFL -> Chauderon", "Genève -> Lausanne")

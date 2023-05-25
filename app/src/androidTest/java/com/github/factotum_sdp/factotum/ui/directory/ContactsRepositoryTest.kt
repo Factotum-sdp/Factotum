@@ -7,7 +7,7 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.models.Contact
+import com.github.factotum_sdp.factotum.model.Contact
 import com.github.factotum_sdp.factotum.repositories.ContactsRepository
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase

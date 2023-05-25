@@ -14,10 +14,10 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.models.DestinationRecord
-import com.github.factotum_sdp.factotum.models.DestinationRecord.Companion.parseActions
-import com.github.factotum_sdp.factotum.models.DestinationRecord.Companion.parseTimestamp
-import com.github.factotum_sdp.factotum.models.DestinationRecord.Companion.parseWaitTimeOrRate
+import com.github.factotum_sdp.factotum.model.DestinationRecord
+import com.github.factotum_sdp.factotum.model.DestinationRecord.Companion.parseActions
+import com.github.factotum_sdp.factotum.model.DestinationRecord.Companion.parseTimestamp
+import com.github.factotum_sdp.factotum.model.DestinationRecord.Companion.parseWaitTimeOrRate
 import com.github.factotum_sdp.factotum.ui.dialog.ClientIDViewValidation
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder

@@ -3,8 +3,7 @@ package com.github.factotum_sdp.factotum.utils
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.models.Contact
-import com.github.factotum_sdp.factotum.models.Role
+import com.github.factotum_sdp.factotum.model.Contact
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.getDatabase
 import kotlinx.coroutines.CompletableDeferred
 import org.hamcrest.Description

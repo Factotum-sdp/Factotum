@@ -4,8 +4,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
-import com.github.factotum_sdp.factotum.models.Bag
-import com.github.factotum_sdp.factotum.models.Pack
+import com.github.factotum_sdp.factotum.model.Bag
+import com.github.factotum_sdp.factotum.model.Pack
 import com.github.factotum_sdp.factotum.repositories.BagRepository
 import kotlinx.coroutines.runBlocking
 import java.util.Date

@@ -1,9 +1,9 @@
 package com.github.factotum_sdp.factotum
 
 import com.github.factotum_sdp.factotum.data.LoginDataSource
-import com.github.factotum_sdp.factotum.data.Result
-import com.github.factotum_sdp.factotum.models.Role
-import com.github.factotum_sdp.factotum.models.User
+import com.github.factotum_sdp.factotum.model.Result
+import com.github.factotum_sdp.factotum.model.Role
+import com.github.factotum_sdp.factotum.model.User
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test

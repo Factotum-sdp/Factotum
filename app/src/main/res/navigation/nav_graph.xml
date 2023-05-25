@@ -118,7 +118,24 @@
         android:id="@+id/bossMapFragment"
         android:name="com.github.factotum_sdp.factotum.ui.maps.BossMapFragment"
         android:label="BossMapFragment"
-        tools:layout="@layout/fragment_boss_map" />
+        tools:layout="@layout/fragment_boss_map" >
+        <action
+            android:id="@+id/action_bossMapFragment_to_photoProofRecapFragment"
+            app:destination="@id/photoProofRecapFragment" />
+        <action
+            android:id="@+id/action_bossMapFragment_to_deliveryHistoryFragment"
+            app:destination="@id/deliveryHistoryFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/photoProofRecapFragment"
+        android:name="com.github.factotum_sdp.factotum.ui.maps.PhotoProofRecapFragment"
+        android:label="fragment_photo_proof_recap"
+        tools:layout="@layout/fragment_photo_proof_recap" />
+    <fragment
+        android:id="@+id/deliveryHistoryFragment"
+        android:name="com.github.factotum_sdp.factotum.ui.bossmap.DeliveryHistoryFragment"
+        android:label="fragment_delivery_history_list"
+        tools:layout="@layout/fragment_delivery_history_list" />
     <fragment
         android:id="@+id/pictureFragment"
         android:name="com.github.factotum_sdp.factotum.ui.picture.PictureFragment"

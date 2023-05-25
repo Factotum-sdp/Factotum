@@ -1,6 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.display
 
-import android.animation.ObjectAnimator
+import android.app.DatePickerDialog
 import android.content.Intent
 import android.icu.util.Calendar
 import android.net.Uri
@@ -39,8 +39,16 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import java.util.Date
 
 private const val ANIMATION_DURATION = 400L
+import com.github.factotum_sdp.factotum.ui.display.courier_boss.CourierBossDisplayViewModel
+import com.github.factotum_sdp.factotum.ui.display.courier_boss.CourierBossDisplayViewModelFactory
+import com.github.factotum_sdp.factotum.ui.display.courier_boss.CourierBossFolderAdapter
+
 
 class DisplayFragment : Fragment(), MenuProvider {
+
+    companion object {
+        const val PROOF_PICTURE = "ProofPicture"
+    }
 
     private lateinit var displayMenu : Menu
     private lateinit var calendarButton: MenuItem
@@ -198,19 +206,27 @@ class DisplayFragment : Fragment(), MenuProvider {
             rotateRefreshButton(menuItem as ImageView)
             courierBossDisplayViewModel.refreshFolders()
         }
-
-        val courierBossFolderAdapter = CourierBossFolderAdapter(
-            onCardClick = { clientFolder ->
-                userFolder.value = clientFolder.value
-                observeClientPhotos()
-                setupClientUI()
-            }
-        )
+        val proofPicture = arguments?.getString(PROOF_PICTURE)
+        proofPicture?.let { seeProofPicture ->
+            arguments?.remove(PROOF_PICTURE)
+            userFolder.value = seeProofPicture
+            observeClientPhotos()
+            setupClientUI()
+        } ?: run {
+            val courierBossFolderAdapter =
+                CourierBossFolderAdapter(
+                    onCardClick = { clientFolder ->
+                        userFolder.value = clientFolder.value
+                        observeClientPhotos()
+                        setupClientUI()
+                    }
+                )
 
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = courierBossFolderAdapter
         }
+    }
 
     }
 

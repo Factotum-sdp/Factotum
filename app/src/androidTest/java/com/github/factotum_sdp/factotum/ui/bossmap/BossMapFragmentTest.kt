@@ -1,9 +1,14 @@
 package com.github.factotum_sdp.factotum.ui.bossmap
 
 import android.Manifest
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions.open
+import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -18,7 +23,6 @@ import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.LocationClientFactory
 import com.github.factotum_sdp.factotum.data.MockLocationClient
-import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
@@ -106,12 +110,55 @@ class BossMapFragmentTest {
         val cuf = CameraUpdateFactory.newLatLng(LatLng(46.517719,6.569090))
         moveMapCamera(testRule, cuf)
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        val mailboxBuaghiat = device.wait(Until.findObject(By.descContains(DestinationRecords.RECORDS[1].destID)), 5000L)
+        val mailboxBuaghiat = device.wait(Until.findObject(By.descContains("Mailbox")), 5000L)
         assert(mailboxBuaghiat != null)
-        val mailboxX17 = device.findObject(By.descContains(DestinationRecords.RECORDS[2].destID))
+        val mailboxX17 = device.findObject(By.descContains("Mailbox"))
         assert(mailboxX17 != null)
-
     }
+
+    @Test
+    fun testGoesToPictureFragment() : Unit = runBlocking {
+        GeneralUtils.fillUserEntryAndEnterTheApp(UsersPlaceHolder.USER_BOSS.email, UsersPlaceHolder.USER_BOSS.password)
+        goToBossMapFragment()
+        val cuf = CameraUpdateFactory.newLatLng(LatLng(46.517719,6.569090))
+        moveMapCamera(testRule, cuf)
+        delay(10000L)
+        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        val mailbox = device.wait(Until.findObject(By.descContains("Mailbox")), 5000L)
+        mailbox.click()
+        delay(10000L)
+        onView(withId(android.R.id.button3)).perform(click())
+        delay(10000L)
+        onView(withId(R.id.fragment_display_directors_parent)).check(matches(isDisplayed()))
+        device.pressBack()
+        device.pressBack()
+    }
+
+    @Test
+    fun testGoesToHistoryFragment() : Unit  = runBlocking {
+        GeneralUtils.fillUserEntryAndEnterTheApp(UsersPlaceHolder.USER_BOSS.email, UsersPlaceHolder.USER_BOSS.password)
+        goToBossMapFragment()
+        val cuf = CameraUpdateFactory.newLatLng(LatLng(46.517719,6.569090))
+        moveMapCamera(testRule, cuf)
+        delay(10000L)
+        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        val mailbox = device.wait(Until.findObject(By.descContains("Mailbox")), 5000)
+        mailbox.click()
+        delay(10000L)
+        onView(withId(android.R.id.button2)).perform(click())
+        delay(10000L)
+        onView(withId(R.id.list)).check(matches(isDisplayed()))
+        device.pressBack()
+    }
+
+    @Test
+    fun testHistoryUpdates(){
+        GeneralUtils.fillUserEntryAndEnterTheApp(UsersPlaceHolder.USER_BOSS.email, UsersPlaceHolder.USER_BOSS.password)
+        endShift()
+        goToBossMapFragment()
+    }
+
+
 
     private fun goToBossMapFragment() {
         onView(withId(R.id.drawer_layout))
@@ -131,6 +178,14 @@ class BossMapFragmentTest {
         onView(withId(R.id.location_switch)).perform(click())
     }
 
+    private fun endShift(){
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(ViewMatchers.withText(R.string.end_shift)).perform(click())
+        onView(ViewMatchers.withText(R.string.end_shift_dialog_title))
+            .check(matches(isDisplayed()))
+        onView(withId(android.R.id.button1)).perform(click())
+    }
+
     private fun moveMapCamera(rule: ActivityScenarioRule<MainActivity>, cuf : CameraUpdate) {
         val latch = CountDownLatch(1)
         rule.scenario.onActivity {
@@ -140,6 +195,5 @@ class BossMapFragmentTest {
             }
         }
         latch.await(1L, TimeUnit.SECONDS)
-
     }
 }

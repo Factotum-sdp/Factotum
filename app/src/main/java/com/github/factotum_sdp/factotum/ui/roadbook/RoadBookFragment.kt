@@ -284,7 +284,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
         )
         loadPreferencesButtonState(defaultPreferences)
     }
-
     private fun loadPreferencesButtonState(preferences: RoadBookPreferences) {
         dragAndDropButton.isChecked = preferences.enableReordering
         swipeLeftButton.isChecked = preferences.enableArchivingAndDeletion

@@ -1,9 +1,9 @@
 package com.github.factotum_sdp.factotum.ui.bag
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.map
 import com.github.factotum_sdp.factotum.models.Bag
 import com.github.factotum_sdp.factotum.models.Pack
 import com.github.factotum_sdp.factotum.repositories.BagRepository
@@ -16,11 +16,19 @@ import java.util.HashMap
  * of the packages delivered or currently delivered
  */
 class BagViewModel(private val repository: BagRepository): ViewModel() {
+
     private val _packages = MutableLiveData<List<Pack>>(listOf())
-    val packages: LiveData<List<Pack>> = _packages
+    val displayedPackages = _packages.map { packs ->
+        if(!withSendPacks) {
+            packs.filter { it.deliveredAt == null }
+        } else {
+            packs
+        }
+    }
 
     private val packageOccurrences = HashMap<Pair<String, String>, Int>()
     private var blockPackUpdate = false
+    private var withSendPacks = false
 
 
     /**
@@ -136,14 +144,34 @@ class BagViewModel(private val repository: BagRepository): ViewModel() {
         }
     }
 
+    /**
+     * Whether the delivered Packs have to be displayed
+     * @param isDisplayed: Boolean
+     */
+    fun displayDeliveredPacks(isDisplayed: Boolean) {
+        withSendPacks = isDisplayed
+        _packages.value = currentPackages()
+    }
+
+    /**
+     * To check the current packs update state
+     * If false, no update of this BagViewModel should be triggered from outside
+     * @return Boolean
+     */
     fun isPackUpdateBlocked(): Boolean {
         return blockPackUpdate
     }
 
+    /**
+     * Set the packs update state to blocked
+     */
     fun blockPackUpdate() {
         blockPackUpdate = true
     }
 
+    /**
+     * Allow the packs update
+     */
     fun allowPackUpdate() {
         blockPackUpdate = false
     }

@@ -14,6 +14,7 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.model.Contact
+import com.github.factotum_sdp.factotum.model.Role
 import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment.Companion.USERNAME_NAV_KEY
 import com.google.android.material.card.MaterialCardView
 
@@ -76,8 +77,19 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
     override fun onBindViewHolder(holder: ContactsViewHolder, i: Int) {
         holder.itemName.text = filteredContacts[i].surname + "  " + filteredContacts[i].name
         holder.itemUsername.text = "@" + filteredContacts[i].username
-        holder.itemImage.setImageResource(filteredContacts[i].profile_pic_id)
+
+        val imageResource = getRoleImageResource(filteredContacts[i].role)
+        holder.itemImage.setImageResource(imageResource)
     }
+
+    private fun getRoleImageResource(role : String): Int {
+    return when (role) {
+        "BOSS" ->  R.mipmap.ic_boss_profile_pic_round
+        "COURIER" -> R.mipmap.ic_courier_profile_pic_round
+        "CLIENT" -> R.mipmap.ic_client_profile_pic_round
+        else -> R.mipmap.ic_launcher_round
+    }
+}
 
     override fun getItemCount(): Int { //simple getter for the number of contacts
         return filteredContacts.size

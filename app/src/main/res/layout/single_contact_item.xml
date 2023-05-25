@@ -27,11 +27,11 @@
                 android:id="@+id/contact_image"
                 android:layout_width="56dp"
                 android:layout_height="56dp"
-                android:src="@mipmap/ic_profile_pic_round"
                 app:layout_constraintBottom_toBottomOf="@+id/contact_surname_and_name"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/contact_surname_and_name"
-                android:contentDescription="@string/contact_image"/>
+                android:contentDescription="@string/contact_image"
+                tools:srcCompat="@tools:sample/avatars"/>
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/contact_surname_and_name"

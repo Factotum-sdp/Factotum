@@ -53,6 +53,7 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
 
     private val bossMapViewModel: BossMapViewModel by viewModels()
     private val contactsViewModel: ContactsViewModel by activityViewModels()
+    private var cameraSetupDone = false
     private lateinit var mapView: MapView
     private lateinit var googleMap: GoogleMap
 
@@ -79,6 +80,7 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
         bitmapNotDeliveredScaled = createScaledBitmap(
             BitmapFactory.decodeResource(requireContext().resources, R.drawable.mailbox_lowered_flag),
             MAIL_BOX_SIZE, MAIL_BOX_SIZE, false)
+        cameraSetupDone = false
 
         return view
     }
@@ -97,13 +99,16 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
 
         bossMapViewModel.courierLocations.observe(viewLifecycleOwner) { locations ->
             updateMap(locations, bossMapViewModel.deliveriesStatus.value ?: mapOf())
-            val geometricMedian = calculateMedianLocation()
-            googleMap.moveCamera(
-                CameraUpdateFactory.newLatLngZoom(
-                    geometricMedian,
-                    ZOOM_LEVEL_CITY
+            if(!cameraSetupDone) {
+                val geometricMedian = calculateMedianLocation()
+                googleMap.moveCamera(
+                    CameraUpdateFactory.newLatLngZoom(
+                        geometricMedian,
+                        ZOOM_LEVEL_CITY
+                    )
                 )
-            )
+                cameraSetupDone = true
+            }
         }
 
         bossMapViewModel.deliveriesStatus.observe(viewLifecycleOwner) { deliveryStatus ->

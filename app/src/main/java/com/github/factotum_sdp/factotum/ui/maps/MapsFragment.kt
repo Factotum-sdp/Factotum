@@ -12,8 +12,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LiveData
-import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.databinding.FragmentMapsBinding
 import com.github.factotum_sdp.factotum.hasLocationPermission
@@ -43,7 +41,6 @@ class MapsFragment : Fragment() {
     }
 
     private var _binding: FragmentMapsBinding? = null
-    private val viewModel: MapsViewModel by activityViewModels()
     private val rbViewModel: RoadBookViewModel by activityViewModels()
     private val contactsViewModel : ContactsViewModel by activityViewModels()
     private lateinit var mMap: GoogleMap
@@ -64,10 +61,8 @@ class MapsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         _binding = FragmentMapsBinding.inflate(inflater, container, false)
-        val toolbar = requireActivity().findViewById<Toolbar>(R.id.toolbar)
-        toolbar.title = getString(R.string.title_maps)
+        (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.title_maps)
         return binding.root
     }
 

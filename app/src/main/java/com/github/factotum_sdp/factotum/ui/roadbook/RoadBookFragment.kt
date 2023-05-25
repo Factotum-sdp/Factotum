@@ -45,6 +45,7 @@ import com.github.factotum_sdp.factotum.ui.bag.BagViewModel
 import com.github.factotum_sdp.factotum.ui.bag.PackCreationDialogBuilder
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.ui.settings.SettingsViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.*
 
@@ -347,7 +348,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     }
 
     private fun showsPermissionsAlertDialog(iconID: Int, message: String) {
-        val builder = AlertDialog.Builder(requireContext())
+        val builder = MaterialAlertDialogBuilder(ContextThemeWrapper(requireContext(), R.style.Theme_Factotum_Dialog))
         builder
             .setTitle(getString(R.string.live_location_service_dialog_title))
             .setMessage(message)

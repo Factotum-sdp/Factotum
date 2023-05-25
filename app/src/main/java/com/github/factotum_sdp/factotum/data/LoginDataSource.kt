@@ -1,8 +1,9 @@
 package com.github.factotum_sdp.factotum.data
 
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
-import com.github.factotum_sdp.factotum.models.Role
-import com.github.factotum_sdp.factotum.models.User
+import com.github.factotum_sdp.factotum.model.Result
+import com.github.factotum_sdp.factotum.model.Role
+import com.github.factotum_sdp.factotum.model.User
 import com.google.firebase.auth.UserProfileChangeRequest
 import java.io.IOException
 import java.util.concurrent.CompletableFuture

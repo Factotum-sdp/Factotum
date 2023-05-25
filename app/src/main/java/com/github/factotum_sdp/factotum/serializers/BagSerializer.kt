@@ -2,7 +2,7 @@ package com.github.factotum_sdp.factotum.serializers
 
 import kotlinx.serialization.SerializationException
 import androidx.datastore.core.Serializer
-import com.github.factotum_sdp.factotum.models.Bag
+import com.github.factotum_sdp.factotum.model.Bag
 import kotlinx.serialization.json.Json
 import java.io.InputStream
 import java.io.OutputStream

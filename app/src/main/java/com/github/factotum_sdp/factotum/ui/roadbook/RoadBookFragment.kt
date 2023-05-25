@@ -23,13 +23,13 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.bagDataStore
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
+import com.github.factotum_sdp.factotum.model.Contact
+import com.github.factotum_sdp.factotum.model.DestinationRecord.Action.DELIVER
+import com.github.factotum_sdp.factotum.model.DestinationRecord.Action.PICK
+import com.github.factotum_sdp.factotum.model.RoadBookPreferences
+import com.github.factotum_sdp.factotum.model.Shift
 import com.github.factotum_sdp.factotum.hasLocationPermission
 import com.github.factotum_sdp.factotum.hasNotificationPermission
-import com.github.factotum_sdp.factotum.models.Contact
-import com.github.factotum_sdp.factotum.models.DestinationRecord.Action.DELIVER
-import com.github.factotum_sdp.factotum.models.DestinationRecord.Action.PICK
-import com.github.factotum_sdp.factotum.models.RoadBookPreferences
-import com.github.factotum_sdp.factotum.models.Shift
 import com.github.factotum_sdp.factotum.preferencesDataStore
 import com.github.factotum_sdp.factotum.repositories.BagRepository
 import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
@@ -388,6 +388,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun setEndShiftButtonListener(fragMenu: Menu) {
         val endShiftButton = fragMenu.findItem(R.id.finish_shift)
         endShiftButton.setOnMenuItemClickListener {
@@ -408,6 +409,9 @@ class RoadBookFragment : Fragment(), MenuProvider {
                                 Toast.LENGTH_SHORT
                             ).show() } ?: Log.w("RoadBookFragment", "User is null, cannot log shift")
                     } ?: Log.w("RoadBookFragment", "Record list is null, cannot log shift")
+
+                    rbViewModel.clearAllRecords()
+                    rbRecyclerView.adapter?.notifyDataSetChanged()
                 }
                 .setNegativeButton(R.string.decline_end_shift) { dialog, _ ->
                     dialog.cancel()

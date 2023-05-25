@@ -1,6 +1,6 @@
-package com.github.factotum_sdp.factotum.models
+package com.github.factotum_sdp.factotum.model
 
-import com.github.factotum_sdp.factotum.models.DestinationRecord.Action
+import com.github.factotum_sdp.factotum.model.DestinationRecord.Action
 import com.github.factotum_sdp.factotum.serializers.NullableDateKSerializer
 import kotlinx.serialization.Serializable
 import java.text.DateFormat

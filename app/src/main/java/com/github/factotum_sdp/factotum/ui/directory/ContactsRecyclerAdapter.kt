@@ -13,7 +13,7 @@ import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.models.Contact
+import com.github.factotum_sdp.factotum.model.Contact
 import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment.Companion.USERNAME_NAV_KEY
 
 class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.ContactsViewHolder>(),

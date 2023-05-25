@@ -25,9 +25,9 @@ import androidx.navigation.findNavController
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.databinding.FragmentContactCreationBinding
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getDatabase
-import com.github.factotum_sdp.factotum.models.AddressCoordinates
-import com.github.factotum_sdp.factotum.models.Contact
-import com.github.factotum_sdp.factotum.models.Role
+import com.github.factotum_sdp.factotum.model.AddressCoordinates
+import com.github.factotum_sdp.factotum.model.Contact
+import com.github.factotum_sdp.factotum.model.Role
 import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment.Companion.USERNAME_NAV_KEY
 import kotlinx.coroutines.launch
 

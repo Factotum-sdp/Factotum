@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.models.DestinationRecord.Companion.timeStampFormat
-import com.github.factotum_sdp.factotum.models.Pack
+import com.github.factotum_sdp.factotum.model.DestinationRecord.Companion.timeStampFormat
+import com.github.factotum_sdp.factotum.model.Pack
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.textview.MaterialTextView
 

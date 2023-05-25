@@ -3,8 +3,8 @@ import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.github.factotum_sdp.factotum.data.LoginDataSource
-import com.github.factotum_sdp.factotum.data.Result
-import com.github.factotum_sdp.factotum.models.User
+import com.github.factotum_sdp.factotum.model.Result
+import com.github.factotum_sdp.factotum.model.User
 import com.google.gson.Gson
 
 class LoginRepository(private val dataSource: LoginDataSource, context: Context) {

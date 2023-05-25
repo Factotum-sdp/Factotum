@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
-import com.github.factotum_sdp.factotum.models.Role
+import com.github.factotum_sdp.factotum.model.Role
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class DirectoryFragment : Fragment() {

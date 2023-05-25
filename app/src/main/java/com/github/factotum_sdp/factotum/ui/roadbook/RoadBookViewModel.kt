@@ -1,11 +1,10 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.*
-import com.github.factotum_sdp.factotum.models.DestinationRecord
-import com.github.factotum_sdp.factotum.models.RoadBookPreferences
-import com.github.factotum_sdp.factotum.models.Shift
+import com.github.factotum_sdp.factotum.model.DRecordList
+import com.github.factotum_sdp.factotum.model.DestinationRecord
+import com.github.factotum_sdp.factotum.model.RoadBookPreferences
+import com.github.factotum_sdp.factotum.model.Shift
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
 import com.github.factotum_sdp.factotum.repositories.RoadBookRepository

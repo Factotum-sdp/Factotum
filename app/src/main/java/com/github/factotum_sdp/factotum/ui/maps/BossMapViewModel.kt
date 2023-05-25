@@ -7,10 +7,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
-import com.github.factotum_sdp.factotum.models.Contact
-import com.github.factotum_sdp.factotum.models.CourierLocation
-import com.github.factotum_sdp.factotum.models.DeliveryStatus
-import com.github.factotum_sdp.factotum.models.DestinationRecord
+import com.github.factotum_sdp.factotum.model.Contact
+import com.github.factotum_sdp.factotum.model.CourierLocation
+import com.github.factotum_sdp.factotum.model.DeliveryStatus
+import com.github.factotum_sdp.factotum.model.DestinationRecord
 import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookFragment.Companion.ROADBOOK_DB_PATH
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError

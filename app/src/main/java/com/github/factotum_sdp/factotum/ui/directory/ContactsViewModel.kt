@@ -5,7 +5,7 @@ import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
-import com.github.factotum_sdp.factotum.models.Contact
+import com.github.factotum_sdp.factotum.model.Contact
 import com.github.factotum_sdp.factotum.repositories.ContactsRepository
 import com.google.firebase.database.FirebaseDatabase
 

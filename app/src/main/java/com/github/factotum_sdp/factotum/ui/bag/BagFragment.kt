@@ -15,7 +15,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.models.Pack
+import com.github.factotum_sdp.factotum.model.Pack
 
 /**
  * The "bag" Fragment

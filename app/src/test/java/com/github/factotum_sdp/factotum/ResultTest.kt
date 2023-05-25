@@ -1,6 +1,6 @@
 package com.github.factotum_sdp.factotum
 
-import com.github.factotum_sdp.factotum.data.Result
+import com.github.factotum_sdp.factotum.model.Result
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 

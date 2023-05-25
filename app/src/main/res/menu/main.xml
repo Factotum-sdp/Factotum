@@ -3,30 +3,27 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <group
+        android:checkableBehavior="all"
         android:menuCategory="alternative">
         <item
             android:id="@+id/rbDragDrop"
-            android:title="@string/rb_label_dragdrop"
-            android:checkable="true"/>
+            android:title="@string/rb_label_dragdrop" />
         <item
             android:id="@+id/rbSwipeLDeletion"
-            android:title="@string/rb_label_swipel_deletion"
-            android:checkable="true"/>
+            android:title="@string/rb_label_swipel_deletion" />
         <item
             android:id="@+id/rbSwipeREdition"
-            android:title="@string/rb_label_swiper_edition"
-            android:checkable="true"/>
+            android:title="@string/rb_label_swiper_edition" />
         <item
             android:id="@+id/rbTouchClick"
-            android:title="@string/rb_label_touch_click"
-            android:checkable="true"/>
+            android:title="@string/rb_label_touch_click" />
         <item
             android:id="@+id/showArchived"
-            android:title="@string/rb_label_show_archived"
-            android:checkable="true"/>
+            android:title="@string/rb_label_show_archived" />
         <item
             android:id="@+id/finish_shift"
-            android:title="@string/end_shift" />
+            android:title="@string/end_shift"
+            android:checkable="false"/>
         <item
             android:id="@+id/refresh_button"
             android:icon="@drawable/refresh"

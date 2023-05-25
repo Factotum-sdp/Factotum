@@ -6,7 +6,6 @@ import android.icu.util.Calendar
 import android.icu.util.GregorianCalendar
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -21,8 +20,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MutableLiveData
-import androidx.navigation.Navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
@@ -30,14 +27,19 @@ import com.github.factotum_sdp.factotum.databinding.FragmentDisplayBinding
 import com.github.factotum_sdp.factotum.models.Contact
 import com.github.factotum_sdp.factotum.models.Role
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
-import com.github.factotum_sdp.factotum.ui.display.courier_boss.CourierBossDisplayViewModel
-import com.github.factotum_sdp.factotum.ui.display.courier_boss.CourierBossDisplayViewModelFactory
-import com.github.factotum_sdp.factotum.ui.display.courier_boss.CourierBossFolderAdapter
 import com.github.factotum_sdp.factotum.ui.display.client.ClientDisplayViewModel
 import com.github.factotum_sdp.factotum.ui.display.client.ClientDisplayViewModelFactory
 import com.github.factotum_sdp.factotum.ui.display.client.ClientPhotoAdapter
+import com.github.factotum_sdp.factotum.ui.display.courier_boss.CourierBossDisplayViewModel
+import com.github.factotum_sdp.factotum.ui.display.courier_boss.CourierBossDisplayViewModelFactory
+import com.github.factotum_sdp.factotum.ui.display.courier_boss.CourierBossFolderAdapter
+
 
 class DisplayFragment : Fragment(), MenuProvider {
+
+    companion object {
+        const val PROOF_PICTURE = "ProofPicture"
+    }
 
     private lateinit var displayMenu : Menu
     private lateinit var calendarButton: MenuItem
@@ -62,7 +64,7 @@ class DisplayFragment : Fragment(), MenuProvider {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.STARTED)
+        requireActivity().addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             onBackPressedCallback
@@ -175,19 +177,27 @@ class DisplayFragment : Fragment(), MenuProvider {
         binding.refreshButton.setOnClickListener {
             courierBossDisplayViewModel.refreshFolders()
         }
-
-        val courierBossFolderAdapter = CourierBossFolderAdapter(
-            onCardClick = { clientFolder ->
-                userFolder.value = clientFolder.value
-                observeClientPhotos()
-                setupClientUI()
-            }
-        )
+        val proofPicture = arguments?.getString(PROOF_PICTURE)
+        proofPicture?.let { seeProofPicture ->
+            arguments?.remove(PROOF_PICTURE)
+            userFolder.value = seeProofPicture
+            observeClientPhotos()
+            setupClientUI()
+        } ?: run {
+            val courierBossFolderAdapter =
+                CourierBossFolderAdapter(
+                    onCardClick = { clientFolder ->
+                        userFolder.value = clientFolder.value
+                        observeClientPhotos()
+                        setupClientUI()
+                    }
+                )
 
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = courierBossFolderAdapter
         }
+    }
 
     }
 

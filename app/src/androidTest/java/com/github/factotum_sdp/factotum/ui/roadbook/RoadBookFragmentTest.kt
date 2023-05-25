@@ -96,10 +96,8 @@ class RoadBookFragmentTest {
 
     @Before
     fun toRoadBookFragment() {
-        RoadBookViewModel.setTimedBackUp(false)
         GeneralUtils.injectLoggedInUser(testRule, courier)
-        // Ensure "use RoadBook preferences" is disabled
-        PreferencesSetting.setRoadBookPrefs(testRule)
+        PreferencesSetting.setRoadBookPrefs(testRule) // Ensure "use RoadBook preferences" is disabled
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))
@@ -1136,6 +1134,8 @@ class RoadBookFragmentTest {
 
         onView(withId(R.id.bag_button)).perform(click())
 
+        onView(withId(R.id.menu_filter_button)).perform(click())
+
         onView(withText(startsWith(packageName))).check(matches(isDisplayed()))
         onView(withText(containsString(clientID))).check(matches(isDisplayed()))
         onView(withText(containsString(recipientID))).check(matches(isDisplayed()))
@@ -1161,6 +1161,8 @@ class RoadBookFragmentTest {
 
         onView(withId(R.id.bag_button)).perform(click())
 
+        onView(withId(R.id.menu_filter_button)).perform(click())
+
         onView(withText(startsWith(packageName))).check(matches(isDisplayed()))
         onView(withText(containsString(clientID))).check(matches(isDisplayed()))
         onView(withText(containsString(recipientID))).check(matches(isDisplayed()))
@@ -1183,6 +1185,8 @@ class RoadBookFragmentTest {
 
         onView(withId(R.id.bag_button)).perform(click())
 
+        onView(withId(R.id.menu_filter_button)).perform(click())
+
         onView(withText(startsWith(packageName))).check(matches(isDisplayed()))
         onView(withText(containsString(clientID))).check(matches(isDisplayed()))
         onView(withText(containsString(recipientID))).check(matches(isDisplayed()))
@@ -1196,6 +1200,8 @@ class RoadBookFragmentTest {
         val clientID = DestinationRecords.RECORDS[1].clientID
         val packageName = "Gold bottle"
         val recipientID = "X17"
+
+        addNonDeliveredPackageInBag(1, packageName, recipientID)
 
         swipeRightTheRecordAt(1)
         onView(withId(R.id.editTextTimestamp)).perform(click())
@@ -1252,6 +1258,8 @@ class RoadBookFragmentTest {
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
 
         onView(withId(R.id.bag_button)).perform(click())
+
+        onView(withId(R.id.menu_filter_button)).perform(click())
 
         onView(withText(startsWith(packageName))).check(matches(isDisplayed()))
         onView(withText(containsString(clientID))).check(matches(isDisplayed()))

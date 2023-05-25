@@ -9,6 +9,7 @@ import android.widget.CheckBox
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.ui.bag.BagViewModel
 import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookViewModel
 import com.google.android.material.snackbar.Snackbar
 
@@ -19,6 +20,7 @@ class SettingsFragment: Fragment() {
 
     private val settings: SettingsViewModel by activityViewModels()
     private val roadBookViewModel: RoadBookViewModel by activityViewModels()
+    private val bagViewModel: BagViewModel by activityViewModels()
 
     private lateinit var roadBookPreferences: CheckBox
     private lateinit var loadRoadBookBackUp: CheckBox
@@ -53,7 +55,9 @@ class SettingsFragment: Fragment() {
         }
         setCheckedSettingBehavior(loadRoadBookBackUp, false) {
             if(it) {
+                bagViewModel.blockPackUpdate()
                 roadBookViewModel.fetchBackBackUps()
+                bagViewModel.fetchBackBackUp()
                 snapMessage(R.string.snap_load_roadbook_backup)
             }
         }

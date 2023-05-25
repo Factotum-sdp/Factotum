@@ -14,32 +14,26 @@ import java.util.Date
 import java.util.Locale.ENGLISH
 
 /**
- * This class is used to serialize and deserialize java.util.Date
+ * This class is used to serialize and deserialize a nullable java.util.Date instance
  */
-object DateKSerializer: KSerializer<Date> {
+object NullableDateKSerializer : KSerializer<Date?> {
     override val descriptor: SerialDescriptor
         get() = PrimitiveSerialDescriptor("java.util.Date", PrimitiveKind.STRING)
 
-    override fun deserialize(decoder: Decoder): Date {
+    override fun deserialize(decoder: Decoder): Date? {
         val format = decoder.decodeString()
         return try {
-            SimpleDateFormat.getDateTimeInstance(
-                DEFAULT,
-                DEFAULT,
-                ENGLISH
-            ).parse(format) as Date
+            SimpleDateFormat.getDateTimeInstance(DEFAULT, DEFAULT, ENGLISH).parse(format)
         } catch (e: ParseException) {
-            Log.e("DateKSerializer", "Failed to parse date: $format")
-            Date()
+            Log.e("NullableDateKSerializer", "Failed to parse date: $format")
+            null
         }
     }
 
-    override fun serialize(encoder: Encoder, value: Date) {
-            val format = SimpleDateFormat.getDateTimeInstance(
-                DEFAULT,
-                DEFAULT,
-                ENGLISH
-            ).format(value)
+    override fun serialize(encoder: Encoder, value: Date?) {
+        value?.let {
+            val format = SimpleDateFormat.getDateTimeInstance(DEFAULT, DEFAULT, ENGLISH).format(value)
             encoder.encodeString(format)
+        } ?: encoder.encodeString("_")
     }
 }

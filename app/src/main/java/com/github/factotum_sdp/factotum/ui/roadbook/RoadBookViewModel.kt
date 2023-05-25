@@ -33,23 +33,8 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
     private val clientOccurrences = HashMap<String, Int>()
     private lateinit var preferencesRepository: RoadBookPreferencesRepository
 
-    private val handler = Handler(Looper.getMainLooper())
-    private val fetchDataRunnable = object : Runnable {
-        override fun run() {
-            roadBookRepository.setBackUp(currentDRecList())
-            handler.postDelayed(this, WAIT_TIME_BACK_UP_UPDATE)
-        }
-    }
-
     init {
         addDemoRecords(DestinationRecords.RECORDS)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        if(withTimedBackUp) {
-            handler.removeCallbacks(fetchDataRunnable)
-        }
     }
 
     /**
@@ -110,11 +95,27 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
     }
 
     /**
-     * Launch the Runnable routine to achieve timed back-ups of the RoadBook
+     * Replace the current displayed list by the last available back up of the RoadBookRepository
+     *
+     * Note that the the back up don't take into account the archiving state, all fetched from
+     * back up records are no more archived.
      */
-    fun launchRunnableBackUp() {
-        if(withTimedBackUp) {
-            handler.post(fetchDataRunnable)
+    fun fetchBackBackUps(){
+        runBlocking {
+            val lastBackUp = roadBookRepository.getLastBackUp()
+            val timestamped = buildSet {
+                lastBackUp.forEach { record ->
+                    record.timeStamp?.let {
+                        add(record)
+                    }
+                }
+            }
+            _recordsList.value =
+                DRecordList(
+                    allRecords = lastBackUp,
+                    showArchived = currentDRecList().showArchived,
+                    timestamped = timestamped
+                )
         }
     }
 
@@ -147,31 +148,6 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
         val pos = currentDRecList().getIndexOf(record.destID)
 
         _recordsList.postValue(currentDRecList().editRecordAt(pos, newRec))
-    }
-
-    /**
-     * Replace the current displayed list by the last available back up of the RoadBookRepository
-     *
-     * Note that the the back up don't take into account the archiving state, all fetched from
-     * back up records are no more archived.
-     */
-    fun fetchBackBackUps(){
-        runBlocking {
-            val lastBackUp = roadBookRepository.getLastBackUp()
-            val timestamped = buildSet {
-                lastBackUp.forEach { record ->
-                    record.timeStamp?.let {
-                        add(record)
-                    }
-                }
-            }
-            _recordsList.value =
-                DRecordList(
-                    allRecords = lastBackUp,
-                    showArchived = currentDRecList().showArchived,
-                    timestamped = timestamped
-                )
-        }
     }
 
     /**
@@ -362,14 +338,6 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
             if (modelClass.isAssignableFrom(RoadBookViewModel::class.java))
                 return RoadBookViewModel(repository, shiftRepository) as T
             throw IllegalArgumentException("Unknown ViewModel class")
-        }
-    }
-
-    companion object {
-        const val WAIT_TIME_BACK_UP_UPDATE = 15000L
-        var withTimedBackUp = true
-        fun setTimedBackUp(isEnabled: Boolean) { // For testing purpose
-            withTimedBackUp = isEnabled
         }
     }
 }

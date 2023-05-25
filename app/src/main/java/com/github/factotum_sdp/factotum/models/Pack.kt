@@ -1,5 +1,8 @@
 package com.github.factotum_sdp.factotum.models
 
+import com.github.factotum_sdp.factotum.serializers.DateKSerializer
+import com.github.factotum_sdp.factotum.serializers.NullableDateKSerializer
+import kotlinx.serialization.Serializable
 import java.util.Date
 
 /**
@@ -15,13 +18,15 @@ import java.util.Date
  * @property deliveredAt: Date The time when this package has been delivered
  * @property notes: String Some additional notes about this package
  */
+
+@Serializable
 data class Pack(
-    val packageID: String,
-    val name: String,
-    val senderID: String,
-    val recipientID: String,
-    val startingRecordID: String,
-    val arrivalRecordID: String?,
-    val takenAt: Date,
-    val deliveredAt: Date?,
-    val notes: String)
+    val packageID: String = "",
+    val name: String = "",
+    val senderID: String = "",
+    val recipientID: String = "",
+    val startingRecordID: String = "",
+    val arrivalRecordID: String? = "",
+    @Serializable(with = DateKSerializer::class) val takenAt: Date = Date(),
+    @Serializable(with = NullableDateKSerializer::class) val deliveredAt: Date? = null,
+    val notes: String = "")

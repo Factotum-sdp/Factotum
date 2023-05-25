@@ -60,7 +60,7 @@ fun triggerCancel(device: UiDevice) {
 fun goToPictureFragment() {
     onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
-    onView(withId(R.id.directoryFragment))
+    onView(withId(R.id.roadBookFragment))
             .perform(click())
 
     // Click on one of the roadbook

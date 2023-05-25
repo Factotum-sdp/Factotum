@@ -129,8 +129,7 @@
             android:id="@+id/contact_phone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/contact_phone"
-            android:autoLink="phone"/>
+            android:text="@string/contact_phone" />
 
         <TextView
             android:id="@+id/details_description"

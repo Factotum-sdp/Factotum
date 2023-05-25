@@ -105,7 +105,7 @@ class BossMapFragmentTest {
     }
 
     @Test
-    fun testGoesToPictureFragment(){
+    fun testGoesToPictureFragment() : Unit = runBlocking {
         GeneralUtils.fillUserEntryAndEnterTheApp(UsersPlaceHolder.USER_BOSS.email, UsersPlaceHolder.USER_BOSS.password)
         goToBossMapFragment()
         val cuf = CameraUpdateFactory.newLatLng(LatLng(46.517719,6.569090))
@@ -113,16 +113,16 @@ class BossMapFragmentTest {
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         val mailbox = device.wait(Until.findObject(By.descContains("Mailbox")), 5000L)
         mailbox.click()
-        runBlocking { delay(10000L) }
+        delay(10000L)
         onView(withId(android.R.id.button3)).perform(click())
-        runBlocking { delay(10000L) }
+        delay(10000L)
         onView(withId(R.id.fragment_display_directors_parent)).check(matches(isDisplayed()))
         device.pressBack()
         device.pressBack()
     }
 
     @Test
-    fun testGoesToHistoryFragment(){
+    fun testGoesToHistoryFragment() : Unit  = runBlocking {
         GeneralUtils.fillUserEntryAndEnterTheApp(UsersPlaceHolder.USER_BOSS.email, UsersPlaceHolder.USER_BOSS.password)
         goToBossMapFragment()
         val cuf = CameraUpdateFactory.newLatLng(LatLng(46.517719,6.569090))
@@ -130,9 +130,9 @@ class BossMapFragmentTest {
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         val mailbox = device.wait(Until.findObject(By.descContains("Mailbox")), 5000)
         mailbox.click()
-        runBlocking { delay(10000L) }
+        delay(10000L)
         onView(withId(android.R.id.button2)).perform(click())
-        runBlocking { delay(10000L) }
+        delay(10000L)
         onView(withId(R.id.list)).check(matches(isDisplayed()))
         device.pressBack()
     }

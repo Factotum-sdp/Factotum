@@ -131,11 +131,14 @@ class MapsFragment : Fragment() {
             route?.let {
                 placeMarkers(listOf(it), googleMap)
             }
+            // Remove scroll gestures from the map (to avoid conflicts with the ViewPager)
+            googleMap.uiSettings.isScrollGesturesEnabled = false
         }
         else {
             // places markers on the map and centers the camera
             val destinations = getDestinationsFromRoadbook()
             placeMarkers(destinations, googleMap)
+            googleMap.uiSettings.isScrollGesturesEnabled = true
         }
         // Add zoom controls to the map
         googleMap.uiSettings.isZoomControlsEnabled = true

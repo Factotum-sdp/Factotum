@@ -119,4 +119,11 @@
         android:name="com.github.factotum_sdp.factotum.ui.maps.BossMapFragment"
         android:label="BossMapFragment"
         tools:layout="@layout/fragment_boss_map" />
+    <fragment
+        android:id="@+id/pictureFragment"
+        android:name="com.github.factotum_sdp.factotum.ui.picture.PictureFragment"
+        android:label="PictureFragment"
+        tools:layout="@layout/fragment_picture" >
+    </fragment>
+
 </navigation>

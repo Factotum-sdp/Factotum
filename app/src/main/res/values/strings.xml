@@ -201,4 +201,5 @@
     <string name="notifications_not_enabled_message">Allowed permissions are not sufficient, the notifications should be enabled too.</string>
     <string name="precise_location_not_enabled_message">Allowed permissions are not sufficient, the precise location is needed.</string>
     <string name="delivery_history">Delivery History</string>
+    <string name="erase">Erase</string>
 </resources>

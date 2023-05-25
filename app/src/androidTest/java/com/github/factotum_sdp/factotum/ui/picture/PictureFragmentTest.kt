@@ -57,17 +57,12 @@ class PictureFragmentTest {
         GeneralUtils.injectBossAsLoggedInUser(testRule)
         PreferencesSetting.setRoadBookPrefs(testRule)
         PreferencesSetting.enableTouchClick()
-        emptyLocalFiles(picturesDir)
-        launch { emptyFirebaseStorage(GeneralUtils.getStorage().reference) }.join()
-        device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         goToPictureFragment()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @After
     fun tearDown() = runTest {
-        launch { emptyFirebaseStorage(GeneralUtils.getStorage().reference) }.join()
-        emptyLocalFiles(picturesDir)
         Intents.release()
     }
 

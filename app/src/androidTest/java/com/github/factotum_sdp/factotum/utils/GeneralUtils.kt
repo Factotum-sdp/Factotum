@@ -59,6 +59,10 @@ class GeneralUtils {
             return auth
         }
 
+        fun getStorage(): FirebaseStorage {
+            return storage
+        }
+
         fun fillUserEntryAndEnterTheApp(email: String, password: String) {
             onView(withId(R.id.email)).perform(typeText(email))
             onView(withId(R.id.fragment_login_directors_parent)).perform(

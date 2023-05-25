@@ -6,6 +6,7 @@
     <color name="light_blue_a200">#40C4FF</color>
     <color name="light_blue_a400">#0091EA</color>
     <color name="light_blue_700">#0288D1</color>
+    <color name="light_grey">#9FA8DA</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="cardview_stroke_color_light_mode">#FFE0E0E0</color>

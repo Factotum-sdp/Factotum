@@ -93,8 +93,8 @@ class DRecordDetailsFragment : Fragment() {
                 val currentContact = first { c -> c.username == rec.clientID }
                 if (currentContact.hasCoordinates()) {
                     val route = Route(
-                        0.0, //Should be the current location
-                        0.0,
+                        currentContact.latitude ?: 0.0, // should be current location
+                        currentContact.longitude ?: 0.0,
                         currentContact.latitude ?: 0.0,
                         currentContact.longitude ?: 0.0
                     )

@@ -10,7 +10,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LiveData
 import com.github.factotum_sdp.factotum.databinding.FragmentMapsBinding
 import com.github.factotum_sdp.factotum.hasLocationPermission
 import com.github.factotum_sdp.factotum.models.Route
@@ -76,11 +75,31 @@ class MapsFragment : Fragment() {
     private fun getDestinationsFromRoadbook() : List<Route> {
         val destinations = mutableListOf<Route>()
         rbViewModel.recordsListState.value?.let { records ->
-            records.forEach { record ->
-                val contact = contactsViewModel.contacts.value?.first{ it.username == record.clientID }
-                if(contact?.latitude != null && contact.longitude != null){
-                    val route = Route(0.0, 0.0, contact.latitude, contact.longitude)
+            if(records.size == 1) {
+                val firstRecord = records.first()
+                val firstContact = contactsViewModel.contacts.value?.first{ it.username == firstRecord.clientID }
+                if(firstContact?.hasCoordinates() == true){
+                    val route = Route(firstContact.latitude ?: 0.0, firstContact.longitude ?: 0.0, firstContact.latitude ?: 0.0, firstContact.longitude ?: 0.0 )
                     destinations.add(route)
+                }
+            }
+            else {
+                records.windowed(2, 1).forEach { recordList ->
+                    val firstRecord = recordList.first()
+                    val secondRecord = recordList.last()
+                    val firstContact =
+                        contactsViewModel.contacts.value?.first { it.username == firstRecord.clientID }
+                    val secondContact =
+                        contactsViewModel.contacts.value?.first { it.username == secondRecord.clientID }
+                    if (firstContact?.hasCoordinates() == true && secondContact?.hasCoordinates() == true) {
+                        val route = Route(
+                            firstContact.latitude ?: 0.0,
+                            firstContact.longitude ?: 0.0,
+                            secondContact.latitude ?: 0.0,
+                            secondContact.longitude ?: 0.0
+                        )
+                        destinations.add(route)
+                    }
                 }
             }
 
@@ -155,6 +174,7 @@ class MapsFragment : Fragment() {
             route.addDstToMap(googleMap)
             if (drawRoutes) route.drawRoute(googleMap)
             bounds.include(route.dst)
+            bounds.include(route.src)
         }
 
         googleMap.setOnPolylineClickListener { polyline ->

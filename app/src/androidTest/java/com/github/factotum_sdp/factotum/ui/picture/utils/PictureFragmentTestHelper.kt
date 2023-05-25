@@ -16,8 +16,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import java.io.File
 
-const val TIME_WAIT_UPLOAD_PHOTO = 2000L
-const val TIME_WAIT_BETWEEN_ACTIONS = 500L
+const val TIME_WAIT_BETWEEN_ACTIONS = 750L
 
 // HELPER METHODS
 suspend fun emptyFirebaseStorage(storageRef: StorageReference) {

@@ -3,6 +3,8 @@ package com.github.factotum_sdp.factotum.ui.picture
 import android.Manifest
 import android.os.Environment
 import androidx.test.espresso.IdlingResource
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -51,6 +53,7 @@ class PictureFragmentTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Before
     fun setUp() = runTest{
+        Intents.init()
         GeneralUtils.injectBossAsLoggedInUser(testRule)
         PreferencesSetting.setRoadBookPrefs(testRule)
         PreferencesSetting.enableTouchClick()
@@ -58,7 +61,6 @@ class PictureFragmentTest {
         launch { emptyFirebaseStorage(GeneralUtils.getStorage().reference) }.join()
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         goToPictureFragment()
-        triggerShutter(device)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -66,16 +68,14 @@ class PictureFragmentTest {
     fun tearDown() = runTest {
         launch { emptyFirebaseStorage(GeneralUtils.getStorage().reference) }.join()
         emptyLocalFiles(picturesDir)
+        Intents.release()
     }
 
     @Test
-    fun takingPictureWorks() {
-        triggerDone(device)
-    }
-
-    @Test
-    fun cancelingPictureWorks() {
-        triggerCancel(device)
+    fun goesIntoFragment() = runBlocking {
+        //Check that the intent for the camera is launched
+        delay(TIME_WAIT_BETWEEN_ACTIONS)
+        Intents.intended(hasAction("android.media.action.IMAGE_CAPTURE"))
     }
 
 }

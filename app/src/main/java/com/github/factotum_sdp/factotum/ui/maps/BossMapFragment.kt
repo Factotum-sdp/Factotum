@@ -1,5 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.maps
 
+import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Bitmap.createScaledBitmap
@@ -8,11 +9,9 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
-import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
@@ -34,14 +33,12 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 
 private const val ZOOM_LEVEL_CITY = 13f
 private const val SCALE_FACTOR_ICON = 0.7f
 private const val FACTOR_DARKER_COLOR = 0.7f
 private const val MAILBOX_TITLE = "Mailbox"
-private var MAIL_BOX_SIZE = 100
 
 /**
  * A map fragment that should be available only for a boss user.
@@ -77,6 +74,8 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
         bitmapNotDeliveredScaled = createScaledBitmap(
             BitmapFactory.decodeResource(requireContext().resources, R.drawable.mailbox_lowered_flag),
             MAIL_BOX_SIZE, MAIL_BOX_SIZE, false)
+        val toolbar = requireActivity().findViewById<Toolbar>(R.id.toolbar)
+        toolbar.title = getString(R.string.title_maps)
 
         return view
     }
@@ -155,7 +154,7 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
         deliveryStatus.second.forEach {status ->
             deliveryInfos.append("${status.courier} : ${status.timeStamp ?: "not delivered"}\n")
         }
-        MaterialAlertDialogBuilder(ContextThemeWrapper(context, R.style.Theme_Factotum_Dialog))
+        AlertDialog.Builder(requireContext())
             .setTitle("Delivery status of ${deliveryStatus.first}")
             .setMessage(deliveryInfos.toString())
             .setPositiveButton("OK") { dialog, _ ->

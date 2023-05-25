@@ -240,7 +240,7 @@ class ContactCreationFragment : Fragment() {
                         role = spinner.selectedItem.toString(),
                         name = name.text.toString(),
                         surname = surname.text.toString(),
-                        profile_pic_id = R.mipmap.ic_profile_pic_round,
+                        profile_pic_id = R.mipmap.ic_launcher_round,
                         addressName = address.addressName,
                         latitude = address.coordinates?.latitude,
                         longitude = address.coordinates?.longitude,

@@ -38,8 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:hint="@string/hint_dialog_timestamp"
-            app:endIconMode="clear_text">
+            android:hint="@string/hint_dialog_timestamp">
 
             <com.google.android.material.textfield.TextInputEditText
                 style="@style/Widget.MaterialComponents.AutoCompleteTextView.FilledBox"
@@ -50,6 +49,14 @@
                 android:ems="10"
                 android:inputType="time" />
         </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/Widget.Material3.Button.TextButton"
+            android:id="@+id/button_erase_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:text="@string/erase"/>
 
         <com.google.android.material.textfield.TextInputLayout
             style="?attr/textInputFilledStyle"

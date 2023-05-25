@@ -7,6 +7,7 @@ import android.view.ContextThemeWrapper
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import android.widget.Button
 import android.widget.EditText
 import android.widget.MultiAutoCompleteTextView
 import androidx.appcompat.app.AlertDialog
@@ -66,6 +67,7 @@ class DRecordEditDialogBuilder(
     private val actionsView: MultiAutoCompleteTextView
     private val notesView: EditText
     private val dialogView : View
+    private val eraseTimeButton: Button
 
     init {
         val inflater = host.requireActivity().layoutInflater
@@ -81,6 +83,10 @@ class DRecordEditDialogBuilder(
         rateView = dialogView.findViewById(R.id.editTextRate)
         actionsView = dialogView.findViewById(R.id.multiAutoCompleteActions)
         notesView = dialogView.findViewById(R.id.editTextNotes)
+        eraseTimeButton = dialogView.findViewById(R.id.button_erase_time)
+        eraseTimeButton.setOnClickListener {
+            timestampView.text.clear()
+        }
     }
 
     override fun clientIDInputView(): AutoCompleteTextView {
@@ -92,8 +98,6 @@ class DRecordEditDialogBuilder(
         setTimestampTimePicker()
         setActionsAdapter()
         setClientIDFieldCheck()
-
-
 
         return super.create()
     }
@@ -229,18 +233,15 @@ class DRecordEditDialogBuilder(
                     val cal = Calendar.getInstance()
                     cal.set(Calendar.HOUR_OF_DAY, picker.hour)
                     cal.set(Calendar.MINUTE, picker.minute)
-
                     timestampView.setText(SimpleDateFormat.getTimeInstance().format(cal.time))
                 }
 
-                picker.addOnNegativeButtonClickListener {
-                    timestampView.setText("")
-                }
                 picker.show(host.parentFragmentManager, "MATERIAL_TIME_PICKER")
             }
         }
         timestampView.onFocusChangeListener = focusChangeListener
     }
+
 
     private fun setActionsAdapter() {
         val actionsAdapter = ArrayAdapter(

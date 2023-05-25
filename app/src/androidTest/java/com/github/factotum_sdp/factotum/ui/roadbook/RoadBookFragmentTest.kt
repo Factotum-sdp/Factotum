@@ -201,7 +201,8 @@ class RoadBookFragmentTest {
         onView(withId(R.id.autoCompleteClientID))
             .perform(click(), typeText("$clientID "), closeSoftKeyboard())
         onView(withId(R.id.editTextTimestamp)).perform(click())
-        onView(withText(timePickerCancelBLabel)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click())
+        onView(withId(R.id.button_erase_time)).perform(click())
 
         onView(withId(R.id.editTextTimestamp)).perform(typeText("2222"), closeSoftKeyboard())
         onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
@@ -538,7 +539,8 @@ class RoadBookFragmentTest {
         onView(withId(R.id.autoCompleteClientID))
             .perform(click(), clearText(), typeText("$newRecordClientID "), closeSoftKeyboard())
         onView(withId(R.id.editTextTimestamp)).perform(click())
-        onView(withText(timePickerCancelBLabel)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click())
+        onView(withId(R.id.button_erase_time)).perform(click())
         onView(withId(R.id.editTextTimestamp)).perform(typeText("2222"))
         onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
 
@@ -563,7 +565,8 @@ class RoadBookFragmentTest {
 
         val cal: Calendar = Calendar.getInstance()
         onView(withId(R.id.editTextTimestamp)).perform(click())
-        onView(withText(timePickerCancelBLabel)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click())
+        onView(withId(R.id.button_erase_time)).perform(click())
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
 
         onView(withText(startsWith("arrival : ${timestampUntilHourFormat(cal)}"))).check(
@@ -621,7 +624,8 @@ class RoadBookFragmentTest {
     private fun eraseFirstRecTimestamp() {
         swipeRightTheRecordAt(0)
         onView(withId(R.id.editTextTimestamp)).perform(click())
-        onView(withText(timePickerCancelBLabel)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click())
+        onView(withId(R.id.button_erase_time)).perform(click())
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
     }
 
@@ -1193,7 +1197,8 @@ class RoadBookFragmentTest {
 
         swipeRightTheRecordAt(2)
         onView(withId(R.id.editTextTimestamp)).perform(click())
-        onView(withText(timePickerCancelBLabel)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click())
+        onView(withId(R.id.button_erase_time)).perform(click())
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
 
         onView(withId(R.id.bag_button)).perform(click())
@@ -1218,7 +1223,8 @@ class RoadBookFragmentTest {
 
         swipeRightTheRecordAt(1)
         onView(withId(R.id.editTextTimestamp)).perform(click())
-        onView(withText(timePickerCancelBLabel)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click())
+        onView(withId(R.id.button_erase_time)).perform(click())
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
 
         onView(withId(R.id.bag_button)).perform(click())

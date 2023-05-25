@@ -3,6 +3,7 @@ package com.github.factotum_sdp.factotum.ui.picture
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.swipeLeft
+import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.uiautomator.UiDevice
@@ -57,6 +58,11 @@ fun triggerCancel(device: UiDevice) {
 }
 
 fun goToPictureFragment() {
+    onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+    onView(withId(R.id.directoryFragment))
+            .perform(click())
+
     // Click on one of the roadbook
     val destID = DestinationRecords.RECORDS[0].destID
     onView(withText(destID)).perform(click())

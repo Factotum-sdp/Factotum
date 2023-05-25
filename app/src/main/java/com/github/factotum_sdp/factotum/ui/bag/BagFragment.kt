@@ -75,8 +75,8 @@ class BagFragment: Fragment(), MenuProvider {
         withSendPackButton.setOnMenuItemClickListener {
             it.isChecked = !it.isChecked
 
-            if(it.isChecked) it.setIcon(R.drawable.blue_send)
-            else it.setIcon(R.drawable.send)
+            if(it.isChecked) it.setIcon(R.drawable.blue_work_history)
+            else it.setIcon(R.drawable.work_history)
 
             bagViewModel.displayDeliveredPacks(it.isChecked)
             true

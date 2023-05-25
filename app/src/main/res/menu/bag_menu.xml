@@ -7,7 +7,7 @@
         android:menuCategory="alternative">
         <item
             android:id="@+id/menu_filter_button"
-            android:icon="@drawable/send"
+            android:icon="@drawable/work_history"
             android:title="@string/with_send_packs_button"
             app:showAsAction="always" />
     </group>

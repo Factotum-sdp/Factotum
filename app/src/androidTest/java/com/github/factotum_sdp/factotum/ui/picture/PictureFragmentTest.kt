@@ -53,6 +53,7 @@ class PictureFragmentTest {
     @Before
     fun setUp() = runTest{
         GeneralUtils.injectBossAsLoggedInUser(testRule)
+        PreferencesSetting.setRoadBookPrefs(testRule)
         PreferencesSetting.enableTouchClick()
         emptyLocalFiles(picturesDir)
         launch { emptyFirebaseStorage(GeneralUtils.getStorage().reference) }.join()

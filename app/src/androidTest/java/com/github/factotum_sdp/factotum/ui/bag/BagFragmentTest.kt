@@ -205,7 +205,7 @@ class BagFragmentTest {
         onView(withId(R.id.packageCardView)).perform(click())
 
         // Edit notes
-        onView(withId(R.id.postEditTextPackageNotes)).perform(clearText(), typeText(newNotes))
+        onView(withId(R.id.postEditTextPackageNotes)).perform(clearText(), typeText(newNotes), closeSoftKeyboard())
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
 
         // Check notes are updated
@@ -229,7 +229,7 @@ class BagFragmentTest {
         onView(withId(R.id.packageCardView)).perform(click())
 
         // Edit notes but then cancel
-        onView(withId(R.id.postEditTextPackageNotes)).perform(clearText(),  typeText(newNotes))
+        onView(withId(R.id.postEditTextPackageNotes)).perform(clearText(),  typeText(newNotes), closeSoftKeyboard())
         onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
 
         // Check notes are NOT updated

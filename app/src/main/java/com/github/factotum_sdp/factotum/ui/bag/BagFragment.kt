@@ -61,6 +61,7 @@ class BagFragment: Fragment(), MenuProvider {
             val builder = MaterialAlertDialogBuilder(
                 ContextThemeWrapper(requireContext(), R.style.Theme_Factotum_Dialog))
             builder.setTitle(R.string.bag_edit_dialog_title)
+            builder.setView(dialogView)
             builder.setNegativeButton(R.string.edit_dialog_cancel_b, null)
             builder.setPositiveButton(R.string.edit_dialog_update_b) { _, _ ->
                 bagViewModel.updateNotesOf(it.packageID, notesView.text.toString())

@@ -20,6 +20,9 @@ import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.File
 import java.util.Date
 import java.util.Locale
@@ -79,11 +82,18 @@ class PictureFragment(clientID : String) : Fragment() {
                 val photoRef = storageRef.child("$folderName/$photoName")
                 val uploadTask = photoRef.putFile(photoUri)
 
-                uploadTask.addOnSuccessListener { photoFile.delete() }
+                CoroutineScope(Dispatchers.IO).launch {
+                    uploadTask.addOnSuccessListener {
+                        photoFile.delete()
+                        findNavController().navigateUp()
+                    }.addOnFailureListener {
+                        findNavController().navigateUp()
+                    }
+                }
             } else {
                 photoFile.delete()
+                findNavController().navigateUp()
             }
-            findNavController().navigateUp()
         }
 
     private val readCameraPermissionResult = registerForActivityResult(

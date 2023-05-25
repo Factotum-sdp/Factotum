@@ -146,8 +146,6 @@ class BossMapFragmentTest {
         goToBossMapFragment()
     }
 
-
-
     private fun goToBossMapFragment() {
         onView(withId(R.id.drawer_layout))
             .perform(open())

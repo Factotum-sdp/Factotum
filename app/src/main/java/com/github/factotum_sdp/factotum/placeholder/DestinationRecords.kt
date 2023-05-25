@@ -1,7 +1,7 @@
 package com.github.factotum_sdp.factotum.placeholder
 
-import com.github.factotum_sdp.factotum.models.DestinationRecord
-import com.github.factotum_sdp.factotum.models.DestinationRecord.Action
+import com.github.factotum_sdp.factotum.model.DestinationRecord
+import com.github.factotum_sdp.factotum.model.DestinationRecord.Action
 import java.util.Calendar
 
 /**

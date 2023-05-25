@@ -7,8 +7,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.models.DestinationRecord
-import com.github.factotum_sdp.factotum.models.DestinationRecord.Action
+import com.github.factotum_sdp.factotum.model.DRecordList
+import com.github.factotum_sdp.factotum.model.DestinationRecord
+import com.github.factotum_sdp.factotum.model.DestinationRecord.Action
 import java.util.*
 
 /**

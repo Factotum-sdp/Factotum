@@ -28,7 +28,6 @@ class LocationTrackingHandler {
     private val _isTrackingEnabled = MutableStateFlow(false)
     private val _currentLocation = MutableStateFlow<Location?>(null)
 
-    private var mockLocationClient: LocationClient? = null
 
     /**
      * The StateFlow<Location?> giving the current location when the tracking is enabled

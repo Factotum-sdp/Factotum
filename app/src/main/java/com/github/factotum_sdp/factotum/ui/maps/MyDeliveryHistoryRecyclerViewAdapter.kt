@@ -2,13 +2,11 @@ package com.github.factotum_sdp.factotum.ui.bossmap
 
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import com.github.factotum_sdp.factotum.R
 
 import com.github.factotum_sdp.factotum.databinding.FragmentDeliveryHistoryBinding
-import com.github.factotum_sdp.factotum.models.DeliveryStatus
+import com.github.factotum_sdp.factotum.model.DeliveryStatus
 
 /**
  * [RecyclerView.Adapter] that can display a [DeliveryStatus].

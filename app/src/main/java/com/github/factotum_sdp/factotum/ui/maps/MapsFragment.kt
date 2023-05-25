@@ -14,7 +14,7 @@ import androidx.fragment.app.activityViewModels
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.databinding.FragmentMapsBinding
 import com.github.factotum_sdp.factotum.hasLocationPermission
-import com.github.factotum_sdp.factotum.models.Route
+import com.github.factotum_sdp.factotum.model.Route
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookViewModel
 import com.google.android.gms.maps.CameraUpdateFactory

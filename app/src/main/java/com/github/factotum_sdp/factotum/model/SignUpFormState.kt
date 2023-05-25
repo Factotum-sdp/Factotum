@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum.ui.signup
+package com.github.factotum_sdp.factotum.model
 
 import com.github.factotum_sdp.factotum.ui.auth.BaseAuthState
 

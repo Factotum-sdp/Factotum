@@ -10,7 +10,7 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
-import com.github.factotum_sdp.factotum.models.User
+import com.github.factotum_sdp.factotum.model.User
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder.USER_BOSS
 import com.github.factotum_sdp.factotum.ui.login.LoginViewModel
 import com.google.firebase.auth.FirebaseAuth

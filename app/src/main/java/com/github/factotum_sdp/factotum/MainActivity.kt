@@ -19,7 +19,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.github.factotum_sdp.factotum.databinding.ActivityMainBinding
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getDatabase
-import com.github.factotum_sdp.factotum.models.Role
+import com.github.factotum_sdp.factotum.model.Role
 import com.github.factotum_sdp.factotum.repositories.SettingsRepository
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.ui.login.LoginViewModel

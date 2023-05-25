@@ -1,8 +1,8 @@
 package com.github.factotum_sdp.factotum.repositories
 
 import androidx.datastore.core.DataStore
-import com.github.factotum_sdp.factotum.models.Bag
-import com.github.factotum_sdp.factotum.models.Pack
+import com.github.factotum_sdp.factotum.model.Bag
+import com.github.factotum_sdp.factotum.model.Pack
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseReference
 

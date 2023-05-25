@@ -282,6 +282,52 @@ class BagFragmentTest {
         onView(withText(notes)).check(matches(isDisplayed()))
     }
 
+    @Test
+    fun createAPackAndDeliverItDisplaysTheModifications() {
+        val record = DestinationRecords.RECORD_TO_ADD
+        val clientID = record.clientID
+        val packageName = "Gold bottle"
+        val recipientID = "X17"
+        val notes = "It is the end of SDP"
+
+        createAPackWithNotes(clientID, packageName, recipientID, notes)
+
+        onView(withId(R.id.fab)).perform(click())
+        onView(withId(R.id.autoCompleteClientID))
+            .perform(typeText("$recipientID "))
+
+        onView(withId(R.id.multiAutoCompleteActions))
+            .perform(
+                click(),
+                clearText(),
+                typeText("deliver, contact"),
+                closeSoftKeyboard()
+            )
+
+        onView(withId(R.id.editTextTimestamp)).perform(click())
+        onView(withText(timePickerUpdateBLabel)).perform(click())
+
+        onView(withText(R.string.edit_dialog_update_b)).perform(click())
+
+        onView(withId(R.id.bag_button)).perform(click())
+
+        onView(withText(startsWith(packageName))).check(doesNotExist())
+        onView(withText(containsString(clientID))).check(doesNotExist())
+        onView(withText(containsString(recipientID))).check(doesNotExist())
+        onView(withText(containsString(BagAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
+            doesNotExist())
+
+        onView(withId(R.id.menu_filter_button)).perform(click())
+
+        onView(withText(startsWith(packageName))).check(matches(isDisplayed()))
+        onView(withText(containsString(clientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(recipientID))).check(matches(isDisplayed()))
+        onView(withText(containsString(BagAdapter.DELIVERED_TIMESTAMP_PREFIX))).check(
+            matches(isDisplayed())
+        )
+
+    }
+
     private fun createAPackWithNotes(clientID: String, packageName: String, recipientID: String, notes: String) {
         onView(withId(R.id.fab)).perform(click())
         onView(withId(R.id.autoCompleteClientID))

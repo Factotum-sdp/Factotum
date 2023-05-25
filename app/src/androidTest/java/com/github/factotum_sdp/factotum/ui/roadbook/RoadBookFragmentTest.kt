@@ -1149,6 +1149,8 @@ class RoadBookFragmentTest {
 
         onView(withId(R.id.bag_button)).perform(click())
 
+        onView(withId(R.id.menu_filter_button)).perform(click())
+
         onView(withText(startsWith(packageName))).check(matches(isDisplayed()))
         onView(withText(containsString(clientID))).check(matches(isDisplayed()))
         onView(withText(containsString(recipientID))).check(matches(isDisplayed()))
@@ -1174,6 +1176,8 @@ class RoadBookFragmentTest {
 
         onView(withId(R.id.bag_button)).perform(click())
 
+        onView(withId(R.id.menu_filter_button)).perform(click())
+
         onView(withText(startsWith(packageName))).check(matches(isDisplayed()))
         onView(withText(containsString(clientID))).check(matches(isDisplayed()))
         onView(withText(containsString(recipientID))).check(matches(isDisplayed()))
@@ -1196,6 +1200,8 @@ class RoadBookFragmentTest {
 
         onView(withId(R.id.bag_button)).perform(click())
 
+        onView(withId(R.id.menu_filter_button)).perform(click())
+
         onView(withText(startsWith(packageName))).check(matches(isDisplayed()))
         onView(withText(containsString(clientID))).check(matches(isDisplayed()))
         onView(withText(containsString(recipientID))).check(matches(isDisplayed()))
@@ -1209,6 +1215,8 @@ class RoadBookFragmentTest {
         val clientID = DestinationRecords.RECORDS[1].clientID
         val packageName = "Gold bottle"
         val recipientID = "X17"
+
+        addNonDeliveredPackageInBag(1, packageName, recipientID)
 
         swipeRightTheRecordAt(1)
         onView(withId(R.id.editTextTimestamp)).perform(click())
@@ -1265,6 +1273,8 @@ class RoadBookFragmentTest {
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
 
         onView(withId(R.id.bag_button)).perform(click())
+
+        onView(withId(R.id.menu_filter_button)).perform(click())
 
         onView(withText(startsWith(packageName))).check(matches(isDisplayed()))
         onView(withText(containsString(clientID))).check(matches(isDisplayed()))

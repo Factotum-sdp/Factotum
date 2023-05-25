@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.view.MenuProvider
@@ -317,17 +316,15 @@ class RoadBookFragment : Fragment(), MenuProvider {
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            val b = AlertDialog.Builder(requireContext())
-            b.setTitle("Live location service")
-            b.setMessage("Permissions enabled !")
-            b.setIcon(R.drawable.green_check)
-            b.show()
+            showsPermissionsAlertDialog(
+                R.drawable.green_check,
+                getString(R.string.location_permissions_enabled_message)
+            )
         } else {
-            val b = AlertDialog.Builder(requireContext())
-            b.setTitle("Live location service")
-            b.setMessage("Allowed permissions are not sufficient, the notifications should be enabled too.")
-            b.setIcon(R.drawable.red_cross)
-            b.show()
+            showsPermissionsAlertDialog(
+                R.drawable.red_cross,
+                getString(R.string.notifications_not_enabled_message)
+            )
         }
     }
 
@@ -341,13 +338,18 @@ class RoadBookFragment : Fragment(), MenuProvider {
             }
         } else {
             if (!isGranted) {
-                val b = AlertDialog.Builder(requireContext())
-                b.setTitle("Live location service")
-                b.setMessage("Allowed permissions are not sufficient, the precise location is needed.")
-                b.setIcon(R.drawable.red_cross)
-                b.show()
+                showsPermissionsAlertDialog(R.drawable.red_cross, getString(R.string.precise_location_not_enabled_message))
             }
         }
+    }
+
+    private fun showsPermissionsAlertDialog(iconID: Int, message: String) {
+        val builder = AlertDialog.Builder(requireContext())
+        builder
+            .setTitle(getString(R.string.live_location_service_dialog_title))
+            .setMessage(message)
+            .setIcon(iconID)
+            .show()
     }
 
     private fun setLiveLocationSwitch(menu: Menu) {

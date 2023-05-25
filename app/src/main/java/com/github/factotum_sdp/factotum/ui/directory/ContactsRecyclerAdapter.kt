@@ -83,13 +83,13 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
     }
 
     private fun getRoleImageResource(role : String): Int {
-    return when (role) {
-        "BOSS" ->  R.mipmap.ic_boss_profile_pic_round
-        "COURIER" -> R.mipmap.ic_courier_profile_pic_round
-        "CLIENT" -> R.mipmap.ic_client_profile_pic_round
-        else -> R.mipmap.ic_launcher_round
+        return when (role) {
+            "BOSS" ->  R.mipmap.ic_boss_profile_pic_round
+            "COURIER" -> R.mipmap.ic_courier_profile_pic_round
+            "CLIENT" -> R.mipmap.ic_client_profile_pic_round
+            else -> R.mipmap.ic_launcher_round
+        }
     }
-}
 
     override fun getItemCount(): Int { //simple getter for the number of contacts
         return filteredContacts.size

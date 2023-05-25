@@ -187,7 +187,7 @@
     <string name="folders">Folders</string>
     <string name="photos">Photos</string>
     <string name="searchbar_hint">Search for Contacts…</string>
-    <string name="create_new_record">Create New Destination Record</string>
+    <string name="create_new_record">Destination Record Edition</string>
     <string name="login_menu_title">Welcome</string>
     <string name="bag_edit_dialog_title">Edit Package Notes</string>
     <string name="sign_in">Sign-In</string>

@@ -1,7 +1,5 @@
 package com.github.factotum_sdp.factotum.ui.bag
 
-import android.app.AlertDialog
-import android.content.ContextWrapper
 import android.os.Bundle
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
@@ -80,8 +78,8 @@ class BagFragment: Fragment(), MenuProvider {
         withSendPackButton.setOnMenuItemClickListener {
             it.isChecked = !it.isChecked
 
-            if(it.isChecked) it.setIcon(R.drawable.blue_work_history)
-            else it.setIcon(R.drawable.work_history)
+            if(it.isChecked) it.setIcon(R.drawable.work_history)
+            else it.setIcon(R.drawable.grey_work_history)
 
             bagViewModel.displayDeliveredPacks(it.isChecked)
             true

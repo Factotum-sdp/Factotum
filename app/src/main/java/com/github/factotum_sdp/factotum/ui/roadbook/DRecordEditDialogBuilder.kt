@@ -1,8 +1,8 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
-import android.text.Editable
 import android.view.ContextThemeWrapper
 import android.view.View
 import android.widget.ArrayAdapter
@@ -22,7 +22,6 @@ import com.github.factotum_sdp.factotum.ui.dialog.ClientIDViewValidation
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import java.text.SimpleDateFormat
@@ -104,6 +103,7 @@ class DRecordEditDialogBuilder(
      * On edit validation, the RoadBookViewModel of this class will be notified by a
      * RoadBookViewModel.addRecord() call
      */
+    @SuppressLint("NotifyDataSetChanged")
     fun forNewRecordEdition(): DRecordEditDialogBuilder {
         setViewModelUpdates({ _, _ ->
             // On negative button do nothing
@@ -119,6 +119,8 @@ class DRecordEditDialogBuilder(
                 )
                 setSnackBar(host.getString(R.string.snap_text_record_added), 700)
             }
+            rbRecyclerView.adapter!!.notifyDataSetChanged()
+            rbRecyclerView.scrollToPosition((rbViewModel.recordsListState.value?.size ?: 1) - 1)
         })
         return this
     }

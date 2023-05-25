@@ -189,11 +189,7 @@ class RoadBookFragmentTest {
             .check(matches(isDisplayed()))
         // Add a new record
         newRecord()
-        // Scroll to last position to see if the new record is displayed at the end
-        onView(withId(R.id.list)).perform(
-            click(),
-            RecyclerViewActions.scrollToLastPosition<RoadBookViewAdapter.RecordViewHolder>(),
-        )
+
         onView((withText("$clientID#1")))
             .check(matches(isDisplayed()))
     }

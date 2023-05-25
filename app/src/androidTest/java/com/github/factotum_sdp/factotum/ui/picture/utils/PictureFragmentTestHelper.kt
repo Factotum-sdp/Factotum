@@ -6,6 +6,7 @@ import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.google.firebase.storage.StorageReference
@@ -15,10 +16,7 @@ import kotlinx.coroutines.tasks.await
 import java.io.File
 
 const val TIME_WAIT_UPLOAD_PHOTO = 2000L
-const val TIME_WAIT_PHOTO_DELETE = 1000L
-const val TIME_WAIT_BETWEEN_ACTIONS = 250L
-const val CLIENT_ID = "X17"
-
+const val TIME_WAIT_BETWEEN_ACTIONS = 500L
 
 // HELPER METHODS
 suspend fun emptyFirebaseStorage(storageRef: StorageReference) {
@@ -44,27 +42,18 @@ fun emptyLocalFiles(dir: File) {
 }
 
 fun triggerShutter(device: UiDevice) {
-    device.executeShellCommand("input keyevent 27")
+    val captureButton = device.findObject(UiSelector().description("Shutter"));
+    captureButton.click()
 }
 
 fun triggerDone(device: UiDevice) {
-    runBlocking { delay(TIME_WAIT_BETWEEN_ACTIONS) }
-    device.executeShellCommand("input keyevent 61")
-    runBlocking { delay(TIME_WAIT_BETWEEN_ACTIONS) }
-    device.executeShellCommand("input keyevent 61")
-    runBlocking { delay(TIME_WAIT_BETWEEN_ACTIONS) }
-    device.executeShellCommand("input keyevent 62")
+    val doneButton = device.findObject(UiSelector().description("Done"))
+    doneButton.click()
 }
 
 fun triggerCancel(device: UiDevice) {
-    runBlocking { delay(TIME_WAIT_BETWEEN_ACTIONS) }
-    device.executeShellCommand("input keyevent 61")
-    runBlocking { delay(TIME_WAIT_BETWEEN_ACTIONS) }
-    device.executeShellCommand("input keyevent 61")
-    runBlocking { delay(TIME_WAIT_BETWEEN_ACTIONS) }
-    device.executeShellCommand("input keyevent 61")
-    runBlocking { delay(TIME_WAIT_BETWEEN_ACTIONS) }
-    device.executeShellCommand("input keyevent 62")
+    val cancelButton = device.findObject(UiSelector().description("Cancel"))
+    cancelButton.click()
 }
 
 fun goToPictureFragment() {

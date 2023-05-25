@@ -12,6 +12,7 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.model.User
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder.USER_BOSS
+import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder.USER_CLIENT
 import com.github.factotum_sdp.factotum.ui.login.LoginViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -33,6 +34,14 @@ class GeneralUtils {
             USER_BOSS.email,
             USER_BOSS.role
         )
+
+        private val CLIENT_USER = User(
+            USER_CLIENT.uid,
+            USER_CLIENT.name,
+            USER_CLIENT.email,
+            USER_CLIENT.role
+        )
+
 
         fun initFirebase(online: Boolean = true) {
 
@@ -80,6 +89,10 @@ class GeneralUtils {
 
         fun injectBossAsLoggedInUser(testRule: ActivityScenarioRule<MainActivity>) {
             injectLoggedInUser(testRule, BOSS_USER)
+        }
+
+        fun injectClientAsLoggedInUser(testRule: ActivityScenarioRule<MainActivity>) {
+            injectLoggedInUser(testRule, CLIENT_USER)
         }
 
         fun injectLoggedInUser(testRule: ActivityScenarioRule<MainActivity>, loggedInUser: User) {

@@ -35,6 +35,7 @@ import com.github.factotum_sdp.factotum.ui.picture.emptyFirebaseStorage
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.logout
+import com.github.factotum_sdp.factotum.utils.PreferencesSetting
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.firebase.ktx.Firebase
@@ -88,7 +89,7 @@ class DisplayFragmentTest {
 
     @Before
     fun setUp() {
-        context = InstrumentationRegistry.getInstrumentation().context
+        context = getInstrumentation().context
         Intents.init()
     }
 
@@ -105,7 +106,8 @@ class DisplayFragmentTest {
     @Test
     fun displayOnlyOnePhotoIfSame() = runTest {
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
-        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
+        GeneralUtils.injectClientAsLoggedInUser(testRule)
+        goToDisplayFragment()
 
         onView(withId(R.id.menu_refresh_icon)).perform(click())
 
@@ -124,8 +126,8 @@ class DisplayFragmentTest {
     fun displayTwoDifferentPhotosWorks() = runTest {
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
-        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
-
+        GeneralUtils.injectClientAsLoggedInUser(testRule)
+        goToDisplayFragment()
 
         onView(withId(R.id.menu_refresh_icon)).perform(click())
 
@@ -139,7 +141,9 @@ class DisplayFragmentTest {
     @Test
     fun displayOneBadFormatPhotosWorks() = runTest {
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH3, TEST_IMAGE_PATH3) }.join()
-        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
+        GeneralUtils.injectClientAsLoggedInUser(testRule)
+        goToDisplayFragment()
+
 
         onView(withId(R.id.menu_refresh_icon)).perform(click())
 
@@ -152,7 +156,8 @@ class DisplayFragmentTest {
     fun displayTwoBadFormatPhotosWorks() = runTest {
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH4, TEST_IMAGE_PATH4) }.join()
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH3, TEST_IMAGE_PATH3) }.join()
-        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
+        GeneralUtils.injectClientAsLoggedInUser(testRule)
+        goToDisplayFragment()
 
         val recyclerView = onView(withId(R.id.recyclerView))
         recyclerView.check(matches(hasItemCount(2)))
@@ -160,7 +165,9 @@ class DisplayFragmentTest {
 
     @Test
     fun displayNoPhotosIfEmpty() {
-        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
+        GeneralUtils.injectClientAsLoggedInUser(testRule)
+        goToDisplayFragment()
+
         val recyclerView = onView(withId(R.id.recyclerView))
         recyclerView.check(matches(hasItemCount(0)))
 
@@ -173,7 +180,8 @@ class DisplayFragmentTest {
     @Test
     fun clickingOnPhotosFireCorrectIntents() = runTest {
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
-        GeneralUtils.fillUserEntryAndEnterTheApp("client@gmail.com", "123456")
+        GeneralUtils.injectClientAsLoggedInUser(testRule)
+        goToDisplayFragment()
 
         onView(withId(R.id.recyclerView)).perform(
             RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
@@ -191,8 +199,7 @@ class DisplayFragmentTest {
     @Test
     fun sharingPhotoWorks() = runTest {
         launch { uploadImageToStorageEmulator(context, "Buhagiat", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
-        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
-
+        GeneralUtils.injectBossAsLoggedInUser(testRule)
         goToDisplayFragment()
 
         onView(withId(R.id.recyclerView)).perform(
@@ -211,8 +218,7 @@ class DisplayFragmentTest {
     @Test
     fun cantShareIfNoPhoneNumber() = runTest {
         launch { uploadImageToStorageEmulator(context, "750ukPcnZS3xZKTAk6fQmj04", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
-        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
-
+        GeneralUtils.injectBossAsLoggedInUser(testRule)
         goToDisplayFragment()
 
         onView(withId(R.id.recyclerView)).perform(
@@ -232,8 +238,7 @@ class DisplayFragmentTest {
     fun bossCanSeeFolders() = runTest {
         launch { uploadImageToStorageEmulator(context, "Boss", TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
-        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
-
+        GeneralUtils.injectBossAsLoggedInUser(testRule)
         goToDisplayFragment()
 
         val recyclerView = onView(withId(R.id.recyclerView))
@@ -245,8 +250,7 @@ class DisplayFragmentTest {
     fun bossCanClickOnFolderAndSeePhotos() = runTest {
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
-        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
-
+        GeneralUtils.injectBossAsLoggedInUser(testRule)
         goToDisplayFragment()
 
         //click on the first folder
@@ -265,8 +269,7 @@ class DisplayFragmentTest {
     @Test
     fun bossCanStillSeePhotos() = runTest {
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
-        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
-
+        GeneralUtils.injectBossAsLoggedInUser(testRule)
         goToDisplayFragment()
 
         //click on the first folder
@@ -295,8 +298,7 @@ class DisplayFragmentTest {
     fun bossCanGoBackFromClientFolder() = runTest {
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
-        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
-
+        GeneralUtils.injectBossAsLoggedInUser(testRule)
         goToDisplayFragment()
 
         //click on the first folder
@@ -318,8 +320,7 @@ class DisplayFragmentTest {
     @Test
     fun refreshWorksOnFolders() = runTest {
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
-        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
-
+        GeneralUtils.injectBossAsLoggedInUser(testRule)
         goToDisplayFragment()
 
         val recyclerView = onView(withId(R.id.recyclerView))
@@ -337,8 +338,7 @@ class DisplayFragmentTest {
     fun pickingDateWorks() = runTest {
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH1, TEST_IMAGE_PATH1) }.join()
         launch { uploadImageToStorageEmulator(context, "Client", TEST_IMAGE_PATH2, TEST_IMAGE_PATH2) }.join()
-        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
-
+        GeneralUtils.injectBossAsLoggedInUser(testRule)
         goToDisplayFragment()
 
         onView(withId(R.id.recyclerView)).perform(

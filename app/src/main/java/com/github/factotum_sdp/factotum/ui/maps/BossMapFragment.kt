@@ -8,6 +8,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,12 +34,14 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 
 private const val ZOOM_LEVEL_CITY = 13f
 private const val SCALE_FACTOR_ICON = 0.7f
 private const val FACTOR_DARKER_COLOR = 0.7f
 private const val MAILBOX_TITLE = "Mailbox"
+private var MAIL_BOX_SIZE = 100
 
 /**
  * A map fragment that should be available only for a boss user.
@@ -47,13 +50,10 @@ private const val MAILBOX_TITLE = "Mailbox"
  */
 class BossMapFragment : Fragment(), OnMapReadyCallback {
 
-    private var cameraPositionInitialized = false
     private val bossMapViewModel: BossMapViewModel by viewModels()
     private val contactsViewModel: ContactsViewModel by activityViewModels()
     private lateinit var mapView: MapView
     private lateinit var googleMap: GoogleMap
-    private var MAIL_BOX_SIZE = 100
-
 
     private lateinit var bitmapDeliveredScaled : Bitmap
     private lateinit var bitmapNotDeliveredScaled : Bitmap
@@ -69,8 +69,6 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
         val displayMetrics = resources.displayMetrics
         val screenWidth = displayMetrics.widthPixels
         MAIL_BOX_SIZE = (screenWidth / 10 * SCALE_FACTOR_ICON).toInt()
-
-
 
         bitmapDeliveredScaled = createScaledBitmap(
             BitmapFactory.decodeResource(requireContext().resources, R.drawable.mailbox_delivered),
@@ -97,17 +95,13 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
 
         bossMapViewModel.courierLocations.observe(viewLifecycleOwner) { locations ->
             updateMap(locations, bossMapViewModel.deliveriesStatus.value ?: mapOf())
-            if (!cameraPositionInitialized) {
-                val geometricMedian = calculateMedianLocation()
-                googleMap.moveCamera(
-                    CameraUpdateFactory.newLatLngZoom(
-                        geometricMedian,
-                        ZOOM_LEVEL_CITY
-                    )
+            val geometricMedian = calculateMedianLocation()
+            googleMap.moveCamera(
+                CameraUpdateFactory.newLatLngZoom(
+                    geometricMedian,
+                    ZOOM_LEVEL_CITY
                 )
-                cameraPositionInitialized = true
-
-            }
+            )
         }
 
         bossMapViewModel.deliveriesStatus.observe(viewLifecycleOwner) { deliveryStatus ->
@@ -123,9 +117,11 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
                     val mailboxNumber = title.split(" ")[1]
                     val deliveryStatus = bossMapViewModel.deliveriesStatus.value?.get(mailboxNumber) ?: emptyList()
                     showDeliveryInfos(Pair(mailboxNumber, deliveryStatus))
+                    true
+                } else {
+                    false
                 }
-            }
-            true
+            } ?: false
         }
     }
 
@@ -159,7 +155,7 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
         deliveryStatus.second.forEach {status ->
             deliveryInfos.append("${status.courier} : ${status.timeStamp ?: "not delivered"}\n")
         }
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(ContextThemeWrapper(context, R.style.Theme_Factotum_Dialog))
             .setTitle("Delivery status of ${deliveryStatus.first}")
             .setMessage(deliveryInfos.toString())
             .setPositiveButton("OK") { dialog, _ ->

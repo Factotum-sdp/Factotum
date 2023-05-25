@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.Toolbar
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
@@ -79,6 +80,8 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
         bitmapNotDeliveredScaled = createScaledBitmap(
             BitmapFactory.decodeResource(requireContext().resources, R.drawable.mailbox_lowered_flag),
             MAIL_BOX_SIZE, MAIL_BOX_SIZE, false)
+        val toolbar = requireActivity().findViewById<Toolbar>(R.id.toolbar)
+        toolbar.title = getString(R.string.title_maps)
 
         return view
     }

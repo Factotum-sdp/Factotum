@@ -18,7 +18,7 @@ import com.google.android.gms.maps.model.PolylineOptions
  * @param dstLat: Double. Latitude of the ending point
  * @param dstLon: Double. Longitude of the ending point
  */
-class Route(srcLat: Double, srcLon: Double, dstLat: Double, dstLon: Double) {
+class Route(srcLat: Double, srcLon: Double, dstLat: Double, dstLon: Double, private val name : String? = null) {
 
     val src = LatLng(srcLat, srcLon)
     val dst = LatLng(dstLat, dstLon)
@@ -49,7 +49,7 @@ class Route(srcLat: Double, srcLon: Double, dstLat: Double, dstLon: Double) {
         googleMap.addMarker(
             MarkerOptions()
                 .position(this.src)
-                .title("Source of $id")
+                .title(name?.let { "Source of $name" } ?: "Source of $id")
         )
     }
 
@@ -64,7 +64,7 @@ class Route(srcLat: Double, srcLon: Double, dstLat: Double, dstLon: Double) {
         googleMap.addMarker(
             MarkerOptions()
                 .position(this.dst)
-                .title("Destination of $id")
+                .title(name?.let { "Destination of $name" } ?: "Destination of $id")
         )
     }
 

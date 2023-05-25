@@ -88,7 +88,6 @@ class DRecordDetailsFragment : Fragment() {
             try {
                 val bundle = Bundle().apply {
                     putBoolean(MapsFragment.IN_NAV_PAGER, true)
-                    putBoolean(MapsFragment.DRAW_ROUTE, false)
                 }
                 val currentContact = first { c -> c.username == rec.clientID }
                 if (currentContact.hasCoordinates()) {
@@ -96,7 +95,8 @@ class DRecordDetailsFragment : Fragment() {
                         0.0, //Should be the current location
                         0.0,
                         currentContact.latitude ?: 0.0,
-                        currentContact.longitude ?: 0.0
+                        currentContact.longitude ?: 0.0,
+                        rec.destID,
                     )
                     val routeJson = Gson().toJson(route)
                     bundle.putString(MapsFragment.ROUTE_NAV_KEY, routeJson)

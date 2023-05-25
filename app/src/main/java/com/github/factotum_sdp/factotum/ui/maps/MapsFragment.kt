@@ -7,10 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LiveData
+import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.databinding.FragmentMapsBinding
 import com.github.factotum_sdp.factotum.hasLocationPermission
 import com.github.factotum_sdp.factotum.models.Route
@@ -35,7 +36,6 @@ class MapsFragment : Fragment() {
         private const val minZoom = 6.0f
         const val IN_NAV_PAGER = "nav_pager"
         const val ROUTE_NAV_KEY = "route"
-        const val DRAW_ROUTE = "draw_route"
         const val MAPS_PKG = "com.google.android.apps.maps"
     }
 
@@ -63,6 +63,8 @@ class MapsFragment : Fragment() {
     ): View {
 
         _binding = FragmentMapsBinding.inflate(inflater, container, false)
+        val toolbar = requireActivity().findViewById<Toolbar>(R.id.toolbar)
+        toolbar.title = getString(R.string.title_maps)
         return binding.root
     }
 
@@ -79,14 +81,13 @@ class MapsFragment : Fragment() {
             records.forEach { record ->
                 val contact = contactsViewModel.contacts.value?.first{ it.username == record.clientID }
                 if(contact?.latitude != null && contact.longitude != null){
-                    val route = Route(0.0, 0.0, contact.latitude, contact.longitude)
+                    val route = Route(0.0, 0.0, contact.latitude, contact.longitude, record.clientID)
                     destinations.add(route)
                 }
             }
 
         }
         return destinations
-
     }
 
     private fun setMapProperties() {
@@ -127,9 +128,8 @@ class MapsFragment : Fragment() {
 
         if (arguments?.getBoolean(IN_NAV_PAGER) == true) {
             val route = arguments?.getString(ROUTE_NAV_KEY)?.let { Gson().fromJson(it, Route::class.java) }
-            val drawRoute = arguments?.getBoolean(DRAW_ROUTE) ?: true
             route?.let {
-                placeMarkers(listOf(it), googleMap, drawRoute)
+                placeMarkers(listOf(it), googleMap)
             }
         }
         else {
@@ -147,23 +147,16 @@ class MapsFragment : Fragment() {
         googleMap.setMinZoomPreference(minZoom)
     }
 
-    private fun placeMarkers(routes: List<Route>?, googleMap: GoogleMap, drawRoutes : Boolean = true) {
+    private fun placeMarkers(routes: List<Route>?, googleMap: GoogleMap) {
         val bounds = LatLngBounds.Builder()
+
 
         for (route in routes.orEmpty()) {
             route.addSrcToMap(googleMap)
             route.addDstToMap(googleMap)
-            if (drawRoutes) route.drawRoute(googleMap)
             bounds.include(route.dst)
         }
 
-        googleMap.setOnPolylineClickListener { polyline ->
-            val route = (polyline.tag as Route)
-            googleMap.clear()
-            route.addDstToMap(googleMap)
-            route.addSrcToMap(googleMap)
-            route.drawRoute(googleMap)
-        }
 
         val padding = ZOOM_PADDING // offset from edges of the map in pixels
 

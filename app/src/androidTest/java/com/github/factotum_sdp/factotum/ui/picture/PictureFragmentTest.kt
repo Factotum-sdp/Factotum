@@ -30,7 +30,6 @@ class PictureFragmentTest {
     private val externalDir = Environment.getExternalStorageDirectory()
     private val picturesDir =
         File(externalDir, "/Android/data/com.github.factotum_sdp.factotum/files/Pictures")
-    private lateinit var loginMenuIdlingResource: IdlingResource
 
 
     @get:Rule
@@ -70,15 +69,12 @@ class PictureFragmentTest {
     }
 
     @Test
-    fun takingPictureWorks() = runBlocking {
-        delay(TIME_WAIT_BETWEEN_ACTIONS)
+    fun takingPictureWorks() {
         triggerDone(device)
-        delay(TIME_WAIT_UPLOAD_PHOTO)
     }
 
     @Test
-    fun cancelingPictureWorks() = runBlocking {
-        delay(TIME_WAIT_BETWEEN_ACTIONS)
+    fun cancelingPictureWorks() {
         triggerCancel(device)
     }
 

@@ -180,4 +180,5 @@
     <string name="menu_date_picker">date_picker</string>
     <string name="menu_loading_bar">menu_loading_bar</string>
     <string name="notes_presence_indicator">Notes presence indicator</string>
+    <string name="with_send_packs_button">With send packs Button</string>
 </resources>

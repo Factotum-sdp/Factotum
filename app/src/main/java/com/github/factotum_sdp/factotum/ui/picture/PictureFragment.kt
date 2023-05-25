@@ -3,69 +3,101 @@ package com.github.factotum_sdp.factotum.ui.picture
 import android.Manifest
 import android.icu.text.SimpleDateFormat
 import android.net.Uri
+import android.os.Bundle
 import android.os.Environment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.databinding.FragmentPictureBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
-class PictureFragment(clientID: String) : Fragment() {
+class PictureFragment(clientID : String) : Fragment() {
 
+    private var _binding: FragmentPictureBinding? = null
+    private val binding get() = _binding!!
     private lateinit var photoFile: File
     private lateinit var photoUri: Uri
     private lateinit var photoName: String
+    private val dateFormat = SimpleDateFormat("dd-MM-yyyy_HH-mm-ss", Locale.getDefault())
+    private var folderName: String = clientID
     private val storage: FirebaseStorage = FirebaseStorage.getInstance()
     private val storageRef: StorageReference = storage.reference
-    private val folderName: String = clientID.ifBlank { "default" }
     private val userID : String = FirebaseAuth.getInstance().currentUser?.uid.toString()
 
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentPictureBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-    override fun onStart() {
-        super.onStart()
+    override fun onResume() {
+        super.onResume()
         readCameraPermissionResult.launch(Manifest.permission.CAMERA)
     }
 
-    private fun openCamera() {
-        val fileProvider = getString(R.string.file_provider)
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    private fun createPhotoFile(): File {
         val storageDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
 
-        val tempFolder = File(storageDir, folderName)
-        if (!tempFolder.exists()) {
-            tempFolder.mkdir()
+        if (folderName.isBlank()) {
+            folderName = "default"
         }
 
-        val dateFormat = SimpleDateFormat("dd-MM-yyyy_HH-mm-ss", Locale.getDefault())
+        val tempFolder = File(storageDir, folderName).apply { mkdirs() }
         val currentDateAndTime = dateFormat.format(Date())
 
         photoName = "${userID}_${currentDateAndTime}.jpg"
-        photoFile = File(tempFolder, photoName) // Create the photo file in the temporary folder
-        photoUri = FileProvider.getUriForFile(requireContext(), fileProvider, photoFile)
-
-        // Launch the camera given the URI of the photo
-        takePictureAndUpload.launch(photoUri)
+        return File(tempFolder, photoName)
     }
 
-    // Register an activity result launcher to take a picture and upload it to Firebase Storage
+    private fun openCamera() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val fileProvider = getString(R.string.file_provider)
+            photoFile = createPhotoFile()
+            photoUri = FileProvider.getUriForFile(requireContext(), fileProvider, photoFile)
+            withContext(Dispatchers.Main) {
+                takePictureAndUpload.launch(photoUri)
+            }
+        }
+    }
+
     private val takePictureAndUpload =
         registerForActivityResult(ActivityResultContracts.TakePicture()) { result ->
             if (result) {
-                // Upload photo to Firebase Storage
                 val photoRef = storageRef.child("$folderName/$photoName")
                 val uploadTask = photoRef.putFile(photoUri)
 
-                // Register observers to listen for when the upload is done or if it fails
-                uploadTask.addOnSuccessListener { photoFile.delete() }
+                uploadTask.addOnSuccessListener {
+                    photoFile.delete()
+                }.addOnFailureListener {
+                    Toast.makeText(context, "Failed to upload photo", Toast.LENGTH_SHORT).show()
+                }
             } else {
                 photoFile.delete()
             }
 
-            findNavController().popBackStack()
+            findNavController().navigateUp()
         }
 
     private val readCameraPermissionResult = registerForActivityResult(
@@ -74,8 +106,7 @@ class PictureFragment(clientID: String) : Fragment() {
         if (isGranted) {
             openCamera()
         } else {
-            findNavController().popBackStack()
+            findNavController().navigateUp()
         }
     }
-
 }

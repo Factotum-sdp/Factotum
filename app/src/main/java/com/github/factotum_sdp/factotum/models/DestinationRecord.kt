@@ -1,7 +1,7 @@
 package com.github.factotum_sdp.factotum.models
 
 import com.github.factotum_sdp.factotum.models.DestinationRecord.Action
-import com.github.factotum_sdp.factotum.serializers.DateKSerializer
+import com.github.factotum_sdp.factotum.serializers.NullableDateKSerializer
 import kotlinx.serialization.Serializable
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -23,7 +23,7 @@ import java.util.*
 data class DestinationRecord(
     val destID: String = "",
     val clientID: String = "",
-    @Serializable(with = DateKSerializer::class) val timeStamp: Date? = null,
+    @Serializable(with = NullableDateKSerializer::class) val timeStamp: Date? = null,
     val waitingTime: Int = 0,
     val rate: Int = 0,
     val actions: List<Action> = emptyList(),

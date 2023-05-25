@@ -1,10 +1,10 @@
-package com.github.factotum_sdp.factotum.ui.bossmap
+package com.github.factotum_sdp.factotum.ui.maps
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.ui.display.DisplayFragment
 

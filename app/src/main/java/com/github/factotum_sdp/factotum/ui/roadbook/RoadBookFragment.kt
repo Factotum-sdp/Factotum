@@ -383,7 +383,6 @@ class RoadBookFragment : Fragment(), MenuProvider {
         refreshButton.setOnClickListener {
             rotateRefreshButton(refreshButton)
             rbRecyclerView.adapter?.notifyDataSetChanged()
-            true
         }
     }
 

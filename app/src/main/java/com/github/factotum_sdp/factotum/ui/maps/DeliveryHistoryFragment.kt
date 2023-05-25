@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.models.DeliveryStatus
 import com.google.gson.Gson
@@ -22,6 +23,7 @@ class DeliveryHistoryFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.delivery_history)
         val jsonDelivery = arguments?.getString("History") ?: ""
         val deliveries = Gson().fromJson(jsonDelivery, Array<DeliveryStatus>::class.java)
         if(deliveries != null) {

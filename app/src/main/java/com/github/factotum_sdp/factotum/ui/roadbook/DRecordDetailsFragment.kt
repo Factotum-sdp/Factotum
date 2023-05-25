@@ -88,7 +88,6 @@ class DRecordDetailsFragment : Fragment() {
             try {
                 val bundle = Bundle().apply {
                     putBoolean(MapsFragment.IN_NAV_PAGER, true)
-                    putBoolean(MapsFragment.DRAW_ROUTE, false)
                 }
                 val currentContact = first { c -> c.username == rec.clientID }
                 if (currentContact.hasCoordinates()) {

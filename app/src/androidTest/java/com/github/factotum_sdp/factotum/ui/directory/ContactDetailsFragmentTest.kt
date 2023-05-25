@@ -51,8 +51,7 @@ class ContactDetailsFragmentTest {
     @get:Rule
     val permission = GrantPermissionRule.grant(
         Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.CALL_PHONE
+        Manifest.permission.ACCESS_COARSE_LOCATION
     )
 
     companion object {

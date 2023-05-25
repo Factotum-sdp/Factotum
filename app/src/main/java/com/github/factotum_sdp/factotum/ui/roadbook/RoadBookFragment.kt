@@ -317,18 +317,17 @@ class RoadBookFragment : Fragment(), MenuProvider {
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            userViewModel.locationTrackingHandler.startLocationService(requireContext(), requireActivity())
-            Toast.makeText(
-                requireContext(),
-                "The precise location is enabled you could to use the automatic timestamp",
-                Toast.LENGTH_LONG
-            ).show()
+            val b = AlertDialog.Builder(requireContext())
+            b.setTitle("Live location service")
+            b.setMessage("Permissions enabled !")
+            b.setIcon(R.drawable.green_check)
+            b.show()
         } else {
-            Toast.makeText(
-                requireContext(),
-                "The precise location is enabled you could to use the automatic timestamp",
-                Toast.LENGTH_LONG
-            ).show()
+            val b = AlertDialog.Builder(requireContext())
+            b.setTitle("Live location service")
+            b.setMessage("Allowed permissions are not sufficient, the notifications should be enabled too.")
+            b.setIcon(R.drawable.red_cross)
+            b.show()
         }
     }
 
@@ -339,20 +338,14 @@ class RoadBookFragment : Fragment(), MenuProvider {
             requireContext().hasLocationPermission()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-            } else {
-                Toast.makeText(
-                    requireContext(),
-                    "Make sure to enable the notifications settings",
-                    Toast.LENGTH_LONG
-                ).show()
             }
         } else {
             if (!isGranted) {
-                Toast.makeText(
-                    requireContext(),
-                    "The precise location should be enabled to use the automatic timestamp",
-                    Toast.LENGTH_LONG
-                ).show()
+                val b = AlertDialog.Builder(requireContext())
+                b.setTitle("Live location service")
+                b.setMessage("Allowed permissions are not sufficient, the precise location is needed.")
+                b.setIcon(R.drawable.red_cross)
+                b.show()
             }
         }
     }

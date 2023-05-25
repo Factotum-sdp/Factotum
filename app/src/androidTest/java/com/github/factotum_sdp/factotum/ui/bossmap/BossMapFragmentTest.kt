@@ -49,7 +49,8 @@ class BossMapFragmentTest {
     @get:Rule
     val permission = GrantPermissionRule.grant(
         Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.ACCESS_COARSE_LOCATION
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.POST_NOTIFICATIONS
     )
 
     companion object {

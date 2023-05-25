@@ -7,9 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.databinding.FragmentMapsBinding
 import com.github.factotum_sdp.factotum.hasLocationPermission
 import com.github.factotum_sdp.factotum.models.Route
@@ -62,6 +64,8 @@ class MapsFragment : Fragment() {
     ): View {
 
         _binding = FragmentMapsBinding.inflate(inflater, container, false)
+        val toolbar = requireActivity().findViewById<Toolbar>(R.id.toolbar)
+        toolbar.title = getString(R.string.title_maps)
         return binding.root
     }
 
@@ -79,7 +83,7 @@ class MapsFragment : Fragment() {
                 val firstRecord = records.first()
                 val firstContact = contactsViewModel.contacts.value?.first{ it.username == firstRecord.clientID }
                 if(firstContact?.hasCoordinates() == true){
-                    val route = Route(firstContact.latitude ?: 0.0, firstContact.longitude ?: 0.0, firstContact.latitude ?: 0.0, firstContact.longitude ?: 0.0 )
+                    val route = Route(firstContact.latitude ?: 0.0, firstContact.longitude ?: 0.0, firstContact.latitude ?: 0.0, firstContact.longitude ?: 0.0)
                     destinations.add(route)
                 }
             }
@@ -105,7 +109,6 @@ class MapsFragment : Fragment() {
 
         }
         return destinations
-
     }
 
     private fun setMapProperties() {
@@ -146,7 +149,7 @@ class MapsFragment : Fragment() {
 
         if (arguments?.getBoolean(IN_NAV_PAGER) == true) {
             val route = arguments?.getString(ROUTE_NAV_KEY)?.let { Gson().fromJson(it, Route::class.java) }
-            val drawRoute = arguments?.getBoolean(DRAW_ROUTE) ?: true
+            val drawRoute = arguments?.getBoolean(DRAW_ROUTE) ?: false
             route?.let {
                 placeMarkers(listOf(it), googleMap, drawRoute)
             }

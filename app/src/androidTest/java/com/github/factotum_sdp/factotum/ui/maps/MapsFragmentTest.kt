@@ -98,6 +98,7 @@ class MapsFragmentTest {
     }
 
 
+
     private fun checkLocationEnabled(rule: ActivityScenarioRule<MainActivity>): Boolean {
         var isEnabled = false
         val latch = CountDownLatch(1)

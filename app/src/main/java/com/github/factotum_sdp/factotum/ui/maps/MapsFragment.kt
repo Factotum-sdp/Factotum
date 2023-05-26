@@ -45,7 +45,6 @@ class MapsFragment : Fragment() {
     }
 
     private var _binding: FragmentMapsBinding? = null
-    private val viewModel: MapsViewModel by activityViewModels()
     private val rbViewModel: RoadBookViewModel by activityViewModels()
     private val contactsViewModel : ContactsViewModel by activityViewModels()
     private val userViewModel : UserViewModel by activityViewModels()
@@ -63,6 +62,8 @@ class MapsFragment : Fragment() {
     private var currentUserLocation: LatLng? = null
     private var routeSelected: Boolean = false
     private var userRouteSelected: Boolean = false
+
+    private val drawnRoutes : MutableList<Polyline> = mutableListOf()
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -93,7 +94,8 @@ class MapsFragment : Fragment() {
                 val firstRecord = records.first()
                 val firstContact = contactsViewModel.contacts.value?.first{ it.username == firstRecord.clientID }
                 if(firstContact?.hasCoordinates() == true){
-                    val route = Route(firstContact.latitude ?: 0.0, firstContact.longitude ?: 0.0, firstContact.latitude ?: 0.0, firstContact.longitude ?: 0.0)
+                    val route = Route(firstContact.latitude!!, firstContact.longitude!!,
+                        firstContact.latitude, firstContact.longitude)
                     destinations.add(route)
                 }
             }
@@ -107,10 +109,10 @@ class MapsFragment : Fragment() {
                         contactsViewModel.contacts.value?.first { it.username == secondRecord.clientID }
                     if (firstContact?.hasCoordinates() == true && secondContact?.hasCoordinates() == true) {
                         val route = Route(
-                            firstContact.latitude ?: 0.0,
-                            firstContact.longitude ?: 0.0,
-                            secondContact.latitude ?: 0.0,
-                            secondContact.longitude ?: 0.0
+                            firstContact.latitude!!, // !! because we know it has coordinates
+                            firstContact.longitude!!,
+                            secondContact.latitude!!,
+                            secondContact.longitude!!
                         )
                         destinations.add(route)
                     }
@@ -222,44 +224,56 @@ class MapsFragment : Fragment() {
     }
 
     private fun drawRoutes(routes: List<Route>, googleMap: GoogleMap) {
+        updateRoutes(googleMap, routes)
+
         userViewModel.userLocation.observe(viewLifecycleOwner) { userLocation ->
-            userLocation?.let {
+            userLocation?.let { it ->
                 currentUserLocation = LatLng(userLocation.latitude, userLocation.longitude) // Save the latest user location
                 val currentRoute = Route(it.latitude, it.longitude, routes.first().src.latitude, routes.first().src.longitude)
                 userLocationRoute?.remove() // Remove the old userLocation route
                 userLocationRoute = currentRoute.drawRoute(googleMap, transparency = !userRouteSelected && routeSelected) // Draw and keep a reference to the new one
+                userLocationRoute?.let { drawnRoutes.add(it) } // Add the new userLocation route to the drawnRoutes
             }
         }
 
         googleMap.setOnPolylineClickListener { polyline ->
             val selRoute = (polyline.tag as Route)
             userRouteSelected = polyline == userLocationRoute
-            updateRoutes(selRoute, routes, googleMap)
+            updateRoutes(googleMap, routes, selRoute)
         }
 
         googleMap.setOnMapClickListener {
             routeSelected = false
-            updateRoutes(null, routes, googleMap)
+            updateRoutes(googleMap, routes)
         }
     }
 
-    private fun updateRoutes(selRoute : Route?, routes : List<Route>, googleMap: GoogleMap) {
-        googleMap.clear()
-        userLocationRoute = null // The userLocation route has been cleared from the map, so clear our reference too
+    private fun updateRoutes(googleMap: GoogleMap, routes : List<Route>, selRoute : Route? = null) {
+        // Remove the previously drawn routes
+        drawnRoutes.forEach { it.remove() }
+        drawnRoutes.clear()
+
         routeSelected = routeSelected || selRoute != null
         for (route in routes) {
-            if (route == selRoute) route.drawRoute(googleMap)
-            else route.drawRoute(googleMap, transparency = routeSelected)
+            val polyline = if (route == selRoute) {
+                route.drawRoute(googleMap)
+            } else {
+                route.drawRoute(googleMap, transparency = routeSelected)
+            }
+            polyline.let { drawnRoutes.add(it) } // Add the newly drawn route to the drawnRoutes
         }
 
         // Draw the user route
         currentUserLocation?.let { userLocation ->
             if (routes.isNotEmpty()) {
                 val userRoute = Route(userLocation.latitude, userLocation.longitude, routes.first().src.latitude, routes.first().src.longitude)
+                userLocationRoute?.remove() // Remove the old userLocation route
                 userLocationRoute = userRoute.drawRoute(googleMap, transparency = !userRouteSelected && routeSelected)
+                userLocationRoute?.let { drawnRoutes.add(it) } // Add the new userLocation route to the drawnRoutes
             }
         }
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

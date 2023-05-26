@@ -3,7 +3,7 @@ package com.github.factotum_sdp.factotum.models
 import android.graphics.Color
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 
 /**
@@ -18,7 +18,7 @@ import com.google.android.gms.maps.model.PolylineOptions
  * @param dstLat: Double. Latitude of the ending point
  * @param dstLon: Double. Longitude of the ending point
  */
-class Route(srcLat: Double, srcLon: Double, dstLat: Double, dstLon: Double, private val name : String? = null) {
+class Route(srcLat: Double, srcLon: Double, dstLat: Double, dstLon: Double) {
 
     val src = LatLng(srcLat, srcLon)
     val dst = LatLng(dstLat, dstLon)
@@ -39,7 +39,7 @@ class Route(srcLat: Double, srcLon: Double, dstLat: Double, dstLon: Double, priv
     override fun toString(): String {
         return "The route starts at coordinates (${src.latitude}, ${src.longitude}) and finishes at coordinates (${dst.latitude}, ${dst.longitude})"
     }
-
+/*
     /**
      * Adds a src to the map
      *
@@ -66,22 +66,25 @@ class Route(srcLat: Double, srcLon: Double, dstLat: Double, dstLon: Double, priv
                 .position(this.dst)
                 .title(name?.let { "Destination of $name" } ?: "Destination of $id")
         )
-    }
+    } */
 
     /**
      * Draws the route on the map
      *
      * @param googleMap : map to which the route is added
+     * @param transparency : transparency value for the route color (0-255)
      */
-    fun drawRoute(googleMap: GoogleMap) {
+    fun drawRoute(googleMap: GoogleMap, transparency: Boolean = false) : Polyline {
         val polyline = googleMap.addPolyline(
             PolylineOptions()
                 .add(src, dst)
                 .width(15f)
-                .color(Color.RED)
+                .color(if (transparency) Color.argb(120, 0, 0, 255)
+                                    else Color.argb(255, 0, 0, 255))
                 .clickable(true)
         )
         polyline.tag = this
+        return polyline
     }
 
 }

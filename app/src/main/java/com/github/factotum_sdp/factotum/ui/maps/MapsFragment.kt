@@ -12,8 +12,10 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.github.factotum_sdp.factotum.R
+import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.databinding.FragmentMapsBinding
 import com.github.factotum_sdp.factotum.hasLocationPermission
+import com.github.factotum_sdp.factotum.models.Contact
 import com.github.factotum_sdp.factotum.models.Route
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookViewModel
@@ -22,6 +24,8 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.Polyline
 import com.google.gson.Gson
 
 
@@ -44,6 +48,7 @@ class MapsFragment : Fragment() {
     private val viewModel: MapsViewModel by activityViewModels()
     private val rbViewModel: RoadBookViewModel by activityViewModels()
     private val contactsViewModel : ContactsViewModel by activityViewModels()
+    private val userViewModel : UserViewModel by activityViewModels()
     private lateinit var mMap: GoogleMap
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -53,6 +58,11 @@ class MapsFragment : Fragment() {
             activateLocation(mMap)
         }
     }
+
+    private var userLocationRoute: Polyline? = null
+    private var currentUserLocation: LatLng? = null
+    private var routeSelected: Boolean = false
+    private var userRouteSelected: Boolean = false
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -76,7 +86,7 @@ class MapsFragment : Fragment() {
 
     }
 
-    private fun getDestinationsFromRoadbook() : List<Route> {
+    private fun getRoutesFromRoadbook() : List<Route> {
         val destinations = mutableListOf<Route>()
         rbViewModel.recordsListState.value?.let { records ->
             if(records.size == 1) {
@@ -109,6 +119,20 @@ class MapsFragment : Fragment() {
 
         }
         return destinations
+    }
+
+    private fun getContactsFromRoadbook() : List<Contact> {
+        val contacts = mutableListOf<Contact>()
+        rbViewModel.recordsListState.value?.let { records ->
+            records.forEach { record ->
+                val contact = contactsViewModel.contacts.value?.first{ it.username == record.clientID }
+                if(contact != null) {
+                    contacts.add(contact)
+                }
+            }
+
+        }
+        return contacts
     }
 
     private fun setMapProperties() {
@@ -146,18 +170,20 @@ class MapsFragment : Fragment() {
     private fun initMapUI(googleMap: GoogleMap) {
         // clears map from previous markers
         googleMap.clear()
+        val contacts = getContactsFromRoadbook()
+        placeContactsMarkers(googleMap, contacts)
 
         if (arguments?.getBoolean(IN_NAV_PAGER) == true) {
             val route = arguments?.getString(ROUTE_NAV_KEY)?.let { Gson().fromJson(it, Route::class.java) }
             val drawRoute = arguments?.getBoolean(DRAW_ROUTE) ?: false
-            route?.let {
-                placeMarkers(listOf(it), googleMap, drawRoute)
+            if(route != null && drawRoute) {
+                drawRoutes(listOf(route), googleMap)
             }
         }
         else {
             // places markers on the map and centers the camera
-            val destinations = getDestinationsFromRoadbook()
-            placeMarkers(destinations, googleMap)
+            val routes = getRoutesFromRoadbook()
+            drawRoutes(routes, googleMap)
         }
         // Add zoom controls to the map
         googleMap.uiSettings.isZoomControlsEnabled = true
@@ -169,32 +195,70 @@ class MapsFragment : Fragment() {
         googleMap.setMinZoomPreference(minZoom)
     }
 
-    private fun placeMarkers(routes: List<Route>?, googleMap: GoogleMap, drawRoutes : Boolean = true) {
+    private fun placeContactsMarkers(googleMap: GoogleMap, contacts: List<Contact>) {
+        var noLocation = true
         val bounds = LatLngBounds.Builder()
 
-        for (route in routes.orEmpty()) {
-            route.addSrcToMap(googleMap)
-            route.addDstToMap(googleMap)
-            if (drawRoutes) route.drawRoute(googleMap)
-            bounds.include(route.dst)
-            bounds.include(route.src)
-        }
-
-        googleMap.setOnPolylineClickListener { polyline ->
-            val route = (polyline.tag as Route)
-            googleMap.clear()
-            route.addDstToMap(googleMap)
-            route.addSrcToMap(googleMap)
-            route.drawRoute(googleMap)
+        for (contact in contacts) {
+            if (contact.hasCoordinates()) {
+                noLocation = false
+                bounds.include(LatLng(contact.latitude!!, contact.longitude!!))
+                val marker = MarkerOptions()
+                    .position(LatLng(contact.latitude, contact.longitude))
+                    .title(contact.username)
+                googleMap.addMarker(marker)
+            }
         }
 
         val padding = ZOOM_PADDING // offset from edges of the map in pixels
 
-        val cuf = routes?.takeIf { it.isNotEmpty() }
-            ?.run { CameraUpdateFactory.newLatLngBounds(bounds.build(), padding) }
-            ?: CameraUpdateFactory.newLatLngZoom(EPFL_LOC, 8f)
+        val cuf = if (!noLocation) {
+                CameraUpdateFactory.newLatLngBounds(bounds.build(), padding) }
+            else {
+                CameraUpdateFactory.newLatLngZoom(EPFL_LOC, 8f)
+            }
 
         googleMap.moveCamera(cuf)
+    }
+
+    private fun drawRoutes(routes: List<Route>, googleMap: GoogleMap) {
+        userViewModel.userLocation.observe(viewLifecycleOwner) { userLocation ->
+            userLocation?.let {
+                currentUserLocation = LatLng(userLocation.latitude, userLocation.longitude) // Save the latest user location
+                val currentRoute = Route(it.latitude, it.longitude, routes.first().src.latitude, routes.first().src.longitude)
+                userLocationRoute?.remove() // Remove the old userLocation route
+                userLocationRoute = currentRoute.drawRoute(googleMap, transparency = !userRouteSelected && routeSelected) // Draw and keep a reference to the new one
+            }
+        }
+
+        googleMap.setOnPolylineClickListener { polyline ->
+            val selRoute = (polyline.tag as Route)
+            userRouteSelected = polyline == userLocationRoute
+            updateRoutes(selRoute, routes, googleMap)
+        }
+
+        googleMap.setOnMapClickListener {
+            routeSelected = false
+            updateRoutes(null, routes, googleMap)
+        }
+    }
+
+    private fun updateRoutes(selRoute : Route?, routes : List<Route>, googleMap: GoogleMap) {
+        googleMap.clear()
+        userLocationRoute = null // The userLocation route has been cleared from the map, so clear our reference too
+        routeSelected = routeSelected || selRoute != null
+        for (route in routes) {
+            if (route == selRoute) route.drawRoute(googleMap)
+            else route.drawRoute(googleMap, transparency = routeSelected)
+        }
+
+        // Draw the user route
+        currentUserLocation?.let { userLocation ->
+            if (routes.isNotEmpty()) {
+                val userRoute = Route(userLocation.latitude, userLocation.longitude, routes.first().src.latitude, routes.first().src.longitude)
+                userLocationRoute = userRoute.drawRoute(googleMap, transparency = !userRouteSelected && routeSelected)
+            }
+        }
     }
 
     override fun onDestroyView() {

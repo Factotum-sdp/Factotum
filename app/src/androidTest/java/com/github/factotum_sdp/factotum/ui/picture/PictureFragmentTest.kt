@@ -56,7 +56,6 @@ class PictureFragmentTest {
         Intents.init()
         GeneralUtils.injectBossAsLoggedInUser(testRule)
         PreferencesSetting.setRoadBookPrefs(testRule)
-        PreferencesSetting.enableTouchClick()
         goToPictureFragment()
     }
 

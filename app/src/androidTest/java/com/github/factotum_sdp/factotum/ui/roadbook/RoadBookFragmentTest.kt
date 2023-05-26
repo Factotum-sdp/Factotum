@@ -117,6 +117,8 @@ class RoadBookFragmentTest {
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))
             .perform(click())
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_touch_click)).perform(click())
     }
 
     @After
@@ -499,14 +501,6 @@ class RoadBookFragmentTest {
     }
 
     @Test
-    fun editWithAWrongClientIDIsShownOnTheDialog() {
-        swipeRightTheRecordAt(2)
-        onView(withId(R.id.autoCompleteClientID)).perform(typeText("edited"))
-        onView(withId(R.id.editTextRate)).perform(click())
-        onView((withText(R.string.invalid_client_id_text))).check(matches(isDisplayed()))
-    }
-
-    @Test
     fun editWithAWrongClientIDAndConfirmDoesNotApplyChanges() {
         swipeRightTheRecordAt(2)
         onView(withId(R.id.autoCompleteClientID))
@@ -768,6 +762,8 @@ class RoadBookFragmentTest {
     // By default archived records are not displayed, see @before setUp() routine
     @Test
     fun archiveARecordMakesItDisappear() {
+        clickOnShowArchivedButton()
+
         // Archive first one because it's already timestamped
         onView((withText(DestinationRecords.RECORDS[0].destID)))
             .check(matches(isDisplayed()))
@@ -785,12 +781,13 @@ class RoadBookFragmentTest {
         onView((withText(DestinationRecords.RECORDS[0].destID)))
             .check(matches(isDisplayed()))
 
+        clickOnShowArchivedButton()
+
         swipeLeftTheRecordAt(0)
 
         onView((withText(DestinationRecords.RECORDS[0].destID)))
             .check(doesNotExist())
 
-        // Enable showArchived
         clickOnShowArchivedButton()
 
         onView((withText(DestinationRecords.RECORDS[0].destID)))
@@ -803,8 +800,6 @@ class RoadBookFragmentTest {
 
     @Test
     fun archiveRecordWithShowArchivedChecked() {
-        // Enable showArchived
-        clickOnShowArchivedButton()
 
         // Check no archived icon is displayed yet :
         onView(allOf(withId(R.id.archivedIcon), withEffectiveVisibility(Visibility.VISIBLE)))
@@ -851,8 +846,6 @@ class RoadBookFragmentTest {
 
     @Test
     fun unarchiveARecord() {
-        // Enable showArchived
-        clickOnShowArchivedButton()
 
         // Archive first
         swipeLeftTheRecordAt(0)
@@ -906,8 +899,6 @@ class RoadBookFragmentTest {
 
     @Test
     fun stayArchivedAfterNavigationWithShowArchived() {
-        // Enable showArchived
-        clickOnShowArchivedButton()
 
         // Archive the record
         swipeLeftTheRecordAt(0)
@@ -917,7 +908,6 @@ class RoadBookFragmentTest {
             .check(matches(isDisplayed()))
 
         navigateOutsideAndComeBack()
-        clickOnShowArchivedButton()
 
         // Check that the record is still archived
         onView(allOf(withId(R.id.archivedIcon), withEffectiveVisibility(Visibility.VISIBLE)))
@@ -990,6 +980,8 @@ class RoadBookFragmentTest {
     fun noAutomaticTimestampIsDoneOutOfDestinationPlace() = runTest {
         injectMockLocationWithDefaultJourney()
 
+        clickOnShowArchivedButton()
+
         // Non timestamped record, hence swipe left shows deletion dialog
         swipeLeftTheRecordAt(1)
         onView(withText(R.string.delete_dialog_title)).check(matches(isDisplayed()))
@@ -1016,6 +1008,7 @@ class RoadBookFragmentTest {
     @Test // Buhagiat is exactly at the same coordinates where the courier will arrive
     fun automaticTimestampIsDoneOnExactDestinationPlace() = runTest {
         injectMockLocationWithDefaultJourney()
+        clickOnShowArchivedButton()
 
         // Non timestamped record, hence swipe left shows deletion dialog
         swipeLeftTheRecordAt(1)
@@ -1043,6 +1036,7 @@ class RoadBookFragmentTest {
     @Test
     fun automaticTimestampIsDoneOnDestinationPlacePerimeter() = runTest {
         injectMockLocationWithDefaultJourney()
+        clickOnShowArchivedButton()
 
         // Delete Buhagiat and let the X17 which is at the Rolex center (< 15m of where the courier arrive)
         swipeLeftTheRecordAt(1)

@@ -61,6 +61,7 @@ class LocationTrackingHandler {
                 action = LocationService.ACTION_STOP
                 unbindWrapForCI { componentActivity.unbindService(it) }
                 componentActivity.stopService(this)
+                _isTrackingEnabled.update { false }
             }
         } // else the service is already disabled
     }
@@ -91,9 +92,7 @@ class LocationTrackingHandler {
             _isTrackingEnabled.update { true }
         }
 
-        override fun onServiceDisconnected(arg0: ComponentName) {
-            _isTrackingEnabled.update { false }
-        }
+        override fun onServiceDisconnected(arg0: ComponentName) {}
     }
 
     private fun unbindWrapForCI(unbind: (connection: ServiceConnection) -> Unit) {

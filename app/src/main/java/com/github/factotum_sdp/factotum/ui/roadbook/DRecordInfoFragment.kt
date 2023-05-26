@@ -35,7 +35,7 @@ class DRecordInfoFragment(private val record: DestinationRecord) : Fragment() {
         setEditText(rec.waitingTime.toString(), R.id.editTextWaitingTime, view)
         setEditText(rec.rate.toString(), R.id.editTextRate, view)
         setEditText(DestinationRecord.actionsFormat(rec.actions), R.id.editTextActions, view)
-        setEditText(rec.notes, R.id.editTextNotes, view)
+        setEditText(rec.notes, R.id.editTextNotesInfo, view)
     }
 
     private fun setEditText(format: String, id: Int, view: View) {

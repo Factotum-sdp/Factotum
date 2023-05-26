@@ -110,7 +110,7 @@ class DRecordDetailsFragmentTest {
                 closeSoftKeyboard()
             )
 
-        onView(withId(R.id.editTextNotes))
+        onView(withId(R.id.editTextNotesInfo))
             .perform(
                 click(),
                 typeText(notes),

@@ -113,7 +113,7 @@
             app:hintTextAppearance="?attr/textAppearanceBodyMedium">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editTextNotes"
+                android:id="@+id/editTextNotesInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:enabled="false" />

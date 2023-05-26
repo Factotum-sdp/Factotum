@@ -168,7 +168,7 @@ class ContactDetailsFragment : Fragment() {
                     }
                 if (isSubFragment) {
                     it.findNavController()
-                        .navigate(R.id.action_dRecordDetailsFragment_to_MapsFragment)
+                        .navigate(R.id.action_dRecordDetailsFragment_to_MapsFragment, bundle)
                 } else {
                     it.findNavController()
                         .navigate(R.id.action_contactDetailsFragment2_to_holderFragment, bundle)

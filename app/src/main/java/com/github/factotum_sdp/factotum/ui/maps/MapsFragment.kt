@@ -40,7 +40,6 @@ class MapsFragment : Fragment() {
         private const val minZoom = 6.0f
         const val IN_NAV_PAGER = "nav_pager"
         const val CONTACT_TO_MARK = "contact_to_mark"
-        const val DRAW_ROUTE = "draw_route"
         const val MAPS_PKG = "com.google.android.apps.maps"
     }
 

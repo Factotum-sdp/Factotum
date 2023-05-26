@@ -38,7 +38,7 @@ import java.util.*
 @RunWith(AndroidJUnit4::class)
 class DRecordDetailsFragmentTest {
 
-    val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+    val device = UiDevice.getInstance(getInstrumentation())
 
     @get:Rule
     var testRule = ActivityScenarioRule(
@@ -110,7 +110,7 @@ class DRecordDetailsFragmentTest {
                 closeSoftKeyboard()
             )
 
-        onView(withId(R.id.editTextNotesInfo))
+        onView(withId(R.id.editTextNotes))
             .perform(
                 click(),
                 typeText(notes),

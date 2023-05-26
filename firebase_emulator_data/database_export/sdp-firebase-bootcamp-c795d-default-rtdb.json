@@ -95,6 +95,13 @@
         "username": "QG"
         }    
     },
+    "Location": {
+      "AZnp6E5RlZR3pbD3WdFe2iJIaiK3": {
+        "latitude": 46.53,
+        "longitude": 6.57,
+        "name": "FakeCourier"
+      }
+    },
     "profile-dispatch": {
         "9Q9PdkiVQKwgHcuEGyshqXyXHrHT": {
             "email": "courier@gmail.com",

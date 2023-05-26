@@ -285,8 +285,8 @@ class RoadBookFragment : Fragment(), MenuProvider {
             enableReordering = true,
             enableArchivingAndDeletion = true,
             enableEdition = true,
-            enableDetailsAccess = false,
-            showArchived = false
+            enableDetailsAccess = true,
+            showArchived = true
         )
         loadPreferencesButtonState(defaultPreferences)
     }

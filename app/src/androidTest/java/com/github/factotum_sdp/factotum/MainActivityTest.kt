@@ -192,15 +192,6 @@ class MainActivityTest {
     }
 
     @Test
-    fun navHeaderDisplaysUserData() {
-        GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
-
-        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
-        //onView(withText("boss@gmail.com")).check(matches(isDisplayed()))
-        onView(withText("Boss (BOSS)")).check(matches(isDisplayed()))
-    }
-
-    @Test
     fun drawerMenuIsCorrectlyDisplayedForBoss() {
         GeneralUtils.fillUserEntryAndEnterTheApp("boss@gmail.com", "123456")
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())

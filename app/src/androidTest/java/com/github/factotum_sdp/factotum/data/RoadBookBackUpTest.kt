@@ -61,6 +61,7 @@ class RoadBookBackUpTest {
             .perform(DrawerActions.open())
         onView(ViewMatchers.withId(R.id.roadBookFragment))
             .perform(ViewActions.click())
+
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

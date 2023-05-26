@@ -72,6 +72,8 @@ class DRecordDetailsFragmentTest {
             .perform(DrawerActions.open())
         onView(withId(R.id.roadBookFragment))
             .perform(click())
+        Espresso.openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
+        onView(withText(R.string.rb_label_touch_click)).perform(click())
     }
 
     private fun toFragment() {

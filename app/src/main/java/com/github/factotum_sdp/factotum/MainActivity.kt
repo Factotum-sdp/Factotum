@@ -81,7 +81,6 @@ class MainActivity : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.roadBookFragment, R.id.directoryFragment,
-                R.id.loginFragment,
                 R.id.displayFragment,R.id.mapsFragment,
                 R.id.bossMapFragment,
                 R.id.settingsFragment
@@ -154,18 +153,29 @@ class MainActivity : AppCompatActivity() {
         }
         user.userLocation.observe(this) {
             val coordinatesFormat =
-                "[${it?.latitude} ; ${it?.longitude}]"
+            it?.let {
+                "[${it.latitude} ; ${it.longitude}]"
+            } ?: getString(R.string.live_tracking_disabled_text)
             email.text = coordinatesFormat
+        }
+        user.userHasTrackingEnabled.observe(this) {
+            if(!it) {
+                email.text = getString(R.string.live_tracking_disabled_text)
+            }
         }
     }
 
     private fun listenLogoutButton() {
         binding.navView.menu.findItem(R.id.signoutButton).setOnMenuItemClickListener {
-            login.logout()
-            finish()
-            startActivity(intent)
+            restartAppActivity()
             true
         }
+    }
+
+    fun restartAppActivity() {
+        login.logout()
+        finish()
+        startActivity(intent)
     }
 
     // Update the menu items according to the user roledisplayFragment

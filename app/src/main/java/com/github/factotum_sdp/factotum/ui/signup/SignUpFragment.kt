@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.data.*
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance.getAuth
@@ -38,13 +39,17 @@ class SignUpFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        //(requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSignupBinding.inflate(inflater, container, false)
-        (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.sign_up)
+        //(activity as AppCompatActivity).supportActionBar?.title = getString(R.string.sign_up)
         return binding.root
     }
 
@@ -85,7 +90,8 @@ class SignUpFragment : Fragment() {
 
         listenToAuthButton(signUpButton, loadingProgressBar, emailEditText, passwordEditText)
 
-        observeAuthResult(loadingProgressBar)
+        observeAuthResult()
+        observeUpdateUserResult(loadingProgressBar)
 
         adapter = ArrayAdapter(requireContext(), R.layout.user_role_item, roles)
 
@@ -167,11 +173,10 @@ class SignUpFragment : Fragment() {
         }
     }
 
-    private fun observeAuthResult(loadingProgressBar: View) {
+    private fun observeAuthResult() {
         viewModel.authResult.observe(viewLifecycleOwner,
             Observer { authResult ->
                 authResult ?: return@Observer
-                loadingProgressBar.visibility = View.GONE
                 authResult.error?.let {
                     showSignUpFailed(it)
                 }
@@ -179,6 +184,19 @@ class SignUpFragment : Fragment() {
                     updateUi(it)
                 }
             })
+    }
+
+    private fun observeUpdateUserResult(loadingProgressBar: View) {
+        viewModel.updateUserResult.observe(viewLifecycleOwner, Observer { updateUserResult ->
+            updateUserResult ?: return@Observer
+            loadingProgressBar.visibility = View.GONE
+            updateUserResult.error?.let {
+                showSignUpFailed(it)
+            }
+            updateUserResult.success?.let {
+                (requireActivity() as MainActivity).restartAppActivity()
+            }
+        })
     }
 
     private fun updateUi(model: String) {

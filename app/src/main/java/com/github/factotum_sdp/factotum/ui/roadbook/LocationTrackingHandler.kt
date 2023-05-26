@@ -1,6 +1,5 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
-import android.Manifest
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -8,8 +7,6 @@ import android.content.ServiceConnection
 import android.location.Location
 import android.os.IBinder
 import androidx.activity.ComponentActivity
-import androidx.activity.result.contract.ActivityResultContracts
-import com.github.factotum_sdp.factotum.data.LocationClient
 import com.github.factotum_sdp.factotum.services.LocationService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

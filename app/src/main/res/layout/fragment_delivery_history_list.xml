@@ -6,8 +6,8 @@
     android:name="com.github.factotum_sdp.factotum.ui.bossmap.DeliveryHistoryFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
+    android:layout_marginLeft="8dp"
+    android:layout_marginRight="8dp"
     app:layoutManager="LinearLayoutManager"
     tools:context=".ui.bossmap.DeliveryHistoryFragment"
     tools:listitem="@layout/fragment_delivery_history" />

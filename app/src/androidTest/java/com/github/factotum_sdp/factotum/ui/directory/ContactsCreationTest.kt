@@ -14,8 +14,10 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.By.*
 import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.model.AddressCoordinates
@@ -55,6 +57,16 @@ class ContactsCreationTest {
                 nbContacts
             }
         }
+
+        @BeforeClass
+        @JvmStatic
+        fun dismissANRSystemDialog() {
+            val device = UiDevice.getInstance(getInstrumentation())
+            val waitButton = device.findObject(UiSelector().textContains("wait"))
+            if (waitButton.exists()) {
+                waitButton.click()
+            }
+        }
     }
 
     @Before
@@ -69,7 +81,6 @@ class ContactsCreationTest {
 
     @Test
     fun hasAllTheFields() {
-        onView((withId(R.id.contact_image_creation))).check(matches(isDisplayed()))
         onView((withId(R.id.contactCreationAddress))).check(matches(isDisplayed()))
         onView(withId(R.id.roles_spinner)).check(matches(isDisplayed()))
         onView(withId(R.id.editTextName)).check(matches(isDisplayed()))

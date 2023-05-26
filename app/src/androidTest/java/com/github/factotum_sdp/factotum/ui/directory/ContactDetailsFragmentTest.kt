@@ -2,17 +2,20 @@ package com.github.factotum_sdp.factotum.ui.directory
 
 import android.Manifest
 import android.content.Intent
+import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
+import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
@@ -61,6 +64,16 @@ class ContactDetailsFragmentTest {
             createRandomContacts(1)
             currContact = randomContacts[0]
             logout()
+        }
+
+        @BeforeClass
+        @JvmStatic
+        fun dismissANRSystemDialog() {
+            val device = UiDevice.getInstance(getInstrumentation())
+            val waitButton = device.findObject(UiSelector().textContains("wait"))
+            if (waitButton.exists()) {
+                waitButton.click()
+            }
         }
     }
 
@@ -181,7 +194,7 @@ class ContactDetailsFragmentTest {
         Intents.init()
         onView(withId(R.id.run_button)).perform(click())
         if (LocationUtils.hasLocationPopUp()) {
-            val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+            val device = UiDevice.getInstance(getInstrumentation())
             device.findObject(UiSelector().textContains(LocationUtils.buttonTextAllow)).click()
         }
         Intents.intended(
@@ -196,7 +209,7 @@ class ContactDetailsFragmentTest {
     @Test
     fun buttonShowDestination() {
         onView(withId(R.id.show_all_button)).perform(click())
-        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        val device = UiDevice.getInstance(getInstrumentation())
         val markers = device.wait(hasObject(By.descContains("Destination")), 5000L)
         assertTrue(markers)
     } */

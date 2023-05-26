@@ -1,4 +1,5 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment_directory_directors_parent"
@@ -7,12 +8,22 @@
     android:orientation="vertical"
     tools:context=".ui.directory.DirectoryFragment">
 
-    <SearchView
-        android:id="@+id/contacts_search_view"
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/contacts_search_view_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:iconifiedByDefault="false"
-        android:queryHint="Search contacts..." />
+        android:layout_margin="6dp"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:startIconDrawable="@drawable/ic_search">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/contacts_search_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/searchbar_hint" />
+    </com.google.android.material.textfield.TextInputLayout>
+
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -37,7 +48,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@android:drawable/ic_input_add" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/empty_contacts_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

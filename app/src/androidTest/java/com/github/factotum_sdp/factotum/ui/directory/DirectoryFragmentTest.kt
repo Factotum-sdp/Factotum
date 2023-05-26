@@ -53,6 +53,16 @@ class DirectoryFragmentTest {
                 nbContacts
             }
         }
+
+        @BeforeClass
+        @JvmStatic
+        fun dismissANRSystemDialog() {
+            val device = UiDevice.getInstance(getInstrumentation())
+            val waitButton = device.findObject(UiSelector().textContains("wait"))
+            if (waitButton.exists()) {
+                waitButton.click()
+            }
+        }
     }
 
     @Before
@@ -87,7 +97,6 @@ class DirectoryFragmentTest {
     @Test
     fun addButtonExists() {
         onView(withId(R.id.add_contact_button)).check(matches(isDisplayed()))
-
     }
 
     @Test
@@ -126,6 +135,7 @@ class DirectoryFragmentTest {
 
     @Test
     fun incorrectQueryShowsNoMatchingQueryMessage() {
+        onView(withId(R.id.contacts_search_view)).perform(click())
         onView(withId(R.id.empty_contacts_message)).check(matches(withEffectiveVisibility(Visibility.GONE)))
         // Type a search query in the search view and close the soft keyboard
         onView(withId(R.id.contacts_search_view))

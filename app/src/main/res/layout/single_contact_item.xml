@@ -1,37 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     tools:ignore="UseCompoundDrawables">
 
-    <ImageView
-        android:id="@+id/contact_image"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:layout_gravity="center_vertical"
-        android:layout_margin="10dp"
-        android:contentDescription="@string/contact_image"
-        tools:srcCompat="@tools:sample/avatars" />
-
-    <TextView
-        android:id="@+id/contact_surname_and_name"
-        android:layout_width="wrap_content"
+    <com.google.android.material.card.MaterialCardView
+        style="?attr/materialCardViewElevatedStyle"
+        android:id="@+id/contact_card"
+        android:layout_margin="6dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginStart="10dp"
-        android:text="@string/contact_surname_and_name"
-        android:textSize="20sp" />
+        app:shapeAppearance="@style/ShapeAppearance.Material3.MediumComponent">
 
-    <TextView
-        android:id="@+id/contact_username"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginStart="25dp"
-        android:text="@string/Single_contact_username"
-        android:textStyle="italic"
-        android:textSize="15sp"/>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="6dp">
+
+            <ImageView
+                android:id="@+id/contact_image"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                app:layout_constraintBottom_toBottomOf="@+id/contact_surname_and_name"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/contact_surname_and_name"
+                android:contentDescription="@string/contact_image"
+                tools:srcCompat="@tools:sample/avatars"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/contact_surname_and_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="@string/contact_surname_and_name"
+                android:textSize="20sp"
+                app:layout_constraintEnd_toStartOf="@+id/contact_username"
+                app:layout_constraintStart_toEndOf="@+id/contact_image"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/contact_username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/Single_contact_username"
+                android:textStyle="italic"
+                android:textSize="16sp"
+                app:layout_constraintBaseline_toBaselineOf="@+id/contact_surname_and_name"
+                app:layout_constraintStart_toEndOf="@+id/contact_surname_and_name"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
 
 </LinearLayout>

@@ -1,5 +1,6 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
+import android.animation.ObjectAnimator
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
@@ -8,6 +9,8 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.view.animation.LinearInterpolator
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.SwitchCompat
@@ -42,10 +45,12 @@ import com.github.factotum_sdp.factotum.ui.bag.BagViewModel
 import com.github.factotum_sdp.factotum.ui.bag.PackCreationDialogBuilder
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.ui.settings.SettingsViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.*
 
 private const val ON_DESTINATION_RADIUS = 15.0
+private const val ANIMATION_DURATION = 400L
 
 /**
  * A fragment representing a RoadBook which is a list of DestinationRecord
@@ -343,7 +348,7 @@ class RoadBookFragment : Fragment(), MenuProvider {
     }
 
     private fun showsPermissionsAlertDialog(iconID: Int, message: String) {
-        val builder = AlertDialog.Builder(requireContext())
+        val builder = MaterialAlertDialogBuilder(ContextThemeWrapper(requireContext(), R.style.Theme_Factotum_Dialog))
         builder
             .setTitle(getString(R.string.live_location_service_dialog_title))
             .setMessage(message)
@@ -373,11 +378,19 @@ class RoadBookFragment : Fragment(), MenuProvider {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun setRefreshButtonListener(menu: Menu) {
-        val refreshButton = menu.findItem(R.id.refresh_button)
-        refreshButton.setOnMenuItemClickListener {
+        val menuRefresh = menu.findItem(R.id.refresh_button)
+        val refreshButton = menuRefresh.actionView as ImageView
+        refreshButton.setOnClickListener {
+            rotateRefreshButton(refreshButton)
             rbRecyclerView.adapter?.notifyDataSetChanged()
-            true
         }
+    }
+
+    private fun rotateRefreshButton(view: ImageView) {
+        val rotation = ObjectAnimator.ofFloat(view, "rotation", 0f, 360f)
+        rotation.duration = ANIMATION_DURATION
+        rotation.interpolator = LinearInterpolator()
+        rotation.start()
     }
 
     private fun setBagButtonListener(menu: Menu) {
@@ -468,19 +481,23 @@ class RoadBookFragment : Fragment(), MenuProvider {
     }
 
     private fun isDragAndDropEnabled(): Boolean {
-        return dragAndDropButton.isChecked
+        return if(::dragAndDropButton.isInitialized) dragAndDropButton.isChecked else false
     }
+
     private fun isTouchClickEnabled(): Boolean {
-        return touchClickButton.isChecked
+        return if(::touchClickButton.isInitialized) touchClickButton.isChecked else false
     }
+
     private fun isSwipeLeftEnabled(): Boolean {
-        return swipeLeftButton.isChecked
+        return if(::swipeLeftButton.isInitialized) swipeLeftButton.isChecked else false
     }
+
     private fun isSwipeRightEnabled(): Boolean {
-        return swipeRightButton.isChecked
+        return if(::swipeRightButton.isInitialized) swipeRightButton.isChecked else false
     }
+
     private fun isShowArchivedEnabled(): Boolean {
-        return showArchivedButton.isChecked
+        return if(::showArchivedButton.isInitialized) showArchivedButton.isChecked else false
     }
 
     companion object {

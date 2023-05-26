@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment_drecord_info_directors_parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:visibility="visible"
     tools:context=".ui.roadbook.DRecordInfoFragment"
     tools:visibility="visible">
 
@@ -13,93 +13,110 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp"
+        android:padding="8dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/textvlabel_destination_id"
-            android:textSize="16sp" />
+            android:layout_marginBottom="12dp"
+            android:hint="@string/textvlabel_destination_id"
+            app:hintTextAppearance="?attr/textAppearanceBodyMedium">
 
-        <EditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editTextDestID"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:enabled="false" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <TextView
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/textvlabel_client_id"
-            android:textSize="16sp" />
+            android:layout_marginBottom="12dp"
+            android:hint="@string/textvlabel_client_id"
+            app:hintTextAppearance="?attr/textAppearanceBodyMedium">
 
-        <EditText
-            android:id="@+id/editTextClientID"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextClientID"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:enabled="false" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:enabled="false" />
+            android:layout_marginBottom="12dp"
+            android:hint="@string/textvlabel_timestamp"
+            app:hintTextAppearance="?attr/textAppearanceBodyMedium">
 
-        <TextView
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextTimestampDRecord"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:enabled="false" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/textvlabel_timestamp"
-            android:textSize="16sp" />
+            android:layout_marginBottom="12dp"
+            android:hint="@string/textvlabel_waiting_time"
+            app:hintTextAppearance="?attr/textAppearanceBodyMedium">
 
-        <EditText
-            android:id="@+id/editTextTimestampDRecord"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextWaitingTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:enabled="false" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:enabled="false" />
+            android:layout_marginBottom="12dp"
+            android:hint="@string/textvlabel_rate"
+            app:hintTextAppearance="?attr/textAppearanceBodyMedium">
 
-        <TextView
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextRate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:enabled="false" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/textvlabel_waiting_time"
-            android:textSize="16sp" />
+            android:layout_marginBottom="12dp"
+            android:hint="@string/textvlabel_actions"
+            app:hintTextAppearance="?attr/textAppearanceBodyMedium">
 
-        <EditText
-            android:id="@+id/editTextWaitingTime"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextActions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:enabled="false" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:enabled="false" />
+            android:layout_marginBottom="12dp"
+            android:hint="@string/textvlabel_notes"
+            app:hintTextAppearance="?attr/textAppearanceBodyMedium">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/textvlabel_rate"
-            android:textSize="16sp" />
-
-        <EditText
-            android:id="@+id/editTextRate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:enabled="false" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/textvlabel_actions"
-            android:textSize="16sp" />
-
-        <EditText
-            android:id="@+id/editTextActions"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:enabled="false" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/textvlabel_notes"
-            android:textSize="16sp" />
-
-        <EditText
-            android:id="@+id/editTextNotes"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:enabled="false" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextNotes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:enabled="false" />
+        </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

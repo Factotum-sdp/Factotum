@@ -14,7 +14,9 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.model.Contact
+import com.github.factotum_sdp.factotum.model.Role
 import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment.Companion.USERNAME_NAV_KEY
+import com.google.android.material.card.MaterialCardView
 
 class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.ContactsViewHolder>(),
     Filterable {
@@ -34,9 +36,10 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
         notifyDataSetChanged()
     }
 
-    class ContactsViewHolder(itemView: View) :
+    class ContactsViewHolder(itemView : View) :
         RecyclerView.ViewHolder(itemView) { //this is the view holder for the recycler view
 
+        private val cardView: MaterialCardView
         val itemName: TextView
         val itemUsername: TextView
         val itemImage: ImageView
@@ -45,16 +48,17 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
             itemName = itemView.findViewById(R.id.contact_surname_and_name)
             itemImage = itemView.findViewById(R.id.contact_image)
             itemUsername = itemView.findViewById(R.id.contact_username)
+            cardView = itemView.findViewById(R.id.contact_card)
 
-            itemView.setOnClickListener {   //when a contact is clicked, go to the contact details fragment
-                itemView.findNavController().navigate(
-                    R.id.action_directoryFragment_to_contactDetailsFragment2,
-                    Bundle().apply {
-                        putString(
-                            USERNAME_NAV_KEY,
-                            itemUsername.text.toString().substring(1)
-                        ) // pass the id of the contact to the contact details fragment so that it can display the correct contact
-                    })
+            cardView.setOnClickListener {  // Now we're setting the click listener to the card view
+            it.findNavController().navigate(
+                R.id.action_directoryFragment_to_contactDetailsFragment2,
+                Bundle().apply {
+                    putString(
+                        USERNAME_NAV_KEY,
+                        itemUsername.text.toString().substring(1)
+                    )
+                })
             }
         }
     }
@@ -73,7 +77,18 @@ class ContactsRecyclerAdapter : RecyclerView.Adapter<ContactsRecyclerAdapter.Con
     override fun onBindViewHolder(holder: ContactsViewHolder, i: Int) {
         holder.itemName.text = filteredContacts[i].surname + "  " + filteredContacts[i].name
         holder.itemUsername.text = "@" + filteredContacts[i].username
-        holder.itemImage.setImageResource(filteredContacts[i].profile_pic_id)
+
+        val imageResource = getRoleImageResource(filteredContacts[i].role)
+        holder.itemImage.setImageResource(imageResource)
+    }
+
+    private fun getRoleImageResource(role : String): Int {
+        return when (role) {
+            "BOSS" ->  R.mipmap.ic_boss_profile_pic_round
+            "COURIER" -> R.mipmap.ic_courier_profile_pic_round
+            "CLIENT" -> R.mipmap.ic_client_profile_pic_round
+            else -> R.mipmap.ic_launcher_round
+        }
     }
 
     override fun getItemCount(): Int { //simple getter for the number of contacts

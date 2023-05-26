@@ -1,7 +1,7 @@
 package com.github.factotum_sdp.factotum.ui.bag
 
-import android.app.AlertDialog
 import android.os.Bundle
+import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -16,6 +16,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.RecyclerView
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.model.Pack
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 /**
  * The "bag" Fragment
@@ -55,7 +56,9 @@ class BagFragment: Fragment(), MenuProvider {
             val notesView: EditText = dialogView.findViewById(R.id.postEditTextPackageNotes)
             notesView.setText(it.notes)
 
-            val builder = AlertDialog.Builder(requireContext())
+            val builder = MaterialAlertDialogBuilder(
+                ContextThemeWrapper(requireContext(), R.style.Theme_Factotum_Dialog))
+            builder.setTitle(R.string.bag_edit_dialog_title)
             builder.setView(dialogView)
             builder.setNegativeButton(R.string.edit_dialog_cancel_b, null)
             builder.setPositiveButton(R.string.edit_dialog_update_b) { _, _ ->
@@ -75,8 +78,8 @@ class BagFragment: Fragment(), MenuProvider {
         withSendPackButton.setOnMenuItemClickListener {
             it.isChecked = !it.isChecked
 
-            if(it.isChecked) it.setIcon(R.drawable.blue_work_history)
-            else it.setIcon(R.drawable.work_history)
+            if(it.isChecked) it.setIcon(R.drawable.work_history)
+            else it.setIcon(R.drawable.grey_work_history)
 
             bagViewModel.displayDeliveredPacks(it.isChecked)
             true

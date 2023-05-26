@@ -2,6 +2,8 @@ package com.github.factotum_sdp.factotum.ui.directory
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +18,7 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.model.Role
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.textfield.TextInputEditText
 
 class DirectoryFragment : Fragment() {
 
@@ -41,7 +44,6 @@ class DirectoryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         adapter = ContactsRecyclerAdapter()
         adapter.updateContacts(viewModel.contacts.value ?: emptyList())
 
@@ -60,8 +62,7 @@ class DirectoryFragment : Fragment() {
 
         val recycler =
             view.findViewById<RecyclerView>(R.id.contacts_recycler_view) // connect the recycler view to the layout
-        val searchView =
-            view.findViewById<SearchView>(R.id.contacts_search_view) // connect the search view to the layout
+        val searchView = view.findViewById<TextInputEditText>(R.id.contacts_search_view)
 
         //the recycler is just the way we chose to represent the list of contacts
         recycler.apply {
@@ -79,16 +80,15 @@ class DirectoryFragment : Fragment() {
             }
         })
 
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return false
+         searchView.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                // Filter the RecyclerView when the text changes
+                adapter.filter.filter(s.toString())
             }
 
-            override fun onQueryTextChange(newText: String?): Boolean {
-                // Filter the RecyclerView when the text changes
-                adapter.filter.filter(newText)
-                return true
-            }
+            override fun afterTextChanged(s: Editable) {}
         })
     }
 }

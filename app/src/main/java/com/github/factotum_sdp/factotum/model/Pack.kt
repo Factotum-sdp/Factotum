@@ -27,6 +27,7 @@ data class Pack(
     val recipientID: String = "",
     val startingRecordID: String = "",
     val arrivalRecordID: String? = "",
-    @Serializable(with = DateKSerializer::class) val takenAt: Date = Date(),
+
+    @Serializable(with = DateKSerializer::class) val takenAt: Date? = Date(),
     @Serializable(with = NullableDateKSerializer::class) val deliveredAt: Date? = null,
     val notes: String = "")

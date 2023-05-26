@@ -1,14 +1,16 @@
 package com.github.factotum_sdp.factotum.ui.bag
 
-import android.app.AlertDialog
 import android.content.Context
+import android.view.ContextThemeWrapper
 import android.view.View
 import android.widget.AutoCompleteTextView
 import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.ui.dialog.ClientIDViewValidation
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.util.Date
 
 /**
@@ -36,7 +38,8 @@ class PackCreationDialogBuilder(
     private val bagViewModel: BagViewModel,
     override val contactsViewModel: ContactsViewModel
 ) :
-    AlertDialog.Builder(context),
+
+    MaterialAlertDialogBuilder(ContextThemeWrapper(context, R.style.Theme_Factotum_Dialog)),
     ClientIDViewValidation {
 
     private val nameView: EditText
@@ -79,6 +82,6 @@ class PackCreationDialogBuilder(
     }
 
     companion object {
-        const val DIALOG_TITLE_PREFIX = "New package from"
+        const val DIALOG_TITLE_PREFIX = "New package from "
     }
 }

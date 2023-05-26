@@ -16,6 +16,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.utils.GeneralUtils
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.initFirebase
 import com.github.factotum_sdp.factotum.utils.GeneralUtils.Companion.logout
@@ -50,6 +51,17 @@ class MainActivityTest {
         @JvmStatic
         fun setUpDatabase() = runTest {
             initFirebase()
+            logout()
+        }
+
+        @BeforeClass
+        @JvmStatic
+        fun dismissANRSystemDialog() {
+            val device = UiDevice.getInstance(getInstrumentation())
+            val waitButton = device.findObject(UiSelector().textContains("wait"))
+            if (waitButton.exists()) {
+                waitButton.click()
+            }
         }
     }
 
@@ -197,7 +209,7 @@ class MainActivityTest {
         onView(withText("RoadBook")).check(matches(isDisplayed()))
         onView(withText("Directory")).check(matches(isDisplayed()))
         onView(withText("Maps")).check(matches(isDisplayed()))
-        onView(withText("View Proof Pictures")).check(matches(isDisplayed()))
+        onView(withText("Proof Photos")).check(matches(isDisplayed()))
     }
 
     @Test
@@ -209,7 +221,7 @@ class MainActivityTest {
         onView(withText("RoadBook")).check(doesNotExist())
         onView(withText("Directory")).check(doesNotExist())
         onView(withText("Maps")).check(doesNotExist())
-        onView(withText("View Proof Pictures")).check(matches(isDisplayed()))
+        onView(withText("Proof Photos")).check(matches(isDisplayed()))
     }
 
     // Work when executing the scenario manually but emulators issues make it fails in the connectedCheck

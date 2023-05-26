@@ -5,61 +5,73 @@
     android:layout_height="wrap_content">
 
     <com.google.android.material.card.MaterialCardView
+        style="?attr/materialCardViewElevatedStyle"
         android:id="@+id/cardView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_margin="12dp"
         android:clickable="true"
         android:focusable="true"
-        app:cardCornerRadius="10dp"
-        app:cardElevation="4dp"
+        app:shapeAppearance="@style/ShapeAppearance.Material3.MediumComponent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Media -->
+        <ImageView
+            android:id="@+id/displayItemPicture"
+            android:layout_width="match_parent"
+            android:layout_height="194dp"
+            app:srcCompat="@drawable/cardview_clickable_background"
+            android:scaleType="centerCrop"
+            android:contentDescription="@string/content_description_media"
+            />
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/cardview_clickable_background">
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <ImageView
-                android:id="@+id/imageIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@android:drawable/ic_menu_view"
-                app:layout_constraintBottom_toBottomOf="@+id/displayItemView"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/displayItemView" />
-
+            <!-- Title, secondary and supporting text -->
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/displayItemView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical|start"
-                android:paddingStart="12dp"
-                android:paddingTop="16dp"
-                android:paddingEnd="16dp"
-                android:paddingBottom="16dp"
-                android:textSize="16sp"
-                app:layout_constraintEnd_toStartOf="@+id/shareButton"
-                app:layout_constraintStart_toEndOf="@+id/imageIcon"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageButton
-                android:id="@+id/shareButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:background="?attr/selectableItemBackground"
-                android:contentDescription="@string/share"
-                android:src="@android:drawable/ic_menu_share"
-                app:layout_constraintBottom_toBottomOf="@+id/displayItemView"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/displayItemView" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                android:textSize="20.5sp"
+                android:textAppearance="?attr/textAppearanceTitleMedium" />
+            <!-- Secondary text -->
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/displayItemSecondaryView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16.5sp"
+                android:textAppearance="?attr/textAppearanceSubtitle1" />
+        </LinearLayout>
+
+        <!-- Buttons -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp">
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/Widget.Material3.Button.Icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/share"
+                android:textSize="20sp"
+                android:id="@+id/shareButton"
+                android:layout_alignParentEnd="true"
+                app:icon="@android:drawable/ic_menu_share" />
+        </RelativeLayout>
+
+    </LinearLayout>
 
     </com.google.android.material.card.MaterialCardView>
 

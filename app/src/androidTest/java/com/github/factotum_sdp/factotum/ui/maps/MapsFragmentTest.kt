@@ -52,6 +52,16 @@ class MapsFragmentTest {
             initFirebase()
             logout()
         }
+
+        @BeforeClass
+        @JvmStatic
+        fun dismissANRSystemDialog() {
+            val device = UiDevice.getInstance(getInstrumentation())
+            val waitButton = device.findObject(UiSelector().textContains("wait"))
+            if (waitButton.exists()) {
+                waitButton.click()
+            }
+        }
     }
 
     @get:Rule

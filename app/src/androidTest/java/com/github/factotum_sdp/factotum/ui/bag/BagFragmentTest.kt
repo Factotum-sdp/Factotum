@@ -10,7 +10,10 @@ import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.GrantPermissionRule
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.UiSelector
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.model.User
@@ -52,6 +55,16 @@ class BagFragmentTest {
         @JvmStatic
         fun setUpDatabase() {
             initFirebase()
+        }
+
+        @BeforeClass
+        @JvmStatic
+        fun dismissANRSystemDialog() {
+            val device = UiDevice.getInstance(getInstrumentation())
+            val waitButton = device.findObject(UiSelector().textContains("wait"))
+            if (waitButton.exists()) {
+                waitButton.click()
+            }
         }
     }
 
@@ -192,7 +205,7 @@ class BagFragmentTest {
         onView(withId(R.id.packageCardView)).perform(click())
 
         // Edit notes
-        onView(withId(R.id.postEditTextPackageNotes)).perform(clearText(), typeText(newNotes))
+        onView(withId(R.id.postEditTextPackageNotes)).perform(clearText(), typeText(newNotes), closeSoftKeyboard())
         onView(withText(R.string.edit_dialog_update_b)).perform(click())
 
         // Check notes are updated
@@ -216,7 +229,7 @@ class BagFragmentTest {
         onView(withId(R.id.packageCardView)).perform(click())
 
         // Edit notes but then cancel
-        onView(withId(R.id.postEditTextPackageNotes)).perform(clearText(),  typeText(newNotes))
+        onView(withId(R.id.postEditTextPackageNotes)).perform(clearText(),  typeText(newNotes), closeSoftKeyboard())
         onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
 
         // Check notes are NOT updated

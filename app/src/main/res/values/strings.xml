@@ -12,7 +12,7 @@
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="google_maps">Google maps</string>
-    <string name="show_all">Show dst</string>
+    <string name="show_all">Show Destination</string>
     <string name="phone">Phone</string>
     <string name="email">Email</string>
     <string name="Set">Set</string>
@@ -38,7 +38,7 @@
     <string name="snap_text_on_rec_unarchive">Record unarchived</string>
 
     <string name="menu_maps">Maps</string>
-    <string name="run">Go To dst</string>
+    <string name="run">Go-To Destination</string>
     <string name="rate_text_view">rate</string>
     <string name="wait_text_view">wait</string>
     <string name="arrival_text_view">arrival</string>
@@ -55,13 +55,13 @@
     <string name="back_to_list_button">Back to List of Contacts</string>
     <string name="all_contact_info">All contact Info</string>
     <string name="contact_details_intro">Contact Details</string>
-    <string name="address_ex_layout">Address :</string>
-    <string name="phone_nb_ex_layout">Phone Number :</string>
-    <string name="notes_ex_layout">Notes :</string>
+    <string name="address_ex_layout">Address: </string>
+    <string name="phone_nb_ex_layout">Phone Number: </string>
+    <string name="notes_ex_layout">Notes: </string>
 
     <!-- Strings related to login -->
-    <string name="prompt_email">email@gmail.com</string>
-    <string name="prompt_password">••••••</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
     <string name="action_sign_in">Access</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="welcome">"Welcome"</string>
@@ -87,7 +87,7 @@
     <string name="sign_out">Sign Out</string>
 
     <!-- Strings related to signup -->
-    <string name="welcome_text">Welcome</string>
+    <string name="create_new_account">Create New Account</string>
     <string name="full_name_text">Full Name</string>
     <string name="create_account_text">Create Account</string>
     <string name="select_role_text">Select Role</string>
@@ -99,7 +99,7 @@
     <string name="rb_label_dragdrop"><![CDATA[Drag & Drop]]></string>
     <string name="edit_dialog_cancel_b">Cancel</string>
     <string name="edit_dialog_update_b">Confirm</string>
-    <string name="menu_view_proof_picture">View Proof Pictures</string>
+    <string name="menu_view_proof_picture">Proof Photos</string>
     <string name="refresh">Refresh</string>
     <string name="hint_dialog_client_id">Client ID</string>
     <string name="hint_dialog_timestamp">Timestamp</string>
@@ -135,7 +135,7 @@
     <string name="textvlabel_notes">Notes</string>
     <string name="rb_label_show_archived">Show archived</string>
     <string name="delete_contact_button">Delete Contact</string>
-    <string name="button_modify_contact">Modify contact</string>
+    <string name="button_modify_contact">Modify Contact</string>
     <string name="form_button_update">Update Contact</string>
     <string name="form_button_create">Create Contact</string>
     <string name="contact_surname_and_name">Doe John</string>
@@ -166,7 +166,7 @@
     <string name="super_client_username">Super client username</string>
     <string name="super_client_id_not_valid">The managing client\'s username is not valid.</string>
     <string name="contact_not_found">Contact not found</string>
-    <string name="boss_Map">Boss Map</string>
+    <string name="boss_maps">Boss Maps</string>
     <string name="decline_end_shift">Not now</string>
     <string name="invalid_client_id_snack_bar">Invalid Client ID, please correct it</string>
     <string name="invalid_client_id_text">Invalid Client ID</string>
@@ -174,16 +174,32 @@
     <string name="bag_button">BagButton</string>
     <string name="location_switch">LocationSwitch</string>
     <string name="package_schedule_icon">package schedule icon</string>
-    <string name="package_name_hint">Package name</string>
+    <string name="package_name_hint">Package Name</string>
     <string name="package_recipient_hint">Recipient</string>
     <string name="package_notes_hint">Package notes</string>
     <string name="confirm_label_pack_creation_dialog">Confirm</string>
     <string name="menu_date_picker">date_picker</string>
     <string name="menu_loading_bar">menu_loading_bar</string>
     <string name="notes_presence_indicator">Notes presence indicator</string>
+    <string name="content_description_media">content_description_media</string>
+    <string name="title">title\n</string>
+    <string name="secondary_text">secondary_text</string>
+    <string name="folders">Folders</string>
+    <string name="photos">Photos</string>
+    <string name="searchbar_hint">Search for Contacts…</string>
+    <string name="create_new_record">Destination Record Edition</string>
+    <string name="login_menu_title">Welcome</string>
+    <string name="bag_edit_dialog_title">Edit Package Notes</string>
+    <string name="sign_in">Sign-In</string>
+    <string name="sign_up">Sign-Up</string>
+    <string name="settings">Settings</string>
+    <string name="contact_details_fragment">Contact Details</string>
+    <string name="contact_creation">Contact Creation</string>
     <string name="with_send_packs_button">With send packs Button</string>
     <string name="live_location_service_dialog_title">Live location service</string>
     <string name="location_permissions_enabled_message">Permissions enabled !</string>
     <string name="notifications_not_enabled_message">Allowed permissions are not sufficient, the notifications should be enabled too.</string>
     <string name="precise_location_not_enabled_message">Allowed permissions are not sufficient, the precise location is needed.</string>
+    <string name="delivery_history">Delivery History</string>
+    <string name="erase">Erase</string>
 </resources>

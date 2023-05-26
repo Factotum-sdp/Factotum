@@ -9,11 +9,12 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.Toolbar
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -34,12 +35,14 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 
 private const val ZOOM_LEVEL_CITY = 13f
 private const val SCALE_FACTOR_ICON = 0.7f
 private const val FACTOR_DARKER_COLOR = 0.7f
 private const val MAILBOX_TITLE = "Mailbox"
+private var MAIL_BOX_SIZE = 100
 
 /**
  * A map fragment that should be available only for a boss user.
@@ -48,13 +51,11 @@ private const val MAILBOX_TITLE = "Mailbox"
  */
 class BossMapFragment : Fragment(), OnMapReadyCallback {
 
-    private var cameraPositionInitialized = false
     private val bossMapViewModel: BossMapViewModel by viewModels()
     private val contactsViewModel: ContactsViewModel by activityViewModels()
+    private var cameraSetupDone = false
     private lateinit var mapView: MapView
     private lateinit var googleMap: GoogleMap
-    private var MAIL_BOX_SIZE = 100
-
 
     private lateinit var bitmapDeliveredScaled : Bitmap
     private lateinit var bitmapNotDeliveredScaled : Bitmap
@@ -64,14 +65,13 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_boss_map, container, false)
+        (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.title_maps)
         mapView = view.findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
         val displayMetrics = resources.displayMetrics
         val screenWidth = displayMetrics.widthPixels
         MAIL_BOX_SIZE = (screenWidth / 10 * SCALE_FACTOR_ICON).toInt()
-
-
 
         bitmapDeliveredScaled = createScaledBitmap(
             BitmapFactory.decodeResource(requireContext().resources, R.drawable.mailbox_delivered),
@@ -80,8 +80,7 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
         bitmapNotDeliveredScaled = createScaledBitmap(
             BitmapFactory.decodeResource(requireContext().resources, R.drawable.mailbox_lowered_flag),
             MAIL_BOX_SIZE, MAIL_BOX_SIZE, false)
-        val toolbar = requireActivity().findViewById<Toolbar>(R.id.toolbar)
-        toolbar.title = getString(R.string.title_maps)
+        cameraSetupDone = false
 
         return view
     }
@@ -100,7 +99,7 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
 
         bossMapViewModel.courierLocations.observe(viewLifecycleOwner) { locations ->
             updateMap(locations, bossMapViewModel.deliveriesStatus.value ?: mapOf())
-            if (!cameraPositionInitialized) {
+            if(!cameraSetupDone) {
                 val geometricMedian = calculateMedianLocation()
                 googleMap.moveCamera(
                     CameraUpdateFactory.newLatLngZoom(
@@ -108,8 +107,7 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
                         ZOOM_LEVEL_CITY
                     )
                 )
-                cameraPositionInitialized = true
-
+                cameraSetupDone = true
             }
         }
 
@@ -126,9 +124,11 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
                     val mailboxNumber = title.split(" ")[1]
                     val deliveryStatus = bossMapViewModel.deliveriesStatus.value?.get(mailboxNumber) ?: emptyList()
                     showDeliveryInfos(Pair(mailboxNumber, deliveryStatus))
+                    true
+                } else {
+                    false
                 }
-            }
-            true
+            } ?: false
         }
     }
 
@@ -162,7 +162,7 @@ class BossMapFragment : Fragment(), OnMapReadyCallback {
         deliveryStatus.second.forEach {status ->
             deliveryInfos.append("${status.courier} : ${status.timeStamp ?: "not delivered"}\n")
         }
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(ContextThemeWrapper(context, R.style.Theme_Factotum_Dialog))
             .setTitle("Delivery status of ${deliveryStatus.first}")
             .setMessage(deliveryInfos.toString())
             .setPositiveButton("OK") { dialog, _ ->

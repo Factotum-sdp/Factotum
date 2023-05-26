@@ -15,6 +15,7 @@ import android.widget.CursorAdapter
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.cursoradapter.widget.SimpleCursorAdapter
 import androidx.fragment.app.Fragment
@@ -50,7 +51,6 @@ class ContactCreationFragment : Fragment() {
 
     private val contactsViewModel: ContactsViewModel by activityViewModels()
 
-
     private lateinit var name: EditText
     private lateinit var surname: EditText
     private lateinit var username: EditText
@@ -67,6 +67,7 @@ class ContactCreationFragment : Fragment() {
     ): View {
         // Inflate the layout for this fragment
         _binding = FragmentContactCreationBinding.inflate(inflater, container, false)
+        (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.contact_creation)
         return binding.root
     }
 

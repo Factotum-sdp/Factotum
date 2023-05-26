@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.github.factotum_sdp.factotum.R
@@ -31,6 +32,7 @@ class SettingsFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val view = inflater.inflate(R.layout.fragment_settings, container, false)
+        (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.settings)
 
         roadBookPreferences = view.findViewById(R.id.save_roadbook_preferences)
         loadRoadBookBackUp = view.findViewById(R.id.load_roadbook_backup)

@@ -1,9 +1,9 @@
 package com.github.factotum_sdp.factotum.ui.display
 
+import android.animation.ObjectAnimator
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.icu.util.Calendar
-import android.icu.util.GregorianCalendar
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,8 +12,11 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.LinearInterpolator
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -33,6 +36,10 @@ import com.github.factotum_sdp.factotum.ui.display.client.ClientPhotoAdapter
 import com.github.factotum_sdp.factotum.ui.display.courier_boss.CourierBossDisplayViewModel
 import com.github.factotum_sdp.factotum.ui.display.courier_boss.CourierBossDisplayViewModelFactory
 import com.github.factotum_sdp.factotum.ui.display.courier_boss.CourierBossFolderAdapter
+import com.google.android.material.datepicker.MaterialDatePicker
+import java.util.Date
+
+private const val ANIMATION_DURATION = 400L
 
 
 class DisplayFragment : Fragment(), MenuProvider {
@@ -43,6 +50,7 @@ class DisplayFragment : Fragment(), MenuProvider {
 
     private lateinit var displayMenu : Menu
     private lateinit var calendarButton: MenuItem
+    private lateinit var refreshButton: ImageView
 
     private val clientViewModel: ClientDisplayViewModel by viewModels{ ClientDisplayViewModelFactory(userFolder, requireContext()) }
     private val courierBossDisplayViewModel : CourierBossDisplayViewModel by viewModels{ CourierBossDisplayViewModelFactory(requireContext()) }
@@ -69,6 +77,7 @@ class DisplayFragment : Fragment(), MenuProvider {
             viewLifecycleOwner,
             onBackPressedCallback
         )
+
     }
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -77,24 +86,41 @@ class DisplayFragment : Fragment(), MenuProvider {
 
         calendarButton = menu.findItem(R.id.menu_date_picker)
         calendarButton.setOnMenuItemClickListener {
-            showDatePickerDialog()
+            showMaterialDatePickerDialog()
             true
         }
+
+        val menuRefresh = menu.findItem(R.id.menu_refresh)
+        refreshButton = menuRefresh.actionView as ImageView
+        refreshButton.setImageResource(R.drawable.refresh)
 
         setupObservers()
     }
 
-    private fun showDatePickerDialog() {
-        val c = Calendar.getInstance()
-        val year = c.get(Calendar.YEAR)
-        val month = c.get(Calendar.MONTH)
-        val day = c.get(Calendar.DAY_OF_MONTH)
 
-        val dpd = DatePickerDialog(requireContext(), { _, year, monthOfYear, dayOfMonth ->
-            val selectedDate = GregorianCalendar(year, monthOfYear, dayOfMonth).time
+    private fun rotateRefreshButton(view: ImageView) {
+        val rotation = ObjectAnimator.ofFloat(view, "rotation", 0f, 360f)
+        rotation.duration = ANIMATION_DURATION
+        rotation.interpolator = LinearInterpolator()
+        rotation.start()
+    }
+
+    private fun showMaterialDatePickerDialog() {
+        val calendar = Calendar.getInstance()
+        val currentDate = calendar.timeInMillis
+
+        val datePicker = MaterialDatePicker.Builder.datePicker()
+            .setTitleText("Select date")
+            .setSelection(currentDate)
+            .build()
+
+        datePicker.addOnPositiveButtonClickListener { selection ->
+            // The selection returns a Long value representing the selected date
+            val selectedDate = Date(selection)
             clientViewModel.filterImagesByDate(selectedDate)
-        }, year, month, day)
-        dpd.show()
+        }
+
+        datePicker.show(parentFragmentManager, "MATERIAL_DATE_PICKER")
     }
 
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -155,7 +181,6 @@ class DisplayFragment : Fragment(), MenuProvider {
     //================================================================
     // Boss UI
     //================================================================
-
     private fun observeCourierBossFolders() {
         courierBossDisplayViewModel.folderReferences.observe(viewLifecycleOwner) { folderReferences ->
             (binding.recyclerView.adapter as? CourierBossFolderAdapter)?.submitList(folderReferences)
@@ -173,8 +198,10 @@ class DisplayFragment : Fragment(), MenuProvider {
     private fun setupCourierBossUI() {
         courierBossDisplayViewModel.refreshFolders()
         calendarButton.isVisible = false
+        (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.folders)
 
-        binding.refreshButton.setOnClickListener {
+        refreshButton.setOnClickListener { menuItem ->
+            rotateRefreshButton(menuItem as ImageView)
             courierBossDisplayViewModel.refreshFolders()
         }
         val proofPicture = arguments?.getString(PROOF_PICTURE)
@@ -204,7 +231,6 @@ class DisplayFragment : Fragment(), MenuProvider {
     //================================================================
     // Client UI
     //================================================================
-
     private fun observeClientPhotos() {
         clientViewModel.photoReferences.observe(viewLifecycleOwner) { photoReferences ->
             (binding.recyclerView.adapter as? ClientPhotoAdapter)?.submitList(photoReferences)
@@ -222,8 +248,11 @@ class DisplayFragment : Fragment(), MenuProvider {
     private fun setupClientUI() {
         clientViewModel.refreshImages()
         calendarButton.isVisible = true
+        val clientName = userFolder.value?.replaceFirstChar { it.uppercase() }
+        (activity as AppCompatActivity).supportActionBar?.title = clientName
 
-        binding.refreshButton.setOnClickListener {
+        refreshButton.setOnClickListener { menuItem ->
+            rotateRefreshButton(menuItem as ImageView)
             clientViewModel.refreshImages()
         }
 
@@ -243,9 +272,7 @@ class DisplayFragment : Fragment(), MenuProvider {
             layoutManager = LinearLayoutManager(context)
             adapter = clientPhotoAdapter
         }
-
     }
-
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -270,9 +297,8 @@ class DisplayFragment : Fragment(), MenuProvider {
     //================================================================
     // Sharing
     //================================================================
-
     private fun shareImage(uri: Uri) {
-        contactsViewModel.contacts.observe(viewLifecycleOwner) { contacts ->
+        contactsViewModel.contacts.value?.let { contacts ->
             val phone = getUserContactPhone(contacts)
             shareViaAppropriateChannel(phone, "Here is your delivery: $uri")
         }

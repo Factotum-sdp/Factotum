@@ -141,7 +141,9 @@ task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'crea
             '/Manifest*.*',
             '/*Test*.*',
             'android//*.*',
-            '/**/*Serializer.class'
+            '/**/*Serializer.class',
+            '/**/*Dao.*',
+            '/**/*Location.*'
     ]
 
     def debugTree = fileTree(dir: "$project.buildDir/tmp/kotlin-classes/debug", excludes: fileFilter)

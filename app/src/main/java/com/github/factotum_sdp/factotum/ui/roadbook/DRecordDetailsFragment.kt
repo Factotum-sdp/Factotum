@@ -12,7 +12,6 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.model.DestinationRecord
-import com.github.factotum_sdp.factotum.model.Route
 import com.github.factotum_sdp.factotum.ui.directory.ContactDetailsFragment
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment.Companion.IS_SUB_FRAGMENT_NAV_KEY
@@ -88,18 +87,11 @@ class DRecordDetailsFragment : Fragment() {
             try {
                 val bundle = Bundle().apply {
                     putBoolean(MapsFragment.IN_NAV_PAGER, true)
-                    putBoolean(MapsFragment.DRAW_ROUTE, false)
                 }
                 val currentContact = first { c -> c.username == rec.clientID }
                 if (currentContact.hasCoordinates()) {
-                    val route = Route(
-                        currentContact.latitude ?: 0.0, // should be current location
-                        currentContact.longitude ?: 0.0,
-                        currentContact.latitude ?: 0.0,
-                        currentContact.longitude ?: 0.0
-                    )
-                    val routeJson = Gson().toJson(route)
-                    bundle.putString(MapsFragment.ROUTE_NAV_KEY, routeJson)
+                    val contactJson = Gson().toJson(currentContact)
+                    bundle.putString(MapsFragment.CONTACT_TO_MARK, contactJson)
                 }
                 mapsFragment.arguments = bundle
 

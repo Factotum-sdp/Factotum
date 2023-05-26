@@ -13,8 +13,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
@@ -22,11 +20,11 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.model.Contact
 import com.github.factotum_sdp.factotum.model.Role
-import com.github.factotum_sdp.factotum.model.Route
 import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment.Companion.IS_SUB_FRAGMENT_NAV_KEY
 import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment.Companion.USERNAME_NAV_KEY
 import com.github.factotum_sdp.factotum.ui.maps.MapsFragment
 import com.github.factotum_sdp.factotum.ui.maps.MapsViewModel
+import com.google.gson.Gson
 
 class ContactDetailsFragment : Fragment() {
     private lateinit var currentContact: Contact
@@ -160,21 +158,20 @@ class ContactDetailsFragment : Fragment() {
         }
 
         view.findViewById<Button>(R.id.show_all_button).setOnClickListener {
+            val bundle = Bundle().apply {
+                putBoolean(MapsFragment.IN_NAV_PAGER, true)
+            }
             if (currentContact.hasCoordinates()) {
-                mapsViewModel.addRoute(
-                    Route(
-                        0.0,
-                        0.0,
-                        currentContact.latitude!!,
-                        currentContact.longitude!!
-                    )
-                )
+                    val jsonContact = Gson().toJson(currentContact)
+                    bundle.apply {
+                        putString(MapsFragment.CONTACT_TO_MARK, jsonContact)
+                    }
                 if (isSubFragment) {
                     it.findNavController()
                         .navigate(R.id.action_dRecordDetailsFragment_to_MapsFragment)
                 } else {
                     it.findNavController()
-                        .navigate(R.id.action_contactDetailsFragment2_to_MapsFragment)
+                        .navigate(R.id.action_contactDetailsFragment2_to_holderFragment, bundle)
                 }
             } else {
                 coordinatesError()

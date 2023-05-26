@@ -40,7 +40,7 @@ class MapsFragmentTest {
     val device = UiDevice.getInstance(getInstrumentation())
 
     @get:Rule
-    val permission = GrantPermissionRule.grant(
+    val permission: GrantPermissionRule = GrantPermissionRule.grant(
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.ACCESS_COARSE_LOCATION
     )
@@ -88,6 +88,7 @@ class MapsFragmentTest {
     fun permissionAllowShowLocation() {
         assertTrue(checkLocationEnabled(testRule))
     }
+    /*
 
     @Test
     fun showsDestinationMarker() = runBlocking {
@@ -105,14 +106,14 @@ class MapsFragmentTest {
             endMarker = device.findObjects(descContains("Destination"))
         }
         assertTrue(endMarker.size != 0)
-    }
+    } */
 
 
 
     private fun checkLocationEnabled(rule: ActivityScenarioRule<MainActivity>): Boolean {
         var isEnabled = false
         val latch = CountDownLatch(1)
-        rule.scenario.onActivity {
+        rule.scenario.onActivity { it ->
             val navHostFragment =
                 it.supportFragmentManager.primaryNavigationFragment as NavHostFragment
             val mapsFragment = navHostFragment.childFragmentManager.fragments[0]

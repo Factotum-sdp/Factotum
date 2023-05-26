@@ -1,7 +1,7 @@
 package com.github.factotum_sdp.factotum.serializers
 
 import androidx.datastore.core.Serializer
-import com.github.factotum_sdp.factotum.ui.roadbook.DRecordList
+import com.github.factotum_sdp.factotum.model.DRecordList
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import java.io.InputStream

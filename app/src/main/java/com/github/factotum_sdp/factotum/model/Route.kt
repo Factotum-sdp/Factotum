@@ -1,4 +1,4 @@
-package com.github.factotum_sdp.factotum.models
+package com.github.factotum_sdp.factotum.model
 
 import android.graphics.Color
 import com.google.android.gms.maps.GoogleMap

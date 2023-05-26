@@ -1,5 +1,4 @@
-package com.github.factotum_sdp.factotum.ui.roadbook
-import com.github.factotum_sdp.factotum.models.DestinationRecord
+package com.github.factotum_sdp.factotum.model
 import java.lang.IllegalArgumentException
 import kotlinx.serialization.Serializable
 
@@ -10,6 +9,7 @@ import kotlinx.serialization.Serializable
  * - Allows archived records management through a private field containing all the archived items
  * - Allows choice at construction time for the main List, whether it contains or not the archived records.
  */
+
 private fun displayedRecords(
     allRecords: List<DestinationRecord>,
     archived: List<DestinationRecord>,

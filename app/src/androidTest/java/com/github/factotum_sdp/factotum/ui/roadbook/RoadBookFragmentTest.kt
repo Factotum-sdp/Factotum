@@ -29,9 +29,11 @@ import com.github.factotum_sdp.factotum.data.MockLocationClient
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
 import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseDateFormatted
 import com.github.factotum_sdp.factotum.firebase.FirebaseStringFormat.firebaseSafeString
-import com.github.factotum_sdp.factotum.models.DestinationRecord
-import com.github.factotum_sdp.factotum.models.Shift
-import com.github.factotum_sdp.factotum.models.User
+import com.github.factotum_sdp.factotum.model.DRecordList
+import com.github.factotum_sdp.factotum.model.DestinationRecord
+import com.github.factotum_sdp.factotum.model.Shift
+import com.github.factotum_sdp.factotum.model.ShiftList
+import com.github.factotum_sdp.factotum.model.User
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder.USER_COURIER
 import com.github.factotum_sdp.factotum.repositories.ShiftRepository
@@ -75,7 +77,7 @@ class RoadBookFragmentTest {
     val fineLocationRule = GrantPermissionRule.grant(Manifest.permission.ACCESS_FINE_LOCATION)
 
     @get:Rule
-    val foreGroundService = GrantPermissionRule.grant(Manifest.permission.FOREGROUND_SERVICE)
+    val postNotificationGroundService = GrantPermissionRule.grant(Manifest.permission.POST_NOTIFICATIONS)
 
 
     @get:Rule

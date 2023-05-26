@@ -20,8 +20,8 @@ import androidx.test.uiautomator.UiSelector
 import androidx.test.uiautomator.Until.hasObject
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.models.Contact
-import com.github.factotum_sdp.factotum.models.User
+import com.github.factotum_sdp.factotum.model.Contact
+import com.github.factotum_sdp.factotum.model.User
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder
 import com.github.factotum_sdp.factotum.ui.maps.MapsFragment
 import com.github.factotum_sdp.factotum.utils.ContactsUtils.Companion.createRandomContacts

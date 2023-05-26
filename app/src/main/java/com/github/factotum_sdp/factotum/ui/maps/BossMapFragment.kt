@@ -21,8 +21,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.models.CourierLocation
-import com.github.factotum_sdp.factotum.models.DeliveryStatus
+import com.github.factotum_sdp.factotum.model.CourierLocation
+import com.github.factotum_sdp.factotum.model.DeliveryStatus
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.ui.display.DisplayFragment.Companion.PROOF_PICTURE
 import com.google.android.gms.maps.CameraUpdateFactory

@@ -1,11 +1,10 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.*
-import com.github.factotum_sdp.factotum.models.DestinationRecord
-import com.github.factotum_sdp.factotum.models.RoadBookPreferences
-import com.github.factotum_sdp.factotum.models.Shift
+import com.github.factotum_sdp.factotum.model.DRecordList
+import com.github.factotum_sdp.factotum.model.DestinationRecord
+import com.github.factotum_sdp.factotum.model.RoadBookPreferences
+import com.github.factotum_sdp.factotum.model.Shift
 import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
 import com.github.factotum_sdp.factotum.repositories.RoadBookRepository
@@ -34,7 +33,9 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
     private lateinit var preferencesRepository: RoadBookPreferencesRepository
 
     init {
-        addDemoRecords(DestinationRecords.RECORDS)
+        if(demo_records.isNotEmpty()) {
+            addDemoRecords(demo_records)
+        }
     }
 
     /**
@@ -282,7 +283,7 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
     }
 
     //Needed to update the destIDOccurrences cache
-    private fun addDemoRecords(ls: List<DestinationRecord>) {
+    fun addDemoRecords(ls: List<DestinationRecord>) {
         val newList = arrayListOf<DestinationRecord>()
         ls.forEach {
             val destID = computeDestID(it.clientID)
@@ -315,6 +316,7 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
                 allRecords = emptyList(),
                 showArchived = currentDRecList().showArchived
             )
+        clientOccurrences.clear()
     }
 
     private fun currentDRecList(): DRecordList {
@@ -339,5 +341,9 @@ class RoadBookViewModel(private val roadBookRepository: RoadBookRepository,
                 return RoadBookViewModel(repository, shiftRepository) as T
             throw IllegalArgumentException("Unknown ViewModel class")
         }
+    }
+
+    companion object {
+        var demo_records = emptyList<DestinationRecord>()
     }
 }

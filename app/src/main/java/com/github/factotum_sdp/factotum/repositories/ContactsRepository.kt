@@ -1,7 +1,7 @@
 package com.github.factotum_sdp.factotum.repositories
 
 import android.content.SharedPreferences
-import com.github.factotum_sdp.factotum.models.Contact
+import com.github.factotum_sdp.factotum.model.Contact
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference

@@ -15,8 +15,8 @@ import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.databinding.FragmentMapsBinding
 import com.github.factotum_sdp.factotum.hasLocationPermission
-import com.github.factotum_sdp.factotum.models.Contact
-import com.github.factotum_sdp.factotum.models.Route
+import com.github.factotum_sdp.factotum.model.Contact
+import com.github.factotum_sdp.factotum.model.Route
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -181,11 +181,14 @@ class MapsFragment : Fragment() {
             if(route != null && drawRoute) {
                 drawRoutes(listOf(route), googleMap)
             }
+            // Remove scroll gestures from the map (to avoid conflicts with the ViewPager)
+            googleMap.uiSettings.isScrollGesturesEnabled = false
         }
         else {
             // places markers on the map and centers the camera
             val routes = getRoutesFromRoadbook()
             drawRoutes(routes, googleMap)
+            googleMap.uiSettings.isScrollGesturesEnabled = true
         }
         // Add zoom controls to the map
         googleMap.uiSettings.isZoomControlsEnabled = true

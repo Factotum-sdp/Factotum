@@ -17,9 +17,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.UserViewModel
-import com.github.factotum_sdp.factotum.models.Contact
-import com.github.factotum_sdp.factotum.models.Role
-import com.github.factotum_sdp.factotum.models.Route
+import com.github.factotum_sdp.factotum.model.Contact
+import com.github.factotum_sdp.factotum.model.Role
+import com.github.factotum_sdp.factotum.model.Route
 import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment.Companion.IS_SUB_FRAGMENT_NAV_KEY
 import com.github.factotum_sdp.factotum.ui.directory.DirectoryFragment.Companion.USERNAME_NAV_KEY
 import com.github.factotum_sdp.factotum.ui.maps.MapsFragment
@@ -98,7 +98,14 @@ class ContactDetailsFragment : Fragment() {
         contactName.text = contact.name
         contactSurname.text = contact.surname
         contactRole.text = contact.role
-        contactImage.setImageResource(R.mipmap.ic_profile_pic_round)
+        when (contact.role) {
+            "CLIENT" -> contactImage.setImageResource(R.mipmap.ic_client_profile_pic_round)
+            "BOSS" -> contactImage.setImageResource(R.mipmap.ic_boss_profile_pic_round)
+            "COURIER" -> contactImage.setImageResource(R.mipmap.ic_courier_profile_pic_round)
+            else -> {
+                contactImage.setImageResource(R.mipmap.ic_launcher_round)
+            }
+        }
         contactPhone.text = contact.phone
         contactAddress.text = contact.addressName
         contactDetails.text = contact.details

@@ -10,9 +10,11 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.github.factotum_sdp.factotum.MainActivity
 import com.github.factotum_sdp.factotum.R
 import com.github.factotum_sdp.factotum.firebase.FirebaseInstance
-import com.github.factotum_sdp.factotum.models.User
+import com.github.factotum_sdp.factotum.model.User
+import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.placeholder.UsersPlaceHolder.USER_BOSS
 import com.github.factotum_sdp.factotum.ui.login.LoginViewModel
+import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
@@ -35,7 +37,6 @@ class GeneralUtils {
         )
 
         fun initFirebase(online: Boolean = true) {
-
             if (!emulatorSet) {
                 database.useEmulator("10.0.2.2", 9000)
                 auth.useEmulator("10.0.2.2", 9099)
@@ -64,6 +65,7 @@ class GeneralUtils {
         }
 
         fun fillUserEntryAndEnterTheApp(email: String, password: String) {
+            RoadBookViewModel.demo_records = DestinationRecords.RECORDS
             onView(withId(R.id.email)).perform(typeText(email))
             onView(withId(R.id.fragment_login_directors_parent)).perform(
                 closeSoftKeyboard()
@@ -78,10 +80,12 @@ class GeneralUtils {
         }
 
         fun injectBossAsLoggedInUser(testRule: ActivityScenarioRule<MainActivity>) {
+            RoadBookViewModel.demo_records = DestinationRecords.RECORDS
             injectLoggedInUser(testRule, BOSS_USER)
         }
 
         fun injectLoggedInUser(testRule: ActivityScenarioRule<MainActivity>, loggedInUser: User) {
+            RoadBookViewModel.demo_records = DestinationRecords.RECORDS
             testRule.scenario.onActivity {
                 val user = it.applicationUserViewModel()
                 user.setLoggedInUser(loggedInUser)

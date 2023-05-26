@@ -202,4 +202,5 @@
     <string name="precise_location_not_enabled_message">Allowed permissions are not sufficient, the precise location is needed.</string>
     <string name="delivery_history">Delivery History</string>
     <string name="erase">Erase</string>
+    <string name="live_tracking_disabled_text">Live tracking is disabled</string>
 </resources>

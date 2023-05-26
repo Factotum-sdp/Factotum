@@ -179,7 +179,7 @@ class SignUpFragmentTest {
 
     @Test
     fun clickOnSignUpLeadsToLoginFragment() {
-        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        val device = UiDevice.getInstance(getInstrumentation())
         device.pressBack()
         onView(withId(R.id.fragment_login_directors_parent)).check(
             ViewAssertions.matches(

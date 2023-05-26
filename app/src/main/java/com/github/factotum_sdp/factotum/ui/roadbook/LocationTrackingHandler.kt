@@ -1,6 +1,5 @@
 package com.github.factotum_sdp.factotum.ui.roadbook
 
-import android.Manifest
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -8,8 +7,6 @@ import android.content.ServiceConnection
 import android.location.Location
 import android.os.IBinder
 import androidx.activity.ComponentActivity
-import androidx.activity.result.contract.ActivityResultContracts
-import com.github.factotum_sdp.factotum.data.LocationClient
 import com.github.factotum_sdp.factotum.services.LocationService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -64,6 +61,7 @@ class LocationTrackingHandler {
                 action = LocationService.ACTION_STOP
                 unbindWrapForCI { componentActivity.unbindService(it) }
                 componentActivity.stopService(this)
+                _isTrackingEnabled.update { false }
             }
         } // else the service is already disabled
     }
@@ -94,9 +92,7 @@ class LocationTrackingHandler {
             _isTrackingEnabled.update { true }
         }
 
-        override fun onServiceDisconnected(arg0: ComponentName) {
-            _isTrackingEnabled.update { false }
-        }
+        override fun onServiceDisconnected(arg0: ComponentName) {}
     }
 
     private fun unbindWrapForCI(unbind: (connection: ServiceConnection) -> Unit) {

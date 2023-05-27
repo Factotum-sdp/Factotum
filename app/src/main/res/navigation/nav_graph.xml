@@ -87,6 +87,9 @@
         <action
             android:id="@+id/action_contactDetailsFragment2_to_MapsFragment"
             app:destination="@id/MapsFragment" />
+        <action
+            android:id="@+id/action_contactDetailsFragment2_to_holderFragment"
+            app:destination="@id/holderFragment" />
     </fragment>
     <fragment
         android:id="@+id/contactCreationFragment"
@@ -142,5 +145,10 @@
         android:label="PictureFragment"
         tools:layout="@layout/fragment_picture" >
     </fragment>
+    <fragment
+        android:id="@+id/holderFragment"
+        android:name="com.github.factotum_sdp.factotum.ui.directory.HolderFragment"
+        android:label="fragment_holder"
+        tools:layout="@layout/fragment_holder" />
 
 </navigation>

@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -40,8 +39,7 @@ class MapsFragment : Fragment() {
         private const val ZOOM_PADDING = 100
         private const val minZoom = 6.0f
         const val IN_NAV_PAGER = "nav_pager"
-        const val ROUTE_NAV_KEY = "route"
-        const val DRAW_ROUTE = "draw_route"
+        const val CONTACT_TO_MARK = "contact_to_mark"
         const val MAPS_PKG = "com.google.android.apps.maps"
     }
 
@@ -172,20 +170,17 @@ class MapsFragment : Fragment() {
     private fun initMapUI(googleMap: GoogleMap) {
         // clears map from previous markers
         googleMap.clear()
-        val contacts = getContactsFromRoadbook()
-        placeContactsMarkers(googleMap, contacts)
 
         if (arguments?.getBoolean(IN_NAV_PAGER) == true) {
-            val route = arguments?.getString(ROUTE_NAV_KEY)?.let { Gson().fromJson(it, Route::class.java) }
-            val drawRoute = arguments?.getBoolean(DRAW_ROUTE) ?: false
-            if(route != null && drawRoute) {
-                drawRoutes(listOf(route), googleMap)
-            }
+            val contact = arguments?.getString(CONTACT_TO_MARK)?.let { Gson().fromJson(it, Contact::class.java) }
+            placeContactsMarkers(googleMap, listOf(contact!!))
             // Remove scroll gestures from the map (to avoid conflicts with the ViewPager)
             googleMap.uiSettings.isScrollGesturesEnabled = false
         }
         else {
             // places markers on the map and centers the camera
+            val contacts = getContactsFromRoadbook()
+            placeContactsMarkers(googleMap, contacts)
             val routes = getRoutesFromRoadbook()
             drawRoutes(routes, googleMap)
             googleMap.uiSettings.isScrollGesturesEnabled = true

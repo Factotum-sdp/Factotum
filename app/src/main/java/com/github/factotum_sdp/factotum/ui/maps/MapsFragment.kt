@@ -13,10 +13,8 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.github.factotum_sdp.factotum.R
-import com.github.factotum_sdp.factotum.UserViewModel
 import com.github.factotum_sdp.factotum.databinding.FragmentMapsBinding
 import com.github.factotum_sdp.factotum.hasLocationPermission
-import com.github.factotum_sdp.factotum.model.Contact
 import com.github.factotum_sdp.factotum.model.Route
 import com.github.factotum_sdp.factotum.ui.directory.ContactsViewModel
 import com.github.factotum_sdp.factotum.ui.roadbook.RoadBookViewModel
@@ -25,8 +23,6 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.Polyline
 import com.google.gson.Gson
 
 
@@ -41,14 +37,13 @@ class MapsFragment : Fragment() {
         private const val minZoom = 6.0f
         const val IN_NAV_PAGER = "nav_pager"
         const val ROUTE_NAV_KEY = "route"
-        const val DRAW_ROUTE = "draw_route"
         const val MAPS_PKG = "com.google.android.apps.maps"
     }
 
     private var _binding: FragmentMapsBinding? = null
+    private val viewModel: MapsViewModel by activityViewModels()
     private val rbViewModel: RoadBookViewModel by activityViewModels()
     private val contactsViewModel : ContactsViewModel by activityViewModels()
-    private val userViewModel : UserViewModel by activityViewModels()
     private lateinit var mMap: GoogleMap
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -58,13 +53,6 @@ class MapsFragment : Fragment() {
             activateLocation(mMap)
         }
     }
-
-    private var userLocationRoute: Polyline? = null
-    private var currentUserLocation: LatLng? = null
-    private var routeSelected: Boolean = false
-    private var userRouteSelected: Boolean = false
-
-    private val drawnRoutes : MutableList<Polyline> = mutableListOf()
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -86,55 +74,20 @@ class MapsFragment : Fragment() {
 
     }
 
-    private fun getRoutesFromRoadbook() : List<Route> {
+    private fun getDestinationsFromRoadbook() : List<Route> {
         val destinations = mutableListOf<Route>()
         rbViewModel.recordsListState.value?.let { records ->
-            if(records.size == 1) {
-                val firstRecord = records.first()
-                val firstContact = contactsViewModel.contacts.value?.first{ it.username == firstRecord.clientID }
-                if(firstContact?.hasCoordinates() == true){
-                    val route = Route(firstContact.latitude!!, firstContact.longitude!!,
-                        firstContact.latitude, firstContact.longitude)
+            records.forEach { record ->
+                val contact = contactsViewModel.contacts.value?.first{ it.username == record.clientID }
+                if(contact?.latitude != null && contact.longitude != null){
+                    val route = Route(0.0, 0.0, contact.latitude, contact.longitude, record.clientID)
                     destinations.add(route)
-                }
-            }
-            else {
-                records.windowed(2, 1).forEach { recordList ->
-                    val firstRecord = recordList.first()
-                    val secondRecord = recordList.last()
-                    val firstContact =
-                        contactsViewModel.contacts.value?.first { it.username == firstRecord.clientID }
-                    val secondContact =
-                        contactsViewModel.contacts.value?.first { it.username == secondRecord.clientID }
-                    if (firstContact?.hasCoordinates() == true && secondContact?.hasCoordinates() == true) {
-                        val route = Route(
-                            firstContact.latitude!!, // !! because we know it has coordinates
-                            firstContact.longitude!!,
-                            secondContact.latitude!!,
-                            secondContact.longitude!!
-                        )
-                        destinations.add(route)
-                    }
                 }
             }
 
         }
         return destinations
 
-    }
-
-    private fun getContactsFromRoadbook() : List<Contact> {
-        val contacts = mutableListOf<Contact>()
-        rbViewModel.recordsListState.value?.let { records ->
-            records.forEach { record ->
-                val contact = contactsViewModel.contacts.value?.first{ it.username == record.clientID }
-                if(contact != null) {
-                    contacts.add(contact)
-                }
-            }
-
-        }
-        return contacts
     }
 
     private fun setMapProperties() {
@@ -172,22 +125,19 @@ class MapsFragment : Fragment() {
     private fun initMapUI(googleMap: GoogleMap) {
         // clears map from previous markers
         googleMap.clear()
-        val contacts = getContactsFromRoadbook()
-        placeContactsMarkers(googleMap, contacts)
 
         if (arguments?.getBoolean(IN_NAV_PAGER) == true) {
             val route = arguments?.getString(ROUTE_NAV_KEY)?.let { Gson().fromJson(it, Route::class.java) }
-            val drawRoute = arguments?.getBoolean(DRAW_ROUTE) ?: false
-            if(route != null && drawRoute) {
-                drawRoutes(listOf(route), googleMap)
+            route?.let {
+                placeMarkers(listOf(it), googleMap)
             }
             // Remove scroll gestures from the map (to avoid conflicts with the ViewPager)
             googleMap.uiSettings.isScrollGesturesEnabled = false
         }
         else {
             // places markers on the map and centers the camera
-            val routes = getRoutesFromRoadbook()
-            drawRoutes(routes, googleMap)
+            val destinations = getDestinationsFromRoadbook()
+            placeMarkers(destinations, googleMap)
             googleMap.uiSettings.isScrollGesturesEnabled = true
         }
         // Add zoom controls to the map
@@ -200,83 +150,25 @@ class MapsFragment : Fragment() {
         googleMap.setMinZoomPreference(minZoom)
     }
 
-    private fun placeContactsMarkers(googleMap: GoogleMap, contacts: List<Contact>) {
-        var noLocation = true
+    private fun placeMarkers(routes: List<Route>?, googleMap: GoogleMap) {
         val bounds = LatLngBounds.Builder()
 
-        for (contact in contacts) {
-            if (contact.hasCoordinates()) {
-                noLocation = false
-                bounds.include(LatLng(contact.latitude!!, contact.longitude!!))
-                val marker = MarkerOptions()
-                    .position(LatLng(contact.latitude, contact.longitude))
-                    .title(contact.username)
-                googleMap.addMarker(marker)
-            }
+
+        for (route in routes.orEmpty()) {
+            route.addSrcToMap(googleMap)
+            route.addDstToMap(googleMap)
+            bounds.include(route.dst)
         }
+
 
         val padding = ZOOM_PADDING // offset from edges of the map in pixels
 
-        val cuf = if (!noLocation) {
-                CameraUpdateFactory.newLatLngBounds(bounds.build(), padding) }
-            else {
-                CameraUpdateFactory.newLatLngZoom(EPFL_LOC, 8f)
-            }
+        val cuf = routes?.takeIf { it.isNotEmpty() }
+            ?.run { CameraUpdateFactory.newLatLngBounds(bounds.build(), padding) }
+            ?: CameraUpdateFactory.newLatLngZoom(EPFL_LOC, 8f)
 
         googleMap.moveCamera(cuf)
     }
-
-    private fun drawRoutes(routes: List<Route>, googleMap: GoogleMap) {
-        updateRoutes(googleMap, routes)
-
-        userViewModel.userLocation.observe(viewLifecycleOwner) { userLocation ->
-            userLocation?.let { it ->
-                currentUserLocation = LatLng(userLocation.latitude, userLocation.longitude) // Save the latest user location
-                val currentRoute = Route(it.latitude, it.longitude, routes.first().src.latitude, routes.first().src.longitude)
-                userLocationRoute?.remove() // Remove the old userLocation route
-                userLocationRoute = currentRoute.drawRoute(googleMap, transparency = !userRouteSelected && routeSelected) // Draw and keep a reference to the new one
-                userLocationRoute?.let { drawnRoutes.add(it) } // Add the new userLocation route to the drawnRoutes
-            }
-        }
-
-        googleMap.setOnPolylineClickListener { polyline ->
-            val selRoute = (polyline.tag as Route)
-            userRouteSelected = polyline == userLocationRoute
-            updateRoutes(googleMap, routes, selRoute)
-        }
-
-        googleMap.setOnMapClickListener {
-            routeSelected = false
-            updateRoutes(googleMap, routes)
-        }
-    }
-
-    private fun updateRoutes(googleMap: GoogleMap, routes : List<Route>, selRoute : Route? = null) {
-        // Remove the previously drawn routes
-        drawnRoutes.forEach { it.remove() }
-        drawnRoutes.clear()
-
-        routeSelected = routeSelected || selRoute != null
-        for (route in routes) {
-            val polyline = if (route == selRoute) {
-                route.drawRoute(googleMap)
-            } else {
-                route.drawRoute(googleMap, transparency = routeSelected)
-            }
-            polyline.let { drawnRoutes.add(it) } // Add the newly drawn route to the drawnRoutes
-        }
-
-        // Draw the user route
-        currentUserLocation?.let { userLocation ->
-            if (routes.isNotEmpty()) {
-                val userRoute = Route(userLocation.latitude, userLocation.longitude, routes.first().src.latitude, routes.first().src.longitude)
-                userLocationRoute?.remove() // Remove the old userLocation route
-                userLocationRoute = userRoute.drawRoute(googleMap, transparency = !userRouteSelected && routeSelected)
-                userLocationRoute?.let { drawnRoutes.add(it) } // Add the new userLocation route to the drawnRoutes
-            }
-        }
-    }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

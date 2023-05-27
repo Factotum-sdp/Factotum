@@ -205,12 +205,12 @@ class ContactDetailsFragmentTest {
         )
         Intents.release()
     }
-/*
+
     @Test
     fun buttonShowDestination() {
         onView(withId(R.id.show_all_button)).perform(click())
         val device = UiDevice.getInstance(getInstrumentation())
         val markers = device.wait(hasObject(By.descContains("Destination")), 5000L)
         assertTrue(markers)
-    } */
+    }
 }

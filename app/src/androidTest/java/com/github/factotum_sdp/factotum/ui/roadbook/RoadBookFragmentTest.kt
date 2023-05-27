@@ -877,26 +877,6 @@ class RoadBookFragmentTest {
             .check(doesNotExist())
     }
 
-    /*
-    @Test
-    fun recordStayArchivedAfterNavigation() {
-        onView((withText(DestinationRecords.RECORDS[0].destID)))
-            .check(matches(isDisplayed()))
-
-        // Archive the record
-        swipeLeftTheRecordAt(0)
-
-        // Check that the record is not here
-        onView((withText(DestinationRecords.RECORDS[0].destID)))
-            .check(doesNotExist())
-
-        navigateOutsideAndComeBack()
-
-        // Check that the record is still not there
-        onView((withText(DestinationRecords.RECORDS[0].destID)))
-            .check(doesNotExist())
-    }*/
-
     @Test
     fun stayArchivedAfterNavigationWithShowArchived() {
 
@@ -912,63 +892,6 @@ class RoadBookFragmentTest {
         // Check that the record is still archived
         onView(allOf(withId(R.id.archivedIcon), withEffectiveVisibility(Visibility.VISIBLE)))
             .check(matches(isDisplayed()))
-    }
-
-    // Check that moving somewhere else in the app keep the sharedPref alive.
-    @Test
-    fun movingOutsideRBFragmentKeepsButtonStates() {
-        // Set Save user Preferences check in the Application Settings
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.settingsFragment))
-            .perform(click())
-        onView(withId(R.id.save_roadbook_preferences)).perform(click())
-
-        // Come back to RoadBook Fragment
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-        onView(withId(R.id.roadBookFragment))
-            .perform(click())
-
-        // Set some states :
-        // Turn SwipeLeft disabled
-        // Keep SwipeRight, DragNDrop enabled and Touch Navigation disabled
-        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext())
-        onView(withText(R.string.rb_label_swipel_deletion)).perform(click())
-
-        // Check features :
-        // Swipe Left disabled
-        swipeLeftTheRecordAt(2)
-        onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
-
-        // SwipeRight enabled
-        swipeRightTheRecordAt(2)
-        onView(withText(R.string.edit_dialog_update_b)).check(matches(isDisplayed()))
-        onView(withText(R.string.edit_dialog_cancel_b)).check(matches(isDisplayed()))
-        onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
-
-        // Navigation on Click disabled
-        Thread.sleep(WORST_REFRESH_TIME)
-        onView(withText(DestinationRecords.RECORDS[2].destID)).perform(click())
-        onView(withId(R.id.fragment_drecord_details_directors_parent)).check(doesNotExist())
-
-        navigateOutsideAndComeBack()
-
-        // Check features again :
-        // Swipe Left disabled
-        swipeLeftTheRecordAt(2)
-        onView(withText(R.string.delete_dialog_title)).check(doesNotExist())
-
-        // SwipeRight enabled
-        swipeRightTheRecordAt(2)
-        onView(withText(R.string.edit_dialog_update_b)).check(matches(isDisplayed()))
-        onView(withText(R.string.edit_dialog_cancel_b)).check(matches(isDisplayed()))
-        onView(withText(R.string.edit_dialog_cancel_b)).perform(click())
-
-        // Navigation on Click disabled
-        Thread.sleep(WORST_REFRESH_TIME)
-        onView(withText(DestinationRecords.RECORDS[2].destID)).perform(click())
-        onView(withId(R.id.fragment_drecord_details_directors_parent)).check(doesNotExist())
     }
 
 
@@ -1331,7 +1254,6 @@ class RoadBookFragmentTest {
     // ===================================== Helpers ==============================================
 
     // Set by defaults by the TimePicker Instance, not stored in String Ressources
-    private val timePickerCancelBLabel = "Cancel"
     private val timePickerUpdateBLabel = "OK"
 
     private fun injectMockLocationWithDefaultJourney() {

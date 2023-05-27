@@ -5,7 +5,6 @@ import com.github.factotum_sdp.factotum.model.DRecordList
 import com.github.factotum_sdp.factotum.model.DestinationRecord
 import com.github.factotum_sdp.factotum.model.RoadBookPreferences
 import com.github.factotum_sdp.factotum.model.Shift
-import com.github.factotum_sdp.factotum.placeholder.DestinationRecords
 import com.github.factotum_sdp.factotum.repositories.RoadBookPreferencesRepository
 import com.github.factotum_sdp.factotum.repositories.RoadBookRepository
 import com.github.factotum_sdp.factotum.repositories.ShiftRepository
